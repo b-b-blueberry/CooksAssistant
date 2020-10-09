@@ -1,0 +1,24 @@
+{
+    // Object data
+    "Name": "Sugar Cane",
+    "Description": "A hardy crop only used for producing sweet, sweet sugar.",
+    "Category": "Vegetable",
+    "Edibility": 8,
+    "EdibleIsDrink": false,
+    "EdibleBuffs": null,
+    "Price": 30,
+    "IsColored": false,
+    "Recipe": null,
+
+    // Object purchase
+    "CanPurchase": false,
+    "PurchaseFrom": "Gus",
+    "PurchasePrice": 405,
+    "PurchaseRequirements": null,
+
+    // Localisation
+    "NameLocalization": {
+    },
+    "DescriptionLocalization": {
+    }
+}

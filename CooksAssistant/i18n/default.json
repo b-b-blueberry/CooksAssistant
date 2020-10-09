@@ -1,0 +1,86 @@
+﻿{
+	// Cooking interface
+	"world.range_gus.rejected": "You're not good enough friends with Gus to use the Cooking Range.",
+	"world.range_npc.rejected": "You're not good enough friends with {{name}} to use their kitchen.",
+
+	"menu.cooking_station.none": "No cooking station nearby.",
+	"menu.cooking_station.busy": "Something's already cooking here.",
+	"menu.cooking_station.done": "The {{recipe}} is ready!",
+	"menu.cooking_station.done_improv": "You wrote the recipe down in Mom's Cookbook.",
+
+	"menu.cooking_recipe.title_unknown": "???",
+	"menu.cooking_recipe.notes_unknown": "You've not tried this recipe yet.",
+	"menu.cooking_recipe.ingredients_label": "Ingredients:",
+	"menu.cooking_recipe.notes_label": "Notes:",
+	"menu.cooking_recipe.time_label": "Cooking time:",
+	"menu.cooking_recipe.time_value": "{{duration}} min",
+	"menu.cooking_recipe.search_label": "Search",
+	"menu.cooking_recipe.quantity_label": "How many?",
+	"menu.cooking_recipe.which_label": "Which would you like to make?",
+	//"요리" "시작!",
+
+	// Cooking skill
+	"menu.cooking_skill.tier1_path1": "",
+	"menu.cooking_skill.tier1_path2": "",
+	"menu.cooking_skill.tier2_path1_a": "Gourmet",
+	"menu.cooking_skill.tier2_path1_b": "Glutton",
+	"menu.cooking_skill.tier2_path2_a": "",
+	"menu.cooking_skill.tier2_path2_b": "",
+
+	// Kebab item interactions
+	"buff.kebab.quality_worst": "Rotten ",
+	"buff.kebab.quality_best": "Delicious ",
+	"buff.kebab.inspect": "{{quality}}Kebab",
+	"item.kebab.worst": "That was a pretty rotten kebab! You feel quite ill.",
+	"item.kebab.bad": "That kebab wasn't so good at all...",
+	"item.kebab.best": "That kebab really hit the spot! You feel much better.",
+
+	// Other world interactions
+	"buff.nettles.inspect": "Stung by nettles!",
+
+	"world.fisherman.inspect_1": "Nice night for a fish, eh?$b#Here, kid. This one was a good catch.[{{id}}]",
+	"world.fisherman.inspect_2": "You ever seen a river troll, kid? Heh heh...$b#Ahh, you're too old for fairy tales.",
+	"world.fisherman.inspect_3": "There's no good catches with those travelling market folks in the bay...",
+
+	// Egg Festival - Year 2
+	"world.bunny_talk.inspect_1": "Oh my, oh me, oh fie! I'm late, I'm late!",
+	"world.bunny_talk.inspect_2": "You there! I saw your face, I saw that race! You're a natural egg-chaser!",
+	"world.bunny_talk.inspect_3": "Take this basket and run! I'll need YOU to deliver these eggs to town!",
+	"world.bunny_talk.inspect_4": "Oh no, oh slow, I'm late! I'm late, you know!",
+
+	"talk.egg_gift.abigail": "Thanks. I'll forgive you this time for stealing the show at the egg hunt!",
+	"talk.egg_gift.alex": "It doesn't match my diet, but I'll make an exception for you. Nice one, @!",
+	"talk.egg_gift.caroline": "Oh my, well I really shouldn't... but maybe this once!",
+	"talk.egg_gift.clint": "Don't bring it near the furnace! I'd rather not get it all over me.",
+	"talk.egg_gift.demetrius": "Chocolates! How nice of you.",
+	"talk.egg_gift.dwarf": "You say this came from a rabbit? I will need to inspect your claims.",
+	"talk.egg_gift.elliott": "The bow's just a darling touch. Thank you.",
+	"talk.egg_gift.emily": "Delicious, chocolatey, and a pretty little ribbon, too! You know me so well, @.",
+	"talk.egg_gift.evelyn": "Thank you, dear! This reminds me of the time spent putting together egg hunts for my own little girl.",
+	"talk.egg_gift.george": "Hmph... chocolate? I suppose it's a thought.",
+	"talk.egg_gift.gunther": "Thanks for the treat, farmer.",
+	"talk.egg_gift.gus": "Ho ho! Cheers for the egg, but I'll need to loosen up my belt after a few more!",
+	"talk.egg_gift.haley": "Chocolates, wrapped in a cute bow! You're sweet, farmer @!",
+	"talk.egg_gift.harvey": "Err, well... The bow's cute!",
+	"talk.egg_gift.jas": "You remembered to share! You're nice!",
+	"talk.egg_gift.jodi": "How very sweet of you! The kids'll love this, I'm sure.",
+	"talk.egg_gift.kent": "This is for Vincent, right? Thanks, farmer.",
+	"talk.egg_gift.krobus": "This egg is painted with striking colours, but it has a dark and welcoming interior. I will keep this one.",
+	"talk.egg_gift.leah": "Well I'm not the biggest fan of chocolate, but it sure is cute!",
+	"talk.egg_gift.lewis": "Oh! This isn't one of the eggs from the festival. Did you make your own?",
+	"talk.egg_gift.linus": "How nice of you to remember me.",
+	"talk.egg_gift.marlon": "This egg? Strange, I was so sure... Oh, thank you.",
+	"talk.egg_gift.marnie": "What an adorable gift, I wonder what sort of chicken would have laid these!",
+	"talk.egg_gift.maru": "Hey, thanks! Is this one of the eggs from the festival? It looks a little different.",
+	"talk.egg_gift.pam": "Cute gift, kid!",
+	"talk.egg_gift.penny": "Very sweet of you, @! Thanks.",
+	"talk.egg_gift.pierre": "Don't mind if I do! Thanks, @.",
+	"talk.egg_gift.robin": "Chocolate egg, huh? Aren't these for the kids?",
+	"talk.egg_gift.sam": "Hey, a chocolate egg! Mom used to get us these from Joja Mart all the time. They tasted like grease, though.",
+	"talk.egg_gift.sandy": "Oh sweetie, you brought this all the way here for me? I'd best have it before it melts!",
+	"talk.egg_gift.sebastian": "Hey, that's cute. Thanks.",
+	"talk.egg_gift.shane": "This egg reminded you of me, huh? I'm not complaining.",
+	"talk.egg_gift.vincent": "I knew you weren't gonna take all the eggs for yourself! Thanks, mister!^I knew you weren't gonna take all the eggs for yourself! Thanks, miss!",
+	"talk.egg_gift.willy": "Why, I haven't had one of these since I was a wee lad!",
+	"talk.egg_gift.wizard": "An egg.. born from an ordinary rabbit, and composed entirely of chocolate. This is worth deep study indeed..."
+}

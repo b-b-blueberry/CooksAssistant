@@ -1,0 +1,54 @@
+{
+    // Object data
+    "Name": "Chocolate Egg",
+    "Description": "Best before Summer 1.",
+    "Category": "Junk",
+    "CategoryTextOverride": "",
+    "CategoryColorOverride": "0, 0, 0, 0",
+    "Edibility": 30,
+    "EdibleIsDrink": false,
+    "EdibleBuffs": null,
+    "Price": 32,
+    "IsColored": true,
+    "Colors": [
+        // Blue
+        "20",
+        "75",
+        "195",
+        "255",
+        // Orange
+        "225",
+        "115",
+        "15",
+        "255",
+        // Pink
+        "225",
+        "75",
+        "225",
+        "255",
+        // Green
+        "75",
+        "195",
+        "75",
+        "255"
+    ],
+    "Recipe": null,
+
+    // Object purchase
+    "CanPurchase": false,
+    "PurchaseFrom": "Gus",
+    "PurchasePrice": 60,
+    "PurchaseRequirements": null,
+
+    // Gifting
+    "GiftTastes": {
+        "Like": [ "Abigail", "Alex", "Caroline", "Clint", "Demetrius", "Dwarf", "Elliott", "Emily", "Evelyn", "George", "Gus", "Haley", "Harvey", "Jas", "Jodi", "Kent", "Krobus", "Leah", "Lewis", "Linus", "Marnie", "Maru", "Penny", "Pierre", "Robin", "Sam", "Sandy", "Sebastian", "Shane", "Vincent", "Willy", "Wizard" ],
+        "Neutral": [ "Marlon" ]
+    },
+
+    // Localisation
+    "NameLocalization": {
+    },
+    "DescriptionLocalization": {
+    }
+}

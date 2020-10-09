@@ -1,0 +1,12 @@
+{
+	"Name": "Bunny Ears",
+	"Description": "A cute pair of bunny ears? You bet!",
+	"PurchasePrice": 1,
+	"ShowHair": true,
+	"IgnoreHairstyleOffset": false,
+    
+    "NameLocalization":
+    {},
+    "DescriptionLocalization":
+    {}
+}

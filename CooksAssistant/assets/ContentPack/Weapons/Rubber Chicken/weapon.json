@@ -1,0 +1,31 @@
+{
+    // Weapon data
+    "Name": "Rubber Chicken",
+    "Description": "It's probably not the most lethal weapon, yet only the seasoned adventurer will appreciate it.",
+    "Type": "Club",
+
+    // Weapon stats
+    "MinimumDamage": 3,
+    "MaximumDamage": 9,
+    "Knockback": 8,
+    "Accuracy": 1,
+    "Defense": 0,
+    "Speed": -6,
+    "MineDropVar": -1,
+    "MineDropMinimumLevel": -1,
+    "ExtraSwingArea": 3,
+    "CritChance": 0.3,
+    "CritMultiplier": 0,
+
+    // Purchase data
+    "CanPurchase": false,
+    "PurchaseFrom": "Marlon",
+    "PurchasePrice": 60,
+    "PurchaseRequirements": null,
+
+    // Localisation
+    "NameLocalization": {
+    },
+    "DescriptionLocalization": {
+    }
+}

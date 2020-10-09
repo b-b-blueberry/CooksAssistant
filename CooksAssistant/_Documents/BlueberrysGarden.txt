@@ -1,0 +1,81 @@
+﻿Things I'd like:
+
+	Concepts to think on:
+		Kitchen
+		Cooking range
+		Frying pan
+		Cooking levels
+		Cooking menu search and sort by filter
+		Easter events for year 2 and 3
+		Cooking festival minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
+
+	Others:
+		Bunny ears? You bet
+		Egg basket
+	🍰	Chocolate eggs
+		Easter bunny idle hopping and poofing in and out and stuff
+
+	Changes:
+	✔	Coleslaw -> Mayo + Cabbage
+	✔	Chocolate Cake -> Cake + Chocolate Bar
+	✔	Pink Cake -> Cake + Melon
+	✔	Maki Roll -> Sashimi + Rice + Seaweed
+	✔	Cookies -> Flour + Egg + Chocolate Bar
+
+	Patches:
+	✔	Cider -> Keg + Apple
+	✔	Vinegar -> Keg + Wine/Cider
+	✔	Nettle Tea -> Keg + Nettles
+
+	Shops:
+		Chocolate Bar -> Joja Mart
+
+	Ingredients:
+w	🍰	Cabbage
+w	🍰	Onion
+w	🍰	Redberries
+w	🍰	Watermelon
+w	🍰	Carrot
+_	🍰	Pineapple
+w	🍰	Nettles
+_	🍰	Chocolate Bar
+w	/	Sugar Cane
+
+	Artisan:
+	✔	Cider
+	✔	Nettle Tea
+
+	Recipes:
+	✔	Admiral Pie -> Flour + Milk + Fish x2
+	✔	Apple Pie -> Flour + Sugar + Apple x2
+	✔	Baked Potato -> Potato
+e	✔	Big Burger -> Bread + Cheese + Onion
+e	✔	Buttered Corn -> Corn
+	✔	Big Burger -> Bread + Cheese + Onion
+	✔	Breakfast Bran -> Wheat + Fruit (Farming +2)
+G	✔	Burrito -> Tortilla + Rice + Chilli
+	✔ 	Cabbage Pot -> Cabbage x2 + Onion x2
+	✔	Cake -> Flour x2 + Egg x2 + Milk
+	✔	Dwarven Stew -> Hearty Stew + Beer/Ale/Cider (Attack +3 Defence +3 Speed -1)
+	✔	Eel Sushi -> Eel + Seaweed + Rice
+×	✔	Egg Sandwich -> Bread + Mayonnaise + Egg ()
+	✔	Fish Supper -> Fish + Potato + Bean ()
+	✔	Garden Pie -> Flour + Cabbage + Onion + Tomato (Farming +2)
+G	✔	Hearty Stew -> Carrot x2 + Potato (Defence +2)
+	✔	Hot Cocoa -> Milk + Chocolate Bar (Max Health +25 Max Energy +35 )
+	✔	Hot Curry -> Hearty Stew + Hot Pepper + Rice (Attack +2 Defence -2 Speed +1)
+	✔	Hunter's Plate -> Potato + Cabbage + Horseradish (Foraging +1)
+	✔	Kebab -> Tortilla + Tomato + Onion (Kebab bonus)
+	✔	Loaded Potato -> Baked Potato + Tuna + Corn ()
+	❎	Mashed Potatoes -> Potato x2 + Milk
+	❎	Onion Soup -> Onion + Garlic + Cheese (Garlic Aura)
+	❎	Porridge -> Wheat + Milk
+	✔	Quick Breakfast -> Omelet + Coffee (Speed +1)
+	✔	Redberry Pie -> Flour + Sugar + Redberries x3
+×	✔	Salad Sandwich -> Bread + Vinegar + Dandelion ()
+×	✔	Seafood Sandwich -> Bread + Mayonnaise + Crab ()
+e	✔	Pineapple Skewers -> Pineapple + Onion + Eggplant
+	✔	Stuffed Potato -> Potato + Cheese + Common Mushroom ()
+	✔	Summer Pie -> Flour + Watermelon + Strawberry
+e	✔	Tropical Salad -> Pineapple + Watermelon
+	✔	Waffles -> Wheat + Blueberry x2 + Maple Syrup (Foraging +1 Mining +1 Max Energy +20)

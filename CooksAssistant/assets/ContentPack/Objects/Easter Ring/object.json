@@ -1,0 +1,19 @@
+{
+	"Name": "Easter Ring",
+	"Description": "A ring given to you by the Easter Bunny!",
+	"Category": "Ring",
+	"Edibility": -300,
+	"Price": 1500,
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": "Carrot",
+				"Count": 10
+			}
+		],
+		"CanPurchase": false,
+		"PurchaseFrom": "Krobus",
+		"PurchasePrice": 3000
+	}
+}

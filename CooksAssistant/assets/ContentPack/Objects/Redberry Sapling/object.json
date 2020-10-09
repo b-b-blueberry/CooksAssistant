@@ -1,0 +1,28 @@
+{
+    // Object data
+    "Name": "Redberry Sapling",
+    "Description": "Takes 17 days to mature. Gradually produces big bunches of berries across seasons.",
+    "Category": "Seeds",
+    "Edibility": -300,
+    "EdibleIsDrink": false,
+    "EdibleBuffs": null,
+    "Price": 820,
+    "IsColored": false,
+    "Recipe": null,
+
+    // Object purchase
+    "CanPurchase": false,
+    "PurchaseFrom": "Gus",
+    "PurchasePrice": 1800,
+    "PurchaseRequirements": null,
+
+    // Gifting
+    "GiftTastes": {
+    },
+
+    // Localisation
+    "NameLocalization": {
+    },
+    "DescriptionLocalization": {
+    }
+}

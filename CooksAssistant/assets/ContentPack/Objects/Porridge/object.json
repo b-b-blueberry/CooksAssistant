@@ -1,0 +1,43 @@
+{
+	// Object data
+	"Name": "Porridge",
+	"Description": "A warming breakfast staple made of creamy blended grains.",
+	"Category": "Cooking",
+	"Edibility": 36,
+	"EdibleIsDrink": true,
+	"EdibleBuffs": null,
+	"Price": 180,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 262, // Wheat
+				"Count": 1
+			},
+			{
+				"Object": -6, // Category:Milk
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

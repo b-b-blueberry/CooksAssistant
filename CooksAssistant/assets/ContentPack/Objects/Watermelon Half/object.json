@@ -1,0 +1,32 @@
+{
+    // Object data
+    "Name": "Watermelon Half",
+    "Description": "It's so good you couldn't just eat it all at once.",
+    "Category": "Junk",
+    "CategoryTextOverride": "",
+    "CategoryColorOverride": "0, 0, 0, 0",
+    "Edibility": 16,
+    "EdibleIsDrink": false,
+    "EdibleBuffs": null,
+    "Price": 87,
+    "IsColored": false,
+    "Recipe": null,
+
+    // Object purchase
+    "CanPurchase": false,
+    "PurchaseFrom": "Gus",
+    "PurchasePrice": 405,
+    "PurchaseRequirements": null,
+
+    // Gifting
+    "GiftTastes": {
+        "Dislike": [ "Shane" ],
+        "Hate": [ "Lewis" ]
+    },
+
+    // Localisation
+    "NameLocalization": {
+    },
+    "DescriptionLocalization": {
+    }
+}

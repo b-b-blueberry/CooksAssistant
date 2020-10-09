@@ -1,0 +1,47 @@
+{
+	// Object data
+	"Name": "Tropical Salad",
+	"Description": "A refreshing fruit salad with a tropical twist.",
+	"Category": "Cooking",
+	"Edibility": 98,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 425,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": "Pineapple",
+				"Count": 1
+			},
+			{
+				"Object": "Watermelon",
+				"Count": 1
+			},
+			{
+				"Object": 400, // Strawberry
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

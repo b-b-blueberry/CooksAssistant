@@ -1,0 +1,47 @@
+{
+	// Object data
+	"Name": "Kebab",
+	"Description": "The filling seems dubious. Who knows how it'll taste?",
+	"Category": "Cooking",
+	"Edibility": 48,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 97,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 229, // Tortilla
+				"Count": 1
+			},
+			{
+				"Object": 256, // Tomato
+				"Count": 1
+			},
+			{
+				"Object": "Onion",
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

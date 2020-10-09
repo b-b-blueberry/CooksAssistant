@@ -1,0 +1,18 @@
+﻿{
+	"Name": "Cook's Assistant",
+	"Author": "blueberry",
+	"Version": "1.0.0",
+	"Description": "..?",
+	"UniqueID": "blueberry.CooksAssistant",
+	"EntryDll": "CooksAssistant.dll",
+	"MinimumApiVersion": "3.0.0",
+	"UpdateKeys": [ "Nexus:6830" ],
+	"Dependencies": [
+		{
+			"UniqueID": "spacechase0.SpaceCore"
+		},
+		{
+			"UniqueID": "Platonymous.Toolkit"
+		}
+	]
+}

@@ -1,0 +1,11 @@
+﻿{
+  "Name": "[PFM] Cook's Assistant",
+  "Author": "blueberry",
+  "Version": "1.0.0",
+  "Description": "..?",
+  "UniqueID": "blueberry.PFM.CooksAssistant",
+  "MinimumApiVersion": "3.0.0",
+  "UpdateKeys": [ "Nexus:????" ],
+  "ContentPackFor": { "UniqueID": "Digus.ProducerFrameworkMod" },
+  "Dependencies": [ { "UniqueID": "blueberry.CooksAssistant" } ]
+}

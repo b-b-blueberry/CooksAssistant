@@ -1,0 +1,43 @@
+{
+	// Object data
+	"Name": "Cabbage Pot",
+	"Description": "A big pot of soggy cabbage, good for a couple of meals.",
+	"Category": "Cooking",
+	"Edibility": 30,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 65,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": "Cabbage",
+				"Count": 2
+			},
+			{
+				"Object": "Onion",
+				"Count": 2
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

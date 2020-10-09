@@ -1,0 +1,47 @@
+{
+	// Object data
+	"Name": "Big Burger",
+	"Description": "It's so greasy!",
+	"Category": "Cooking",
+	"Edibility": 67,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 170,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 216, // Bread
+				"Count": 1
+			},
+			{
+				"Object": 424, // Cheese
+				"Count": 1
+			},
+			{
+				"Object": "Onion",
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

@@ -1,0 +1,24 @@
+{
+    // Object data
+    "Name": "Pineapple",
+    "Description": "The only fruit-bearing member of the bromeliad family, the spiny fruit packs a sweet, acidic punch.",
+    "Category": "Fruit",
+    "Edibility": 28,
+    "EdibleIsDrink": false,
+    "EdibleBuffs": null,
+    "Price": 240,
+    "IsColored": false,
+    "Recipe": null,
+
+    // Object purchase
+    "CanPurchase": false,
+    "PurchaseFrom": "Gus",
+    "PurchasePrice": 405,
+    "PurchaseRequirements": null,
+
+    // Localisation
+    "NameLocalization": {
+    },
+    "DescriptionLocalization": {
+    }
+}

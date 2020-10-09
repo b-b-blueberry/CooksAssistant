@@ -1,0 +1,43 @@
+{
+	// Object data
+	"Name": "Mashed Potatoes",
+	"Description": "A stick-to-your-bones, warm-you-through sort of meal.",
+	"Category": "Cooking",
+	"Edibility": 82,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 130,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 192, // Potato
+				"Count": 2
+			},
+			{
+				"Object": -6, // Category:Milk
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

@@ -1,0 +1,47 @@
+{
+	// Object data
+	"Name": "Redberry Pie",
+	"Description": "Looks tasty. Smells gorgeous.",
+	"Category": "Cooking",
+	"Edibility": 75,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 460,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 880,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 246, // Wheat Flour
+				"Count": 1
+			},
+			{
+				"Object": 245, // Sugar
+				"Count": 1
+			},
+			{
+				"Object": "Redberries",
+				"Count": 3
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": null
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

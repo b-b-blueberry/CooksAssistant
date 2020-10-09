@@ -1,0 +1,39 @@
+{
+	// Object data
+	"Name": "Buttered Corn",
+	"Description": "Sweet and buttery. You can taste the grill on it.",
+	"Category": "Cooking",
+	"Edibility": 17,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 38,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": false,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 270, // Corn
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": false,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": [ "y 2" ]
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}

@@ -1,0 +1,47 @@
+{
+	// Object data
+	"Name": "Burrito",
+	"Description": "A wrap of all things nice.",
+	"Category": "Cooking",
+	"Edibility": 63,
+	"EdibleIsDrink": false,
+	"EdibleBuffs": null,
+	"Price": 185,
+	"IsColored": false,
+
+	// Object purchase
+	"CanPurchase": true,
+	"PurchaseFrom": "Gus",
+	"PurchasePrice": 220,
+	"PurchaseRequirements": [ "y 2" ],
+
+	// Recipe
+	"Recipe": {
+		"ResultCount": 1,
+		"Ingredients": [
+			{
+				"Object": 229, // Tortilla
+				"Count": 1
+			},
+			{
+				"Object": 273, // Rice
+				"Count": 1
+			},
+			{
+				"Object": 260, // Hot Pepper
+				"Count": 1
+			}
+		],
+		// Recipe purchase
+		"CanPurchase": true,
+		"PurchaseFrom": "Gus",
+		"PurchasePrice": 500,
+		"PurchaseRequirements": [ "y 2" ]
+	},
+
+	// Localisation
+	"NameLocalization": {
+	},
+	"DescriptionLocalization": {
+	}
+}
