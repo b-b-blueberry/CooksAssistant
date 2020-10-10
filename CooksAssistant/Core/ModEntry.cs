@@ -78,11 +78,16 @@ namespace CooksAssistant
 
 			HarmonyPatches.Patch();
 
-			Helper.ConsoleCommands.Add(Cmd + "menu", "Open cooking menu.", (s, args) =>
-			{
-				Log.D("Opened cooking menu.");
+			Helper.ConsoleCommands.Add(Cmd + "menu", "Open cooking menu.", (s, args)
+				=> { OpenNewCookingMenu(); });
+		}
+
+		private void OpenNewCookingMenu()
+		{
+			Log.D("Opened cooking menu.");
+			if (!(Game1.activeClickableMenu is GameObjects.Menus.CookingMenu)
+			    || Game1.activeClickableMenu is GameObjects.Menus.CookingMenu menu && menu.PopMenuStack(true, true))
 				Game1.activeClickableMenu = new GameObjects.Menus.CookingMenu();
-			});
 		}
 
 		private void SpaceEventsOnBeforeGiftGiven(object sender, EventArgsBeforeReceiveObject e)
@@ -198,6 +203,10 @@ namespace CooksAssistant
 			// debug test
 			if (Config.DebugMode)
 			{
+				if (e.Button == SButton.H)
+				{
+					OpenNewCookingMenu();
+				}
 				if (e.Button == SButton.F5)
 				{
 					Game1.currentLocation.largeTerrainFeatures.Add(
@@ -231,7 +240,7 @@ namespace CooksAssistant
 					else
 					{
 						Log.W($"Clicked the campfire icon");
-						Game1.activeClickableMenu = new GameObjects.Menus.CookingMenu();
+						OpenNewCookingMenu();
 					}
 				}
 			}
@@ -253,7 +262,7 @@ namespace CooksAssistant
 					|| NpcHomeLocations.All(pair => pair.Value != Game1.currentLocation.Name))
 					{
 						Log.W($"Clicked the kitchen at {Game1.currentLocation.Name}");
-						Game1.activeClickableMenu = new GameObjects.Menus.CookingMenu();
+						OpenNewCookingMenu();
 					}
 					else
 					{
@@ -389,7 +398,7 @@ namespace CooksAssistant
 						break;
 					}
 					//Game1.activeClickableMenu = new CraftingPage(-1, -1, -1, -1, true);
-					Game1.activeClickableMenu = new GameObjects.Menus.CookingMenu();
+					OpenNewCookingMenu();
 					break;
 
 				case ActionDockCrate:

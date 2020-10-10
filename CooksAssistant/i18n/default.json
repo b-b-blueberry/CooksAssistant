@@ -17,6 +17,18 @@
 	"menu.cooking_recipe.search_label": "Search",
 	"menu.cooking_recipe.quantity_label": "How many?",
 	"menu.cooking_recipe.which_label": "Which would you like to make?",
+
+	"menu.cooking_search.view.list": "View details",
+	"menu.cooking_search.view.grid": "View icons",
+	"menu.cooking_search.filter_label": "Filter recipes",
+	"menu.cooking_search.filter.ascending": "Ascending order",
+	"menu.cooking_search.filter.descending": "Descending order",
+	"menu.cooking_search.filter.0": "Alphabetical order",
+	"menu.cooking_search.filter.1": "Energy and Health",
+	"menu.cooking_search.filter.2": "Gold value",
+	"menu.cooking_search.filter.3": "Recent recipes",
+	"menu.cooking_search.filter.4": "Quest recipes",
+	"menu.cooking_search.filter.5": "Favourites",
 	//"요리" "시작!",
 
 	// Cooking skill
