@@ -5,7 +5,7 @@
 		Cooking range
 		Frying pan
 		Cooking levels
-		Cooking menu search and sort by filter
+	✔	Cooking menu search and sort by filter
 		Easter events for year 2 and 3
 		Cooking festival minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
 

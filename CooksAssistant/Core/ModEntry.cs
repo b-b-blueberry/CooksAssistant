@@ -145,6 +145,7 @@ namespace CooksAssistant
 
 			// Populate NPC home locations for cooking range usage
 			var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
+			NpcHomeLocations.Clear();
 			foreach (var npc in npcData)
 				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
 		}
