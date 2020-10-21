@@ -1,19 +1,40 @@
 ﻿Things I'd like:
 
+	Idea credits:
+		[goboking] Cooking overhaul - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/
+		✔	[Denfro] Cook in bulk - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbuho3a/
+			[chichago_] Cooking competition - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
+		?	[Deltron_Zed] Queen of Sauce event - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbszsxh/
+		?	[meFalloutnerd93] Mix-and-match cooking - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fcjq2zn/
+		?	[helenaneedshugs] Community centre kitchen - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt5tbf/
+		✔	[slugline] Cook in NPC kitchens - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt4pd9/
+		✔	[MazeMagic] Cookbook - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu70qr/
+			[SaltyHeathen] Cooking animation - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu69py/
+			[Kryzeth] Limited Campfire Cooking - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu5gdr/
+		✔	[Ruittsorf] Select ingredients - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu0j81/
+			[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
+		[YorikTheDestroyer] Cooking festival - https://github.com/StardewModders/mod-ideas/issues/490
+	✔	[killkrazed] Filter, search, sort, grid - https://github.com/StardewModders/mod-ideas/issues/470
+
 	Concepts to think on:
-		Kitchen
-		Cooking range
-		Frying pan
-		Cooking levels
+		Kitchen in farmhouse reworks
+		Cooking range in the Saloon with a rising level
+		Frying pan and equipment levels opened up by raising your cooking level
+	✔	Cooking levels
 	✔	Cooking menu search and sort by filter
 		Easter events for year 2 and 3
-		Cooking festival minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
+		Cooking festival
+			Queen of Sauce feature: https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
+			Minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
+	✔	Remove Oil from all recipes, instead include it as a qualtiy buff
+		Goblin cooking: https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
 
 	Others:
-		Bunny ears? You bet
-		Egg basket
-	🍰	Chocolate eggs
-		Easter bunny idle hopping and poofing in and out and stuff
+		Easter event
+			Bunny ears? You bet
+			Egg basket
+		🍰	Chocolate eggs
+			Easter bunny idle hopping and poofing in and out and stuff
 
 	Changes:
 	✔	Coleslaw -> Mayo + Cabbage
@@ -58,7 +79,7 @@ G	✔	Burrito -> Tortilla + Rice + Chilli
 	✔	Cake -> Flour x2 + Egg x2 + Milk
 	✔	Dwarven Stew -> Hearty Stew + Beer/Ale/Cider (Attack +3 Defence +3 Speed -1)
 	✔	Eel Sushi -> Eel + Seaweed + Rice
-×	✔	Egg Sandwich -> Bread + Mayonnaise + Egg ()
+×	✔	Egg Sandwich -> Bread + Mayonnaise + Egg (Leftovers)
 	✔	Fish Supper -> Fish + Potato + Bean ()
 	✔	Garden Pie -> Flour + Cabbage + Onion + Tomato (Farming +2)
 G	✔	Hearty Stew -> Carrot x2 + Potato (Defence +2)
@@ -72,10 +93,23 @@ G	✔	Hearty Stew -> Carrot x2 + Potato (Defence +2)
 	❎	Porridge -> Wheat + Milk
 	✔	Quick Breakfast -> Omelet + Coffee (Speed +1)
 	✔	Redberry Pie -> Flour + Sugar + Redberries x3
-×	✔	Salad Sandwich -> Bread + Vinegar + Dandelion ()
-×	✔	Seafood Sandwich -> Bread + Mayonnaise + Crab ()
+×	✔	Salad Sandwich -> Bread + Vinegar + Dandelion (Leftovers)
+×	✔	Seafood Sandwich -> Bread + Mayonnaise + Crab (Leftovers)
 e	✔	Pineapple Skewers -> Pineapple + Onion + Eggplant
 	✔	Stuffed Potato -> Potato + Cheese + Common Mushroom ()
 	✔	Summer Pie -> Flour + Watermelon + Strawberry
 e	✔	Tropical Salad -> Pineapple + Watermelon
 	✔	Waffles -> Wheat + Blueberry x2 + Maple Syrup (Foraging +1 Mining +1 Max Energy +20)
+
+	KEY:
+	✔	Implementation complete
+	🍰	Icon finished
+	/	Icon incomplete
+	_	Not required
+	?	Considering
+	❎	Rejected
+
+	w	World sprite required
+	e	Event-only
+	x	Unique event
+	G	Gus's shop

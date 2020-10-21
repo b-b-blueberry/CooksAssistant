@@ -19,26 +19,52 @@
 	"menu.cooking_recipe.quantity_label": "How many?",
 	"menu.cooking_recipe.which_label": "Which would you like to make?",
 
-	"menu.cooking_search.order_label": "Change order",
+	"menu.cooking_search.order_label": "Ascending/descending order",
 	"menu.cooking_search.view.list": "View details",
 	"menu.cooking_search.view.grid": "View icons",
 	"menu.cooking_search.filter_label": "Filter recipes",
-	"menu.cooking_search.filter.0": "Alphabetical order",
-	"menu.cooking_search.filter.1": "Energy and Health",
-	"menu.cooking_search.filter.2": "Gold value",
-	"menu.cooking_search.filter.3": "New recipes",
+	"menu.cooking_search.filter.1": "Alphabetical order",
+	"menu.cooking_search.filter.2": "Energy and Health",
+	"menu.cooking_search.filter.3": "Gold value",
 	"menu.cooking_search.filter.4": "Quest recipes",
-	"menu.cooking_search.filter.5": "Favourites",
+	"menu.cooking_search.filter.5": "New recipes",
+	"menu.cooking_search.filter.6": "Unknown recipes",
+	"menu.cooking_search.filter.7": "Favourites",
 	"menu.cooking_search.none_label": "No recipes found.",
 	//"요리" "시작!",
 
 	// Cooking skill
-	"menu.cooking_skill.tier1_path1": "",
-	"menu.cooking_skill.tier1_path2": "",
-	"menu.cooking_skill.tier2_path1_a": "Gourmet",
-	"menu.cooking_skill.tier2_path1_b": "Glutton",
-	"menu.cooking_skill.tier2_path2_a": "",
-	"menu.cooking_skill.tier2_path2_b": "",
+	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
+	// Tier 1:
+	// Path 1: Cooking
+	"menu.cooking_skill.tier1_path1.name": "Line Cook",
+	"menu.cooking_skill.tier1_path1.description": "Cooking oil further improves the quality of recipes.",
+	// Path 2: Eating (CONFIG: Food restores over time)
+	"menu.cooking_skill.tier1_path2.name": "Quick Eater",
+	"menu.cooking_skill.tier1_path2.description": "Food restores your energy more quickly.",
+	// Path 2: Eating (CONFIG: Food restores instantly)
+	"menu.cooking_skill.tier1_path2_alt.name": "Big Eater",
+	"menu.cooking_skill.tier1_path2_alt.description": "Cooked food restores {{RestorationAltValue}}% more.",
+
+	// Tier 2: Path 1
+	// Choice A: Gifting
+	"menu.cooking_skill.tier2_path1a.name": "Head Chef",
+	"menu.cooking_skill.tier2_path1a.description": "Cooked foods given as gifts befriend quicker.",
+	// Choice B: Selling
+	"menu.cooking_skill.tier2_path1b.name": "Five Star Cook",
+	"menu.cooking_skill.tier2_path1b.description": "Cooked foods worth {{SaleValue}}% more.",
+
+	// Tier 2: Path B
+	// Choice A: Crafting
+	"menu.cooking_skill.tier2_path2a.name": "Gourmet",
+	"menu.cooking_skill.tier2_path2a.description": "Chance to craft an extra portion when cooking.",
+	// Choice B: Healing
+	"menu.cooking_skill.tier2_path2b.name": "Glutton",
+	"menu.cooking_skill.tier2_path2b.description": "Buff duration from food and drinks increased with full energy.",
+
+	// Cooking ingredients descriptions
+	"item.oil.description": "All purpose cooking oil. Improves the quality of a dish.",
+	"item.truffleoil.description": "A gourmet cooking ingredient. Greatly enhances the quality of a dish.",
 
 	// Kebab item interactions
 	"buff.kebab.quality_worst": "Rotten ",

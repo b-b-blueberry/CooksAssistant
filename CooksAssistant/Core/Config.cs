@@ -6,7 +6,10 @@ namespace CooksAssistant
 	{
 		public bool CookingOverhaul { get; set; } = true;
 		public bool CookingTakesTime { get; set; } = false;
+		public bool CookingSkill { get; set; } = true;
+		public bool FoodHealsOverTime { get; set; } = true;
 		public bool PlayWithQuestline { get; set; } = true;
+		public bool CampfiresBurnOut { get; set; } = true;
 		public bool GiveLeftoversFromBigFoods { get; set; } = true;
 		public bool MakeChangesToMaps { get; set; } = true;
 		public bool MakeChangesToRecipes { get; set; } = true;
@@ -15,6 +18,10 @@ namespace CooksAssistant
 		public string ConsoleCommandPrefix { get; set; } = "cac";
 
 		public string CookingStationUseRange { get; set; } = "2";
+		public List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
+		{
+			498, 499, 632, 633
+		};
 		public List<string> WhereToPutTheSaloonCookingStation = new List<string>
 		{
 			"16", "16"

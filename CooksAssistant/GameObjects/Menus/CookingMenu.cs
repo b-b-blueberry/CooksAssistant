@@ -11,6 +11,7 @@ using Object = StardewValley.Object;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SpaceCore;
 
 namespace CooksAssistant.GameObjects.Menus
 {
@@ -70,7 +71,7 @@ namespace CooksAssistant.GameObjects.Menus
 		private const int FilterContainerSideWidth = 4;
 		private int FilterContainerMiddleWidth;
 		private const int Scale = 4;
-		// todo: please: add Margin rectangle for use ie. Margin.Bottom, Margin.Left
+		// TODO: POLISH: add Margin rectangle for use ie. Margin.Bottom, Margin.Left
 
 		// Clickables
 		private readonly ClickableTextureComponent NavDownButton;
@@ -101,6 +102,7 @@ namespace CooksAssistant.GameObjects.Menus
 		private Rectangle SearchBarTextBoxBounds;
 		private readonly int SearchBarTextBoxMinWidth;
 		private int SearchBarTextBoxMaxWidth;
+		private readonly string _textBoxDefaultText = "  1";
 
 		// Menu data
 		public enum State
@@ -120,11 +122,12 @@ namespace CooksAssistant.GameObjects.Menus
 		private List<int> _recipeBuffs;
 		private int _recipesPerPage;
 		private int _recipeHeight;
-		private readonly int _cookingLevel;
+		private readonly int _cookingSlots;
 		private List<Item> _cookingSlotsDropIn;
 		private bool _showCookingConfirmPopup;
 		private bool _showSearchFilters;
 		private Filter _lastFilterUsed;
+		private bool _lastFilterReversed;
 		private double _mouseHeldStartTime;
 		private readonly int _mouseHeldDelay;
 		private readonly int _mouseHeldLongDelay;
@@ -132,13 +135,15 @@ namespace CooksAssistant.GameObjects.Menus
 
 		private enum Filter
 		{
+			None,
 			Alphabetical,
 			Healing,
 			Value,
 			Quest,
 			New,
 			Unknown,
-			Favourite
+			Favourite,
+			Count
 		}
 
 		// Animations
@@ -154,10 +159,6 @@ namespace CooksAssistant.GameObjects.Menus
 
 		public CookingMenu(bool addDummyState = false, string initialRecipe = null) : base(null)
 		{
-			if (addDummyState)
-				_stack.Push(State.Opening);
-			_stack.Push(State.Search);
-
 			ModEntry.RemoveCookingMenuButton();
 			Game1.displayHUD = false;
 			_locale = LocalizedContentManager.CurrentLanguageCode.ToString();
@@ -168,18 +169,27 @@ namespace CooksAssistant.GameObjects.Menus
 				.GetField<Dictionary<int, double>>(inventory, "_iconShakeTimer");
 
 			// Start off the list of cooking recipes with all those the player has unlocked
-			_unlockedCookingRecipes = new List<CraftingRecipe>();
-			foreach (var recipe in Utility.GetAllPlayerUnlockedCookingRecipes()
+			_unlockedCookingRecipes = Utility.GetAllPlayerUnlockedCookingRecipes()
 				.Select(str => new CraftingRecipe(str, true))
-				.Where(recipe => recipe.name != "Torch"))
-				_unlockedCookingRecipes.Add(recipe);
+				.Where(recipe => recipe.name != "Torch").ToList();
+
 			_filteredRecipeList = _unlockedCookingRecipes;
 			_searchRecipes = new List<CraftingRecipe>();
+			_lastFilterUsed = Filter.None;
+			_lastFilterReversed = false;
 
 			// Cooking ingredients item drop-in slots
-			_cookingLevel = SpaceCore.Skills.GetSkillLevel(Game1.player, ModEntry.CookingSkillId) / 2; // nice
-			_cookingLevel = 3; // nice
-			_cookingSlotsDropIn = new List<Item>(_cookingLevel);
+			//var cookingLevel = SpaceCore.Skills.GetSkillLevel(Game1.player, ModEntry.CookingSkillId);
+			_cookingSlots = ModEntry.Instance.CheckForNearbyCookingStation();
+			/*
+			_cookingSlots = _cookingSlots == ModEntry.GusCookingStationDummyLevel
+				? Math.Max(ModEntry.Instance.SaveData.WorldGusCookingRangeLevel,
+					ModEntry.Instance.SaveData.ClientCookingEquipmentLevel)
+				: Math.Min(_cookingSlots, cookingLevel / 2);
+			*/
+			// TODO: DEBUG: for cooking menu, remove limiter for _cookingSlots = 3;
+			_cookingSlots = 3; // nice
+			_cookingSlotsDropIn = new List<Item>(_cookingSlots);
 			CookingSlots.Clear();
 			for (var i = 0; i < 5; ++i)
 			{
@@ -187,7 +197,7 @@ namespace CooksAssistant.GameObjects.Menus
 				CookingSlots.Add(new ClickableTextureComponent(
 					"cookingSlot" + i,
 					new Rectangle(-1, -1, CookingSlotOpenSource.Width * Scale, CookingSlotOpenSource.Height * Scale),
-					null, null, Texture, _cookingLevel <= i ? CookingSlotLockedSource : CookingSlotOpenSource, Scale));
+					null, null, Texture, _cookingSlots <= i ? CookingSlotLockedSource : CookingSlotOpenSource, Scale));
 			}
 
 			// Misc bits
@@ -243,13 +253,13 @@ namespace CooksAssistant.GameObjects.Menus
 			SearchTabButton = new ClickableTextureComponent(
 				"searchTab", new Rectangle(-1, -1, SearchTabButtonSource.Width * 4, SearchTabButtonSource.Height * 4),
 				null, null, Texture, SearchTabButtonSource, 4f, true);
-			for (var i = 0; i < 7; ++i)
+			for (var i = (int) Filter.Alphabetical; i < (int) Filter.Count; ++i)
 			{
 				FilterButtons.Add(new ClickableTextureComponent(
 					$"filter{i}", new Rectangle(-1, -1, FilterIconSource.Width * 4, FilterIconSource.Height * 4),
 					null, i18n.Get($"menu.cooking_search.filter.{i}"),
 					Texture, new Rectangle(
-						FilterIconSource.X + i * FilterIconSource.Width, FilterIconSource.Y,
+						FilterIconSource.X + (i - 1) * FilterIconSource.Width, FilterIconSource.Y,
 						FilterIconSource.Width, FilterIconSource.Height),
 					4f));
 			}
@@ -270,7 +280,7 @@ namespace CooksAssistant.GameObjects.Menus
 				numbersOnly = true,
 				textLimit = 3,
 				Selected = false,
-				Text = " 1",
+				Text = _textBoxDefaultText,
 			};
 
 			QuantityTextBox.OnEnterPressed += ValidateNumericalTextBox;
@@ -305,12 +315,16 @@ namespace CooksAssistant.GameObjects.Menus
 
 			// Setup menu elements layout
 			RealignElements();
+			
+			if (addDummyState)
+				_stack.Push(State.Opening);
+			OpenSearchPage();
 
 			// Open to a starting recipe if needed
 			if (!string.IsNullOrEmpty(initialRecipe))
 			{
 				ChangeCurrentRecipe(initialRecipe);
-				_stack.Push(State.Recipe);
+				OpenRecipePage();
 			}
 		}
 
@@ -455,7 +469,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 			var textSize = QuantityTextBox.Font.MeasureString(
 				Game1.parseText("999", QuantityTextBox.Font, 96));
-			QuantityTextBox.Text = " 1";
+			QuantityTextBox.Text = _textBoxDefaultText;
 			QuantityTextBox.limitWidth = false;
 			QuantityTextBox.Width = (int)textSize.X + 24;
 
@@ -489,66 +503,149 @@ namespace CooksAssistant.GameObjects.Menus
 			}
 		}
 
+		/// <summary>
+		/// Checks whether an item can be used in cooking recipes.
+		/// Doesn't check for edibility; oil, vinegar, jam, honey, etc are inedible.
+		/// </summary>
 		public bool CanBeCooked(Item item)
 		{
 			return !(item == null || item is Tool || item is Furniture || item is Object o
 				&& (o.bigCraftable.Value || o.specialItem || o.isLostItem || !o.canBeTrashed()));
 		}
+		
+		/// <summary>
+		/// Find an item in a list that works as an ingredient or substitute in a cooking recipe for some given requirement.
+		/// </summary>
+		/// <param name="target">The required item's identifier for the recipe, given as an index or category.</param>
+		/// <param name="items">List of items to seek a match in.</param>
+		/// <param name="item">Returns matching item for the identifier, null if not found.</param>
+		public void GetMatchingIngredient(int target, List<Item> items, out Item item)
+		{
+			item = null;
+			for (var j = 0; j < items.Count && item == null; ++j)
+				if (CanBeCooked(items[j])
+				    && (items[j].ParentSheetIndex == target
+				        || items[j].Category == target
+				        || CraftingRecipe.isThereSpecialIngredientRule((Object) items[j], target)))
+					item = items[j];
+		}
 
-		public int CraftableCount(Dictionary<int, int> requiredItems, List<Item> items)
+		/// <summary>
+		/// Identify items to consume from the ingredients dropIn.
+		/// Abort before consuming if required items are not found.
+		/// </summary>
+		/// <param name="requiredItems">Map of each target item and their quantities.</param>
+		/// <param name="items">List to mark items to be consumed from.</param>
+		/// <returns>Items to be crafted and their quantities to be consumed, null if not all required items were found.</returns>
+		public Dictionary<int, int> ChooseItemsForCrafting(Dictionary<int, int> requiredItems, List<Item> items)
+		{
+			var currentItems = items.TakeWhile(_ => true).ToList();
+			var craftingItems = new Dictionary<int, int>();
+			foreach (var requiredItem in requiredItems)
+			{
+				var identifier = requiredItem.Key;
+				var requiredCount = requiredItem.Value;
+				var craftingCount = 0;
+				while (craftingCount < requiredCount)
+				{
+					GetMatchingIngredient(identifier, currentItems, out var item);
+					if (item == null)
+						return null;
+					var consumed = Math.Min(requiredCount, item.Stack);
+					craftingCount += consumed;
+					var index = items.FindIndex(i =>
+						i != null && i.ParentSheetIndex == item.ParentSheetIndex && i.Stack == item.Stack);
+					craftingItems.Add(index, consumed);
+					currentItems.Remove(item);
+				}
+			}
+			return craftingItems;
+		}
+
+		/// <summary>
+		/// Determines the number of times the player can craft a cooking recipe by consuming required items.
+		/// Returns 0 if any ingredients are missing entirely.
+		/// </summary>
+		public int GetAmountCraftable(Dictionary<int, int> requiredItems, List<Item> items)
 		{
 			var craftableCount = -1;
-			for (var i = requiredItems.Count - 1; i >= 0; --i)
+			foreach (var identifier in requiredItems.Keys)
 			{
 				var localAvailable = 0;
-				var index = requiredItems[requiredItems.Keys.ElementAt(i)];
-				for (var j = items.Count - 1; j >= 0; --j)
-				{
-					if (CanBeCooked(items[j])
-					    && (items[j].ParentSheetIndex == requiredItems.Keys.ElementAt(i)
-					        || items[j].Category == requiredItems.Keys.ElementAt(i)
-					        || CraftingRecipe.isThereSpecialIngredientRule((Object) items[j], requiredItems.Keys.ElementAt(i))))
-						localAvailable += items[j].Stack;
-				}
-				var localCount = localAvailable / index;
+				var requiredCount = requiredItems[identifier];
+				GetMatchingIngredient(identifier, items, out var item);
+				if (item == null)
+					return 0;
+				localAvailable += item.Stack;
+				var localCount = localAvailable / requiredCount;
 				if (localCount < craftableCount || craftableCount == -1)
 					craftableCount = localCount;
 			}
 			return craftableCount;
 		}
 
-		public int ConsumeIngredients(Dictionary<int, int> requiredItems, ref List<Item> items, int quantity)
+		public Item CraftItemAndConsumeIngredients(Dictionary<int, int> requiredItems, ref List<Item> items)
 		{
-			// todo: please fix: only consumes as many are as needed OF ONE REQUIRED ITEM
-
-			// Consume ingredients from source
-			var crafted = Math.Min(quantity, CraftableCount(requiredItems, items));
-			for (var _ = 0; _ < crafted; ++_)
+			var itemsToConsume = ChooseItemsForCrafting(requiredItems, items);
+			
+			// Consume items
+			foreach (var pair in itemsToConsume)
 			{
-				for (var i = requiredItems.Count - 1; i >= 0; --i)
-				{
-					var remaining = requiredItems[requiredItems.Keys.ElementAt(i)];
-					for (var j = items.Count - 1; j >= 0; --j)
-					{
-						if (!CanBeCooked(items[j]))
-							continue;
-						var num = remaining;
-						remaining -= items[j].Stack;
-						items[j].Stack -= num;
-						if (items[j].Stack <= 0)
-							items[j] = null;
-						if (remaining <= 0)
-							break;
-					}
-				}
+				if ((items[pair.Key].Stack -= pair.Value) < 1)
+					items[pair.Key] = null;
 			}
 
 			// Add result item to player's inventory
-			var item = _recipeItem.getOne();
-			item.Stack = crafted;
-			Game1.player.addItemByMenuIfNecessary(item);
+			var result = _recipeItem.getOne() as Object;
+			
+			// Consume Oil to improve the recipe
+			if (items.Count > 0)
+			{
+				var i = items.FindIndex(i => i != null && i.Name.EndsWith("Oil"));
+				if (i > 0)
+				{
+					var hasOilPerk =
+						ModEntry.Instance.Config.CookingSkill && Game1.player.HasCustomProfession(
+							ModEntry.Instance.CookingSkill.Professions[(int) CookingSkill.ProfId.ImprovedOil]);
+					switch (items[i].ParentSheetIndex)
+					{
+						case 247: // Oil
+							result.Quality = hasOilPerk ? 2 : 1;
+							break;
+						case 432: // Truffle Oil
+							result.Quality = hasOilPerk ? 4 : 2;
+							break;
+						default: // Oils not yet discovered by science
+							result.Quality = hasOilPerk ? 4 : 2;
+							break;
+					}
 
-			return crafted;
+					if (--items[i].Stack < 1)
+						items[i] = null;
+				}
+			}
+
+			if (ModEntry.Instance.Config.CookingSkill) {
+				if (Game1.player.HasCustomProfession(
+					ModEntry.Instance.CookingSkill.Professions[(int) CookingSkill.ProfId.SaleValue]))
+					result.Price += result.Price / CookingSkill.SaleValue;
+				if (Game1.random.NextDouble() * 10 < CookingSkill.ExtraPortionChance && Game1.player.HasCustomProfession(
+					ModEntry.Instance.CookingSkill.Professions[(int) CookingSkill.ProfId.ExtraPortion]))
+					++result.Stack;
+			}
+			
+			return result;
+		}
+
+		private bool CookRecipe(Dictionary<int, int> requiredItems, ref List<Item> items, int quantity)
+		{
+			var craftableCount = Math.Min(quantity, GetAmountCraftable(requiredItems, items));
+			Item result = null;
+			for (var i = 0; i < craftableCount; ++i)
+				result = CraftItemAndConsumeIngredients(requiredItems, ref items);
+			result.Stack = craftableCount;
+			Game1.player.addItemByMenuIfNecessary(result);
+			return true;
 		}
 
 		private bool ShouldDrawCookButton()
@@ -556,7 +653,7 @@ namespace CooksAssistant.GameObjects.Menus
 			//return _cookingSlotsDropIn.Any(item => item != null) && !_showCookingConfirmPopup;
 			return _filteredRecipeList.Count > _currentRecipe
 				   && _recipeItem != null
-			       && CraftableCount(_recipeIngredients, _cookingSlotsDropIn) > 0
+			       && GetAmountCraftable(_recipeIngredients, _cookingSlotsDropIn) > 0
 			       && !_showCookingConfirmPopup;
 		}
 
@@ -582,7 +679,7 @@ namespace CooksAssistant.GameObjects.Menus
 			if (_stack.Count > 0 && _stack.Peek() == State.Search)
 				_stack.Pop();
 			_stack.Push(State.Search);
-			
+
 			SearchTabButton.sourceRect.X = SearchTabButtonSource.X + SearchTabButtonSource.Width;
 			_filteredRecipeList = FilterRecipes();
 			_showSearchFilters = false;
@@ -595,7 +692,17 @@ namespace CooksAssistant.GameObjects.Menus
 			Game1.keyboardDispatcher.Subscriber = null;
 		}
 
-		private List<CraftingRecipe> FilterRecipes(Filter which = Filter.Alphabetical, string substr = null)
+		private List<CraftingRecipe> ReverseRecipeList(List<CraftingRecipe> recipes)
+		{
+			recipes.Reverse();
+			_currentRecipe = 0;
+			//_currentRecipe = recipes.Count - 1 - _currentRecipe;
+			_lastFilterReversed = true;
+			return recipes;
+		}
+
+		private List<CraftingRecipe> FilterRecipes(Filter which = Filter.Alphabetical,
+			string substr = null)
 		{
 			Func<CraftingRecipe, object> order = null;
 			Func<CraftingRecipe, bool> filter = null;
@@ -631,7 +738,6 @@ namespace CooksAssistant.GameObjects.Menus
 			}
 
 			_currentRecipe = 0;
-			_lastFilterUsed = which;
 
 			var recipes = (order != null
 				? _unlockedCookingRecipes.OrderBy(order)
@@ -644,9 +750,16 @@ namespace CooksAssistant.GameObjects.Menus
 
 			if (recipes.Count < 1)
 				recipes.Add(new CraftingRecipe("none", true));
+			if (_lastFilterUsed == which && !_lastFilterReversed)
+				recipes = ReverseRecipeList(recipes);
+			else
+				_lastFilterReversed = false;
+			_lastFilterUsed = which;
+
 			return recipes;
 		}
 
+		// TODO: POLISH: find a very suitable position for UpdateSearchRecipes() call, rather than in draw()
 		private void UpdateSearchRecipes()
 		{
 			int minRecipe, maxRecipe;
@@ -657,7 +770,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 			var isGridView = ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch;
 			_recipeHeight = isGridView
-				? 64 // todo: grid view: recipe height/width
+				? 64 + 8
 				: 64;
 			_recipesPerPage = isGridView
 				? (SearchResultsArea.Width / _recipeHeight) * (SearchResultsArea.Height / _recipeHeight)
@@ -672,7 +785,7 @@ namespace CooksAssistant.GameObjects.Menus
 		private void ToggleCookingConfirmPopup(bool playSound)
 		{
 			_showCookingConfirmPopup = !_showCookingConfirmPopup;
-			QuantityTextBox.Text = " 1";
+			QuantityTextBox.Text = _textBoxDefaultText;
 			if (playSound)
 				Game1.playSound(_showCookingConfirmPopup ? "bigSelect" : "bigDeSelect");
 		}
@@ -680,8 +793,8 @@ namespace CooksAssistant.GameObjects.Menus
 		private void ValidateNumericalTextBox(TextBox sender)
 		{
 			sender.Text = Math.Max(1, Math.Min(
-				int.Parse(sender.Text), CraftableCount(_recipeIngredients, _cookingSlotsDropIn))).ToString();
-			for (var i = 3 - sender.Text.Length; i > 0; --i)
+				int.Parse(sender.Text), GetAmountCraftable(_recipeIngredients, _cookingSlotsDropIn))).ToString();
+			for (var i = 3 - sender.Text.Length; i >= 0; --i)
 				sender.Text = $" {sender.Text}";
 			sender.Selected = false;
 		}
@@ -724,9 +837,11 @@ namespace CooksAssistant.GameObjects.Menus
 			if (_stack.Count < 1)
 				return;
 			var state = _stack.Peek();
+			var isGridView = ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch;
 			var max = _filteredRecipeList.Count - 1;
 			var delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, new[] {new InputButton(Keys.LeftShift)})
-				? 5 : 1;
+				? _recipesPerPage
+				: isGridView && state == State.Search ? SearchResultsArea.Width / _recipeHeight : 1;
 			switch (state)
 			{
 				case State.Search:
@@ -790,10 +905,10 @@ namespace CooksAssistant.GameObjects.Menus
 				return false;
 			}
 
-			var dropInIsFull = _cookingSlotsDropIn.GetRange(0, _cookingLevel).TrueForAll(i => i != null);
+			var dropInIsFull = _cookingSlotsDropIn.GetRange(0, _cookingSlots).TrueForAll(i => i != null);
 
 			// Add an inventory item to the ingredients dropIn slots in the best available position
-			for (var i = 0; i < _cookingLevel && inventoryItem != null && clickedAnItem; ++i)
+			for (var i = 0; i < _cookingSlots && inventoryItem != null && clickedAnItem; ++i)
 			{
 				if (_cookingSlotsDropIn[i] == null || !_cookingSlotsDropIn[i].canStackWith(inventoryItem))
 					continue;
@@ -822,7 +937,7 @@ namespace CooksAssistant.GameObjects.Menus
 			{
 				if (!CookingSlots[i].containsPoint(x, y))
 					continue;
-				if (i >= _cookingLevel)
+				if (i >= _cookingSlots)
 				{
 					//Game1.showRedMessage(i18n.Get("menu.cooking_recipe.locked"));
 					return false;
@@ -832,6 +947,20 @@ namespace CooksAssistant.GameObjects.Menus
 			}
 
 			return clickedAnItem;
+		}
+		
+		private int TryGetIndexForSearchResult(int x, int y)
+		{
+			var index = -1;
+			if (!SearchResultsArea.Contains(x, y) || _recipeHeight == 0)
+				return index;
+			var yIndex = (y - SearchResultsArea.Y - (SearchResultsArea.Height % _recipeHeight) / 2) / _recipeHeight;
+			var xIndex = (x - SearchResultsArea.X) / _recipeHeight;
+			if (ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch)
+				index = yIndex * (SearchResultsArea.Width / _recipeHeight) + xIndex;
+			else
+				index = yIndex;
+			return index;
 		}
 
 		/// <summary>
@@ -898,11 +1027,9 @@ namespace CooksAssistant.GameObjects.Menus
 				if (reverse)
 					quantity *= -1;
 
-				_cookingSlotsDropIn[ingredientsIndex].Stack += quantity;
-				inventory.actualInventory[inventoryIndex].Stack -= quantity;
-				if (_cookingSlotsDropIn[ingredientsIndex].Stack < 1)
+				if ((_cookingSlotsDropIn[ingredientsIndex].Stack += quantity) < 1)
 					_cookingSlotsDropIn[ingredientsIndex] = null;
-				if (inventory.actualInventory[inventoryIndex].Stack < 1)
+				if ((inventory.actualInventory[inventoryIndex].Stack -= quantity) < 1)
 					inventory.actualInventory[inventoryIndex] = null;
 
 				if (!string.IsNullOrEmpty(sound))
@@ -926,7 +1053,12 @@ namespace CooksAssistant.GameObjects.Menus
 
 			ReturnIngredientsToInventory();
 
-			_stack.Pop();
+			var state = _stack.Peek();
+			if (state == State.Search)
+				_stack.Pop();
+			else if (state == State.Recipe)
+				CloseRecipePage();
+
 			while (tryToQuit && _stack.Count > 0)
 				_stack.Pop();
 
@@ -959,6 +1091,7 @@ namespace CooksAssistant.GameObjects.Menus
 			if (_stack.Count < 1)
 				return;
 
+			hoverText = null;
 			hoveredItem = null;
 			var obj = inventory.hover(x, y, heldItem);
 			if (obj != null)
@@ -1002,17 +1135,47 @@ namespace CooksAssistant.GameObjects.Menus
 					NavDownButton.tryHover(x, y);
 					NavUpButton.tryHover(x, y);
 
-					ToggleOrderButton.tryHover(x, y, 0.2f);
-					ToggleViewButton.tryHover(x, y, 0.2f);
-					ToggleFilterButton.tryHover(x, y, 0.2f);
+					if (SearchBarTextBox.Selected)
+					{
+						SearchButton.tryHover(x, y);
+						if (SearchButton.containsPoint(x,y ))
+							hoverText = SearchButton.hoverText;
+					}
+					else
+					{
+						foreach (var clickable in new[] { ToggleOrderButton, ToggleViewButton, ToggleFilterButton })
+						{
+							clickable.tryHover(x, y, 0.2f);
+							if (clickable.bounds.Contains(x, y))
+								hoverText = clickable.hoverText;
+						}
 
-					if (_showSearchFilters)
-						foreach (var clickable in FilterButtons)
-							clickable.tryHover(x, y, 0.4f);
+						if (_showSearchFilters)
+						{
+							foreach (var clickable in FilterButtons)
+							{
+								clickable.tryHover(x, y, 0.4f);
+								if (clickable.bounds.Contains(x, y))
+									hoverText = clickable.hoverText;
+							}
+						}
+					}
+
+					if (!ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch)
+						break;
+
+					var index = TryGetIndexForSearchResult(x, y);
+					if (index >= 0 && index < _searchRecipes.Count && _searchRecipes[index].name != "Torch")
+						hoverText = Game1.player.knowsRecipe(_searchRecipes[index].name)
+							? _searchRecipes[index].DisplayName
+							: i18n.Get("menu.cooking_recipe.title_unknown");
+
 					break;
 			}
 
 			SearchTabButton.tryHover(x, y, state != State.Search ? 0.5f : 0f);
+			if (SearchTabButton.bounds.Contains(x, y))
+				hoverText = SearchTabButton.hoverText;
 
 			if (_showCookingConfirmPopup)
 			{
@@ -1060,47 +1223,49 @@ namespace CooksAssistant.GameObjects.Menus
 							SearchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
 						CloseTextBox(SearchBarTextBox);
 					}
-
-					if (SearchResultsArea.Contains(x, y))
+					else
 					{
-						var index = (y - SearchResultsArea.Y) / _recipeHeight;
-						if (index < _searchRecipes.Count)
+						// Filter buttons
+						if (_showSearchFilters)
+						{
+							var clickable = FilterButtons.FirstOrDefault(c => c.containsPoint(x, y));
+							if (clickable != null)
+							{
+								_filteredRecipeList = FilterRecipes(
+									(Filter) int.Parse(clickable.name[clickable.name.Length - 1].ToString()),
+									SearchBarTextBox.Text);
+								Game1.playSound("coin");
+							}
+						}
+					
+						var index = TryGetIndexForSearchResult(x, y);
+						if (index >= 0 && index < _searchRecipes.Count && _searchRecipes[index].name != "Torch")
 						{
 							Game1.playSound("shwip");
 							ChangeCurrentRecipe(_searchRecipes[index].name);
 							OpenRecipePage();
 						}
-					}
 
-					// Search filter toggles
-					if (ToggleFilterButton.containsPoint(x, y))
-					{
-						_showSearchFilters = !_showSearchFilters;
-						Game1.playSound("shwip");
-					}
-					else if (ToggleViewButton.containsPoint(x, y))
-					{
-						var isGridView = ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch;
-						ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (isGridView ? 0 : ToggleViewButtonSource.Width);
-						ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch = !isGridView;
-						Game1.playSound("shwip");
-					}
-					else if (ToggleOrderButton.containsPoint(x, y))
-					{
-						_filteredRecipeList.Reverse();
-						_currentRecipe = 0;
-						//_currentRecipe = _filteredRecipeList.Count - 1 - _currentRecipe;
-					}
-					// Filter buttons
-					else if (_showSearchFilters)
-					{
-						var clickable = FilterButtons.FirstOrDefault(c => c.containsPoint(x, y));
-						if (clickable != null)
+						// Search filter toggles
+						if (ToggleFilterButton.containsPoint(x, y))
 						{
-							_filteredRecipeList = FilterRecipes(
-								(Filter) int.Parse(clickable.name[clickable.name.Length - 1].ToString()),
-								SearchBarTextBox.Text);
-							Game1.playSound("coin");
+							_showSearchFilters = !_showSearchFilters;
+							Game1.playSound("shwip");
+						}
+						else if (ToggleViewButton.containsPoint(x, y))
+						{
+							var isGridView = ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch;
+							ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X
+							                                + (isGridView ? 0 : ToggleViewButtonSource.Width);
+							ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch = !isGridView;
+							Game1.playSound("shwip");
+							ToggleViewButton.hoverText =
+								i18n.Get($"menu.cooking_search.view.{(isGridView ? "grid" : "list")}");
+						}
+						else if (ToggleOrderButton.containsPoint(x, y))
+						{
+							_filteredRecipeList = ReverseRecipeList(_filteredRecipeList);
+							Game1.playSound("shwip");
 						}
 					}
 					break;
@@ -1136,8 +1301,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 				if (CookConfirmButton.containsPoint(x, y))
 				{
-					if (ConsumeIngredients(_recipeIngredients, ref _cookingSlotsDropIn,
-						int.Parse(QuantityTextBox.Text)) > 0)
+					if (CookRecipe(_recipeIngredients, ref _cookingSlotsDropIn, int.Parse(QuantityTextBox.Text)))
 					{
 						Game1.playSound("reward");
 						PopMenuStack(true);
@@ -1163,8 +1327,11 @@ namespace CooksAssistant.GameObjects.Menus
 		{
 			base.receiveRightClick(x, y, playSound);
 
+			if (_stack.Count < 1)
+				return;
+			var state = _stack.Peek();
 			var shouldPop = TryClickItem(x, y, false);
-
+			
 			if (_showCookingConfirmPopup && shouldPop)
 			{
 				ToggleCookingConfirmPopup(true);
@@ -1175,6 +1342,14 @@ namespace CooksAssistant.GameObjects.Menus
 			{
 				SearchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
 				CloseTextBox(SearchBarTextBox);
+				shouldPop = false;
+			}
+			else if (state == State.Search
+			         && !string.IsNullOrEmpty(SearchBarTextBox.Text)
+			         && SearchBarTextBox.Text != i18n.Get("menu.cooking_recipe.search_label"))
+			{
+				SearchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
+				_filteredRecipeList = FilterRecipes();
 				shouldPop = false;
 			}
 
@@ -1210,7 +1385,7 @@ namespace CooksAssistant.GameObjects.Menus
 		{
 			Log.D($"receiveGamePadButton: {b.ToString()}");
 
-			// TODO: SYSTEM: Keep GamePadButtons inputs up-to-date with KeyPress and Click behaviours
+			// TODO: SYSTEM: keep GamePadButtons inputs up-to-date with KeyPress and Click behaviours
 
 			if (b == Buttons.RightTrigger)
 				return;
@@ -1230,7 +1405,7 @@ namespace CooksAssistant.GameObjects.Menus
 			var clickable = direction < 0
 				? state == State.Search ? NavDownButton : NavRightButton
 				: state == State.Search ? NavUpButton : NavLeftButton;
-			TryClickNavButton(clickable.bounds.X, clickable.bounds.Y, false);
+			TryClickNavButton(clickable.bounds.X, clickable.bounds.Y, state == State.Recipe);
 		}
 
 		public override void receiveKeyPress(Keys key)
@@ -1390,38 +1565,60 @@ namespace CooksAssistant.GameObjects.Menus
 				: SearchButton.bounds.Y + SearchButton.bounds.Height + 16;
 			if (_currentRecipe > 0)
 				NavUpButton.draw(b);
-			if (_currentRecipe < _filteredRecipeList.Count)
+			if (_currentRecipe < _filteredRecipeList.Count - 1)
 				NavDownButton.draw(b);
 
 			// Recipe entries
 			UpdateSearchRecipes();
-			int yOffset, textSpacing, x, y, w;
-			var text = "";
+			int textSpacing = 80, yOffset, x, y, w;
+			string text;
 			CraftingRecipe r;
+
+			SearchResultsArea.Y = NavUpButton.bounds.Y - 8;
+			SearchResultsArea.Height = NavDownButton.bounds.Y + NavDownButton.bounds.Height - NavUpButton.bounds.Y + 16;
+			x = SearchResultsArea.X;
+			yOffset = (SearchResultsArea.Height % _recipeHeight) / 2;
+			var rows = SearchResultsArea.Height / _recipeHeight;
+
 			if (ModEntry.Instance.SaveData.IsUsingGridViewInRecipeSearch)
 			{
-
-			}
-			else
-			{
-				SearchResultsArea.Y = NavUpButton.bounds.Y - 8;
-				SearchResultsArea.Height = NavDownButton.bounds.Y + NavDownButton.bounds.Height - NavUpButton.bounds.Y + 16;
-				_recipesPerPage = SearchResultsArea.Height / _recipeHeight;
-
-				yOffset = (SearchResultsArea.Height % _recipeHeight) / 2;
-				x = SearchResultsArea.X;
-				textSpacing = 80;
+				var columns = SearchResultsArea.Width / _recipeHeight;
+				_recipesPerPage = columns * rows;
 
 				for (var i = 0; i < _searchRecipes.Count; ++i)
 				{
-					y = SearchResultsArea.Y + yOffset + i * _recipeHeight + (_recipeHeight - 64) / 2;
-					w = SearchResultsArea.Width - textSpacing;
+					y = SearchResultsArea.Y + yOffset + (i / columns) * _recipeHeight + (_recipeHeight - 64) / 2;
 					r = _searchRecipes[i];
 					if (r.name == "Torch")
 					{
 						text = i18n.Get("menu.cooking_search.none_label");
-						DrawText(b, text, 1f, _leftContent.X - x + textSpacing - 16, y, w, true);
-						continue;
+						DrawText(b, text, 1f,
+							_leftContent.X - SearchResultsArea.X + textSpacing - 16,
+							SearchResultsArea.Y + 64,
+							SearchResultsArea.Width - textSpacing, true);
+						break;
+					}
+					x = SearchResultsArea.X + (i % columns) * _recipeHeight;
+					r.drawMenuView(b, x, y);
+				}
+			}
+			else
+			{
+				_recipesPerPage = rows;
+				w = SearchResultsArea.Width - textSpacing;
+
+				for (var i = 0; i < _searchRecipes.Count; ++i)
+				{
+					y = SearchResultsArea.Y + yOffset + i * _recipeHeight + (_recipeHeight - 64) / 2;
+					r = _searchRecipes[i];
+					if (r.name == "Torch")
+					{
+						text = i18n.Get("menu.cooking_search.none_label");
+						DrawText(b, text, 1f,
+							_leftContent.X - SearchResultsArea.X + textSpacing - 16,
+							SearchResultsArea.Y + 64,
+							SearchResultsArea.Width - textSpacing, true);
+						break;
 					}
 
 					text = Game1.player.knowsRecipe(r.name)
@@ -1506,11 +1703,11 @@ namespace CooksAssistant.GameObjects.Menus
 			textPosition.Y = NavLeftButton.bounds.Y + 4;
 			textPosition.X = NavLeftButton.bounds.X + NavLeftButton.bounds.Width;
 			_filteredRecipeList[_currentRecipe].drawMenuView(b, (int)textPosition.X, (int)textPosition.Y);
-			textWidth = 140;
+			textWidth = 142;
 			text = Game1.player.knowsRecipe(_filteredRecipeList[_currentRecipe].name)
 				? _filteredRecipeList[_currentRecipe].DisplayName
 				: i18n.Get("menu.cooking_recipe.title_unknown");
-			textPosition.X = NavLeftButton.bounds.Width + 64;
+			textPosition.X = NavLeftButton.bounds.Width + 56;
 			textPosition.Y -= Game1.smallFont.MeasureString(
 				Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 24;
 			DrawText(b, text, 1.5f, textPosition.X, textPosition.Y, textWidth, true);
@@ -1541,7 +1738,7 @@ namespace CooksAssistant.GameObjects.Menus
 			{
 				for (var i = 0; i < _recipeIngredients?.Count; ++i)
 				{
-					textPosition.Y += 64 / 2 + 4;
+					textPosition.Y += 64 / 2 + (_recipeIngredients.Count < 5 ? 4 : 0);
 
 					var id = _recipeIngredients.Keys.ElementAt(i);
 					var requiredCount = _recipeIngredients.Values.ElementAt(i);
@@ -1665,7 +1862,7 @@ namespace CooksAssistant.GameObjects.Menus
 			DrawHorizontalDivider(b, 0, textPosition.Y, _lineWidth, false);
 			textPosition.Y += TextDividerGap * 2;
 
-			if (_recipeItem == null)
+			if (_recipeItem == null || _stack.Count < 1 || _stack.Peek() == State.Search)
 				return;
 
 			if (ShouldDrawCookButton())
@@ -1922,7 +2119,7 @@ namespace CooksAssistant.GameObjects.Menus
 			upperRightCloseButton.draw(b);
 
 			// Hover text
-			if (hoverText != null && (hoveredItem == null || ItemsToGrabMenu == null))
+			if (hoverText != null)
 			{
 				if (hoverAmount > 0)
 					drawToolTip(b, hoverText, "", null, true, -1, 0,

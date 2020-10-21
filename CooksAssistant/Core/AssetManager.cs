@@ -3,30 +3,28 @@ using System.Collections.Generic;
 using System.Linq;
 
 using StardewModdingAPI;
-
+using StardewValley;
 using xTile;
 
 namespace CooksAssistant
 {
 	public class AssetManager : IAssetEditor
 	{
-		private readonly IModHelper _helper;
 		private static Config Config => ModEntry.Instance.Config;
+		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 
-		public AssetManager(IModHelper helper)
-		{
-			_helper = helper;
-		}
+		public AssetManager() {}
 		
 		public bool CanEdit<T>(IAssetInfo asset)
 		{
-			return asset.AssetNameEquals(@"Data/CookingRecipes")
-				|| asset.AssetNameEquals(@"Data/ObjectInformation")
-				|| asset.AssetNameEquals(@"Data/Events/Saloon")
-				|| asset.AssetNameEquals(@"Data/Events/Mountain")
-				|| asset.AssetNameEquals(@"Data/Events/JoshHouse")
-				|| asset.AssetNameEquals(@"Maps/Beach")
-				|| asset.AssetNameEquals(@"Maps/Saloon");
+			return Game1.player != null 
+			       && (asset.AssetNameEquals(@"Data/CookingRecipes")
+			           || asset.AssetNameEquals(@"Data/ObjectInformation")
+			           || asset.AssetNameEquals(@"Data/Events/Saloon")
+			           || asset.AssetNameEquals(@"Data/Events/Mountain")
+			           || asset.AssetNameEquals(@"Data/Events/JoshHouse")
+			           || asset.AssetNameEquals(@"Maps/Beach")
+			           || asset.AssetNameEquals(@"Maps/Saloon"));
 		}
 
 		public void Edit<T>(IAssetData asset)
@@ -47,46 +45,57 @@ namespace CooksAssistant
 				try
 				{
 					var data = asset.AsDictionary<string, string>().Data;
-					var recipeData = new Dictionary<string, string[]>
+					var recipeData = new Dictionary<string, string>
 					{
 						// Maki Roll: // Sashimi 1 Seaweed 1 Rice 1
 						{
 							"Maki Roll",
-							new [] {"227 1 152 1 423 1"}
+							"227 1 152 1 423 1"
 						},
 						// Coleslaw: Vinegar 1 Mayonnaise 1
 						{
 							"Coleslaw",
-							new [] {$"{ModEntry.JsonAssets.GetObjectId("Cabbage")} 1" + " 419 1 306 1"}
+							$"{ModEntry.JsonAssets.GetObjectId("Cabbage")} 1" + " 419 1 306 1"
 						},
 						// Pink Cake: Cake 1 Melon 1
 						{
 							"Pink Cake",
-							new [] {$"{ModEntry.JsonAssets.GetObjectId("Cake")} 1" + " 254 1"}
+							$"{ModEntry.JsonAssets.GetObjectId("Cake")} 1" + " 254 1"
 						},
 						// Chocolate Cake: Cake 1 Chocolate Bar 1
 						{
 							"Chocolate Cake",
-							new [] {$"{ModEntry.JsonAssets.GetObjectId("Cake")} 1" 
-							        + $" {ModEntry.JsonAssets.GetObjectId("Chocolate Bar")} 1"}
+							$"{ModEntry.JsonAssets.GetObjectId("Cake")} 1" 
+							+ $" {ModEntry.JsonAssets.GetObjectId("Chocolate Bar")} 1"
 						},
 						// Cookies: Flour 1 Category:Egg 1 Chocolate Bar 1
 						{
 							"Cookies",
-							new [] {"246 1 -5 1" + $" {ModEntry.JsonAssets.GetObjectId("Chocolate Bar")} 1"}
+							"246 1 -5 1" + $" {ModEntry.JsonAssets.GetObjectId("Chocolate Bar")} 1"
 						},
 						// Pizza: Flour 2 Tomato 2 Cheese 2
 						{
 							"Pizza",
-							new [] {"246 2 256 2 424 2"}
+							"246 2 256 2 424 2"
 						},
 					};
 					foreach (var recipe in recipeData)
-						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], recipe.Value, false);
+						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new [] {recipe.Value});
+					
+					// Remove Oil from all cooking recipes in the game
+					foreach (var recipe in data.ToDictionary(pair => pair.Key, pair => pair.Value))
+					{
+						var recipeSplit = data[recipe.Key].Split('/');
+						var ingredients = recipeSplit[0].Split(' ');
+						if (!ingredients.Contains("247"))
+							continue;
 
-					// Sort recipes alphabetically by default cause there's a mod ideas PR for that sort of thing
-					//data = data.OrderBy(pair => pair.Key).ToDictionary(pair => pair.Key, pair => pair.Value);
-					// TODO: DEBUG: This actually causes a critical crash in draw loop due to disposed objects, do it in filters
+						recipeSplit[0] = ModEntry.UpdateEntry(recipeSplit[0],
+							ingredients.Where((ingredient, i) => 
+								ingredient != "247" && (i <= 0 || ingredients[i - 1] != "247")).ToArray(), 
+							false, true, 0, ' ');
+						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], recipeSplit, false, true);
+					}
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
 
@@ -118,16 +127,18 @@ namespace CooksAssistant
 					var data = asset.AsDictionary<int, string>().Data;
 					var objectData = new Dictionary<int, string[]>
 					{
-						{419, new[] {null, "220", "10", "Basic -26"}}, // Vinegar
 						{206, new[] {null, null, "45"}}, // Pizza
 						{220, new[] {null, null, "60"}}, // Chocolate Cake
 						{221, new[] {null, null, "75"}}, // Pink Cake
+						{419, new[] {null, "220", "-300", "Basic -26"}}, // Vinegar
+						{247, new[] {null, null, "-300", "Basic -26", null, i18n.Get("item.oil.description")}}, // Oil
+						{432, new[] {null, null, "-300", null, null, i18n.Get("item.truffleoil.description")}}, // Truffle Oil
 						{ModEntry.JsonAssets.GetObjectId("Sugar Cane"), new[] {null, null, null, "Basic"}},
 					};
 					foreach (var obj in objectData.Where(o =>
 						Config.GiveLeftoversFromBigFoods || !Config.FoodsThatGiveLeftovers.Contains(o.Value[0])))
-						data[obj.Key] = ModEntry.UpdateEntry(data[obj.Key], obj.Value, false);
-					
+						data[obj.Key] = ModEntry.UpdateEntry(data[obj.Key], obj.Value);
+
 					asset.AsDictionary<int, string>().ReplaceWith(data);
 
 					Log.W($"Edited {asset.AssetName}:" + data.Where(
