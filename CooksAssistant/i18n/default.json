@@ -9,7 +9,7 @@
 	"menu.cooking_station.done_improv": "You wrote the recipe down in Mom's Cookbook.",
 
 	"menu.cooking_recipe.title_unknown": "???",
-	"menu.cooking_recipe.notes_unknown": "You've not tried this recipe yet.",
+	"menu.cooking_recipe.notes_unknown": "You've not eaten this recipe yet.",
 	"menu.cooking_recipe.ingredients_label": "Ingredients:",
 	"menu.cooking_recipe.notes_label": "Notes:",
 	"menu.cooking_recipe.time_label": "Cooking time:",
@@ -24,12 +24,12 @@
 	"menu.cooking_search.view.grid": "View icons",
 	"menu.cooking_search.filter_label": "Filter recipes",
 	"menu.cooking_search.filter.1": "Alphabetical order",
-	"menu.cooking_search.filter.2": "Energy and Health",
+	"menu.cooking_search.filter.2": "Energy restored",
 	"menu.cooking_search.filter.3": "Gold value",
-	"menu.cooking_search.filter.4": "Quest recipes",
-	"menu.cooking_search.filter.5": "New recipes",
-	"menu.cooking_search.filter.6": "Unknown recipes",
-	"menu.cooking_search.filter.7": "Favourites",
+	"menu.cooking_search.filter.4": "Recipes with known buffs",
+	"menu.cooking_search.filter.5": "Recipes not yet cooked",
+	"menu.cooking_search.filter.6": "Recipes ready to cook",
+	"menu.cooking_search.filter.7": "Favourite recipes",
 	"menu.cooking_search.none_label": "No recipes found.",
 	//"요리" "시작!",
 
@@ -60,7 +60,7 @@
 	"menu.cooking_skill.tier2_path2a.description": "Chance to craft an extra portion when cooking.",
 	// Choice B: Healing
 	"menu.cooking_skill.tier2_path2b.name": "Glutton",
-	"menu.cooking_skill.tier2_path2b.description": "Buff duration from food and drinks increased with full energy.",
+	"menu.cooking_skill.tier2_path2b.description": "Buff duration from food and drinks increased when at full energy.",
 
 	// Cooking ingredients descriptions
 	"item.oil.description": "All purpose cooking oil. Improves the quality of a dish.",

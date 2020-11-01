@@ -15,6 +15,8 @@
 			[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
 		[YorikTheDestroyer] Cooking festival - https://github.com/StardewModders/mod-ideas/issues/490
 	✔	[killkrazed] Filter, search, sort, grid - https://github.com/StardewModders/mod-ideas/issues/470
+	Other mod recommendations:
+		[LenneDalben] Townies Need Food - https://www.nexusmods.com/stardewvalley/mods/6534/
 
 	Concepts to think on:
 		Kitchen in farmhouse reworks
@@ -27,6 +29,7 @@
 			Queen of Sauce feature: https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
 			Minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
 	✔	Remove Oil from all recipes, instead include it as a qualtiy buff
+	✔	Food healing over time
 		Goblin cooking: https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
 
 	Others:
@@ -76,7 +79,7 @@ e	✔	Buttered Corn -> Corn
 	✔	Breakfast Bran -> Wheat + Fruit (Farming +2)
 G	✔	Burrito -> Tortilla + Rice + Chilli
 	✔ 	Cabbage Pot -> Cabbage x2 + Onion x2
-	✔	Cake -> Flour x2 + Egg x2 + Milk
+	✔	Cake -> Flour x2 + Egg x2 + Milk (Leftovers)
 	✔	Dwarven Stew -> Hearty Stew + Beer/Ale/Cider (Attack +3 Defence +3 Speed -1)
 	✔	Eel Sushi -> Eel + Seaweed + Rice
 ×	✔	Egg Sandwich -> Bread + Mayonnaise + Egg (Leftovers)

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using xTile;
+using Object = StardewValley.Object;
 
 namespace CooksAssistant
 {
@@ -12,6 +14,20 @@ namespace CooksAssistant
 	{
 		private static Config Config => ModEntry.Instance.Config;
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
+
+		private Dictionary<string, int> BuffIndex = new Dictionary<string, int>
+		{
+			{ "Farming", 0},
+			{ "Fishing", 1},
+			{ "Mining", 2},
+			{ "Luck", 4},
+			{ "Foraging", 5},
+			{ "Energy", 7},
+			{ "Magnetism", 8},
+			{ "Speed", 9},
+			{ "Defense", 10},
+			{ "Attack", 11},
+		};
 
 		public AssetManager() {}
 		
@@ -24,7 +40,8 @@ namespace CooksAssistant
 			           || asset.AssetNameEquals(@"Data/Events/Mountain")
 			           || asset.AssetNameEquals(@"Data/Events/JoshHouse")
 			           || asset.AssetNameEquals(@"Maps/Beach")
-			           || asset.AssetNameEquals(@"Maps/Saloon"));
+			           || asset.AssetNameEquals(@"Maps/Saloon")
+			           || asset.AssetNameEquals(@"Maps/springobjects"));
 		}
 
 		public void Edit<T>(IAssetData asset)
@@ -33,11 +50,11 @@ namespace CooksAssistant
 			{
 				// Edit fields of vanilla recipes to use new ingredients
 
-				if (ModEntry.JsonAssets == null)
+				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
 					return;
 				if (!Config.MakeChangesToRecipes)
 				{
-					Log.D($"Did not patch {asset.AssetName}: Recipe patches are disabled in config file.",
+					Log.D($"Did not edit {asset.AssetName}: Recipe edits are disabled in config file.",
 						Config.DebugMode);
 					return;
 				}
@@ -82,10 +99,11 @@ namespace CooksAssistant
 					foreach (var recipe in recipeData)
 						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new [] {recipe.Value});
 					
-					// Remove Oil from all cooking recipes in the game
 					foreach (var recipe in data.ToDictionary(pair => pair.Key, pair => pair.Value))
 					{
 						var recipeSplit = data[recipe.Key].Split('/');
+
+						// Remove Oil from all cooking recipes in the game
 						var ingredients = recipeSplit[0].Split(' ');
 						if (!ingredients.Contains("247"))
 							continue;
@@ -115,9 +133,12 @@ namespace CooksAssistant
 			if (asset.AssetNameEquals(@"Data/ObjectInformation"))
 			{
 				// Edit fields of vanilla objects to revalue and recategorise some produce
+
+				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
+					return;
 				if (!Config.MakeChangesToIngredients)
 				{
-					Log.D($"Did not patch {asset.AssetName}: Ingredients patches are disabled in config file.",
+					Log.D($"Did not edit {asset.AssetName}: Ingredients edits are disabled in config file.",
 						Config.DebugMode);
 					return;
 				}
@@ -135,9 +156,14 @@ namespace CooksAssistant
 						{432, new[] {null, null, "-300", null, null, i18n.Get("item.truffleoil.description")}}, // Truffle Oil
 						{ModEntry.JsonAssets.GetObjectId("Sugar Cane"), new[] {null, null, null, "Basic"}},
 					};
+					
+					// Apply above recipe changes
 					foreach (var obj in objectData.Where(o =>
 						Config.GiveLeftoversFromBigFoods || !Config.FoodsThatGiveLeftovers.Contains(o.Value[0])))
 						data[obj.Key] = ModEntry.UpdateEntry(data[obj.Key], obj.Value);
+
+					if (Config.NewRecipeScaling)
+						RebuildBuffs(ref data);
 
 					asset.AsDictionary<int, string>().ReplaceWith(data);
 
@@ -187,39 +213,152 @@ namespace CooksAssistant
 
 			if (asset.DataType == typeof(IDictionary<string, string>) && !Config.PlayWithQuestline)
 			{
-				Log.D($"Did not patch {asset.AssetName}: Quest patches are disabled in config file.",
+				Log.D($"Did not edit {asset.AssetName}: Quest edits are disabled in config file.",
 					Config.DebugMode);
 				return;
 			}
 			
 			if (asset.DataType == typeof(Map) && !Config.MakeChangesToMaps)
 			{
-				Log.D($"Did not patch {asset.AssetName}: Map patches are disabled in config file.",
+				Log.D($"Did not edit {asset.AssetName}: Map edits are disabled in config file.",
 					Config.DebugMode);
 				return;
 			}
-
-			switch (asset.AssetName)
+			
+			Log.W($"Editing {asset.AssetName}");
+			if (asset.AssetNameEquals(@"Maps/Beach"))
 			{
-				case @"Maps/Beach":
-					// Add dock wares to the secret beach
+				// Add dock wares to the secret beach
 
-					break;
+				// . . .
+			}
+			else if (asset.AssetNameEquals(@"Maps/Saloon"))
+			{
+				// Add a cooking range to Gus' saloon
 
-				case @"Maps/Saloon":
-					// Add a cooking range to Gus' saloon
-					
-					var saloonCooktop = Config.WhereToPutTheSaloonCookingStation.ConvertAll(int.Parse);
-					for (var x = saloonCooktop[0]; x < saloonCooktop[0] + 1; ++x)
-						asset.AsMap().Data.GetLayer("Buildings").Tiles[saloonCooktop[0], saloonCooktop[1]]
-							.Properties.Add("Action", ModEntry.ActionRange);
+				var saloonCooktop = ModEntry.SaloonCookingRangePosition;
+				for (var x = saloonCooktop.X; x < saloonCooktop.Y + 1; ++x)
+					asset.AsMap().Data.GetLayer("Buildings").Tiles[saloonCooktop.X, saloonCooktop.Y]
+						.Properties.Add("Action", ModEntry.ActionRange);
+			}
+			else if (asset.AssetNameEquals(@"Maps/FarmHouse"))
+			{
+				// Add a cooking range to the farmhouse
 
-					break;
+				// . . .
+			}
+			else if (asset.AssetNameEquals(@"Maps/springobjects"))
+			{
+				// Patch in object icons where necessary
 
-				case @"Maps/FarmHouse":
-					// Add a cooking range to the farmhouse
+				if (ModEntry.JsonAssets == null)
+					return;
+				var index = ModEntry.JsonAssets.GetObjectId(ModEntry.EasterBasketItem);
+				if (index < 1)
+					return;
+				var sourceImage = Game1.content.Load<Texture2D>("Maps/Festivals");
+				var sourceArea = new Rectangle(32, 16, 16, 16);
+				var destImage = asset.AsImage();
+				var destArea = Game1.getSourceRectForStandardTileSheet(destImage.Data, index, 16, 16);
+				destImage.PatchImage(sourceImage, sourceArea, destArea, PatchMode.Replace);
+				destImage.PatchImage(sourceImage,
+					new Rectangle(32, 16, 16, 16),
+					Game1.getSourceRectForStandardTileSheet(sourceImage, index, 16, 16),
+					PatchMode.Replace);
+				asset.ReplaceWith(destImage.Data);
+			}
+		}
 
-					break;
+		private void RebuildBuffs(ref IDictionary<int, string> data)
+		{
+			// Reconstruct buffs of all cooking items in the game using our ingredients-to-buffs chart
+			var ingredientsChart =
+				ModEntry.Instance.Helper.Content.Load<Dictionary<string, string>>($"{ModEntry.BuffChartPath}.json");
+			var cookingRecipes = Game1.content.Load<Dictionary<string, string>>(@"Data/CookingRecipes");
+			var keys = new int[data.Keys.Count];
+			data.Keys.CopyTo(keys, 0);
+			foreach (var key in keys)
+			{
+				var objectSplit = data[key].Split('/');
+				if (!objectSplit[3].Contains("-7")
+				    || !cookingRecipes.ContainsKey(objectSplit[0])
+				    || (!Config.ScaleCustomRecipes && cookingRecipes[objectSplit[0]].Split('/')[1].StartsWith("what")))
+					continue;
+				var ingredients = cookingRecipes[objectSplit[0]].Split('/')[0].Split(' ');
+				var buffArray = new[] { "0","0","0","0","0","0","0","0","0","0","0","0" };
+				var buffDuration = 0;
+
+				// Populate buff values using ingredients for this object in CookingRecipes
+				for (var i = 0; i < ingredients.Length; i += 2)
+				{
+					var o = new Object(int.Parse(ingredients[i]), 0);
+					var buffSplit = ingredientsChart.ContainsKey(o.Name)
+						? ingredientsChart[o.Name].Split(' ')
+						: null;
+					if (o.ParentSheetIndex >= 2000 && Config.AddBuffsToCustomIngredients)
+					{
+						var random = new Random(1337 + o.Name.GetHashCode());
+						if (random.NextDouble() < 0.175f)
+						{
+							buffSplit = new[] {
+								BuffIndex.Keys.ToArray()[random.Next(BuffIndex.Count)],
+								random.Next(4).ToString()
+							};
+						}
+					}
+					if (buffSplit == null)
+						continue;
+					for (var j = 0; j < buffSplit.Length; j += 2)
+					{
+						var buffName = buffSplit[j];
+						var buffValue = int.Parse(buffSplit[j + 1]);
+						if (buffName == "Edibility")
+						{
+							objectSplit[1] =
+								(int.Parse(objectSplit[1]) + o.Edibility / 8 * buffValue).ToString();
+						}
+						else if (buffName == "Cooking")
+						{
+							// TODO: SYSTEM: Cooking buff representation in foods
+						}
+						else
+						{
+							buffArray[BuffIndex[buffName]] =
+								(int.Parse(buffArray[BuffIndex[buffName]])
+									+ (buffName == "Energy"
+										? buffValue * 10 + 20
+										: buffName == "Magnetism"
+											? buffValue * 16 + 16
+											: buffValue)).ToString();
+						}
+					}
+					buffDuration += 4 * o.Price + Math.Max(0, o.Edibility);
+				}
+
+				buffDuration -= (int)(int.Parse(objectSplit[2]) * 0.15f);
+				buffDuration = Math.Min(1600, Math.Max(300, buffDuration));
+
+				string[] newData;
+				// If the object now has no buffs, remove the unused fields
+				/*
+				if (buffArray.All(i => i == "0"))
+				{
+					newData = new string[6];
+					objectSplit.CopyTo(newData, 0);
+				}
+				else
+				*/
+				{
+					var newBuffs = buffArray.Aggregate((entry, field)
+						=> $"{entry} {field}").Remove(0, 0);
+					newData = new string[9];
+					objectSplit.CopyTo(newData, 0);
+					newData[6] ??= "food";
+					newData[7] = newBuffs;
+					newData[8] = buffDuration.ToString();
+				}
+
+				data[key] = ModEntry.UpdateEntry(data[key], newData);
 			}
 		}
 	}

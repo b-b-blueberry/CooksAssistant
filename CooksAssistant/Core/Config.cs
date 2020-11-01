@@ -5,6 +5,9 @@ namespace CooksAssistant
 	public class Config
 	{
 		public bool CookingOverhaul { get; set; } = true;
+		public bool NewRecipeScaling { get; set; } = true;
+		public bool ScaleCustomRecipes { get; set; } = true;
+		public bool AddBuffsToCustomIngredients { get; set; } = true;
 		public bool CookingTakesTime { get; set; } = false;
 		public bool CookingSkill { get; set; } = true;
 		public bool FoodHealsOverTime { get; set; } = true;
@@ -21,10 +24,6 @@ namespace CooksAssistant
 		public List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
 		{
 			498, 499, 632, 633
-		};
-		public List<string> WhereToPutTheSaloonCookingStation = new List<string>
-		{
-			"16", "16"
 		};
 		public List<string> DefaultUnlockedRecipes = new List<string>
 		{
@@ -45,6 +44,10 @@ namespace CooksAssistant
 		{
 			"pizza",
 			"cake"
+		};
+		public Dictionary<string, int> ObjectsWithCookingBuffs = new Dictionary<string, int>
+		{
+
 		};
 	}
 }

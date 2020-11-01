@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
-
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using SpaceCore;
 using StardewModdingAPI;
 
@@ -28,7 +26,10 @@ namespace CooksAssistant.GameObjects
 		internal static readonly int ExtraPortionChance = 4;
 		internal static readonly int RestorationValue = 35;
 		internal static readonly int RestorationAltValue = 5;
-		internal static readonly int BuffValue = 6;
+		internal static readonly int BuffRateValue = 3;
+		internal static readonly int BuffDurationValue = 36;
+
+		internal int AddedLevel;
 
 		public class SkillProfession : Profession
 		{
