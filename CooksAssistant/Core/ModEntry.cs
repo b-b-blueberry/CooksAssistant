@@ -3,19 +3,23 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using CooksAssistant.GameObjects;
+using CooksAssistant.GameObjects.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
 using SpaceCore;
 using SpaceCore.Events;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
+using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using Object = StardewValley.Object;
 using xTile.Dimensions;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 // TODO: CONTENT: ensure all slice/half objects have the correct category and colour/text overrides
 
@@ -35,6 +39,7 @@ namespace CooksAssistant
 
 		internal static readonly string ContentPackPath = Path.Combine("assets", "ContentPack");
 		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
+		internal static readonly string BundleDataPath = Path.Combine("assets", "bundles");
 		internal static readonly string BuffChartPath = Path.Combine("assets", "ingredientBuffChart");
 		internal static readonly string SkillIconPath = Path.Combine("assets", "skill");
 		internal static readonly string LevelUpIconPath = Path.Combine("assets", "levelup");
@@ -46,8 +51,15 @@ namespace CooksAssistant
 		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
 		internal const string ActionRange = AssetPrefix + "Range";
 
+		internal const string CommunityCentreAreaName = "Kitchen";
+		internal const int CommunityCentreAreaNumber = 6;
+		internal static readonly Rectangle CommunityCentreArea = new Rectangle(0, 0, 11, 11);
+		internal static readonly Point CommunityCentreNotePosition = new Point(6, 7);
+		internal int BundleStartIndex;
+
 		internal const string DockCrateItem = "Pineapple";
 		internal const string EasterEggItem = "Chocolate Egg";
+		internal const string ChocolateBarItem = "Chocolate Bar";
 		internal const string EasterBasketItem = "Egg Basket";
 		internal static readonly string[] UntrashableItems = {
 			EasterBasketItem
@@ -76,6 +88,7 @@ namespace CooksAssistant
 		private Queue<uint> _debugTicksDiff = new Queue<uint>();
 		private Object _lastFoodEaten;
 		private bool _lastFoodWasDrink;
+		internal static readonly Dictionary<int, int> FoodCookedToday = new Dictionary<int, int>();
 
 		private Buff _watchingBuff;
 
@@ -92,9 +105,13 @@ namespace CooksAssistant
 			
 			Helper.Events.GameLoop.GameLaunched += GameLoopOnGameLaunched;
 			Helper.Events.GameLoop.SaveLoaded += GameLoopOnSaveLoaded;
+			Helper.Events.GameLoop.Saving += GameLoopOnSaving;
 			Helper.Events.GameLoop.DayStarted += GameLoopOnDayStarted;
+			Helper.Events.GameLoop.ReturnedToTitle += GameLoopOnReturnedToTitle;
 			Helper.Events.GameLoop.UpdateTicked += GameLoopUpdateTicked;
+			Helper.Events.Player.Warped += PlayerOnWarped;
 			Helper.Events.Input.ButtonPressed += InputOnButtonPressed;
+
 			if (Config.CookingOverhaul)
 			{
 				Helper.Events.Display.MenuChanged += DisplayOnMenuChanged;
@@ -106,7 +123,7 @@ namespace CooksAssistant
 			}
 			if (Config.DebugMode)
 			{
-				Helper.Events.Display.RenderedHud += Event_DebugDrawHud;
+				Helper.Events.Display.RenderedHud += Event_DrawDebugHud;
 			}
 			SpaceEvents.OnItemEaten += SpaceEventsOnItemEaten;
 			SpaceEvents.BeforeGiftGiven += SpaceEventsOnBeforeGiftGiven;
@@ -163,7 +180,229 @@ namespace CooksAssistant
 				});
 		}
 
-		private void Event_DebugDrawHud(object sender, RenderedHudEventArgs e)
+		internal void UpdateCommunityCentreData(CommunityCenter cc)
+		{
+			AppendAreasCompleteData(cc);// oh my god5
+			AppendBundleData(cc);
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		internal void AppendAreasCompleteData(CommunityCenter cc)
+		{
+			// fUCK YOUJ
+			var areasComplete = Helper.Reflection
+				.GetField<NetArray<bool, NetBool>>(cc, nameof(cc.areasComplete));
+			var oldAreas = areasComplete.GetValue();
+			var newAreas = new NetArray<bool, NetBool>(7);
+			
+			for (var i = 0; i < oldAreas.Count; ++i)
+				newAreas[i] = oldAreas[i];
+			newAreas[newAreas.Length - 1] = SaveData?.HasCompletedCookingBundle ?? false;
+			areasComplete.SetValue(newAreas); // cunsn
+		}
+
+		/// <summary>
+		/// This method is needed to update the CC bundle dictionary that's otherwise populated without our values.
+		/// The CC constructor seemingly populates the dictionary without our changes to Data/Bundles, so it's topped up here.
+		/// </summary>
+		internal void AppendBundleData(CommunityCenter cc)
+		{
+			var brokenDictField = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary");
+			var brokenDict = brokenDictField.GetValue();
+			var keys = Game1.netWorldState.Value.BundleRewards.Keys.Where
+				(key => !brokenDict.ContainsKey(key) && key > BundleStartIndex && BundleStartIndex > 0);
+			var keysDict = keys.ToDictionary(key => key, value => CommunityCentreAreaNumber);
+			brokenDict = brokenDict.Concat(keysDict).ToDictionary(pair => pair.Key, pair => pair.Value);
+			brokenDictField.SetValue(brokenDict);
+
+			if (!Config.DebugMode)
+				return;
+			
+			// aauugh
+			var dog = Game1.netWorldState.Value.Bundles;
+			var dogTreats = Game1.netWorldState.Value.BundleRewards;
+			Log.D(dog.Aggregate("dog: ", (s, boolses)
+				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value.Aggregate("", (s2, b) => $"{s2} {b}")}")}" : "none"));
+			Log.D(dogTreats.Aggregate("dogTreats: ", (s, boolses)
+				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value}")}" : "none"));
+			Log.D(cc.areasComplete.Aggregate("AreasComplete: ", (s, b) => $"{s} {b}"));
+			Log.D(brokenDict.Aggregate("bundleToAreaDictionary: ", (s, pair) => $"{s} ({pair.Key}:{pair.Value})"));
+		}
+		/*
+		internal void PretendCheckForMissingRewards(CommunityCenter cc)
+		{
+			var hasUnclaimedRewards = false;
+			cc.missedRewardsChest.Value.items.Clear();
+			var rewards = new List<Item>();
+			foreach (var key in cc.bundleRewards.Keys)
+			{
+				var bundleToAreaDictionary = Helper.Reflection.GetField<Dictionary<int, int>>
+					(cc, "bundleToAreaDictionary").GetValue();
+				var area = bundleToAreaDictionary[key];
+				if (cc.bundleRewards[key] && cc.areasComplete.Count > area && cc.areasComplete[area])
+				{
+					hasUnclaimedRewards = true;
+					rewards.Clear();
+					JunimoNoteMenu.GetBundleRewards(area, rewards);
+					foreach (var item in rewards)
+					{
+						cc.missedRewardsChest.Value.addItem(item);
+					}
+				}
+			}
+
+			var missedRewardsChestTile = Helper.Reflection.GetField<Vector2>
+				(cc, "missedRewardsChestTile").GetValue();
+			var multiplayer = Helper.Reflection.GetField<Multiplayer>
+				(typeof(Game1), "multiplayer").GetValue();
+			if (hasUnclaimedRewards && !cc.missedRewardsChestVisible.Value)
+			{
+				cc.showMissedRewardsChestEvent.Fire(true);
+				multiplayer.broadcastSprites(cc,
+					new TemporaryAnimatedSprite(Game1.random.NextDouble() < 0.5 ? 5 : 46,
+					missedRewardsChestTile * 64f + new Vector2(16f, 16f), Color.White)
+				{
+					layerDepth = 1f
+				});
+			}
+			else if (!hasUnclaimedRewards && cc.missedRewardsChestVisible.Value)
+			{
+				cc.showMissedRewardsChestEvent.Fire(false);
+				multiplayer.broadcastSprites(cc,
+					new TemporaryAnimatedSprite(Game1.random.NextDouble() < 0.5 ? 5 : 46,
+						missedRewardsChestTile * 64f + new Vector2(16f, 16f), Color.White)
+				{
+					layerDepth = 1f
+				});
+			}
+			cc.missedRewardsChestVisible.Value = hasUnclaimedRewards;
+		}
+		*/
+		private void LoadApis()
+		{
+			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
+			if (JsonAssets == null)
+			{
+				Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
+				return;
+			}
+			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, ContentPackPath));
+		}
+		
+		private void GameLoopOnGameLaunched(object sender, GameLaunchedEventArgs e)
+		{
+			LoadApis();
+		}
+
+		private void GameLoopOnSaveLoaded(object sender, SaveLoadedEventArgs e)
+		{
+			SaveData = Helper.Data.ReadSaveData<ModSaveData>(SaveDataKey) ?? new ModSaveData();
+
+			// Invalidate and reload assets requiring JA indexes
+			Helper.Content.InvalidateCache(@"Data/ObjectInformation");
+			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
+			// and you
+			Helper.Content.InvalidateCache(@"Data/Bundles");
+			
+			// Add watcher to check for first-time Kitchen bundle completion
+			if (Config.AddCookingToCommunityCentre)
+			{
+				Helper.Events.GameLoop.DayEnding += Event_WatchingKitchenBundle;
+			}
+
+			// Load default recipes
+			foreach (var recipe in Config.DefaultUnlockedRecipes
+				.Where(recipe => !Game1.player.cookingRecipes.ContainsKey(recipe)))
+				Game1.player.cookingRecipes.Add(recipe, 0);
+
+			// Populate NPC home locations for cooking range usage
+			var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
+			NpcHomeLocations.Clear();
+			foreach (var npc in npcData)
+				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
+		}
+		
+		private void GameLoopOnSaving(object sender, SavingEventArgs e)
+		{
+			Helper.Data.WriteSaveData(SaveDataKey, SaveData);
+		}
+
+		private void GameLoopOnDayStarted(object sender, DayStartedEventArgs e)
+		{
+			// Load contextual recipes
+			if (Game1.player.knowsRecipe("Maki Roll") && !Game1.player.cookingRecipes.ContainsKey("Eel Sushi"))
+				Game1.player.cookingRecipes.Add("Eel Sushi", 0);
+			if (Game1.player.knowsRecipe("Omelet") && !Game1.player.cookingRecipes.ContainsKey("Quick Breakfast"))
+				Game1.player.cookingRecipes.Add("Quick Breakfast", 0);
+			if (Game1.player.knowsRecipe("Hearty Stew") && !Game1.player.cookingRecipes.ContainsKey("Dwarven Stew"))
+				Game1.player.cookingRecipes.Add("Dwarven Stew", 0);
+
+			// Clear daily cooking to free up Cooking experience gains
+			if (Config.CookingSkill)
+			{
+				FoodCookedToday.Clear();
+			}
+
+			// Attempt to place a wild nettle as forage around other weeds
+			if (Game1.currentSeason != "winter")
+			{
+				foreach (var l in new[] {"Mountain", "Forest", "Railroad", "Farm"})
+				{
+					var location = Game1.getLocationFromName(l);
+					var tile = location.getRandomTile();
+					location.Objects.TryGetValue(tile, out var o);
+					tile = Utility.getRandomAdjacentOpenTile(tile, location);
+					if (tile == Vector2.Zero || o == null || o.ParentSheetIndex < 312 || o.ParentSheetIndex > 322)
+						continue;
+					location.terrainFeatures.Add(tile, new CustomBush(tile, location, CustomBush.BushVariety.Nettle));
+				}
+			}
+
+			// Purge old easter eggs when Summer begins
+			if (Game1.dayOfMonth == 1 && Game1.currentSeason == "summer")
+			{
+				const string itemToPurge = EasterEggItem;
+				const string itemToAdd = ChocolateBarItem;
+				foreach (var chest in Game1.locations.SelectMany(
+					l => l.Objects.SelectMany(dict => dict.Values.Where(
+						o => o is Chest c && c.items.Any(i => i.Name == itemToPurge)))).Cast<Chest>())
+				{
+					var stack = 0;
+					foreach (var item in chest.items.Where(i => i.Name == itemToPurge))
+					{
+						// TODO: TEST: Easter egg expiration on Summer 1
+						stack += item.Stack;
+						chest.items[chest.items.IndexOf(item)] = null;
+					}
+					chest.items.Add(new Object(JsonAssets.GetObjectId(itemToAdd), stack));
+				}
+			}
+
+			// aauugh
+			if (Config.AddCookingToCommunityCentre)
+			{
+				UpdateCommunityCentreData(Game1.getLocationFromName("CommunityCenter") as CommunityCenter);
+			}
+		}
+		
+		private void GameLoopOnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
+		{
+			// Remove Kitchen bundle watcher, assuming one exists
+			if (Config.AddCookingToCommunityCentre)
+			{
+				Helper.Events.GameLoop.DayEnding -= Event_WatchingKitchenBundle;
+			}
+		}
+
+		private void GameLoopUpdateTicked(object sender, UpdateTickedEventArgs e)
+		{
+			_healthOnLastTick = Game1.player.health;
+			_staminaOnLastTick = Game1.player.Stamina;
+		}
+		
+		private void Event_DrawDebugHud(object sender, RenderedHudEventArgs e)
 		{
 			for (var i = 0; i < _debugTicksDiff.Count; ++i)
 				e.SpriteBatch.DrawString(
@@ -191,101 +430,6 @@ namespace CooksAssistant
 				$"EP+   {_staminaRegeneration}",
 				new Vector2(Game1.graphics.GraphicsDevice.Viewport.Width - 222, Game1.graphics.GraphicsDevice.Viewport.Height - 48),
 				Color.White);
-		}
-
-		private bool PlayerAgencyLostCheck()
-		{
-			return !Game1.game1.IsActive // No alt-tabbed game state
-			       || Game1.eventUp && !Game1.currentLocation.currentEvent.playerControlSequence // No event cutscenes
-			       || Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp // No text inputs
-			       || Game1.player.UsingTool || Game1.pickingTool || Game1.numberOfSelectedItems != -1 // No tools in use
-			       || Game1.fadeToBlack;
-		}
-
-		private void LoadApis()
-		{
-			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-			if (JsonAssets == null)
-			{
-				Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
-				return;
-			}
-			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, ContentPackPath));
-		}
-		
-		private void GameLoopOnGameLaunched(object sender, GameLaunchedEventArgs e)
-		{
-			LoadApis();
-		}
-
-		private void GameLoopOnSaveLoaded(object sender, SaveLoadedEventArgs e)
-		{
-			SaveData = Helper.Data.ReadSaveData<ModSaveData>(SaveDataKey) ?? new ModSaveData();
-
-			// Invalidate and reload assets requiring JA indexes
-			Helper.Content.InvalidateCache(@"Data/ObjectInformation");
-			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
-
-			// Load default recipes
-			foreach (var recipe in Config.DefaultUnlockedRecipes
-				.Where(recipe => !Game1.player.cookingRecipes.ContainsKey(recipe)))
-				Game1.player.cookingRecipes.Add(recipe, 0);
-
-			// Populate NPC home locations for cooking range usage
-			var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
-			NpcHomeLocations.Clear();
-			foreach (var npc in npcData)
-				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
-		}
-
-		private void GameLoopOnDayStarted(object sender, DayStartedEventArgs e)
-		{
-			// Load contextual recipes
-			if (Game1.player.knowsRecipe("Maki Roll") && !Game1.player.cookingRecipes.ContainsKey("Eel Sushi"))
-				Game1.player.cookingRecipes.Add("Eel Sushi", 0);
-			if (Game1.player.knowsRecipe("Omelet") && !Game1.player.cookingRecipes.ContainsKey("Quick Breakfast"))
-				Game1.player.cookingRecipes.Add("Quick Breakfast", 0);
-			if (Game1.player.knowsRecipe("Hearty Stew") && !Game1.player.cookingRecipes.ContainsKey("Dwarven Stew"))
-				Game1.player.cookingRecipes.Add("Dwarven Stew", 0);
-
-			// Attempt to place a wild nettle as forage around other weeds
-			if (Game1.currentSeason == "winter")
-				return;
-			foreach (var l in new[] {"Mountain", "Forest", "Railroad", "Farm"})
-			{
-				var location = Game1.getLocationFromName(l);
-				var tile = location.getRandomTile();
-				location.Objects.TryGetValue(tile, out var o);
-				tile = Utility.getRandomAdjacentOpenTile(tile, location);
-				if (tile == Vector2.Zero || o == null || o.ParentSheetIndex < 312 || o.ParentSheetIndex > 322)
-					continue;
-				location.terrainFeatures.Add(tile, new CustomBush(tile, location, CustomBush.BushVariety.Nettle));
-			}
-
-			// Purge old easter eggs when Summer begins
-			if (Game1.dayOfMonth != 1 || Game1.currentSeason != "summer")
-				return;
-			const string itemToPurge = EasterEggItem;
-			const string itemToAdd = "Chocolate Bar";
-			foreach (var chest in Game1.locations.SelectMany(
-				l => l.Objects.SelectMany(dict => dict.Values.Where(
-					o => o is Chest c && c.items.Any(i => i.Name == itemToPurge)))).Cast<Chest>())
-			{
-				var stack = 0;
-				foreach (var item in chest.items.Where(i => i.Name == itemToPurge))
-				{
-					// TODO: TEST: Easter egg expiration on Summer 1
-					stack += item.Stack;
-					chest.items[chest.items.IndexOf(item)] = null;
-				}
-				chest.items.Add(new Object(JsonAssets.GetObjectId(itemToAdd), stack));
-			}
-		}
-		
-		private void GameLoopUpdateTicked(object sender, UpdateTickedEventArgs e)
-		{
-			_healthOnLastTick = Game1.player.health;
-			_staminaOnLastTick = Game1.player.Stamina;
 		}
 
 		private void Event_FoodRegeneration(object sender, UpdateTickedEventArgs e)
@@ -349,6 +493,48 @@ namespace CooksAssistant
 			Log.D($"Reverted gift taste dialogue to {TempPair.Value}");
 			TempPair = new KeyValuePair<string, string>();
 		}
+		
+		private void Event_WatchingBuffs(object sender, UpdateTickedEventArgs e)
+		{
+			if (Game1.buffsDisplay.food.source != _watchingBuff.source
+			    && Game1.buffsDisplay.drink.source != _watchingBuff.source
+			    && Game1.buffsDisplay.otherBuffs.All(buff => buff.source != _watchingBuff.source))
+			{
+				Helper.Events.GameLoop.UpdateTicked -= Event_WatchingBuffs;
+
+				_watchingBuff = null;
+			}
+		}
+		
+		private void Event_WatchingKitchenBundle(object sender, DayEndingEventArgs e)
+		{
+			// Send mail when completing the Kitchen in the community centre
+			var mailId = $"cc{CommunityCentreAreaName}";
+			var cc = Game1.getLocationFromName("CommunityCenter") as CommunityCenter;
+			if (!cc.areasComplete[CommunityCentreAreaNumber] || Game1.player.mailReceived.Contains(mailId))
+				return;
+
+			Game1.player.mailForTomorrow.Add(mailId + "%&NL&%");
+			Game1.addMailForTomorrow($"{Helper.ModRegistry.ModID}.ccKitchenBundleComplete");
+		}
+
+		private void Event_MoveJunimo(object sender, UpdateTickedEventArgs e)
+		{
+			var cc = Game1.currentLocation as CommunityCenter;
+			var p = CommunityCentreNotePosition;
+			if (cc.characters.FirstOrDefault(c => c is Junimo j && j.whichArea.Value == CommunityCentreAreaNumber)
+			    == null)
+			{
+				Log.E($"No junimo in area {CommunityCentreAreaNumber} to move!");
+			}
+			else
+			{
+				cc.characters.FirstOrDefault(c => c is Junimo j && j.whichArea.Value == CommunityCentreAreaNumber)
+					.Position = new Vector2(p.X, p.Y + 2) * 64f;
+				Log.W("Moving junimo");
+			}
+			Helper.Events.GameLoop.UpdateTicked -= Event_MoveJunimo;
+		}
 
 		private void InputOnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
@@ -358,27 +544,28 @@ namespace CooksAssistant
 			// debug test
 			if (Config.DebugMode)
 			{
-				if (e.Button == SButton.H)
+				switch (e.Button)
 				{
-					OpenNewCookingMenu();
-				}
-				if (e.Button == SButton.F5)
-				{
-					Game1.currentLocation.largeTerrainFeatures.Add(
-						new Bush(e.Cursor.GrabTile, 1, Game1.currentLocation));
-					return;
-				}
-				if (e.Button == SButton.F6)
-				{
-					Game1.currentLocation.terrainFeatures.Add(e.Cursor.GrabTile,
-						new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, CustomBush.BushVariety.Nettle));
-					return;
-				}
-				if (e.Button == SButton.F7)
-				{
-					Game1.currentLocation.largeTerrainFeatures.Add(
-						new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, CustomBush.BushVariety.Redberry));
-					return;
+					case SButton.G:
+						Game1.player.warpFarmer(Game1.currentLocation is CommunityCenter
+							? new Warp(0, 0, "FarmHouse", 0, 0, false)
+							: new Warp(0, 0, "CommunityCenter", 12, 6, false));
+						return;
+					case SButton.H:
+						OpenNewCookingMenu();
+						return;
+					case SButton.F5:
+						Game1.currentLocation.largeTerrainFeatures.Add(
+							new Bush(e.Cursor.GrabTile, 1, Game1.currentLocation));
+						return;
+					case SButton.F6:
+						Game1.currentLocation.terrainFeatures.Add(e.Cursor.GrabTile,
+							new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, CustomBush.BushVariety.Nettle));
+						return;
+					case SButton.F7:
+						Game1.currentLocation.largeTerrainFeatures.Add(
+							new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, CustomBush.BushVariety.Redberry));
+						return;
 				}
 			}
 
@@ -480,6 +667,62 @@ namespace CooksAssistant
 			Game1.onScreenMenus.Add(CookingMenuButton);
 		}
 		
+		private void PlayerOnWarped(object sender, WarpedEventArgs e)
+		{/*
+			if (e.NewLocation is CommunityCenter && !(e.OldLocation is CommunityCenter))
+				Helper.Events.Display.RenderedWorld += Event_DrawCC;
+			else if (e.OldLocation is CommunityCenter && !(e.NewLocation is CommunityCenter))
+				Helper.Events.Display.RenderedWorld -= Event_DrawCC;
+			*/
+			// TODO: TEST: drawing final star with TASprite
+			if (!(e.NewLocation is CommunityCenter))
+				return;
+			
+			Helper.Events.GameLoop.UpdateTicked += Event_MoveJunimo;
+			const int num = CommunityCentreAreaNumber;
+			var cc = e.NewLocation as CommunityCenter; // fgs fds
+			var count = Helper.Reflection.GetField<NetArray<bool, NetBool>>(
+				cc, nameof(cc.areasComplete)).GetValue();
+			Log.D($"CC areasComplete count: {count}");
+			
+			if (cc.areasComplete[CommunityCentreAreaNumber])
+			{
+				var multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
+				multiplayer.broadcastSprites(
+					Game1.currentLocation,
+					new TemporaryAnimatedSprite(
+						"LooseSprites\\Cursors", 
+						new Rectangle(354, 401, 7, 7), 
+						9999, 1, 9999, 
+						new Vector2(2096f, 344f), 
+						false, false, 0.8f, 0f, Color.White,
+						4f, 0f, 0f, 0f)
+					{
+						holdLastFrame = true
+					});
+			}
+			if (cc.areAllAreasComplete())
+			{
+				return;
+			}
+
+			var c1 = cc.isJunimoNoteAtArea(num);
+			var c2 = cc.shouldNoteAppearInArea(num);
+			if (!c1 && c2)
+			{
+				Log.E("Adding junimo note manually");
+				cc.addJunimoNote(num);
+				Helper.Reflection.GetMethod(cc, "resetSharedState").Invoke();
+				Helper.Reflection.GetMethod(cc, "resetLocalState").Invoke();
+			}
+			return;
+			// TODO: TEST: Whether cc.resetState() methods will automatically cover loadArea for new area
+			if (cc.areasComplete[CommunityCentreAreaNumber])
+			{
+				cc.loadArea(num);
+			}
+		}
+
 		private void SpaceEventsOnItemEaten(object sender, EventArgs e)
 		{
 			if (!(Game1.player.itemToEat is Object food))
@@ -625,19 +868,7 @@ namespace CooksAssistant
 				Helper.Events.GameLoop.UpdateTicked += Event_WatchingBuffs;
 			}
 		}
-
-		private void Event_WatchingBuffs(object sender, UpdateTickedEventArgs e)
-		{
-			if (Game1.buffsDisplay.food.source != _watchingBuff.source
-			    && Game1.buffsDisplay.drink.source != _watchingBuff.source
-			    && Game1.buffsDisplay.otherBuffs.All(buff => buff.source != _watchingBuff.source))
-			{
-				Helper.Events.GameLoop.UpdateTicked -= Event_WatchingBuffs;
-
-				_watchingBuff = null;
-			}
-		}
-
+		
 		private void SpaceEventsOnBeforeGiftGiven(object sender, EventArgsBeforeReceiveObject e)
 		{
 			// Ignore when gifts aren't going to be accepted
@@ -671,6 +902,15 @@ namespace CooksAssistant
 
 			// Remove the patch on the next tick, after the unique gift dialogue has been loaded and drawn
 			Helper.Events.GameLoop.UpdateTicked += Event_UndoGiftChanges;
+		}
+		
+		private bool PlayerAgencyLostCheck()
+		{
+			return !Game1.game1.IsActive // No alt-tabbed game state
+			       || Game1.eventUp && !Game1.currentLocation.currentEvent.playerControlSequence // No event cutscenes
+			       || Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp // No text inputs
+			       || Game1.player.UsingTool || Game1.pickingTool || Game1.numberOfSelectedItems != -1 // No tools in use
+			       || Game1.fadeToBlack;
 		}
 
 		public void CheckTileAction(Vector2 position, GameLocation location)
@@ -718,9 +958,9 @@ namespace CooksAssistant
 		private void OpenNewCookingMenu()
 		{
 			Log.D("Opened cooking menu.");
-			if (!(Game1.activeClickableMenu is GameObjects.Menus.CookingMenu)
-			    || Game1.activeClickableMenu is GameObjects.Menus.CookingMenu menu && menu.PopMenuStack(true, true))
-				Game1.activeClickableMenu = new GameObjects.Menus.CookingMenu();
+			if (!(Game1.activeClickableMenu is CookingMenu)
+			    || Game1.activeClickableMenu is CookingMenu menu && menu.PopMenuStack(true, true))
+				Game1.activeClickableMenu = new CookingMenu();
 		}
 		
 		internal static void RemoveCookingMenuButton()

@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
+using Newtonsoft.Json;
 using StardewModdingAPI;
 using StardewValley;
 using xTile;
@@ -34,19 +36,65 @@ namespace CooksAssistant
 		public bool CanEdit<T>(IAssetInfo asset)
 		{
 			return Game1.player != null 
-			       && (asset.AssetNameEquals(@"Data/CookingRecipes")
+			       && (asset.AssetNameEquals(@"Data/Bundles")
+			           || asset.AssetNameEquals(@"Data/CookingRecipes")
 			           || asset.AssetNameEquals(@"Data/ObjectInformation")
 			           || asset.AssetNameEquals(@"Data/Events/Saloon")
 			           || asset.AssetNameEquals(@"Data/Events/Mountain")
 			           || asset.AssetNameEquals(@"Data/Events/JoshHouse")
+			           || asset.AssetNameEquals(@"LooseSprites/JunimoNote")
 			           || asset.AssetNameEquals(@"Maps/Beach")
 			           || asset.AssetNameEquals(@"Maps/Saloon")
-			           || asset.AssetNameEquals(@"Maps/springobjects"));
+			           || asset.AssetNameEquals(@"Maps/springobjects")
+			           || asset.AssetNameEquals(@"Maps/townInterior")
+			           || asset.AssetNameEquals(@"Strings/UI")
+			           || asset.AssetNameEquals(@"Strings/Locations"));
 		}
 
 		public void Edit<T>(IAssetData asset)
 		{
-			if (asset.AssetNameEquals(@"Data/CookingRecipes"))
+			EditAsset(ref asset); // eat that, ENC0036
+		}
+
+		private void EditAsset(ref IAssetData asset)
+		{
+			if (asset.AssetNameEquals(@"Data/Bundles"))
+			{
+				// Make changes to facilitate a new community centre bundle
+
+				if (!Game1.hasLoadedGame)
+				{
+					return;
+				}
+				if (!ModEntry.Instance.Config.AddCookingToCommunityCentre)
+				{
+					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
+						Config.DebugMode);
+					return;
+				}
+
+				var data = asset.AsDictionary<string, string>().Data;
+				
+				ModEntry.Instance.BundleStartIndex = data.Keys.ToList().Max(key => int.Parse(key.Split('/')[1]));
+				var customBundleData = ModEntry.Instance.Helper.Content.Load<List<string>>($"{ModEntry.BundleDataPath}.json");
+				for (var i = 0; i < customBundleData.Count; ++i)
+				{
+					var index = ModEntry.Instance.BundleStartIndex + i + 1;
+					var name = $"{ModEntry.CommunityCentreAreaName}.bundle.{i}";
+					var displayName = i18n.Get($"world.community_centre.bundle.{i + 1}");
+
+					// Update bundle data
+					var key = $"{ModEntry.CommunityCentreAreaName}/{index}";
+					var value = string.Format(customBundleData[i]
+						//, name
+						, displayName
+						);
+					data.Add(key, value);
+				}
+
+				asset.AsDictionary<string, string>().ReplaceWith(data);
+			}
+			else if (asset.AssetNameEquals(@"Data/CookingRecipes"))
 			{
 				// Edit fields of vanilla recipes to use new ingredients
 
@@ -226,7 +274,24 @@ namespace CooksAssistant
 			}
 			
 			Log.W($"Editing {asset.AssetName}");
-			if (asset.AssetNameEquals(@"Maps/Beach"))
+			if (asset.AssetNameEquals(@"LooseSprites/JunimoNote"))
+			{
+				// Add icons for a new community centre bundle
+				
+				if (!ModEntry.Instance.Config.AddCookingToCommunityCentre)
+				{
+					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
+						Config.DebugMode);
+					return;
+				}
+				
+				var sourceArea = new Rectangle(0, 180, 32 * 3, 32);
+				var destArea = new Rectangle(544, 212, 32 * 3, 32);
+				var destImage = asset.AsImage();
+				destImage.PatchImage(destImage.Data, sourceArea, destArea, PatchMode.Replace);
+				asset.ReplaceWith(destImage.Data);
+			}
+			else if (asset.AssetNameEquals(@"Maps/Beach"))
 			{
 				// Add dock wares to the secret beach
 
@@ -267,6 +332,63 @@ namespace CooksAssistant
 					PatchMode.Replace);
 				asset.ReplaceWith(destImage.Data);
 			}
+			else if (asset.AssetNameEquals(@"Maps/townInterior"))
+			{
+				// Make changes to facilitate a new community centre star
+				
+				if (!ModEntry.Instance.Config.AddCookingToCommunityCentre)
+				{
+					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
+						Config.DebugMode);
+					return;
+				}
+				
+				var sourceArea = new Rectangle(370, 705, 7, 7);
+				var destArea = new Rectangle(380, 710, 7, 7);
+				var image = asset.AsImage();
+				image.PatchImage(image.Data, sourceArea, destArea, PatchMode.Replace);
+				asset.ReplaceWith(image.Data);
+			}
+			else if (asset.AssetNameEquals(@"Strings/Locations"))
+			{
+				// Make changes to facilitate a new community centre bundle
+
+				if (!ModEntry.Instance.Config.AddCookingToCommunityCentre)
+				{
+					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
+						Config.DebugMode);
+					return;
+				}
+
+				var data = asset.AsDictionary<string, string>().Data;
+
+				if (data.ContainsKey("CommunityCenter_AreaName_" + ModEntry.CommunityCentreAreaName))
+					return;
+
+				data.Add("CommunityCenter_AreaName_" + ModEntry.CommunityCentreAreaName, i18n.Get("world.community_centre.kitchen"));
+				const int newJunimoLineNumber = 3;
+				for (var i = newJunimoLineNumber; i < ModEntry.CommunityCentreAreaNumber - 1; ++i)
+					data["CommunityCenter_AreaCompletion" + i] = data["CommunityCenter_AreaCompletion" + (i - 1)];
+				
+				data["CommunityCenter_AreaCompletion" + newJunimoLineNumber] = i18n.Get("world.community_centre.newjunimoline");
+
+				asset.AsDictionary<string, string>().ReplaceWith(data);
+			}
+			else if (asset.AssetNameEquals(@"Strings/UI"))
+			{
+				// Make changes to facilitate a new community centre bundle
+
+				if (!ModEntry.Instance.Config.AddCookingToCommunityCentre)
+				{
+					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
+						Config.DebugMode);
+					return;
+				}
+
+				var data = asset.AsDictionary<string, string>().Data;
+				data["JunimoNote_Reward" + ModEntry.CommunityCentreAreaName] = i18n.Get("world.community_centre.reward");
+				asset.AsDictionary<string, string>().ReplaceWith(data);
+			}
 		}
 
 		private void RebuildBuffs(ref IDictionary<int, string> data)
@@ -306,7 +428,7 @@ namespace CooksAssistant
 							};
 						}
 					}
-					if (buffSplit == null)
+					if (buffSplit == null || ModEntry.Instance.Config.ObjectsToAvoidScaling.Contains(o.Name))
 						continue;
 					for (var j = 0; j < buffSplit.Length; j += 2)
 					{

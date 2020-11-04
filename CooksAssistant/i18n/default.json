@@ -81,6 +81,14 @@
 	"world.fisherman.inspect_2": "You ever seen a river troll, kid? Heh heh...$b#Ahh, you're too old for fairy tales.",
 	"world.fisherman.inspect_3": "There's no good catches with those travelling market folks in the bay...",
 
+	// Community Centre edits when using the Cooking bundle
+	"world.community_centre.kitchen": "Kitchen", 
+	"world.community_centre.reward": "Cooking stuff", 
+	"world.community_centre.bundle.1": "Picnicker's", 
+	"world.community_centre.bundle.2": "Cook's", 
+	"world.community_centre.bundle.3": "Diner's", 
+	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go.", 
+
 	// Egg Festival - Year 2
 	"world.bunny_talk.inspect_1": "Oh my, oh me, oh fie! I'm late, I'm late!",
 	"world.bunny_talk.inspect_2": "You there! I saw your face, I saw that race! You're a natural egg-chaser!",

@@ -1,5 +1,7 @@
 ﻿Things I'd like:
 
+	Other mod recommendations:
+		[LenneDalben] Townies Need Food - https://www.nexusmods.com/stardewvalley/mods/6534/
 	Idea credits:
 		[goboking] Cooking overhaul - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/
 		✔	[Denfro] Cook in bulk - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbuho3a/
@@ -15,22 +17,23 @@
 			[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
 		[YorikTheDestroyer] Cooking festival - https://github.com/StardewModders/mod-ideas/issues/490
 	✔	[killkrazed] Filter, search, sort, grid - https://github.com/StardewModders/mod-ideas/issues/470
-	Other mod recommendations:
-		[LenneDalben] Townies Need Food - https://www.nexusmods.com/stardewvalley/mods/6534/
 
 	Concepts to think on:
-		Kitchen in farmhouse reworks
+		Kitchen in farmhouse rework
 		Cooking range in the Saloon with a rising level
 		Frying pan and equipment levels opened up by raising your cooking level
+		Lock ingredient types by category behind Cooking level
 	✔	Cooking levels
 	✔	Cooking menu search and sort by filter
+	✔	Remove Oil from all recipes, instead include it as a qualtiy buff
+	✔	Food healing over time
+
 		Easter events for year 2 and 3
 		Cooking festival
 			Queen of Sauce feature: https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
 			Minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
-	✔	Remove Oil from all recipes, instead include it as a qualtiy buff
-	✔	Food healing over time
-		Goblin cooking: https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
+		Goblin cooking
+			https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
 
 	Others:
 		Easter event
@@ -76,33 +79,34 @@ w	/	Sugar Cane
 e	✔	Big Burger -> Bread + Cheese + Onion
 e	✔	Buttered Corn -> Corn
 	✔	Big Burger -> Bread + Cheese + Onion
-	✔	Breakfast Bran -> Wheat + Fruit (Farming +2)
+	✔	Breakfast Bran -> Wheat + Fruit
 G	✔	Burrito -> Tortilla + Rice + Chilli
 	✔ 	Cabbage Pot -> Cabbage x2 + Onion x2
 	✔	Cake -> Flour x2 + Egg x2 + Milk (Leftovers)
-	✔	Dwarven Stew -> Hearty Stew + Beer/Ale/Cider (Attack +3 Defence +3 Speed -1)
+	✔	Dwarven Stew -> Hearty Stew + Beer/Ale/Cider
 	✔	Eel Sushi -> Eel + Seaweed + Rice
 ×	✔	Egg Sandwich -> Bread + Mayonnaise + Egg (Leftovers)
-	✔	Fish Supper -> Fish + Potato + Bean ()
-	✔	Garden Pie -> Flour + Cabbage + Onion + Tomato (Farming +2)
-G	✔	Hearty Stew -> Carrot x2 + Potato (Defence +2)
-	✔	Hot Cocoa -> Milk + Chocolate Bar (Max Health +25 Max Energy +35 )
-	✔	Hot Curry -> Hearty Stew + Hot Pepper + Rice (Attack +2 Defence -2 Speed +1)
-	✔	Hunter's Plate -> Potato + Cabbage + Horseradish (Foraging +1)
+	✔	Fish Supper -> Fish + Potato + Bean
+	✔	Garden Pie -> Flour + Cabbage + Onion + Tomato
+G	✔	Hearty Stew -> Carrot x2 + Potato
+	✔	Hot Cocoa -> Milk + Chocolate Bar
+	✔	Hot Curry -> Hearty Stew + Hot Pepper + Rice
+	✔	Hunter's Plate -> Potato + Cabbage + Horseradish
 	✔	Kebab -> Tortilla + Tomato + Onion (Kebab bonus)
-	✔	Loaded Potato -> Baked Potato + Tuna + Corn ()
+	✔	Loaded Potato -> Baked Potato + Tuna + Corn
 	❎	Mashed Potatoes -> Potato x2 + Milk
 	❎	Onion Soup -> Onion + Garlic + Cheese (Garlic Aura)
 	❎	Porridge -> Wheat + Milk
-	✔	Quick Breakfast -> Omelet + Coffee (Speed +1)
+	✔	Quick Breakfast -> Omelet + Coffee
 	✔	Redberry Pie -> Flour + Sugar + Redberries x3
+		Roast Dinner -> Cranberry Sauce + Stuffing + Roots Platter
 ×	✔	Salad Sandwich -> Bread + Vinegar + Dandelion (Leftovers)
 ×	✔	Seafood Sandwich -> Bread + Mayonnaise + Crab (Leftovers)
 e	✔	Pineapple Skewers -> Pineapple + Onion + Eggplant
 	✔	Stuffed Potato -> Potato + Cheese + Common Mushroom ()
 	✔	Summer Pie -> Flour + Watermelon + Strawberry
 e	✔	Tropical Salad -> Pineapple + Watermelon
-	✔	Waffles -> Wheat + Blueberry x2 + Maple Syrup (Foraging +1 Mining +1 Max Energy +20)
+	✔	Waffles -> Wheat + Blueberry x2 + Maple Syrup
 
 	KEY:
 	✔	Implementation complete

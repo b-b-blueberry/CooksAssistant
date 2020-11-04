@@ -5,6 +5,7 @@ namespace CooksAssistant
 	public class Config
 	{
 		public bool CookingOverhaul { get; set; } = true;
+		public bool AddCookingToCommunityCentre { get; set; } = true;
 		public bool NewRecipeScaling { get; set; } = true;
 		public bool ScaleCustomRecipes { get; set; } = true;
 		public bool AddBuffsToCustomIngredients { get; set; } = true;
@@ -44,6 +45,10 @@ namespace CooksAssistant
 		{
 			"pizza",
 			"cake"
+		};
+		public List<string> ObjectsToAvoidScaling = new List<string>
+		{
+
 		};
 		public Dictionary<string, int> ObjectsWithCookingBuffs = new Dictionary<string, int>
 		{
