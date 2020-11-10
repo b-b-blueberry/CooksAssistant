@@ -19,28 +19,58 @@
 	✔	[killkrazed] Filter, search, sort, grid - https://github.com/StardewModders/mod-ideas/issues/470
 
 	Concepts to think on:
-		Kitchen in farmhouse rework
-		Cooking range in the Saloon with a rising level
-		Frying pan and equipment levels opened up by raising your cooking level
-		Lock ingredient types by category behind Cooking level
 	✔	Cooking levels
 	✔	Cooking menu search and sort by filter
 	✔	Remove Oil from all recipes, instead include it as a qualtiy buff
 	✔	Food healing over time
+	✔	Farmhouse kitchen rebalance
+		✔	Account for quick-start mods
+	✔	Upgrade cooking equipment from Clint
+		✔	Sprites for copper/steel/gold/iridium upgrades
+		Cooking range in the Saloon with a level increasing through questline progression
+		Rebalance ingredients to foods
+		Community centre cooking bundle items and rewards + big reward
+			Picnicker's Bundle
+				Cooking level 2 recipe
+				Friendship level 2 recipe x2
+			Diner's Bundle
+				Cooking level 4 recipe
+				Friendship level 4 recipe x2
+			Cook's Bundle
+				Cooking level 6 recipe
+				Friendship level 6 recipe x2
+		Cooking level bonuses
+		✔	Skill professions
+			Skill profession icons
 
-		Easter events for year 2 and 3
-		Cooking festival
+	Events:
+		RELEASE: Cooking festival
 			Queen of Sauce feature: https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
 			Minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
-		Goblin cooking
-			https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
+			Festival map
+				Town square festival
+				Adjudicator's table
+				Contestants' areas
+				Contestants work in pairs?
 
-	Others:
-		Easter event
-			Bunny ears? You bet
-			Egg basket
-		🍰	Chocolate eggs
-			Easter bunny idle hopping and poofing in and out and stuff
+		UPDATE: Easter event
+		✔	Egg basket
+		✔	Chocolate eggs
+		✔	Bunny ears? You bet
+			Dialogue
+			✔	Bunny intro
+				Bunny mid-progress
+				Bunny outro
+			✔	Villager responses
+			Code
+				Spawn in eggs
+			✔	Villager responses
+			Easter bunny sprite
+				Idle: Look left, look right, hop
+				Poof in/out
+
+		LATER: Goblin cooking
+			https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
 
 	Changes:
 	✔	Coleslaw -> Mayo + Cabbage
@@ -53,60 +83,118 @@
 	✔	Cider -> Keg + Apple
 	✔	Vinegar -> Keg + Wine/Cider
 	✔	Nettle Tea -> Keg + Nettles
+		Marmalade -> Keg + Orange/Lemon/Lime/Citron/Yuzu/Grapefruit/Pomelo
 
-	Shops:
-		Chocolate Bar -> Joja Mart
+✔	Shops:
+	✔	Chocolate Bar -> Joja Mart
+	✔	Burrito -> Gus
+	✔	Hearty Stew -> Gus
 
 	Ingredients:
-w	🍰	Cabbage
-w	🍰	Onion
-w	🍰	Redberries
-w	🍰	Watermelon
-w	🍰	Carrot
-_	🍰	Pineapple
-w	🍰	Nettles
-_	🍰	Chocolate Bar
-w	/	Sugar Cane
+w!	/	Sugar Cane
+	✔	Onion
+	✔	Cabbage
+F	✔	Watermelon
+	✔	Carrot
+	✔	Pineapple
+	✔	Nettles
+	✔	Chocolate Bar
+w!	🍰	Redberries
 
 	Artisan:
 	✔	Cider
 	✔	Nettle Tea
 
+	Cooking levelup themes:
+		 0: Starting recipes
+				Fried Egg
+				Baked Potato
+		 1: Basic recipes
+				Burrito
+				Cauliflower Fritters
+		 2: Breakfast
+			+ You can now brew Nettle Tea.
+				Porridge
+				Quick Breakfast
+		 3: Basic combination recipes
+				Baked Lobster
+				Loaded Potato
+				Stuffed Potato
+		 4: Cakes and sweets
+				Cake
+				Hot Cocoa
+				Berry Waffles
+		 5: Fish recipes
+			+ Professions
+				Cray Mornay
+				Eel Sushi
+				Fish Supper
+		 6: New crops
+				Redberry Pie
+				Cabbage Pot
+				Hearty Stew
+				Hunter's Plate
+		 7: Summer treats
+				Apple Pie
+				Pineapple Skewers
+				Red Wrap
+				Tropical Salad
+		 8: Advanced recipes
+				Admiral Pie
+				Dwarven Stew
+				Hot Curry
+				Pitta Bread
+		 9: Advanced combination recipes
+				Garden Pie
+				Kebab
+				Ocean Platter
+				Roast Dinner
+		10: Sandwiches
+			+ Professions
+				Egg Sandwich
+				Salad Sandwich
+				Seafood Sandwich
+
 	Recipes:
-	✔	Admiral Pie -> Flour + Milk + Fish x2
-	✔	Apple Pie -> Flour + Sugar + Apple x2
-	✔	Baked Potato -> Potato
-e	✔	Big Burger -> Bread + Cheese + Onion
-e	✔	Buttered Corn -> Corn
-	✔	Big Burger -> Bread + Cheese + Onion
-	✔	Breakfast Bran -> Wheat + Fruit
-G	✔	Burrito -> Tortilla + Rice + Chilli
-	✔ 	Cabbage Pot -> Cabbage x2 + Onion x2
-	✔	Cake -> Flour x2 + Egg x2 + Milk (Leftovers)
-	✔	Dwarven Stew -> Hearty Stew + Beer/Ale/Cider
-	✔	Eel Sushi -> Eel + Seaweed + Rice
-×	✔	Egg Sandwich -> Bread + Mayonnaise + Egg (Leftovers)
-	✔	Fish Supper -> Fish + Potato + Bean
-	✔	Garden Pie -> Flour + Cabbage + Onion + Tomato
-G	✔	Hearty Stew -> Carrot x2 + Potato
-	✔	Hot Cocoa -> Milk + Chocolate Bar
-	✔	Hot Curry -> Hearty Stew + Hot Pepper + Rice
-	✔	Hunter's Plate -> Potato + Cabbage + Horseradish
-	✔	Kebab -> Tortilla + Tomato + Onion (Kebab bonus)
-	✔	Loaded Potato -> Baked Potato + Tuna + Corn
-	❎	Mashed Potatoes -> Potato x2 + Milk
-	❎	Onion Soup -> Onion + Garlic + Cheese (Garlic Aura)
-	❎	Porridge -> Wheat + Milk
-	✔	Quick Breakfast -> Omelet + Coffee
-	✔	Redberry Pie -> Flour + Sugar + Redberries x3
-		Roast Dinner -> Cranberry Sauce + Stuffing + Roots Platter
-×	✔	Salad Sandwich -> Bread + Vinegar + Dandelion (Leftovers)
-×	✔	Seafood Sandwich -> Bread + Mayonnaise + Crab (Leftovers)
-e	✔	Pineapple Skewers -> Pineapple + Onion + Eggplant
-	✔	Stuffed Potato -> Potato + Cheese + Common Mushroom ()
-	✔	Summer Pie -> Flour + Watermelon + Strawberry
-e	✔	Tropical Salad -> Pineapple + Watermelon
-	✔	Waffles -> Wheat + Blueberry x2 + Maple Syrup
+	✔	Admiral Pie				Flour + Milk + Tuna + Salmon						Runescape, fish line up in seasons
+	✔	Apple Pie				Flour + Sugar + Apple x2							Runescape
+	🍰	Baked Lobster			Lobster												Add opportunity value to an appealing ingredient
+	✔	Baked Potato			Potato												Populous crop, but recipe has to be augmented
+	?	Beet Burger				Bread + Beet + Onion + Red Cabbage						Too strange?
+	X	Big Burger				Bread + Cheese + Onion									Unappetising
+	X	Breakfast Bran			Wheat + Fruit											No justification, bad sprite / Wheat
+F	✔	Buttered Corn																	?
+G	✔	Burrito					Tortilla + Rice + Chilli							Rice, Tortilla
+	✔ 	Cabbage Pot				Cabbage x2 + Onion x2								New ingredients
+	✔	Cake					Flour x2 + Egg x2 + Milk (Leftovers)				Runescape
+	🍰	Cauliflower Fritters	Cauliflower + Spring Onion							Balance cheap unused ingredient forage with expensive crop
+	✔	Dwarven Stew			Hearty Stew + Beer/Ale/Cider						+Attack -Speed
+	✔	Eel Sushi				Eel + Seaweed + Rice								Rice
+U	✔	Egg Sandwich			Bread + Mayonnaise + Egg (Leftovers)				Runescape
+	✔	Fish Supper				Red Snapper x2 + Potato + Bean						Personal pref
+	✔	Garden Pie				Flour + Cabbage + Onion + Tomato					Runescape
+G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
+	✔	Hot Cocoa				Milk + Chocolate Bar								Personal pref
+	✔	Hot Curry				Hearty Stew + Hot Pepper + Rice						+Speed -Defence
+	✔	Hunter's Plate			Potato + Cabbage + Horseradish						New ingredients
+	✔	Kebab					Tortilla + Tomato + Onion (Kebab bonus)				Runescape
+	✔	Loaded Potato			Baked Potato + Tuna + Corn							Augmented recipe
+	🍰	Cray Mornay				Crayfish + Artichoke								Crayfish
+	🍰	Ocean Platter			Baked Lobster + Baked Fish + Rice + Oyster x2		Superfood
+	X	Mashed Potatoes			Potato x2 + Milk										Uninteresting
+	X	Onion Soup				Onion + Garlic + Cheese (Garlic Aura)					Outmoded
+	✔	Porridge				Wheat x2 + Milk										Wheat
+	✔	Quick Breakfast			Omelet + Coffee										Augmented recipe
+	?	Red Wrap				Tortilla + Red Cabbage + Beet + Onion				Tortilla recipe, strange enough to work
+	✔	Redberry Pie			Flour + Sugar + Redberries x3						Runescape
+		Roast Dinner			Cranberry Sauce + Roots Platter + Stuffing + Potato	Superfood, personal pref
+U	✔	Salad Sandwich			Bread + Vinegar + Dandelion (Leftovers)				Runescape
+U	✔	Seafood Sandwich		Bread + Mayonnaise + Crab (Leftovers)				Runescape
+	✔	Pineapple Skewers		Pineapple + Onion + Eggplant						New ingredients
+	✔	Stuffed Potato			Potato + Cheese + Common Mushroom					Augmented recipe
+	X	Summer Pie				Flour + Watermelon + Strawberry						Enough pies / Runescape
+	✔	Tropical Salad			Pineapple + Watermelon								New ingredients
+	✔	Waffles					Wheat + Blueberry x2 + Maple Syrup					Personal pref / Bad sprite?
 
 	KEY:
 	✔	Implementation complete
@@ -114,9 +202,11 @@ e	✔	Tropical Salad -> Pineapple + Watermelon
 	/	Icon incomplete
 	_	Not required
 	?	Considering
-	❎	Rejected
+	X	Rejected
 
-	w	World sprite required
-	e	Event-only
-	x	Unique event
-	G	Gus's shop
+	w!	World sprite required
+	U	Unique event
+	L	Cooking level-up reward
+	A	Auto-reward on learning other recipes
+	F	Festival only
+	G	Gus' shop only
