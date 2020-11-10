@@ -1,7 +1,7 @@
 {
 	// Object data
 	"Name": "Garden Pie",
-	"Description": "It really makes you wish for a nice burger.",
+	"Description": "A pizza sounds really good right about now.",
 	"Category": "Cooking",
 	"Edibility": 77,
 	"EdibleIsDrink": false,
