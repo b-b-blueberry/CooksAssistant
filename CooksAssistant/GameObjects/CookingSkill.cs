@@ -29,6 +29,8 @@ namespace CooksAssistant.GameObjects
 		internal static readonly int BuffRateValue = 3;
 		internal static readonly int BuffDurationValue = 36;
 
+		internal static readonly float BurnChanceReduction = 0.015f;
+
 		internal int AddedLevel;
 
 		public class SkillProfession : Profession
@@ -60,7 +62,7 @@ namespace CooksAssistant.GameObjects
 					// TODO: CONTENT: Create profession icons
 					Icon = ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.LevelUpIconPath}.png"),
 					Name = i18n.Get(
-						$"{id}.name{(i == 1 || ModEntry.Instance.Config.FoodHealsOverTime ? "" : "_alt")}"),
+						$"{id}.name{(i == 1 || ModEntry.Instance.Config.FoodHealingTakesTime ? "" : "_alt")}"),
 					Description = i18n.Get($"{id}.description", new {SaleValue, RestorationAltValue})
 				};
 				Professions.Add(profession);
@@ -77,14 +79,21 @@ namespace CooksAssistant.GameObjects
 		
 		public override List<string> GetExtraLevelUpInfo(int level)
 		{
-			return level % 2 == 0
-				? new List<string>{i18n.Get("menu.cooking_skill.levelupbonus", new {Number = 1 + level / 2})}
-				: null;
+			var list = new List<string>();
+			if (!ModEntry.Instance.Config.AddCookingTool && level % 2 == 0)
+				list.Add(i18n.Get("menu.cooking_skill.levelupbonus", new { Number = 1 + level / 2 }));
+
+			var extra = i18n.Get($"menu.cooking_skill.levelupbonus.{level}");
+			if (extra.HasValue())
+				list.Add(extra);
+
+			return list.Count > 0 ? list : null;
 		}
 
 		public override string GetSkillPageHoverText(int level)
 		{
-			return i18n.Get("menu.cooking_skill.levelupbonus", new {Number = 1 + level / 2});
+			return i18n.Get("menu.cooking_skill.levelupbonus",
+				new {Number = ModEntry.Instance.GetFarmersMaxUsableIngredients()});
 		}
 	}
 }

@@ -1,12 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Emit;
+﻿using Harmony; // el diavolo
 using Microsoft.Xna.Framework;
-using StardewValley.TerrainFeatures;
-using Harmony; // el diavolo
 using StardewValley;
 using StardewValley.Locations;
+using StardewValley.TerrainFeatures;
+using System;
+using System.Collections.Generic;
 using xTile;
 using xTile.Tiles;
 
@@ -31,7 +29,7 @@ namespace CooksAssistant
 				original: AccessTools.Method(typeof(Bush), "shake"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_shake_Prefix)));
 
-			if (!ModEntry.Instance.Config.AddCookingToCommunityCentre
+			if (!ModEntry.Instance.Config.AddCookingToTheCommunityCentre
 			    || Game1.getLocationFromName("CommunityCenter") is CommunityCenter cc && cc.areAllAreasComplete())
 				return;
 
@@ -44,44 +42,25 @@ namespace CooksAssistant
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNumberFromLocation"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNumberFromLocation_Prefix)));
-				
-			// FatalEngineExecutionError
-			if (false)
-			{
-				Log.W("Patching volatile CC methods: No debugger attached");
-				harmony.Patch( // addLightGlows NRE in loadArea (patched and unpatched)
-					original: AccessTools.Method(typeof(CommunityCenter), "getAreaBounds"),
-					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaBounds_Prefix)));
-				harmony.Patch(
-					original: AccessTools.Method(typeof(CommunityCenter), "getNotePosition"),
-					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_NotePosition_Prefix)));
-				if (false)
-				{
-					harmony.Patch(
-						original: AccessTools.Method(typeof(CommunityCenter), "getNotePosition"),
-						transpiler: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_NotePosition_Transpiler)));
-				}
-			}
-
-			// jesus christ
 			
-			// TODO: SYSTEM: big problem in JunimoNoteMenu.setUpMenu():
+			// TODO: SYSTEM: Big problem in JunimoNoteMenu.setUpMenu():
 			// if (!Game1.player.hasOrWillReceiveMail("hasSeenAbandonedJunimoNote") && whichArea == 6)
 			// add countermeasures, or otherwise patch it
 
-			// TODO: SYSTEM: highjack GameMenu/JunimoNoteMenu to add Kitchen to the Community Centre button
+			// TODO: SYSTEM: Highjack GameMenu/JunimoNoteMenu to add Kitchen to the Community Centre button
 
-			// TODO: REWRITE: move as many routines out of harmony as possible
+			// TODO: REWRITE: Move as many routines out of harmony as possible
 
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "loadArea"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_LoadArea_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "isJunimoNoteAtArea"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_IsJunimoNoteAtArea_Prefix)));
+			
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "shouldNoteAppearInArea"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_ShouldNoteAppearInArea_Prefix)));
+			harmony.Patch(
+				original: AccessTools.Method(typeof(CommunityCenter), "isJunimoNoteAtArea"),
+				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_IsJunimoNoteAtArea_Prefix)));
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "addJunimoNote"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AddJunimoNote_Prefix)));
@@ -101,8 +80,8 @@ namespace CooksAssistant
 				original: AccessTools.Method(typeof(CommunityCenter), "getMessageForAreaCompletion"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_MessageForAreaCompletion_Prefix)));
 
-			// TODO: TEST: community centre cooking bundle completion and all bundle completion
-			// TODO: SYSTEM: add failsafe for delivering community centre completed mail with all bundles complete,
+			// TODO: TEST: Community centre cooking bundle completion and all bundle completion
+			// TODO: SYSTEM: Add failsafe for delivering community centre completed mail with all bundles complete,
 			// assuming that our bundle was removed when the usual number of bundles were completed
 		}
 
@@ -153,8 +132,7 @@ namespace CooksAssistant
 		{
 			try
 			{
-				Log.D($"CC_AreaNumberFromLocation_Prefix");
-				Log.D($"tileLocation={tileLocation.ToString()}");
+				Log.D($"CC_AreaNumberFromLocation_Prefix(tileLocation={tileLocation.ToString()})");
 				if (!new Rectangle(0, 0, 11, 11).Contains(Utility.Vector2ToPoint(tileLocation)))
 					return true;
 				__result = ModEntry.CommunityCentreAreaNumber;
@@ -176,12 +154,13 @@ namespace CooksAssistant
 		{
 			try
 			{
-				Log.D($"CC_LoadArea_Prefix");
-				Log.D($"area={area}");
+				Log.D($"CC_LoadArea_Prefix(area={area})");
 				if (area != ModEntry.CommunityCentreAreaNumber)
 					return true;
 
-				var areaToRefurbish = ModEntry.CommunityCentreArea;
+				var areaToRefurbish = area != ModEntry.CommunityCentreAreaNumber 
+					? ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "getAreaBounds").Invoke<Rectangle>(area)
+					: ModEntry.CommunityCentreArea;
 				var refurbishedMap = Game1.game1.xTileContent.Load<Map>("Maps\\CommunityCenter_Refurbished");
 
 				//PyTK.Extensions.PyMaps.mergeInto(__instance.Map, refurbishedMap, Vector2.Zero, ModEntry.CommunityCentreArea);
@@ -249,7 +228,7 @@ namespace CooksAssistant
 						}
 					}
 				}
-
+				Log.D("End of LoadAreaPrefix");
 				return false;
 			}
 			catch (Exception e)
@@ -268,8 +247,7 @@ namespace CooksAssistant
 		{
 			try
 			{
-				Log.D($"CC_IsJunimoNoteAtArea_Prefix");
-				Log.D($"area={area}");
+				Log.D($"CC_IsJunimoNoteAtArea_Prefix(area={area})");
 				if (area != ModEntry.CommunityCentreAreaNumber)
 					return true;
 
@@ -284,7 +262,7 @@ namespace CooksAssistant
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics ShouldNoteAppearInArea() using a static p value in place of GetNotePosition().
@@ -293,13 +271,10 @@ namespace CooksAssistant
 		{
 			try
 			{
-				Log.D($"CC_ShouldNoteAppearInArea_Prefix");
-				Log.D($"area={area}");
+				Log.D($"CC_ShouldNoteAppearInArea_Prefix(area={area})");
 				if (area != ModEntry.CommunityCentreAreaNumber)
 					return true;
-
 				__result = !__instance.areasComplete[area] && __instance.numberOfCompleteBundles() > 0;
-				Log.D($"Should Show Note: {__result}");
 				return false;
 			}
 			catch (Exception e)
@@ -318,8 +293,7 @@ namespace CooksAssistant
 		{
 			try
 			{
-				Log.D($"CC_AddJunimoNote_Prefix");
-				Log.D($"area={area}");
+				Log.D($"CC_AddJunimoNote_Prefix(area={area})");
 
 				if (area != ModEntry.CommunityCentreAreaNumber)
 					return true;
@@ -450,76 +424,6 @@ namespace CooksAssistant
 			return true;
 		}
 
-		/// <summary>
-		/// GetNotePosition() throws FatalEngineExecutionError when patched.
-		/// Not currently in use.
-		/// </summary>
-		public static IEnumerable<CodeInstruction> CC_NotePosition_Transpiler(IEnumerable<CodeInstruction> instructions)
-		{
-			// Traverse the CIL backwards, adding a new case to the switch, then using its index in CIL to add to the jump table
-			var il = instructions.ToList();
-			var index = -1;
-			for (var i = il.Count - 2; i >= 0; --i)
-			{
-				if (il[i].opcode == OpCodes.Ret && index < 0)
-				{
-					index = i + 2;
-					il.InsertRange(i,
-					new []{
-						new CodeInstruction(OpCodes.Ret),
-						new CodeInstruction(OpCodes.Ldc_I4_S, 6) { labels = new List<Label>{new Label()}},
-						new CodeInstruction(OpCodes.Ldc_I4_S, 7),
-						new CodeInstruction(OpCodes.Newobj, typeof(Point).GetConstructor(new []{typeof(int), typeof(int)}))
-					});
-				}
-				else if (il[i].opcode == OpCodes.Switch && false)
-				{
-					var oldTable = (Label[]) il[i].operand;
-					var newTable = new Label[oldTable.Length + 1];
-					oldTable.CopyTo(newTable, 0);
-					//newTable[newTable.Length - 1] = il[index].labels[0];
-					il[i].operand = newTable;
-				}
-			}
-			
-			Log.W("Instructions:");
-			Log.D(il.Aggregate("", (str, i)
-				=> $"{str}\n{i.opcode} "
-				   + $"{(i.operand is Label[] labels ? labels.Aggregate("", ((s, l) => $"{s} {l.ToString()}")) : i.operand)}"));
-
-			return il;
-		}
-		
-		/// <summary>
-		/// GetNotePosition() throws FatalEngineExecutionError when patched.
-		/// Not currently in use.
-		/// </summary>
-		public static bool CC_NotePosition_Prefix(ref Point __result, int area)
-		{
-			Log.D($"CC_NotePosition_Prefix");
-			Log.D($"area={area}");
-			if (area != ModEntry.CommunityCentreAreaNumber)
-				return true;
-			__result = new Point(6, 7);
-			return false;
-		}
-
-		/// <summary>
-		/// GetAreaBounds() throws FatalEngineExecutionError when patched.
-		/// Not currently in use.
-		/// </summary>
-		public static bool CC_AreaBounds_Prefix(ref Rectangle __result, int area)
-		{
-			Log.D($"CC_AreaBounds_Prefix");
-			Log.D($"area={area}");
-			if (area != 0 && area != ModEntry.CommunityCentreAreaNumber)
-				return true;
-			__result = area == 0
-				? new Rectangle(ModEntry.CommunityCentreArea.X + ModEntry.CommunityCentreArea.Width, 0, 11, 11)
-				: ModEntry.CommunityCentreArea;
-			return false;
-		}
-		
 		public static bool CC_MessageForAreaCompletion_Prefix(CommunityCenter __instance, ref string __result)
 		{
 			try

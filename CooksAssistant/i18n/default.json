@@ -3,13 +3,16 @@
 	"world.range_gus.rejected": "You're not good enough friends with Gus to use the Cooking Range.",
 	"world.range_npc.rejected": "You're not good enough friends with {{name}} to use their kitchen.",
 
+	"menu.cooking_equipment.name": "Frying Pan",
+	"menu.cooking_equipment.description": "When cooking, allows the use of up to {{level}} ingredients.",
+
 	"menu.cooking_station.none": "No cooking station nearby.",
 	"menu.cooking_station.busy": "Something's already cooking here.",
 	"menu.cooking_station.done": "The {{recipe}} is ready!",
 	"menu.cooking_station.done_improv": "You wrote the recipe down in Mom's Cookbook.",
 
 	"menu.cooking_recipe.title_unknown": "???",
-	"menu.cooking_recipe.notes_unknown": "You've not eaten this recipe yet.",
+	"menu.cooking_recipe.notes_unknown": "You've not eaten this recipe.",
 	"menu.cooking_recipe.ingredients_label": "Ingredients:",
 	"menu.cooking_recipe.notes_label": "Notes:",
 	"menu.cooking_recipe.time_label": "Cooking time:",
@@ -20,7 +23,7 @@
 	"menu.cooking_recipe.which_label": "Which would you like to make?",
 
 	"menu.cooking_search.order_label": "Ascending/descending order",
-	"menu.cooking_search.view.list": "View details",
+	"menu.cooking_search.view.list": "View list",
 	"menu.cooking_search.view.grid": "View icons",
 	"menu.cooking_search.filter_label": "Filter recipes",
 	"menu.cooking_search.filter.1": "Alphabetical order",
@@ -35,9 +38,10 @@
 
 	// Cooking skill
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
+	"menu.cooking_skill.levelupbonus.2": "You can now brew Nettle Tea.",
 	// Tier 1:
 	// Path 1: Cooking
-	"menu.cooking_skill.tier1_path1.name": "Line Cook",
+	"menu.cooking_skill.tier1_path1.name": "Sous Chef",
 	"menu.cooking_skill.tier1_path1.description": "Cooking oil further improves the quality of recipes.",
 	// Path 2: Eating (CONFIG: Food restores over time)
 	"menu.cooking_skill.tier1_path2.name": "Quick Eater",
@@ -82,18 +86,20 @@
 	"world.fisherman.inspect_3": "There's no good catches with those travelling market folks in the bay...",
 
 	// Community Centre edits when using the Cooking bundle
-	"world.community_centre.kitchen": "Kitchen", 
-	"world.community_centre.reward": "Cooking stuff", 
-	"world.community_centre.bundle.1": "Picnicker's", 
-	"world.community_centre.bundle.2": "Cook's", 
-	"world.community_centre.bundle.3": "Diner's", 
-	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go.", 
+	"world.community_centre.kitchen": "Kitchen",
+	"world.community_centre.reward": "Cooking stuff",
+	"world.community_centre.bundle.1": "Picnicker's",
+	"world.community_centre.bundle.2": "Cook's",
+	"world.community_centre.bundle.3": "Diner's",
+	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go.",
 
 	// Egg Festival - Year 2
-	"world.bunny_talk.inspect_1": "Oh my, oh me, oh fie! I'm late, I'm late!",
-	"world.bunny_talk.inspect_2": "You there! I saw your face, I saw that race! You're a natural egg-chaser!",
-	"world.bunny_talk.inspect_3": "Take this basket and run! I'll need YOU to deliver these eggs to town!",
-	"world.bunny_talk.inspect_4": "Oh no, oh slow, I'm late! I'm late, you know!",
+	"world.bunny_talk.intro_1": "Oh my, oh me, oh fie! I'm late, I'm late!",
+	"world.bunny_talk.intro_2": "You there! I saw your face, I saw that race! You're a natural egg-chaser!",
+	"world.bunny_talk.intro_3": "Take this basket and run! I'll need YOU to deliver these eggs to town!",
+	"world.bunny_talk.intro_4": "Oh no, oh slow, I'm late! I'm late, you know!",
+	"world.bunny_talk.mid_1": "",
+	"world.bunny_talk.outro_1": "",
 
 	"talk.egg_gift.abigail": "Thanks. I'll forgive you this time for stealing the show at the egg hunt!",
 	"talk.egg_gift.alex": "It doesn't match my diet, but I'll make an exception for you. Nice one, @!",
@@ -103,10 +109,10 @@
 	"talk.egg_gift.dwarf": "You say this came from a rabbit? I will need to inspect your claims.",
 	"talk.egg_gift.elliott": "The bow's just a darling touch. Thank you.",
 	"talk.egg_gift.emily": "Delicious, chocolatey, and a pretty little ribbon, too! You know me so well, @.",
-	"talk.egg_gift.evelyn": "Thank you, dear! This reminds me of the time spent putting together egg hunts for my own little girl.",
+	"talk.egg_gift.evelyn": "Thank you, dear! This reminds me of the time spent arranging egg hunts for my own little girl.",
 	"talk.egg_gift.george": "Hmph... chocolate? I suppose it's a thought.",
 	"talk.egg_gift.gunther": "Thanks for the treat, farmer.",
-	"talk.egg_gift.gus": "Ho ho! Cheers for the egg, but I'll need to loosen up my belt after a few more!",
+	"talk.egg_gift.gus": "Ho ho! Cheers for the chocolate, but I'll need to loosen up my belt if I have any more!",
 	"talk.egg_gift.haley": "Chocolates, wrapped in a cute bow! You're sweet, farmer @!",
 	"talk.egg_gift.harvey": "Err, well... The bow's cute!",
 	"talk.egg_gift.jas": "You remembered to share! You're nice!",

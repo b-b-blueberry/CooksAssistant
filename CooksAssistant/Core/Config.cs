@@ -4,16 +4,20 @@ namespace CooksAssistant
 {
 	public class Config
 	{
-		public bool CookingOverhaul { get; set; } = true;
-		public bool AddCookingToCommunityCentre { get; set; } = true;
-		public bool NewRecipeScaling { get; set; } = true;
-		public bool ScaleCustomRecipes { get; set; } = true;
+		public bool AddCookingOverhaul { get; set; } = true;
+		public bool AddCookingToTheCommunityCentre { get; set; } = true;
+		public bool AddCookingSkill { get; set; } = true;
+		public bool AddCookingTool { get; set; } = true;
+		public bool AddCookingQuestline { get; set; } = true;
+		public bool AddNewCrops { get; set; } = true;
+		public bool AddNewRecipes { get; set; } = true;
 		public bool AddBuffsToCustomIngredients { get; set; } = true;
+		public bool AddNewRecipeScaling { get; set; } = true;
+		public bool ScaleCustomRecipes { get; set; } = true;
+		public bool CookAtKitchens { get; set; } = true;
 		public bool CookingTakesTime { get; set; } = false;
-		public bool CookingSkill { get; set; } = true;
-		public bool FoodHealsOverTime { get; set; } = true;
-		public bool PlayWithQuestline { get; set; } = true;
-		public bool CampfiresBurnOut { get; set; } = true;
+		public bool FoodHealingTakesTime { get; set; } = true;
+		public bool FoodCanBurn { get; set; } = true;
 		public bool GiveLeftoversFromBigFoods { get; set; } = true;
 		public bool MakeChangesToMaps { get; set; } = true;
 		public bool MakeChangesToRecipes { get; set; } = true;
@@ -21,14 +25,9 @@ namespace CooksAssistant
 		public bool DebugMode { get; set; } = true;
 		public string ConsoleCommandPrefix { get; set; } = "cac";
 
-		public string CookingStationUseRange { get; set; } = "2";
 		public List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
 		{
 			498, 499, 632, 633
-		};
-		public List<string> DefaultUnlockedRecipes = new List<string>
-		{
-			"Baked Potato"
 		};
 		public List<string> FoodsThatGiveLeftovers = new List<string>
 		{

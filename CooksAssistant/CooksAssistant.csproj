@@ -15,9 +15,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="assets\ContentPack\Crops\**" />
-    <EmbeddedResource Remove="assets\ContentPack\Crops\**" />
-    <None Remove="assets\ContentPack\Crops\**" />
+    <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 
   <ItemGroup>

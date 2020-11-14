@@ -21,7 +21,7 @@ using Object = StardewValley.Object;
 using xTile.Dimensions;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
-// TODO: CONTENT: ensure all slice/half objects have the correct category and colour/text overrides
+// TODO: CONTENT: Ensure all slice/half objects have the correct category and colour/text overrides
 
 namespace CooksAssistant
 {
@@ -30,79 +30,122 @@ namespace CooksAssistant
 		internal static ModEntry Instance;
 		internal Config Config;
 		internal ModSaveData SaveData;
-		internal CookingSkill CookingSkill;
 
 		internal ITranslationHelper i18n => Helper.Translation;
 		internal static IJsonAssetsApi JsonAssets;
 		internal static Texture2D SpriteSheet;
 		internal static CookingMenuButton CookingMenuButton;
 
-		internal static readonly string ContentPackPath = Path.Combine("assets", "ContentPack");
+		// Assets
+		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
+		internal static readonly string BasicRecipesPackPath = Path.Combine("assets", "BasicRecipesPack");
+		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
+		internal static readonly string NewCropsRecipesPackPath = Path.Combine("assets", "NewCropsRecipesPack");
+		internal static readonly string EasterPackPath = Path.Combine("assets", "EasterPack");
 		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
 		internal static readonly string BundleDataPath = Path.Combine("assets", "bundles");
 		internal static readonly string BuffChartPath = Path.Combine("assets", "ingredientBuffChart");
 		internal static readonly string SkillIconPath = Path.Combine("assets", "skill");
 		internal static readonly string LevelUpIconPath = Path.Combine("assets", "levelup");
+		internal static readonly string MapTileSheetPath = Path.Combine("assets", "maptiles");
 
 		internal const string SaveDataKey = "SaveData";
 		internal const string AssetPrefix = "blueberry.CooksAssistant.";
+
+		// Add Cooking Tool
+		private const string CookingToolName = "Frying Pan";
+		
+		// Add Cooking Skill
+		// TODO: REFACTOR: Remove ModEntry.CookingSkill and instead use Skills.GetSkill()
+		private static readonly List<string> StartingCookingRecipes = new List<string>
+		{
+		};
+		private static readonly Dictionary<int, string[]> CookingSkillLevelUpRecipes = new Dictionary<int, string[]>
+		{
+			{ 0, new[] { "Fried Egg", "Baked Potato" } },
+			{ 1, new[] { "Burrito", "Cauliflower Fritters" } },
+			{ 2, new[] { "Porridge", "Quick Breakfast" } },
+			{ 3, new[] { "Baked Lobster", "Loaded Potato", "Stuffed Potato" } },
+			{ 4, new[] { "Cake", "Hot Cocoa", "Berry Waffles" } },
+			{ 5, new[] { "Cray Mornay", "Eel Sushi", "Pitta Bread" } },
+			{ 6, new[] { "Redberry Pie", "Cabbage Pot", "Hearty Stew", "Hunter's Plate" } },
+			{ 7, new[] { "Apple Pie", "Pineapple Skewers", "Red Wrap", "Tropical Salad" } },
+			{ 8, new[] { "Admiral Pie", "Dwarven Stew", "Hot Curry" } },
+			{ 9, new[] { "Garden Pie", "Kebab", "Ocean Platter", "Roast Dinner" } },
+			{ 10, new[] { "Egg Sandwich", "Salad Sandwich", "Seafood Sandwich" } },
+		};
 		internal const string CookingSkillId = AssetPrefix + "CookingSkill";
-
-		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
-		internal const string ActionRange = AssetPrefix + "Range";
-
+		internal static readonly Dictionary<int, int> FoodCookedToday = new Dictionary<int, int>();
+		internal const int MaxFoodStackPerDayForExperienceGains = 20;
+		internal CookingSkill CookingSkill;
+		private Buff _watchingBuff;
+		
+		// Add Cooking to the Community Centre
 		internal const string CommunityCentreAreaName = "Kitchen";
 		internal const int CommunityCentreAreaNumber = 6;
-		internal static readonly Rectangle CommunityCentreArea = new Rectangle(0, 0, 11, 11);
-		internal static readonly Point CommunityCentreNotePosition = new Point(6, 7);
+		internal static readonly Rectangle CommunityCentreArea = new Rectangle(0, 0, 10, 11);
+		internal static readonly Point CommunityCentreNotePosition = new Point(8, 6);
 		internal int BundleStartIndex;
 
+		// Add Cooking Questline
+		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
+		internal const string ActionRange = AssetPrefix + "Range";
 		internal const string DockCrateItem = "Pineapple";
-		internal const string EasterEggItem = "Chocolate Egg";
-		internal const string ChocolateBarItem = "Chocolate Bar";
-		internal const string EasterBasketItem = "Egg Basket";
-		internal static readonly string[] UntrashableItems = {
-			EasterBasketItem
-		};
 
-		internal static readonly Location SaloonCookingRangePosition = new Location(16, 16);
-		internal static readonly Dictionary<string, string> NpcHomeLocations = new Dictionary<string, string>();
-
-		private const string KebabBuffSource = AssetPrefix + "Kebab";
-		private const int KebabBonusDuration = 220;
-		private const int KebabMalusDuration = 140;
-		private const int KebabCombatBonus = 3;
-		private const int KebabNonCombatBonus = 2;
-
-		internal static KeyValuePair<string, string> TempPair;
-
-		private string _cmd = "";
+		// Cook At Kitchens
+		internal static readonly Location SaloonCookingRangePosition = new Location(18, 17);
+		internal static Dictionary<string, string> NpcHomeLocations;
 		
+		// Food Can Burn
+		private const string BurntFoodName = "Burnt Food";
+
+		// Food Healing Takes Time
 		private const float CombatRegenModifier = 0.02f;
 		private const float CookingRegenModifier = 0.005f;
 		private const float ForagingRegenModifier = 0.0012f;
 		private float _healthOnLastTick, _staminaOnLastTick;
 		private int _healthRegeneration, _staminaRegeneration;
-		private float _debugRegenRate;
-		private uint _debugElapsedTime, _debugTicksCurr;
-		private Queue<uint> _debugTicksDiff = new Queue<uint>();
+		private uint _regenTicksCurr;
+		private Queue<uint> _regenTicksDiff = new Queue<uint>();
 		private Object _lastFoodEaten;
 		private bool _lastFoodWasDrink;
-		internal static readonly Dictionary<int, int> FoodCookedToday = new Dictionary<int, int>();
+		// debug
+		private float _debugRegenRate;
+		private uint _debugElapsedTime;
+		
+		// Others:
+		private const string NettlesName = "Nettles";
+		private const string NettlesUsableMachine = "Keg";
+		private const int NettlesUsableLevel = 2;
+		// kebab
+		private const string KebabBuffSource = AssetPrefix + "Kebab";
+		private const int KebabBonusDuration = 220;
+		private const int KebabMalusDuration = 140;
+		private const int KebabCombatBonus = 3;
+		private const int KebabNonCombatBonus = 2;
+		// easter event
+		private const bool IsEasterEnabled = false;
+		internal static KeyValuePair<string, string> TempPair;
+		internal const string EasterEggItem = "Chocolate Egg";
+		internal const string EasterBasketItem = "Egg Basket";
+		internal const string ChocolateBarItem = "Chocolate Bar";
+		internal static readonly string[] UntrashableItems = {
+			EasterBasketItem
+		};
 
-		private Buff _watchingBuff;
 
 		public override void Entry(IModHelper helper)
 		{
 			Instance = this;
 			Config = helper.ReadConfig<Config>();
-			_cmd = Config.ConsoleCommandPrefix;
 
+			// Asset editors
 			var assetManager = new AssetManager();
 			Helper.Content.AssetEditors.Add(assetManager);
-
+			Helper.Content.AssetLoaders.Add(assetManager);
 			SpriteSheet = Helper.Content.Load<Texture2D>($"{SpriteSheetPath}.png");
 			
+			// Game events
 			Helper.Events.GameLoop.GameLaunched += GameLoopOnGameLaunched;
 			Helper.Events.GameLoop.SaveLoaded += GameLoopOnSaveLoaded;
 			Helper.Events.GameLoop.Saving += GameLoopOnSaving;
@@ -111,12 +154,11 @@ namespace CooksAssistant
 			Helper.Events.GameLoop.UpdateTicked += GameLoopUpdateTicked;
 			Helper.Events.Player.Warped += PlayerOnWarped;
 			Helper.Events.Input.ButtonPressed += InputOnButtonPressed;
-
-			if (Config.CookingOverhaul)
+			if (Config.AddCookingOverhaul)
 			{
 				Helper.Events.Display.MenuChanged += DisplayOnMenuChanged;
 			}
-			if (Config.CookingSkill)
+			if (Config.AddCookingSkill)
 			{
 				CookingSkill = new CookingSkill();
 				Skills.RegisterSkill(CookingSkill);
@@ -128,14 +170,19 @@ namespace CooksAssistant
 			SpaceEvents.OnItemEaten += SpaceEventsOnItemEaten;
 			SpaceEvents.BeforeGiftGiven += SpaceEventsOnBeforeGiftGiven;
 
+			// Harmony patches
 			HarmonyPatches.Patch();
-
-			Helper.ConsoleCommands.Add(_cmd + "menu", "Open cooking menu.", (s, args)
-				=> { OpenNewCookingMenu(); });
-			Helper.ConsoleCommands.Add(_cmd + "lvl", "Set cooking level.", (s, args)
-				=>
+			
+			// Console commands
+			var cmd = Config.ConsoleCommandPrefix;
+			Helper.ConsoleCommands.Add(cmd + "menu", "Open cooking menu.", (s, args) =>
 			{
-				if (!Config.CookingSkill)
+				if (!PlayerAgencyLostCheck())
+					OpenNewCookingMenu(null);
+			});
+			Helper.ConsoleCommands.Add(cmd + "lvl", "Set cooking level.", (s, args) =>
+			{
+				if (!Config.AddCookingSkill)
 				{
 					Log.D("Cooking skill is not enabled.");
 					return;
@@ -152,9 +199,22 @@ namespace CooksAssistant
 						Game1.player.professions.Remove(profession.GetVanillaId());
 				Log.D($"Set Cooking skill to {Skills.GetSkillLevel(Game1.player, CookingSkillId)}");
 			});
-			Helper.ConsoleCommands.Add(_cmd + "lvlmenu", "Show cooking level menu.", (s, args) =>
+			Helper.ConsoleCommands.Add(cmd + "tool", "Set cooking tool level.", (s, args) =>
 			{
-				if (!Config.CookingSkill)
+				if (!Config.AddCookingTool)
+				{
+					Log.D("Cooking tool is not enabled.");
+					return;
+				}
+				if (args.Length < 1)
+					return;
+
+				SaveData.CookingToolLevel = int.Parse(args[0]);
+				Log.D($"Set Cooking tool to {SaveData.CookingToolLevel}");
+			});
+			Helper.ConsoleCommands.Add(cmd + "lvlmenu", "Show cooking level menu.", (s, args) =>
+			{
+				if (!Config.AddCookingSkill)
 				{
 					Log.D("Cooking skill is not enabled.");
 					return;
@@ -163,124 +223,23 @@ namespace CooksAssistant
 					null, new EventArgsShowNightEndMenus());
 				Log.D("Bumped Cooking skill levelup menu.");
 			});
-			Helper.ConsoleCommands.Add(_cmd + "tired", "Reduce health and stamina. Pass zero, one, or two values.",
-				(s, args) =>
-				{
-					if (args.Length < 1)
-					{
-						Game1.player.health = Game1.player.maxHealth / 10;
-						Game1.player.Stamina = Game1.player.MaxStamina / 10;
-					}
-					else
-					{
-						Game1.player.health = int.Parse(args[0]);
-						Game1.player.Stamina = args.Length < 2 ? Game1.player.health * 2.5f : int.Parse(args[1]);
-					}
-					Log.D($"Set HP: {Game1.player.health}, EP: {Game1.player.Stamina}");
-				});
-		}
-
-		internal void UpdateCommunityCentreData(CommunityCenter cc)
-		{
-			AppendAreasCompleteData(cc);// oh my god5
-			AppendBundleData(cc);
-		}
-
-		/// <summary>
-		/// 
-		/// </summary>
-		internal void AppendAreasCompleteData(CommunityCenter cc)
-		{
-			// fUCK YOUJ
-			var areasComplete = Helper.Reflection
-				.GetField<NetArray<bool, NetBool>>(cc, nameof(cc.areasComplete));
-			var oldAreas = areasComplete.GetValue();
-			var newAreas = new NetArray<bool, NetBool>(7);
-			
-			for (var i = 0; i < oldAreas.Count; ++i)
-				newAreas[i] = oldAreas[i];
-			newAreas[newAreas.Length - 1] = SaveData?.HasCompletedCookingBundle ?? false;
-			areasComplete.SetValue(newAreas); // cunsn
-		}
-
-		/// <summary>
-		/// This method is needed to update the CC bundle dictionary that's otherwise populated without our values.
-		/// The CC constructor seemingly populates the dictionary without our changes to Data/Bundles, so it's topped up here.
-		/// </summary>
-		internal void AppendBundleData(CommunityCenter cc)
-		{
-			var brokenDictField = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary");
-			var brokenDict = brokenDictField.GetValue();
-			var keys = Game1.netWorldState.Value.BundleRewards.Keys.Where
-				(key => !brokenDict.ContainsKey(key) && key > BundleStartIndex && BundleStartIndex > 0);
-			var keysDict = keys.ToDictionary(key => key, value => CommunityCentreAreaNumber);
-			brokenDict = brokenDict.Concat(keysDict).ToDictionary(pair => pair.Key, pair => pair.Value);
-			brokenDictField.SetValue(brokenDict);
-
-			if (!Config.DebugMode)
-				return;
-			
-			// aauugh
-			var dog = Game1.netWorldState.Value.Bundles;
-			var dogTreats = Game1.netWorldState.Value.BundleRewards;
-			Log.D(dog.Aggregate("dog: ", (s, boolses)
-				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value.Aggregate("", (s2, b) => $"{s2} {b}")}")}" : "none"));
-			Log.D(dogTreats.Aggregate("dogTreats: ", (s, boolses)
-				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value}")}" : "none"));
-			Log.D(cc.areasComplete.Aggregate("AreasComplete: ", (s, b) => $"{s} {b}"));
-			Log.D(brokenDict.Aggregate("bundleToAreaDictionary: ", (s, pair) => $"{s} ({pair.Key}:{pair.Value})"));
-		}
-		/*
-		internal void PretendCheckForMissingRewards(CommunityCenter cc)
-		{
-			var hasUnclaimedRewards = false;
-			cc.missedRewardsChest.Value.items.Clear();
-			var rewards = new List<Item>();
-			foreach (var key in cc.bundleRewards.Keys)
+			Helper.ConsoleCommands.Add(cmd + "tired", "Reduce health and stamina. Pass zero, one, or two values.", (s, args) =>
 			{
-				var bundleToAreaDictionary = Helper.Reflection.GetField<Dictionary<int, int>>
-					(cc, "bundleToAreaDictionary").GetValue();
-				var area = bundleToAreaDictionary[key];
-				if (cc.bundleRewards[key] && cc.areasComplete.Count > area && cc.areasComplete[area])
+				if (args.Length < 1)
 				{
-					hasUnclaimedRewards = true;
-					rewards.Clear();
-					JunimoNoteMenu.GetBundleRewards(area, rewards);
-					foreach (var item in rewards)
-					{
-						cc.missedRewardsChest.Value.addItem(item);
-					}
+					Game1.player.health = Game1.player.maxHealth / 10;
+					Game1.player.Stamina = Game1.player.MaxStamina / 10;
 				}
-			}
-
-			var missedRewardsChestTile = Helper.Reflection.GetField<Vector2>
-				(cc, "missedRewardsChestTile").GetValue();
-			var multiplayer = Helper.Reflection.GetField<Multiplayer>
-				(typeof(Game1), "multiplayer").GetValue();
-			if (hasUnclaimedRewards && !cc.missedRewardsChestVisible.Value)
-			{
-				cc.showMissedRewardsChestEvent.Fire(true);
-				multiplayer.broadcastSprites(cc,
-					new TemporaryAnimatedSprite(Game1.random.NextDouble() < 0.5 ? 5 : 46,
-					missedRewardsChestTile * 64f + new Vector2(16f, 16f), Color.White)
+				else
 				{
-					layerDepth = 1f
-				});
-			}
-			else if (!hasUnclaimedRewards && cc.missedRewardsChestVisible.Value)
-			{
-				cc.showMissedRewardsChestEvent.Fire(false);
-				multiplayer.broadcastSprites(cc,
-					new TemporaryAnimatedSprite(Game1.random.NextDouble() < 0.5 ? 5 : 46,
-						missedRewardsChestTile * 64f + new Vector2(16f, 16f), Color.White)
-				{
-					layerDepth = 1f
-				});
-			}
-			cc.missedRewardsChestVisible.Value = hasUnclaimedRewards;
+					Game1.player.health = int.Parse(args[0]);
+					Game1.player.Stamina = args.Length < 2 ? Game1.player.health * 2.5f : int.Parse(args[1]);
+				}
+				Log.D($"Set HP: {Game1.player.health}, EP: {Game1.player.Stamina}");
+			});
 		}
-		*/
-		private void LoadApis()
+
+		private void LoadJsonAssetsObjects()
 		{
 			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
 			if (JsonAssets == null)
@@ -288,12 +247,36 @@ namespace CooksAssistant
 				Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
 				return;
 			}
-			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, ContentPackPath));
+			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, BasicObjectsPack));
+
+			if (!Config.AddNewCrops)
+				Log.D("Did not add new crops: Crop additions are disabled in config file.");
+			else if (Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
+				Log.D("Did not add new crops: [PPJA] Fruits and Veggies already adds these objects.");
+			else
+				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsPackPath));
+
+			if (!Config.AddNewRecipes)
+			{
+				Log.D("Did not add new recipes: Recipe additions are disabled in config file.");
+			}
+			else
+			{
+				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, BasicRecipesPackPath));
+				if (Config.AddNewCrops && !Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
+					JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsRecipesPackPath));
+			}
+
+			if (IsEasterEnabled)
+			{
+				Log.D($"EASTER: Adding easter items", Config.DebugMode);
+				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, EasterPackPath));
+			}
 		}
 		
 		private void GameLoopOnGameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			LoadApis();
+			LoadJsonAssetsObjects();
 		}
 
 		private void GameLoopOnSaveLoaded(object sender, SaveLoadedEventArgs e)
@@ -303,50 +286,44 @@ namespace CooksAssistant
 			// Invalidate and reload assets requiring JA indexes
 			Helper.Content.InvalidateCache(@"Data/ObjectInformation");
 			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
-			// and you
-			Helper.Content.InvalidateCache(@"Data/Bundles");
 			
 			// Add watcher to check for first-time Kitchen bundle completion
-			if (Config.AddCookingToCommunityCentre)
+			if (Config.AddCookingToTheCommunityCentre)
 			{
+				Helper.Content.InvalidateCache(@"Data/Bundles");
 				Helper.Events.GameLoop.DayEnding += Event_WatchingKitchenBundle;
 			}
 
-			// Load default recipes
-			foreach (var recipe in Config.DefaultUnlockedRecipes
-				.Where(recipe => !Game1.player.cookingRecipes.ContainsKey(recipe)))
-				Game1.player.cookingRecipes.Add(recipe, 0);
-
 			// Populate NPC home locations for cooking range usage
-			var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
-			NpcHomeLocations.Clear();
-			foreach (var npc in npcData)
-				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
+			if (Config.CookAtKitchens)
+			{
+				var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
+				NpcHomeLocations = new Dictionary<string, string>();
+				foreach (var npc in npcData)
+					NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
+			}
 		}
 		
 		private void GameLoopOnSaving(object sender, SavingEventArgs e)
 		{
-			Helper.Data.WriteSaveData(SaveDataKey, SaveData);
+			// TOOD: DEBUG: Reenable save data write
+			//Helper.Data.WriteSaveData(SaveDataKey, SaveData);
 		}
 
 		private void GameLoopOnDayStarted(object sender, DayStartedEventArgs e)
 		{
-			// Load contextual recipes
-			if (Game1.player.knowsRecipe("Maki Roll") && !Game1.player.cookingRecipes.ContainsKey("Eel Sushi"))
-				Game1.player.cookingRecipes.Add("Eel Sushi", 0);
-			if (Game1.player.knowsRecipe("Omelet") && !Game1.player.cookingRecipes.ContainsKey("Quick Breakfast"))
-				Game1.player.cookingRecipes.Add("Quick Breakfast", 0);
-			if (Game1.player.knowsRecipe("Hearty Stew") && !Game1.player.cookingRecipes.ContainsKey("Dwarven Stew"))
-				Game1.player.cookingRecipes.Add("Dwarven Stew", 0);
+			// Load starting recipes
+			foreach (var recipe in CookingSkillLevelUpRecipes[0])
+				if (!Game1.player.cookingRecipes.ContainsKey(recipe))
+					Game1.player.cookingRecipes.Add(recipe, 0);
 
 			// Clear daily cooking to free up Cooking experience gains
-			if (Config.CookingSkill)
-			{
+			if (Config.AddCookingSkill)
 				FoodCookedToday.Clear();
-			}
 
 			// Attempt to place a wild nettle as forage around other weeds
-			if (Game1.currentSeason != "winter")
+			if (Game1.currentSeason == "summer"
+				|| ((Game1.currentSeason == "spring" || Game1.currentSeason == "fall") && Game1.dayOfMonth % 2 == 0))
 			{
 				foreach (var l in new[] {"Mountain", "Forest", "Railroad", "Farm"})
 				{
@@ -361,7 +338,7 @@ namespace CooksAssistant
 			}
 
 			// Purge old easter eggs when Summer begins
-			if (Game1.dayOfMonth == 1 && Game1.currentSeason == "summer")
+			if (IsEasterEnabled && Game1.dayOfMonth == 1 && Game1.currentSeason == "summer")
 			{
 				const string itemToPurge = EasterEggItem;
 				const string itemToAdd = ChocolateBarItem;
@@ -381,35 +358,34 @@ namespace CooksAssistant
 			}
 
 			// aauugh
-			if (Config.AddCookingToCommunityCentre)
+			if (Config.AddCookingToTheCommunityCentre)
 			{
 				UpdateCommunityCentreData(Game1.getLocationFromName("CommunityCenter") as CommunityCenter);
 			}
 		}
-		
+
 		private void GameLoopOnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
 		{
 			// Remove Kitchen bundle watcher, assuming one exists
-			if (Config.AddCookingToCommunityCentre)
-			{
+			if (Config.AddCookingToTheCommunityCentre)
 				Helper.Events.GameLoop.DayEnding -= Event_WatchingKitchenBundle;
-			}
 		}
 
 		private void GameLoopUpdateTicked(object sender, UpdateTickedEventArgs e)
 		{
+			//Log.D($"UpdateTicked e.Ticks: {e.Ticks}");
 			_healthOnLastTick = Game1.player.health;
 			_staminaOnLastTick = Game1.player.Stamina;
 		}
 		
 		private void Event_DrawDebugHud(object sender, RenderedHudEventArgs e)
 		{
-			for (var i = 0; i < _debugTicksDiff.Count; ++i)
+			for (var i = 0; i < _regenTicksDiff.Count; ++i)
 				e.SpriteBatch.DrawString(
 					Game1.smallFont,
-					$"{(i == 0 ? "DIFF" : "      ")}   {_debugTicksDiff.ToArray()[_debugTicksDiff.Count - 1 - i]}",
+					$"{(i == 0 ? "DIFF" : "      ")}   {_regenTicksDiff.ToArray()[_regenTicksDiff.Count - 1 - i]}",
 					new Vector2(Game1.graphics.GraphicsDevice.Viewport.Width - 222, Game1.graphics.GraphicsDevice.Viewport.Height - 144 - i * 24),
-					Color.White * ((_debugTicksDiff.Count - 1 - i + 1f) / (_debugTicksDiff.Count / 2f)));
+					Color.White * ((_regenTicksDiff.Count - 1 - i + 1f) / (_regenTicksDiff.Count / 2f)));
 			e.SpriteBatch.DrawString(
 				Game1.smallFont,
 				$"MOD  {(_debugRegenRate < 1 ? 0 :_debugElapsedTime % _debugRegenRate)}",
@@ -447,28 +423,28 @@ namespace CooksAssistant
 			var baseRate = 128;
 			var panicRate = (Game1.player.health * 3f + Game1.player.Stamina)
 			                / (Game1.player.maxHealth * 3f + Game1.player.MaxStamina);
-			var regenRate = GetRegenRate(_lastFoodEaten);
+			var regenRate = GetFoodRegenRate(_lastFoodEaten);
 			var scaling =
 				(Game1.player.CombatLevel * CombatRegenModifier
-				   + (Config.CookingSkill ? cookingLevel * CookingRegenModifier : 0)
+				   + (Config.AddCookingSkill ? cookingLevel * CookingRegenModifier : 0)
 				   + Game1.player.ForagingLevel * ForagingRegenModifier)
 				/ (10 * CombatRegenModifier
-				   + (Config.CookingSkill ? 10 * CookingRegenModifier : 0)
+				   + (Config.AddCookingSkill ? 10 * CookingRegenModifier : 0)
 				   + 10 * ForagingRegenModifier);
 			var rate = (baseRate - baseRate * scaling) * regenRate * 100d;
 			rate = Math.Floor(Math.Max(32 - cookingLevel * 1.75f, rate * panicRate));
 
 			_debugRegenRate = (float) rate;
 			_debugElapsedTime = e.Ticks;
-			++_debugTicksCurr;
+			++_regenTicksCurr;
 
-			if (_debugTicksCurr < rate)
+			if (_regenTicksCurr < rate)
 				return;
 
-			_debugTicksDiff.Enqueue(_debugTicksCurr);
-			if (_debugTicksDiff.Count > 5)
-				_debugTicksDiff.Dequeue();
-			_debugTicksCurr = 0;
+			_regenTicksDiff.Enqueue(_regenTicksCurr);
+			if (_regenTicksDiff.Count > 5)
+				_regenTicksDiff.Dequeue();
+			_regenTicksCurr = 0;
 
 			if (_healthRegeneration > 0)
 			{
@@ -494,11 +470,40 @@ namespace CooksAssistant
 			TempPair = new KeyValuePair<string, string>();
 		}
 		
+		private void Event_WatchingToolUpgrades(object sender, UpdateTickedEventArgs e)
+		{
+			// Checks for purchasing a cooking tool upgrade from Clint's upgrade menu
+			if (Game1.activeClickableMenu is ShopMenu menu
+				&& menu.heldItem is StardewValley.Tools.GenericTool tool
+				&& tool.Name.EndsWith(CookingToolName)
+				&& tool.IndexOfMenuItemView - 17 < 3)
+			{
+				Game1.player.toolBeingUpgraded.Value = tool;
+				Game1.player.daysLeftForToolUpgrade.Value = 2;
+				Game1.playSound("parry");
+				Game1.exitActiveMenu();
+				Game1.drawDialogue(Game1.getCharacterFromName("Clint"),
+					Game1.content.LoadString("Strings\\StringsFromCSFiles:Tool.cs.14317"));
+			}
+
+			// Checks for collecting your upgraded cooking tool from Clint after waiting the upgrade period
+			if (Game1.player.mostRecentlyGrabbedItem is StardewValley.Tools.GenericTool tool1
+				&& tool1.Name.EndsWith(CookingToolName)
+				&& tool1.IndexOfMenuItemView - 17 > SaveData.CookingToolLevel - 1)
+			{
+				++SaveData.CookingToolLevel;
+			}
+
+			if (Game1.currentLocation.Name != "Blacksmith")
+				Helper.Events.GameLoop.UpdateTicked -= Event_WatchingToolUpgrades;
+		}
+
 		private void Event_WatchingBuffs(object sender, UpdateTickedEventArgs e)
 		{
-			if (Game1.buffsDisplay.food.source != _watchingBuff.source
-			    && Game1.buffsDisplay.drink.source != _watchingBuff.source
-			    && Game1.buffsDisplay.otherBuffs.All(buff => buff.source != _watchingBuff.source))
+			if (Game1.buffsDisplay.food?.source != _watchingBuff.source
+			    && Game1.buffsDisplay.drink?.source != _watchingBuff.source
+				&& Game1.buffsDisplay.otherBuffs.Any()
+			    && Game1.buffsDisplay.otherBuffs.All(buff => buff?.source != _watchingBuff.source))
 			{
 				Helper.Events.GameLoop.UpdateTicked -= Event_WatchingBuffs;
 
@@ -538,10 +543,10 @@ namespace CooksAssistant
 
 		private void InputOnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
-			if (PlayerAgencyLostCheck() || Game1.keyboardDispatcher.Subscriber != null)
+			if (PlayerAgencyLostCheck())
 				return;
 
-			// debug test
+			// Debug hotkeys
 			if (Config.DebugMode)
 			{
 				switch (e.Button)
@@ -552,7 +557,7 @@ namespace CooksAssistant
 							: new Warp(0, 0, "CommunityCenter", 12, 6, false));
 						return;
 					case SButton.H:
-						OpenNewCookingMenu();
+						OpenNewCookingMenu(null);
 						return;
 					case SButton.F5:
 						Game1.currentLocation.largeTerrainFeatures.Add(
@@ -582,7 +587,7 @@ namespace CooksAssistant
 					else
 					{
 						Log.W($"Clicked the campfire icon");
-						OpenNewCookingMenu();
+						OpenNewCookingMenu(null);
 					}
 				}
 			}
@@ -592,15 +597,15 @@ namespace CooksAssistant
 			{
 				if (Game1.activeClickableMenu != null
 				    && ((Game1.activeClickableMenu is CraftingPage craftingMenu
-				         && craftingMenu.trashCan.containsPoint((int) e.Cursor.ScreenPixels.X,
-					         (int) e.Cursor.ScreenPixels.Y)
-				         || (Game1.activeClickableMenu is InventoryPage inventoryMenu
-				             && inventoryMenu.trashCan.containsPoint((int) e.Cursor.ScreenPixels.X,
-					             (int) e.Cursor.ScreenPixels.Y)))
+							&& craftingMenu.trashCan.containsPoint((int) e.Cursor.ScreenPixels.X,
+								 (int) e.Cursor.ScreenPixels.Y)
+							|| (Game1.activeClickableMenu is InventoryPage inventoryMenu
+								 && inventoryMenu.trashCan.containsPoint((int) e.Cursor.ScreenPixels.X,
+									 (int) e.Cursor.ScreenPixels.Y)))
 				        || !Game1.activeClickableMenu.isWithinBounds((int) e.Cursor.ScreenPixels.X,
 					        (int) e.Cursor.ScreenPixels.Y)))
 				{
-					Log.D("Caught untrashable item trying to get trashed", Config.DebugMode);
+					Log.D($"Caught untrashable item ({Game1.player.CursorSlotItem?.Name ?? "null"})", Config.DebugMode);
 					Helper.Input.Suppress(e.Button);
 				}
 			}
@@ -613,16 +618,19 @@ namespace CooksAssistant
 			var btn = e.Button;
 			if (btn.IsActionButton())
 			{
+				// Try to open the new Cooking menu when nearby to cooking stations (ie. kitchen, range)
 				var tile = Game1.currentLocation.Map.GetLayer("Buildings")
 					.Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
-				if (tile != null && Config.IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
+				if (tile != null
+					&& Config.CookAtKitchens
+					&& Config.IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
 				{
 					if (NpcHomeLocations.Any(pair => pair.Value == Game1.currentLocation.Name
 					                                 && Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= 5)
 					|| NpcHomeLocations.All(pair => pair.Value != Game1.currentLocation.Name))
 					{
 						Log.W($"Clicked the kitchen at {Game1.currentLocation.Name}");
-						OpenNewCookingMenu();
+						OpenNewCookingMenu(null);
 					}
 					else
 					{
@@ -636,6 +644,17 @@ namespace CooksAssistant
 
 					return;
 				}
+				else if (btn.IsUseToolButton())
+				{
+					// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
+					if (Skills.GetSkillLevel(Game1.player, CookingSkillId) < NettlesUsableLevel
+						&& Game1.player.ActiveObject?.Name == NettlesName
+						&& Game1.currentLocation.Objects[e.Cursor.GrabTile]?.Name == NettlesUsableMachine)
+					{
+						Helper.Input.Suppress(btn);
+						Game1.playSound("cancel");
+					}
+				}
 
 				// Use tile actions in maps
 				CheckTileAction(e.Cursor.GrabTile, Game1.currentLocation);
@@ -644,38 +663,85 @@ namespace CooksAssistant
 
 		private void DisplayOnMenuChanged(object sender, MenuChangedEventArgs e)
 		{
+			// Add new crops and objects to shop menus
+			if (e.NewMenu is ShopMenu menu)
+			{
+				if (Game1.currentLocation is SeedShop)
+				{
+					SortSeedShopStock(ref menu);
+				}
+				else if (Game1.currentLocation is JojaMart)
+				{
+					var o = new Object(Vector2.Zero, JsonAssets.GetObjectId(ChocolateBarItem), int.MaxValue);
+					menu.itemPriceAndStock.Add(o, new [] {(int) (o.Price * Game1.MasterPlayer.difficultyModifier), int.MaxValue});
+					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Sugar"), o);
+				}
+			}
+
+			// Upgrade cooking equipment at the blacksmith
+			if (Config.AddCookingTool && Game1.currentLocation.Name == "Blacksmith")
+			{
+				var canUpgrade = CanFarmerUpgradeCookingEquipment();
+				var level = SaveData.CookingToolLevel;
+				if (canUpgrade)
+				{
+					if (e.NewMenu is ShopMenu upgradeMenu)
+					{
+						var toolName = string.Format(
+							$"{Game1.content.LoadString("Strings\\StringsFromCSFiles:Tool.cs." + (14299 + level))}",
+							i18n.Get("menu.cooking_equipment.name").ToString());
+						var toolDescription = i18n.Get("menu.cooking_equipment.description", new { level = level + 2 }).ToString();
+						var cookingTool = new StardewValley.Tools.GenericTool(
+							toolName, toolDescription, level + 1, 17 + level, 17 + level);
+						var price = Helper.Reflection.GetMethod(
+							typeof(Utility), "priceForToolUpgradeLevel").Invoke<int>(level + 1);
+						var index = Helper.Reflection.GetMethod(
+							typeof(Utility), "indexOfExtraMaterialForToolUpgrade").Invoke<int>(level + 1);
+						upgradeMenu.itemPriceAndStock.Add(cookingTool, new int[3] { price / 2, 1, index });
+						upgradeMenu.forSale.Add(cookingTool);
+					}
+				}
+			}
+
 			// Try to add the menu button for cooking
 			//if (!(e.NewMenu is GameMenu))
-				RemoveCookingMenuButton();
+				//RemoveCookingMenuButton();
 
 			if (e.NewMenu is CraftingPage cm)
 			{
 				var cooking = Helper.Reflection.GetField<bool>(cm, "cooking").GetValue();
 				if (cooking)
 				{
+					var recipePages = Helper.Reflection.GetField
+						<List<Dictionary<ClickableTextureComponent, CraftingRecipe>>>(cm, "pagesOfCraftingRecipes").GetValue();
 					cm.exitThisMenuNoSound();
-					OpenNewCookingMenu();
+					OpenNewCookingMenu(recipePages.SelectMany(page => page.Values).ToList());
 				}
 				return;
 			}
 
-			if (!(e.NewMenu is GameMenu) || e.OldMenu is GameMenu && e.NewMenu is GameMenu)
-				return;
+			//if (!(e.NewMenu is GameMenu) || e.OldMenu is GameMenu && e.NewMenu is GameMenu)
+				//return;
 
-			return;
-			CookingMenuButton = new CookingMenuButton();
-			Game1.onScreenMenus.Add(CookingMenuButton);
+			//CookingMenuButton = new CookingMenuButton();
+			//Game1.onScreenMenus.Add(CookingMenuButton);
 		}
 		
 		private void PlayerOnWarped(object sender, WarpedEventArgs e)
-		{/*
+		{
+			/*
 			if (e.NewLocation is CommunityCenter && !(e.OldLocation is CommunityCenter))
 				Helper.Events.Display.RenderedWorld += Event_DrawCC;
 			else if (e.OldLocation is CommunityCenter && !(e.NewLocation is CommunityCenter))
 				Helper.Events.Display.RenderedWorld -= Event_DrawCC;
 			*/
-			// TODO: TEST: drawing final star with TASprite
-			if (!(e.NewLocation is CommunityCenter))
+
+			if (Config.AddCookingTool && e.NewLocation.Name == "Blacksmith")
+			{
+				Helper.Events.GameLoop.UpdateTicked += Event_WatchingToolUpgrades;
+			}
+
+			if (!(e.NewLocation is CommunityCenter) || !Config.AddCookingToTheCommunityCentre)
 				return;
 			
 			Helper.Events.GameLoop.UpdateTicked += Event_MoveJunimo;
@@ -683,9 +749,10 @@ namespace CooksAssistant
 			var cc = e.NewLocation as CommunityCenter; // fgs fds
 			var count = Helper.Reflection.GetField<NetArray<bool, NetBool>>(
 				cc, nameof(cc.areasComplete)).GetValue();
-			Log.D($"CC areasComplete count: {count}");
+			var complete = cc.areAllAreasComplete() || Game1.MasterPlayer.hasCompletedCommunityCenter();
+			Log.D($"CC areasComplete count: {count}, complete: {complete}");
 			
-			if (cc.areasComplete[CommunityCentreAreaNumber])
+			if (complete)
 			{
 				var multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
 				multiplayer.broadcastSprites(
@@ -700,9 +767,6 @@ namespace CooksAssistant
 					{
 						holdLastFrame = true
 					});
-			}
-			if (cc.areAllAreasComplete())
-			{
 				return;
 			}
 
@@ -714,12 +778,6 @@ namespace CooksAssistant
 				cc.addJunimoNote(num);
 				Helper.Reflection.GetMethod(cc, "resetSharedState").Invoke();
 				Helper.Reflection.GetMethod(cc, "resetLocalState").Invoke();
-			}
-			return;
-			// TODO: TEST: Whether cc.resetState() methods will automatically cover loadArea for new area
-			if (cc.areasComplete[CommunityCentreAreaNumber])
-			{
-				cc.loadArea(num);
 			}
 		}
 
@@ -734,7 +792,7 @@ namespace CooksAssistant
 
 			Log.D($"Ate food: {food.Name}");
 			Log.D($"Buffs: (food) {Game1.buffsDisplay.food?.displaySource} (drink) {Game1.buffsDisplay.drink?.displaySource}");
-			if (Config.FoodHealsOverTime)
+			if (Config.FoodHealingTakesTime)
 			{
 				Helper.Events.GameLoop.UpdateTicked += Event_FoodRegeneration;
 				Game1.player.health = (int)_healthOnLastTick;
@@ -742,7 +800,7 @@ namespace CooksAssistant
 				_healthRegeneration += food.healthRecoveredOnConsumption();
 				_staminaRegeneration += food.staminaRecoveredOnConsumption();
 			}
-			else if (Config.CookingSkill
+			else if (Config.AddCookingSkill
 			         && Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.Restoration]))
 			{
 				Game1.player.health = (int) Math.Min(Game1.player.maxHealth,
@@ -756,9 +814,8 @@ namespace CooksAssistant
 				: Game1.buffsDisplay.food;
 			Log.D($"Last buff: {lastBuff?.displaySource ?? "null"} ({lastBuff?.source ?? "null"})"
 			      + $" | Food: {food.DisplayName} ({food.Name})");
-			// TODO: DEBUG: Replace || with && when finished
-			if ((Config.CookingSkill
-			    || Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.BuffDuration]))
+			if ((Config.AddCookingSkill
+			    && Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.BuffDuration]))
 			    && food.displayName == lastBuff?.displaySource)
 			{
 				var duration = lastBuff.millisecondsDuration;
@@ -771,13 +828,15 @@ namespace CooksAssistant
 				}
 			}
 
+			_watchingBuff = lastBuff;
+
 			if (!SaveData.FoodsEaten.ContainsKey(food.Name))
 				SaveData.FoodsEaten.Add(food.Name, 0);
 			++SaveData.FoodsEaten[food.Name];
 
 			if (Config.GiveLeftoversFromBigFoods && Config.FoodsThatGiveLeftovers.Contains(food.Name))
 			{
-				// TODO: TEST: adding leftovers to a full inventory
+				// TODO: TEST: Adding leftovers to a full inventory
 				var leftovers = new Object(
 					JsonAssets.GetObjectId(
 						Config.FoodsWithLeftoversGivenAsSlices.Any(f => food.Name.ToLower().EndsWith(f))
@@ -787,8 +846,7 @@ namespace CooksAssistant
 				if (Game1.player.couldInventoryAcceptThisItem(leftovers))
 					Game1.player.addItemToInventory(leftovers);
 				else
-					Game1.currentLocation.dropObject(leftovers, Game1.player.GetDropLocation(),
-						Game1.viewport, true, Game1.player);
+					Game1.createItemDebris(leftovers, Game1.player.Position, -1);
 			}
 
 			if (food.Name == "Kebab")
@@ -799,7 +857,7 @@ namespace CooksAssistant
 				var message = "";
 				if (roll < 0.06f)
 				{
-					if (Config.FoodHealsOverTime)
+					if (Config.FoodHealingTakesTime)
 					{
 						_healthRegeneration -= food.healthRecoveredOnConsumption();
 						_staminaRegeneration -= food.staminaRecoveredOnConsumption();
@@ -832,7 +890,7 @@ namespace CooksAssistant
 				}
 				else if (roll < 0.18f)
 				{
-					if (Config.FoodHealsOverTime)
+					if (Config.FoodHealingTakesTime)
 					{
 						_healthRegeneration += Game1.player.maxHealth / 10;
 						_staminaRegeneration += Game1.player.MaxStamina / 10;
@@ -871,8 +929,9 @@ namespace CooksAssistant
 		
 		private void SpaceEventsOnBeforeGiftGiven(object sender, EventArgsBeforeReceiveObject e)
 		{
-			// Ignore when gifts aren't going to be accepted
-			if (!Game1.player.friendshipData.ContainsKey(e.Npc.Name)
+			// Ignore gifts that aren't going to be accepted
+			if (!e.Npc.canReceiveThisItemAsGift(e.Gift)
+				|| !Game1.player.friendshipData.ContainsKey(e.Npc.Name)
 			    || Game1.player.friendshipData[e.Npc.Name].GiftsThisWeek > 1
 			    || Game1.player.friendshipData[e.Npc.Name].GiftsToday > 0)
 			{
@@ -880,7 +939,7 @@ namespace CooksAssistant
 			}
 
 			// Cooking skill professions influence gift value of Cooking objects
-			if (Config.CookingSkill
+			if (Config.AddCookingSkill
 			    && Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.GiftBoost])
 			    && e.Gift.Category == -7)
 			{
@@ -888,7 +947,7 @@ namespace CooksAssistant
 			}
 
 			// Patch in unique gift dialogue for easter egg deliveries
-			if (e.Gift.Name != EasterEggItem && e.Gift.Name != EasterBasketItem)
+			if (!IsEasterEnabled || e.Gift.Name != EasterEggItem && e.Gift.Name != EasterBasketItem)
 				return;
 			if (e.Gift.Name == EasterBasketItem)
 				++Game1.player.CurrentItem.Stack;
@@ -903,14 +962,19 @@ namespace CooksAssistant
 			// Remove the patch on the next tick, after the unique gift dialogue has been loaded and drawn
 			Helper.Events.GameLoop.UpdateTicked += Event_UndoGiftChanges;
 		}
-		
-		private bool PlayerAgencyLostCheck()
+
+		/// <summary>
+		/// Checks whether the player has agency during gameplay, cutscenes, and while in menus.
+		/// </summary>
+		public bool PlayerAgencyLostCheck()
 		{
+			// HOUSE RULES
 			return !Game1.game1.IsActive // No alt-tabbed game state
 			       || Game1.eventUp && !Game1.currentLocation.currentEvent.playerControlSequence // No event cutscenes
-			       || Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp // No text inputs
-			       || Game1.player.UsingTool || Game1.pickingTool || Game1.numberOfSelectedItems != -1 // No tools in use
-			       || Game1.fadeToBlack;
+			       || Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp
+				   || Game1.keyboardDispatcher.Subscriber != null // No text inputs
+				   || Game1.player.UsingTool || Game1.pickingTool || Game1.numberOfSelectedItems != -1 // No tools in use
+			       || Game1.fadeToBlack; // None of that
 		}
 
 		public void CheckTileAction(Vector2 position, GameLocation location)
@@ -923,14 +987,13 @@ namespace CooksAssistant
 			switch (action[0])
 			{
 				case ActionRange:
-					// A new cooking range in Gus' saloon acts as a cooking point
-					if (Config.PlayWithQuestline && Game1.player.getFriendshipLevelForNPC("Gus") < 500)
+					// A new cooking range in the Saloon acts as a cooking station
+					if (Config.AddCookingQuestline && Game1.player.getFriendshipHeartLevelForNPC("Gus") < 2)
 					{
 						CreateInspectDialogue(i18n.Get("world.range_gus.inspect"));
 						break;
 					}
-					//Game1.activeClickableMenu = new CraftingPage(-1, -1, -1, -1, true);
-					OpenNewCookingMenu();
+					OpenNewCookingMenu(null);
 					break;
 
 				case ActionDockCrate:
@@ -942,7 +1005,7 @@ namespace CooksAssistant
 					{
 						o = new Object(JsonAssets.GetObjectId(DockCrateItem), 1);
 						if (roll < 0.05f && Game1.player.eventsSeen.Contains(1))
-							o = new Object(JsonAssets.GetObjectId("Chocolate Bar"), 1);
+							o = new Object(JsonAssets.GetObjectId(ChocolateBarItem), 1);
 					}
 					if (o != null)
 						Game1.player.addItemByMenuIfNecessary(o.getOne());
@@ -950,17 +1013,20 @@ namespace CooksAssistant
 			}
 		}
 		
+		/// <summary>
+		/// I keep forgetting the method name
+		/// </summary>
 		private void CreateInspectDialogue(string dialogue)
 		{
 			Game1.drawDialogueNoTyping(dialogue);
 		}
 		
-		private void OpenNewCookingMenu()
+		private void OpenNewCookingMenu(List<CraftingRecipe> recipes)
 		{
 			Log.D("Opened cooking menu.");
 			if (!(Game1.activeClickableMenu is CookingMenu)
 			    || Game1.activeClickableMenu is CookingMenu menu && menu.PopMenuStack(true, true))
-				Game1.activeClickableMenu = new CookingMenu();
+				Game1.activeClickableMenu = new CookingMenu(recipes);
 		}
 		
 		internal static void RemoveCookingMenuButton()
@@ -973,44 +1039,59 @@ namespace CooksAssistant
 			CookingMenuButton = null;
 		}
 
-		public float GetRegenRate(Object food)
+		/// <summary>
+		/// Returns the base health/stamina regeneration rate for some food object.
+		/// </summary>
+		public float GetFoodRegenRate(Object food)
 		{
-			// Regen faster when drinking
-			var rate = _lastFoodWasDrink ? 0.2f : 0.15f;
+			// Regen slower with drinks
+			var rate = _lastFoodWasDrink ? 0.1f : 0.15f;
 			// Regen faster with quality
 			rate += food.Quality * 0.008f;
 			// Regen faster when drunk
 			if (Game1.player.hasBuff(17))
 				rate *= 1.3f;
-			if (Config.CookingSkill && Game1.player.HasCustomProfession(
+			if (Config.AddCookingSkill && Game1.player.HasCustomProfession(
 				CookingSkill.Professions[(int) CookingSkill.ProfId.Restoration]))
 				rate += rate / CookingSkill.RestorationValue;
 			return rate;
 		}
 
+		/// <summary>
+		/// Identifies the level of the best cooking station within the player's use range.
+		/// A cooking station's level influences the number of ingredients slots available to the player.
+		/// </summary>
+		/// <returns>Level of the best cooking station in range, defaults to 0.</returns>
 		public int CheckForNearbyCookingStation()
 		{
+			var toolLevel = SaveData.CookingToolLevel;
+			var skillLevel = Skills.GetSkillLevel(Game1.player, CookingSkillId);
+			var farmhouseLevel = GetFarmhouseKitchenLevel(Game1.getLocationFromName("FarmHouse") as FarmHouse);
+			Log.D($"CheckForNearbyCookingStation()" +
+				$"\nUsing Tool: {Config.AddCookingTool} Cooking: {skillLevel} Tool: {toolLevel}" +
+				$" Farmer: {GetFarmersMaxUsableIngredients()} FarmHouse: {farmhouseLevel}");
+
+			// TODO: SYSTEM: Have cooking slots determined by gus ? math.max(gus, level) : math.max(kitchen, math.min(equipment, level))
 			var cookingStationLevel = 0;
-			var range = int.Parse(Config.CookingStationUseRange);
-			// If using Gus' cooking range, then use his own equipment level
+			var radius = 3;
+			// Gus' cooking range uses his own equipment level as a baseline
 			if (Game1.currentLocation.Name == "Saloon")
 			{
 				if (Utility.tileWithinRadiusOfPlayer(SaloonCookingRangePosition.X, SaloonCookingRangePosition.Y,
-					range, Game1.player))
+					radius, Game1.player))
 				{
-					cookingStationLevel = Math.Max(SaveData.WorldGusCookingRangeLevel, SaveData.ClientCookingEquipmentLevel);
+					cookingStationLevel = Math.Max(SaveData.SaloonCookingRangeLevel, GetFarmersMaxUsableIngredients());
 					Log.W($"Cooking station: {cookingStationLevel}");
 				}
 			}
-			// If indoors, use the farmhouse or cabin level as a base for cooking level
-			// A level 1 farmhouse has a maximum of 2 slots, and a farmhouse with a kitchen has a minimum of 2 slots
+			// If indoors, use the farmhouse or cabin level as a base for cooking levels
 			else if (!Game1.currentLocation.IsOutdoors)
 			{
 				var layer = Game1.currentLocation.Map.GetLayer("Buildings");
-				var xLimit = Game1.player.getTileX() + range;
-				var yLimit = Game1.player.getTileY() + range;
-				for (var x = Game1.player.getTileX() - range; x < xLimit && cookingStationLevel == 0; ++x)
-				for (var y = Game1.player.getTileY() - range; y < yLimit && cookingStationLevel == 0; ++y)
+				var xLimit = Game1.player.getTileX() + radius;
+				var yLimit = Game1.player.getTileY() + radius;
+				for (var x = Game1.player.getTileX() - radius; x < xLimit && cookingStationLevel == 0; ++x)
+				for (var y = Game1.player.getTileY() - radius; y < yLimit && cookingStationLevel == 0; ++y)
 				{
 					var tile = layer.Tiles[x, y];
 					if (tile == null
@@ -1020,12 +1101,12 @@ namespace CooksAssistant
 					switch (Game1.currentLocation)
 					{
 						case FarmHouse farmHouse:
-							cookingStationLevel = (farmHouse.upgradeLevel < 2
-								? Math.Min(2, SaveData.ClientCookingEquipmentLevel)
-								: Math.Max(farmHouse.upgradeLevel, SaveData.ClientCookingEquipmentLevel));
+							// FarmHouses use their upgrade level as a baseline after Robin installs a kitchen
+							cookingStationLevel = GetFarmhouseKitchenLevel(farmHouse);
 							break;
 						default:
-							cookingStationLevel = Math.Max(2, SaveData.ClientCookingEquipmentLevel);
+							// NPC kitchens (other than the Saloon) use the Farmer's ingredients limits only
+							cookingStationLevel = GetFarmersMaxUsableIngredients();
 							break;
 					}
 
@@ -1034,15 +1115,15 @@ namespace CooksAssistant
 			}
 			else
 			{
-				var xLimit = Game1.player.getTileX() + range;
-				var yLimit = Game1.player.getTileY() + range;
-				for (var x = Game1.player.getTileX() - range; x < xLimit && cookingStationLevel == 0; ++x)
-				for (var y = Game1.player.getTileY() - range; y < yLimit && cookingStationLevel == 0; ++y)
+				var xLimit = Game1.player.getTileX() + radius;
+				var yLimit = Game1.player.getTileY() + radius;
+				for (var x = Game1.player.getTileX() - radius; x < xLimit && cookingStationLevel == 0; ++x)
+				for (var y = Game1.player.getTileY() - radius; y < yLimit && cookingStationLevel == 0; ++y)
 				{
 					Game1.currentLocation.Objects.TryGetValue(new Vector2(x, y), out var o);
 					if (o == null || o.Name != "Campfire")
 						continue;
-					cookingStationLevel = SaveData.ClientCookingEquipmentLevel - 1;
+					cookingStationLevel = GetFarmersMaxUsableIngredients();
 					Log.W($"Cooking station: {cookingStationLevel}");
 				}
 			}
@@ -1050,27 +1131,173 @@ namespace CooksAssistant
 			return cookingStationLevel;
 		}
 
+		/// <summary>
+		/// Fetches the cooking station level for the farmhouse based on its upgrade/kitchen level,
+		/// accounting for mods that would provide the kitchen at level 0.
+		/// </summary>
+		public int GetFarmhouseKitchenLevel(FarmHouse farmHouse)
+		{
+			// A basic (modded) farmhouse has a maximum of 1 slot,
+			// and a farmhouse with a kitchen has a minimum of 2+ slots
+			var level = farmHouse.upgradeLevel < 2
+				? Math.Min(farmHouse.upgradeLevel, GetFarmersMaxUsableIngredients())
+				: Math.Max(farmHouse.upgradeLevel, GetFarmersMaxUsableIngredients());
+			// Thanks Lenne
+			// TODO: TEST: Farmhouse mod cooking levels
+			if (farmHouse.upgradeLevel == 0
+				&& (Helper.ModRegistry.IsLoaded("Allayna.Kitchen")
+					|| Helper.ModRegistry.IsLoaded("Froststar11.CustomFarmhouse")
+					|| Helper.ModRegistry.IsLoaded("burakmese.products")
+					|| Helper.ModRegistry.IsLoaded("minervamaga.FR.BiggerFarmhouses")))
+			{
+				level = 1;
+			}
+			return level;
+		}
+
+		public int GetFarmersMaxUsableIngredients()
+		{
+			return Config.AddCookingTool
+				? 1 + SaveData.CookingToolLevel
+				: 1 + Skills.GetSkillLevel(Game1.player, CookingSkillId) / 2;
+		}
+
+		private bool CanFarmerUpgradeCookingEquipment()
+		{
+			var results = new Dictionary<int, List<bool>>();
+			bool canUpgrade(int skill, int tool)
+			{
+				return (skill / 2) / (tool + 1) >= 1;
+			}
+			void calculateLevelupTable()
+			{
+				for (var i = 0; i < 10; ++i)
+				{
+					var list = new List<bool>();
+					for (var j = 0; j < 5; ++j)
+					{
+						var r = canUpgrade(i, j);
+						list.Add(r);
+					}
+					results.Add(i, list);
+				}
+			}
+			var skillLevel = Skills.GetSkillLevel(Game1.player, CookingSkillId);
+			var toolLevel = SaveData.CookingToolLevel;
+			var result = canUpgrade(skillLevel, toolLevel);
+			//calculateLevelupTable();
+			return result;
+		}
+		
+		/// <summary>
+		/// Bunches groups of common items together in the seed shop.
+		/// Json Assets appends new stock to the bottom, and we don't want that very much at all.
+		/// </summary>
+		private void SortSeedShopStock(ref ShopMenu menu)
+		{
+			// Pair a suffix grouping some common items together with the name of the lowest-index (first-found) item in the group
+			var suffixes = new Dictionary<string, string>
+				{{"Seeds", null}, {"Bulb", null}, {"Starter", null}, {"Shoot", null}, {"Sapling", null}};
+			for (var i = 0; i < menu.forSale.Count; ++i)
+			{
+				// Ignore items without one of our group suffixes
+				var split = menu.forSale[i].Name.Split(' ');
+				if (!menu.forSale[i].Name.Contains(' ') || !suffixes.ContainsKey(split[1]))
+					continue;
+				// Set the move-to-this-item name to be the first-found item in the group
+				suffixes[split[1]] ??= menu.forSale[i].Name;
+				if (suffixes[split[1]] == menu.forSale[i].Name)
+					continue;
+				// Move newly-found items of a group up to the first item in the group, and change the move-to name to this item.
+				var item = menu.forSale[i];
+				var index = 1 + menu.forSale.FindIndex(i => i.Name == suffixes[split[1]]);
+				menu.forSale.RemoveAt(i);
+				menu.forSale.Insert(index, item);
+				suffixes[split[1]] = menu.forSale[index].Name;
+			}
+		}
+
+		/// <summary>
+		/// Updates multi-field entries separated by some delimiter, appending or replacing select fields.
+		/// </summary>
+		/// <returns>The old entry, with fields added from the new entry, reformed into a string of the delimited fields.</returns>
 		public static string UpdateEntry(string oldEntry, string[] newEntry, bool append = false, bool replace = false,
 			int startIndex = 0, char delimiter = '/')
 		{
 			var fields = oldEntry.Split(delimiter);
-			/*
-			if (fields.Count == newEntry.Length)
-				;
-			else if (fields.Count < newEntry.Length)
-				for (var i = fields.Count; i < newEntry.Length; ++i)
-					fields.Add(null);
-					*/
 			if (replace)
 				fields = newEntry;
 			else for (var i = 0; i < newEntry.Length; ++i)
 				if (newEntry[i] != null) 
 					fields[startIndex + i] = append ? $"{fields[startIndex + i]} {newEntry[i]}" : newEntry[i];
+			return fields.Aggregate((entry, field) => $"{entry}{delimiter}{field}").Remove(0, 0);
+		}
+		
+		/// <summary>
+		/// god
+		/// </summary>
+		/// <param name="cc"></param>
+		internal void UpdateCommunityCentreData(CommunityCenter cc)
+		{
+			Log.D("UpdateCommunityCentreData start");
+			AppendAreasCompleteData(cc);// oh my god5
+			AppendBundleData(cc);
+			Log.D("UpdateCommunityCentreData end");
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		internal void AppendAreasCompleteData(CommunityCenter cc)
+		{
+			try
+			{
+				Log.D("AppendAreasCompleteData");
+				// fUCK YOUJ
+				var areasComplete = Helper.Reflection
+					.GetField<NetArray<bool, NetBool>>(cc, nameof(cc.areasComplete));
+				var oldAreas = areasComplete.GetValue();
+				var newAreas = new NetArray<bool, NetBool>(7);
+
+				for (var i = 0; i < oldAreas.Count; ++i)
+					newAreas[i] = oldAreas[i];
+				newAreas[newAreas.Length - 1] = SaveData?.HasCompletedCookingBundle ?? false;
+				areasComplete.SetValue(newAreas); // cunsn
+			}
+			catch (Exception e)
+			{
+				Log.E($"Exception in {nameof(AppendAreasCompleteData)}: {e}");
+			}
+		}
+
+		/// <summary>
+		/// This method is needed to update the CC bundle dictionary that's otherwise populated without our values.
+		/// The CC constructor seemingly populates the dictionary without our changes to Data/Bundles, so it's topped up here.
+		/// </summary>
+		internal void AppendBundleData(CommunityCenter cc)
+		{
+			Log.D("AppendBundleData");
+
+			var brokenDictField = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary");
+			var brokenDict = brokenDictField.GetValue();
+			var keys = Game1.netWorldState.Value.BundleRewards.Keys.Where
+				(key => !brokenDict.ContainsKey(key) && key > BundleStartIndex && BundleStartIndex > 0);
+			var keysDict = keys.ToDictionary(key => key, value => CommunityCentreAreaNumber);
+			brokenDict = brokenDict.Concat(keysDict).ToDictionary(pair => pair.Key, pair => pair.Value);
+			brokenDictField.SetValue(brokenDict);
+
+			if (!Config.DebugMode)
+				return;
 			
-			//var ne = newEntry.Aggregate((entry, field) => $"{entry}{delimiter}{field}").Remove(0, 0);
-			var result = fields.Aggregate((entry, field) => $"{entry}{delimiter}{field}").Remove(0, 0);
-			//Log.D($"Updated entry:\nvia: {ne} \nold: {oldEntry}\nnew: {result}", Config.DebugMode);
-			return result;
+			// aauugh
+			var dog = Game1.netWorldState.Value.Bundles;
+			var dogTreats = Game1.netWorldState.Value.BundleRewards;
+			Log.D(dog.Aggregate("dog: ", (s, boolses)
+				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value.Aggregate("", (s2, b) => $"{s2} {b}")}")}" : "none"));
+			Log.D(dogTreats.Aggregate("dogTreats: ", (s, boolses)
+				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value}")}" : "none"));
+			Log.D(cc.areasComplete.Aggregate("AreasComplete: ", (s, b) => $"{s} {b}"));
+			Log.D(brokenDict.Aggregate("bundleToAreaDictionary: ", (s, pair) => $"{s} ({pair.Key}:{pair.Value})"));
 		}
 	}
 }

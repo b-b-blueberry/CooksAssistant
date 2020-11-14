@@ -12,7 +12,6 @@
 		✔	[slugline] Cook in NPC kitchens - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt4pd9/
 		✔	[MazeMagic] Cookbook - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu70qr/
 			[SaltyHeathen] Cooking animation - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu69py/
-			[Kryzeth] Limited Campfire Cooking - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu5gdr/
 		✔	[Ruittsorf] Select ingredients - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu0j81/
 			[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
 		[YorikTheDestroyer] Cooking festival - https://github.com/StardewModders/mod-ideas/issues/490
@@ -27,6 +26,7 @@
 		✔	Account for quick-start mods
 	✔	Upgrade cooking equipment from Clint
 		✔	Sprites for copper/steel/gold/iridium upgrades
+	✔	Limited Campfire Cooking compatibility
 		Cooking range in the Saloon with a level increasing through questline progression
 		Rebalance ingredients to foods
 		Community centre cooking bundle items and rewards + big reward
@@ -105,56 +105,6 @@ w!	🍰	Redberries
 	✔	Cider
 	✔	Nettle Tea
 
-	Cooking levelup themes:
-		 0: Starting recipes
-				Fried Egg
-				Baked Potato
-		 1: Basic recipes
-				Burrito
-				Cauliflower Fritters
-		 2: Breakfast
-			+ You can now brew Nettle Tea.
-				Porridge
-				Quick Breakfast
-		 3: Basic combination recipes
-				Baked Lobster
-				Loaded Potato
-				Stuffed Potato
-		 4: Cakes and sweets
-				Cake
-				Hot Cocoa
-				Berry Waffles
-		 5: Fish recipes
-			+ Professions
-				Cray Mornay
-				Eel Sushi
-				Fish Supper
-		 6: New crops
-				Redberry Pie
-				Cabbage Pot
-				Hearty Stew
-				Hunter's Plate
-		 7: Summer treats
-				Apple Pie
-				Pineapple Skewers
-				Red Wrap
-				Tropical Salad
-		 8: Advanced recipes
-				Admiral Pie
-				Dwarven Stew
-				Hot Curry
-				Pitta Bread
-		 9: Advanced combination recipes
-				Garden Pie
-				Kebab
-				Ocean Platter
-				Roast Dinner
-		10: Sandwiches
-			+ Professions
-				Egg Sandwich
-				Salad Sandwich
-				Seafood Sandwich
-
 	Recipes:
 	✔	Admiral Pie				Flour + Milk + Tuna + Salmon						Runescape, fish line up in seasons
 	✔	Apple Pie				Flour + Sugar + Apple x2							Runescape
@@ -171,7 +121,7 @@ G	✔	Burrito					Tortilla + Rice + Chilli							Rice, Tortilla
 	✔	Dwarven Stew			Hearty Stew + Beer/Ale/Cider						+Attack -Speed
 	✔	Eel Sushi				Eel + Seaweed + Rice								Rice
 U	✔	Egg Sandwich			Bread + Mayonnaise + Egg (Leftovers)				Runescape
-	✔	Fish Supper				Red Snapper x2 + Potato + Bean						Personal pref
+	X	Fish Supper				Red Snapper x2 + Potato + Bean						Unfitting / Personal pref
 	✔	Garden Pie				Flour + Cabbage + Onion + Tomato					Runescape
 G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hot Cocoa				Milk + Chocolate Bar								Personal pref
@@ -194,7 +144,7 @@ U	✔	Seafood Sandwich		Bread + Mayonnaise + Crab (Leftovers)				Runescape
 	✔	Stuffed Potato			Potato + Cheese + Common Mushroom					Augmented recipe
 	X	Summer Pie				Flour + Watermelon + Strawberry						Enough pies / Runescape
 	✔	Tropical Salad			Pineapple + Watermelon								New ingredients
-	✔	Waffles					Wheat + Blueberry x2 + Maple Syrup					Personal pref / Bad sprite?
+	✔	Berry Waffles			Wheat + Blueberry x2 + Maple Syrup					Personal pref
 
 	KEY:
 	✔	Implementation complete
