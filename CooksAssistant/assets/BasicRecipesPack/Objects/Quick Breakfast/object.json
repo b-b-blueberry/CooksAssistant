@@ -4,7 +4,7 @@
 	"Description": "This'll give you a jump start!",
 	"Category": "Cooking",
 	"Edibility": 48,
-	"EdibleIsDrink": true,
+	"EdibleIsDrink": false,
 	"EdibleBuffs": {
 		"Farming": 1,
 		"Fishing": 0,

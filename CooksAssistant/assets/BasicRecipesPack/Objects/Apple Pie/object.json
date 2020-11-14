@@ -8,6 +8,7 @@
 	"EdibleBuffs": null,
 	"Price": 380,
 	"IsColored": false,
+	"DisableWithMod": "ppja.evenmorerecipes",
 
 	// Object purchase
 	"CanPurchase": true,

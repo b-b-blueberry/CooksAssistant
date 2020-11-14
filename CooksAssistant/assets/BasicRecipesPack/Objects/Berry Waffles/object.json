@@ -1,24 +1,24 @@
 {
 	// Object data
-	"Name": "Hot Cocoa",
-	"Description": "Warms you up. There's a big marshmallow on top!",
+	"Name": "Berry Waffles",
+	"Description": "Whole-grain homemade waffles with a blueberry drizzle.",
 	"Category": "Cooking",
-	"Edibility": 75,
+	"Edibility": 45,
 	"EdibleIsDrink": true,
 	"EdibleBuffs": {
 		"Farming": 0,
 		"Fishing": 0,
-		"Mining": 0,
+		"Mining": 1,
 		"Luck": 0,
-		"Foraging": 0,
-		"MaxStamina": 35,
+		"Foraging": 1,
+		"MaxStamina": 20,
 		"MagnetRadius": 0,
 		"Speed": 0,
 		"Defense": 0,
 		"Attack": 0,
-		"Duration": 90
+		"Duration": 142
 	},
-	"Price": 200,
+	"Price": 380,
 	"IsColored": false,
 
 	// Object purchase
@@ -32,11 +32,19 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": -6, // Category:Milk
+				"Object": 262, // Wheat
 				"Count": 1
 			},
 			{
-				"Object": "Chocolate Bar",
+				"Object": 258, // Blueberry
+				"Count": 1
+			},
+			{
+				"Object": "Redberries",
+				"Count": 1
+			},
+			{
+				"Object": 724, // Maple Syrup
 				"Count": 1
 			}
 		],

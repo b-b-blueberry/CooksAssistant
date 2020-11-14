@@ -1,25 +1,26 @@
 {
 	// Object data
-	"Name": "Waffles",
-	"Description": "Whole-grain homemade waffles with a berry drizzle.",
+	"Name": "Hot Cocoa",
+	"Description": "Warms you up. There's a big marshmallow on top!",
 	"Category": "Cooking",
-	"Edibility": 45,
+	"Edibility": 75,
 	"EdibleIsDrink": true,
 	"EdibleBuffs": {
 		"Farming": 0,
 		"Fishing": 0,
-		"Mining": 1,
+		"Mining": 0,
 		"Luck": 0,
-		"Foraging": 1,
-		"MaxStamina": 20,
+		"Foraging": 0,
+		"MaxStamina": 0,
 		"MagnetRadius": 0,
 		"Speed": 0,
-		"Defense": 0,
+		"Defense": 2,
 		"Attack": 0,
-		"Duration": 142
+		"Duration": 90
 	},
-	"Price": 380,
+	"Price": 200,
 	"IsColored": false,
+	"DisableWithMod": "ppja.artisanvalleymachinegoods",
 
 	// Object purchase
 	"CanPurchase": false,
@@ -32,19 +33,11 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 262, // Wheat
+				"Object": -6, // Category:Milk
 				"Count": 1
 			},
 			{
-				"Object": 258, // Blueberry
-				"Count": 1
-			},
-			{
-				"Object": "Redberries",
-				"Count": 1
-			},
-			{
-				"Object": 724, // Maple Syrup
+				"Object": "Chocolate Bar",
 				"Count": 1
 			}
 		],
