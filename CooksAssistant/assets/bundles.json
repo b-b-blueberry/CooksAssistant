@@ -1,5 +1,13 @@
 [
-    "{0}/O 465 20/24 1 0 188 1 0 190 1 0 192 1 0/1",
-    "{0}/O 621 1/256 1 0/2",
-    "{0}/BO 10 1/270 1 0/3"
+    // EASY: Picnicker's Bundle
+    [ "O Chocolate Bar 5", "Hashbrowns 1 0 Cheese Cauliflower 1 0 Burrito 1 0 Farmer's Lunch 1 0", "4" ],
+
+    // HARD: Baker's Bundle
+    [ "BO Oil Maker 1", "Rhubarb Pie 1 0 Strange Bun 1 0 Apple Pie 1 0 Chocolate Cake 1 0 Maple Bar 1 0", "5" ],
+
+    // TODO: CONTENT: Bundle 3 contents
+    // ???: ???
+    // Reward: ???
+    // Something with a gold star
+    //[ "???", "???" ]
 ]

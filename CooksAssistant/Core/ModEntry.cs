@@ -15,13 +15,10 @@ using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
-using StardewValley.Objects;
 using StardewValley.TerrainFeatures;
 using Object = StardewValley.Object;
 using xTile.Dimensions;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-
-// TODO: CONTENT: Ensure all slice/half objects have the correct category and colour/text overrides
 
 namespace CooksAssistant
 {
@@ -31,17 +28,17 @@ namespace CooksAssistant
 		internal Config Config;
 		internal ModSaveData SaveData;
 
+		private bool _forceConfig = false;
+
 		internal ITranslationHelper i18n => Helper.Translation;
 		internal static IJsonAssetsApi JsonAssets;
 		internal static Texture2D SpriteSheet;
-		internal static CookingMenuButton CookingMenuButton;
 
 		// Assets
 		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
 		internal static readonly string BasicRecipesPackPath = Path.Combine("assets", "BasicRecipesPack");
 		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
 		internal static readonly string NewCropsRecipesPackPath = Path.Combine("assets", "NewCropsRecipesPack");
-		internal static readonly string EasterPackPath = Path.Combine("assets", "EasterPack");
 		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
 		internal static readonly string BundleDataPath = Path.Combine("assets", "bundles");
 		internal static readonly string BuffChartPath = Path.Combine("assets", "ingredientBuffChart");
@@ -57,15 +54,12 @@ namespace CooksAssistant
 		
 		// Add Cooking Skill
 		// TODO: REFACTOR: Remove ModEntry.CookingSkill and instead use Skills.GetSkill()
-		private static readonly List<string> StartingCookingRecipes = new List<string>
-		{
-		};
 		private static readonly Dictionary<int, string[]> CookingSkillLevelUpRecipes = new Dictionary<int, string[]>
 		{
 			{ 0, new[] { "Fried Egg", "Baked Potato" } },
 			{ 1, new[] { "Burrito", "Cauliflower Fritters" } },
 			{ 2, new[] { "Porridge", "Quick Breakfast" } },
-			{ 3, new[] { "Baked Lobster", "Loaded Potato", "Stuffed Potato" } },
+			{ 3, new[] { "Lobster Bake", "Loaded Potato", "Stuffed Potato" } },
 			{ 4, new[] { "Cake", "Hot Cocoa", "Berry Waffles" } },
 			{ 5, new[] { "Cray Mornay", "Eel Sushi", "Pitta Bread" } },
 			{ 6, new[] { "Redberry Pie", "Cabbage Pot", "Hearty Stew", "Hunter's Plate" } },
@@ -112,8 +106,10 @@ namespace CooksAssistant
 		// debug
 		private float _debugRegenRate;
 		private uint _debugElapsedTime;
-		
+
 		// Others:
+		internal static bool PlayerAgencyBlocked;
+		private const string ChocolateName = "Chocolate Bar";
 		private const string NettlesName = "Nettles";
 		private const string NettlesUsableMachine = "Keg";
 		private const int NettlesUsableLevel = 2;
@@ -123,14 +119,104 @@ namespace CooksAssistant
 		private const int KebabMalusDuration = 140;
 		private const int KebabCombatBonus = 3;
 		private const int KebabNonCombatBonus = 2;
-		// easter event
-		private const bool IsEasterEnabled = false;
-		internal static KeyValuePair<string, string> TempPair;
-		internal const string EasterEggItem = "Chocolate Egg";
-		internal const string EasterBasketItem = "Egg Basket";
-		internal const string ChocolateBarItem = "Chocolate Bar";
-		internal static readonly string[] UntrashableItems = {
-			EasterBasketItem
+		// configuration
+		public static readonly List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
+		{
+			498, 499, 632, 633
+		};
+		public static readonly List<string> FoodsThatGiveLeftovers = new List<string>
+		{
+			"Seafood Sandwich",
+			"Egg Sandwich",
+			"Salad Sandwich",
+			"Pizza",
+			"Cake",
+			"Chocolate Cake",
+			"Pink Cake",
+			"Watermelon"
+		};
+		public static readonly List<string> FoodsWithLeftoversGivenAsSlices = new List<string>
+		{
+			"pizza",
+			"cake"
+		};
+		public static readonly List<string> ObjectsToAvoidScaling = new List<string>
+		{
+
+		};
+		public static readonly Dictionary<string, int> ObjectsWithCookingBuffs = new Dictionary<string, int>
+		{
+
+		};
+		public static readonly string[] SoupyFoods = new[]
+		{
+			"soup",
+			"bisque",
+			"chowder",
+			"stew",
+			"pot",
+			"broth",
+			"stock",
+		};
+		public static readonly string[] DrinkyFoods = new[]
+		{
+			"candy",
+			"cocoa",
+			"chocolate",
+			"milkshake",
+			"smoothie",
+			"milk",
+			"tea",
+			"coffee",
+			"espresso",
+			"mocha",
+			"latte",
+			"cappucino",
+			"drink",
+		};
+		public static readonly string[] SaladyFoods = new[]
+		{
+			"coleslaw",
+			"salad",
+			"lunch",
+			"taco",
+			"roll",
+			"sashimi",
+			"sushi",
+			"sandwich",
+		};
+		public static readonly string[] CakeyFoods = new[]
+		{
+			"bread",
+			"bun",
+			"cake",
+			"cakes",
+			"pie",
+			"pudding",
+			"bake",
+			"biscuit",
+			"brownie",
+			"brownies",
+			"cobbler",
+			"cookie",
+			"cookies",
+			"crumble",
+			"muffin",
+			"tart",
+			"turnover",
+		};
+		public static readonly string[] PancakeyFoods = new[]
+		{
+			"pancake",
+			"crepe",
+			"hotcake"
+		};
+		public static readonly string[] PizzayFoods = new[]
+		{
+			"pizza",
+			"pitta",
+			"calzone",
+			"tortilla",
 		};
 
 
@@ -138,6 +224,11 @@ namespace CooksAssistant
 		{
 			Instance = this;
 			Config = helper.ReadConfig<Config>();
+			if (_forceConfig)
+			{
+				Log.W("Forcing config setup.");
+				ForceConfig();
+			}
 
 			// Asset editors
 			var assetManager = new AssetManager();
@@ -154,16 +245,14 @@ namespace CooksAssistant
 			Helper.Events.GameLoop.UpdateTicked += GameLoopUpdateTicked;
 			Helper.Events.Player.Warped += PlayerOnWarped;
 			Helper.Events.Input.ButtonPressed += InputOnButtonPressed;
-			if (Config.AddCookingOverhaul)
-			{
-				Helper.Events.Display.MenuChanged += DisplayOnMenuChanged;
-			}
+			Helper.Events.Display.MenuChanged += DisplayOnMenuChanged;
+
 			if (Config.AddCookingSkill)
 			{
 				CookingSkill = new CookingSkill();
 				Skills.RegisterSkill(CookingSkill);
 			}
-			if (Config.DebugMode)
+			if (Config.DebugMode && !_forceConfig)
 			{
 				Helper.Events.Display.RenderedHud += Event_DrawDebugHud;
 			}
@@ -237,6 +326,27 @@ namespace CooksAssistant
 				}
 				Log.D($"Set HP: {Game1.player.health}, EP: {Game1.player.Stamina}");
 			});
+			Helper.ConsoleCommands.Add(cmd + "recipes", "Show all unlocked player recipes.", (s, args) =>
+			{
+				var message = Game1.player.cookingRecipes.Keys.OrderBy(str => str).Aggregate("Cooking recipes:", (cur, str) => $"{cur}\n{str}");
+				Log.D(message);
+			});
+			Helper.ConsoleCommands.Add(cmd + "anim", "Animate for generic or specific food.", (s, args) =>
+			{
+				CookingMenu.AnimateForRecipe(new CraftingRecipe(args.Length > 0 ? args[0] : "Fried Egg", true), 1, false);
+			});
+			Helper.ConsoleCommands.Add(cmd + "inv", "Print contents of current menu inventory.", (s, args) =>
+			{
+				if (Game1.activeClickableMenu is CookingMenu menu)
+				{
+					Log.D(menu.inventory.actualInventory.Aggregate(
+						$"INVENTORY: ({menu.inventory.actualInventory.Count})", (cur, item) => $"{cur}\n{item?.Name ?? "/////"}"));
+				}
+			});
+			Helper.ConsoleCommands.Add(cmd + "unblock", "Unblock player movement.", (s, args) =>
+			{
+				PlayerAgencyBlocked = false;
+			});
 		}
 
 		private void LoadJsonAssetsObjects()
@@ -266,21 +376,38 @@ namespace CooksAssistant
 				if (Config.AddNewCrops && !Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
 					JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsRecipesPackPath));
 			}
+		}
 
-			if (IsEasterEnabled)
-			{
-				Log.D($"EASTER: Adding easter items", Config.DebugMode);
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, EasterPackPath));
-			}
+		private void ForceConfig()
+		{
+			Config.AddCookingMenu = true;
+			Config.AddCookingCommunityCentreBundle = false;
+			Config.AddCookingSkill = false;
+			Config.AddCookingTool = false;
+			Config.AddCookingQuestline = false;
+			Config.AddNewCrops = false;
+			Config.AddNewRecipes = false;
+			Config.AddNewRecipeScaling = false;
+			Config.PlayCookingAnimation = false;
+			Config.CookingTakesTime = false;
+			Config.FoodHealingTakesTime = false;
+			Config.FoodCanBurn = false;
+			Config.HideFoodBuffsUntilEaten = false;
+			//Config.DebugMode = true;
+			Config.ConsoleCommandPrefix = "cac";
 		}
 		
 		private void GameLoopOnGameLaunched(object sender, GameLaunchedEventArgs e)
 		{
+			PlayerAgencyBlocked = false;
+
 			LoadJsonAssetsObjects();
 		}
 
 		private void GameLoopOnSaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
+			PlayerAgencyBlocked = false;
+
 			SaveData = Helper.Data.ReadSaveData<ModSaveData>(SaveDataKey) ?? new ModSaveData();
 
 			// Invalidate and reload assets requiring JA indexes
@@ -288,14 +415,14 @@ namespace CooksAssistant
 			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
 			
 			// Add watcher to check for first-time Kitchen bundle completion
-			if (Config.AddCookingToTheCommunityCentre)
+			if (Config.AddCookingCommunityCentreBundle)
 			{
 				Helper.Content.InvalidateCache(@"Data/Bundles");
 				Helper.Events.GameLoop.DayEnding += Event_WatchingKitchenBundle;
 			}
 
 			// Populate NPC home locations for cooking range usage
-			if (Config.CookAtKitchens)
+			//if (Config.CookAtKitchens)
 			{
 				var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
 				NpcHomeLocations = new Dictionary<string, string>();
@@ -306,12 +433,16 @@ namespace CooksAssistant
 		
 		private void GameLoopOnSaving(object sender, SavingEventArgs e)
 		{
+			PlayerAgencyBlocked = false;
+
 			// TOOD: DEBUG: Reenable save data write
 			//Helper.Data.WriteSaveData(SaveDataKey, SaveData);
 		}
 
 		private void GameLoopOnDayStarted(object sender, DayStartedEventArgs e)
 		{
+			PlayerAgencyBlocked = false;
+
 			// Load starting recipes
 			foreach (var recipe in CookingSkillLevelUpRecipes[0])
 				if (!Game1.player.cookingRecipes.ContainsKey(recipe))
@@ -337,28 +468,8 @@ namespace CooksAssistant
 				}
 			}
 
-			// Purge old easter eggs when Summer begins
-			if (IsEasterEnabled && Game1.dayOfMonth == 1 && Game1.currentSeason == "summer")
-			{
-				const string itemToPurge = EasterEggItem;
-				const string itemToAdd = ChocolateBarItem;
-				foreach (var chest in Game1.locations.SelectMany(
-					l => l.Objects.SelectMany(dict => dict.Values.Where(
-						o => o is Chest c && c.items.Any(i => i.Name == itemToPurge)))).Cast<Chest>())
-				{
-					var stack = 0;
-					foreach (var item in chest.items.Where(i => i.Name == itemToPurge))
-					{
-						// TODO: TEST: Easter egg expiration on Summer 1
-						stack += item.Stack;
-						chest.items[chest.items.IndexOf(item)] = null;
-					}
-					chest.items.Add(new Object(JsonAssets.GetObjectId(itemToAdd), stack));
-				}
-			}
-
 			// aauugh
-			if (Config.AddCookingToTheCommunityCentre)
+			if (Config.AddCookingCommunityCentreBundle)
 			{
 				UpdateCommunityCentreData(Game1.getLocationFromName("CommunityCenter") as CommunityCenter);
 			}
@@ -366,8 +477,10 @@ namespace CooksAssistant
 
 		private void GameLoopOnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
 		{
+			PlayerAgencyBlocked = false;
+
 			// Remove Kitchen bundle watcher, assuming one exists
-			if (Config.AddCookingToTheCommunityCentre)
+			if (Config.AddCookingCommunityCentreBundle)
 				Helper.Events.GameLoop.DayEnding -= Event_WatchingKitchenBundle;
 		}
 
@@ -459,15 +572,6 @@ namespace CooksAssistant
 					++Game1.player.Stamina;
 				--_staminaRegeneration;
 			}
-		}
-		
-		private void Event_UndoGiftChanges(object sender, UpdateTickedEventArgs e)
-		{
-			// Reset unique easter gift dialogue after it's invoked
-			Helper.Events.GameLoop.UpdateTicked -= Event_UndoGiftChanges;
-			Game1.NPCGiftTastes[TempPair.Key] = TempPair.Value;
-			Log.D($"Reverted gift taste dialogue to {TempPair.Value}");
-			TempPair = new KeyValuePair<string, string>();
 		}
 		
 		private void Event_WatchingToolUpgrades(object sender, UpdateTickedEventArgs e)
@@ -574,42 +678,6 @@ namespace CooksAssistant
 				}
 			}
 
-			// Menu interactions:
-			if (CookingMenuButton != null)
-			{
-				if (e.Button.IsUseToolButton() && CookingMenuButton.isWithinBounds(
-					(int)e.Cursor.ScreenPixels.X, (int)e.Cursor.ScreenPixels.Y))
-				{
-					if (CheckForNearbyCookingStation() == 0)
-					{
-						Game1.showRedMessage(i18n.Get("menu.cooking_station.none"));
-					}
-					else
-					{
-						Log.W($"Clicked the campfire icon");
-						OpenNewCookingMenu(null);
-					}
-				}
-			}
-			// When holding an untrashable item, check if cursor is on trashCan or outside of the menu, then block it
-			if ((Game1.activeClickableMenu is GameMenu || Game1.activeClickableMenu is ItemGrabMenu)
-			    && UntrashableItems.Contains(Game1.player.CursorSlotItem?.Name))
-			{
-				if (Game1.activeClickableMenu != null
-				    && ((Game1.activeClickableMenu is CraftingPage craftingMenu
-							&& craftingMenu.trashCan.containsPoint((int) e.Cursor.ScreenPixels.X,
-								 (int) e.Cursor.ScreenPixels.Y)
-							|| (Game1.activeClickableMenu is InventoryPage inventoryMenu
-								 && inventoryMenu.trashCan.containsPoint((int) e.Cursor.ScreenPixels.X,
-									 (int) e.Cursor.ScreenPixels.Y)))
-				        || !Game1.activeClickableMenu.isWithinBounds((int) e.Cursor.ScreenPixels.X,
-					        (int) e.Cursor.ScreenPixels.Y)))
-				{
-					Log.D($"Caught untrashable item ({Game1.player.CursorSlotItem?.Name ?? "null"})", Config.DebugMode);
-					Helper.Input.Suppress(e.Button);
-				}
-			}
-
 			// World interactions:
 			if (Game1.currentBillboard != 0 || Game1.activeClickableMenu != null || Game1.menuUp // No menus
 			    || !Game1.player.CanMove) // Player agency enabled
@@ -621,9 +689,7 @@ namespace CooksAssistant
 				// Try to open the new Cooking menu when nearby to cooking stations (ie. kitchen, range)
 				var tile = Game1.currentLocation.Map.GetLayer("Buildings")
 					.Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
-				if (tile != null
-					&& Config.CookAtKitchens
-					&& Config.IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
+				if (tile != null && IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
 				{
 					if (NpcHomeLocations.Any(pair => pair.Value == Game1.currentLocation.Name
 					                                 && Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= 5)
@@ -647,7 +713,7 @@ namespace CooksAssistant
 				else if (btn.IsUseToolButton())
 				{
 					// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
-					if (Skills.GetSkillLevel(Game1.player, CookingSkillId) < NettlesUsableLevel
+					if ((!Config.AddCookingSkill || Skills.GetSkillLevel(Game1.player, CookingSkillId) < NettlesUsableLevel)
 						&& Game1.player.ActiveObject?.Name == NettlesName
 						&& Game1.currentLocation.Objects[e.Cursor.GrabTile]?.Name == NettlesUsableMachine)
 					{
@@ -666,13 +732,13 @@ namespace CooksAssistant
 			// Add new crops and objects to shop menus
 			if (e.NewMenu is ShopMenu menu)
 			{
-				if (Game1.currentLocation is SeedShop)
+				if (Config.AddNewCrops && Game1.currentLocation is SeedShop)
 				{
 					SortSeedShopStock(ref menu);
 				}
 				else if (Game1.currentLocation is JojaMart)
 				{
-					var o = new Object(Vector2.Zero, JsonAssets.GetObjectId(ChocolateBarItem), int.MaxValue);
+					var o = new Object(Vector2.Zero, JsonAssets.GetObjectId(ChocolateName), int.MaxValue);
 					menu.itemPriceAndStock.Add(o, new [] {(int) (o.Price * Game1.MasterPlayer.difficultyModifier), int.MaxValue});
 					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Sugar"), o);
 				}
@@ -703,11 +769,7 @@ namespace CooksAssistant
 				}
 			}
 
-			// Try to add the menu button for cooking
-			//if (!(e.NewMenu is GameMenu))
-				//RemoveCookingMenuButton();
-
-			if (e.NewMenu is CraftingPage cm)
+			if (Config.AddCookingMenu && e.NewMenu is CraftingPage cm)
 			{
 				var cooking = Helper.Reflection.GetField<bool>(cm, "cooking").GetValue();
 				if (cooking)
@@ -719,29 +781,18 @@ namespace CooksAssistant
 				}
 				return;
 			}
-
-			//if (!(e.NewMenu is GameMenu) || e.OldMenu is GameMenu && e.NewMenu is GameMenu)
-				//return;
-
-			//CookingMenuButton = new CookingMenuButton();
-			//Game1.onScreenMenus.Add(CookingMenuButton);
 		}
 		
 		private void PlayerOnWarped(object sender, WarpedEventArgs e)
 		{
-			/*
-			if (e.NewLocation is CommunityCenter && !(e.OldLocation is CommunityCenter))
-				Helper.Events.Display.RenderedWorld += Event_DrawCC;
-			else if (e.OldLocation is CommunityCenter && !(e.NewLocation is CommunityCenter))
-				Helper.Events.Display.RenderedWorld -= Event_DrawCC;
-			*/
+			PlayerAgencyBlocked = false;
 
 			if (Config.AddCookingTool && e.NewLocation.Name == "Blacksmith")
 			{
 				Helper.Events.GameLoop.UpdateTicked += Event_WatchingToolUpgrades;
 			}
 
-			if (!(e.NewLocation is CommunityCenter) || !Config.AddCookingToTheCommunityCentre)
+			if (!(e.NewLocation is CommunityCenter) || !Config.AddCookingCommunityCentreBundle)
 				return;
 			
 			Helper.Events.GameLoop.UpdateTicked += Event_MoveJunimo;
@@ -834,12 +885,12 @@ namespace CooksAssistant
 				SaveData.FoodsEaten.Add(food.Name, 0);
 			++SaveData.FoodsEaten[food.Name];
 
-			if (Config.GiveLeftoversFromBigFoods && Config.FoodsThatGiveLeftovers.Contains(food.Name))
+			if (FoodsThatGiveLeftovers.Contains(food.Name))
 			{
 				// TODO: TEST: Adding leftovers to a full inventory
 				var leftovers = new Object(
 					JsonAssets.GetObjectId(
-						Config.FoodsWithLeftoversGivenAsSlices.Any(f => food.Name.ToLower().EndsWith(f))
+						FoodsWithLeftoversGivenAsSlices.Any(f => food.Name.ToLower().EndsWith(f))
 							? $"{food.Name} Slice" 
 							: $"{food.Name} Half"), 
 					1);
@@ -945,22 +996,6 @@ namespace CooksAssistant
 			{
 				Game1.player.changeFriendship(CookingSkill.GiftBoostValue, e.Npc);
 			}
-
-			// Patch in unique gift dialogue for easter egg deliveries
-			if (!IsEasterEnabled || e.Gift.Name != EasterEggItem && e.Gift.Name != EasterBasketItem)
-				return;
-			if (e.Gift.Name == EasterBasketItem)
-				++Game1.player.CurrentItem.Stack;
-			
-			TempPair = new KeyValuePair<string, string>(e.Npc.Name, Game1.NPCGiftTastes[e.Npc.Name]);
-			var str = i18n.Get($"talk.egg_gift.{e.Npc.Name.ToLower()}");
-			if (!str.HasValue())
-				throw new KeyNotFoundException();
-			Game1.NPCGiftTastes[e.Npc.Name] = UpdateEntry(
-				Game1.NPCGiftTastes[e.Npc.Name], new[] {(string)str}, false, false, 2);
-
-			// Remove the patch on the next tick, after the unique gift dialogue has been loaded and drawn
-			Helper.Events.GameLoop.UpdateTicked += Event_UndoGiftChanges;
 		}
 
 		/// <summary>
@@ -974,7 +1009,8 @@ namespace CooksAssistant
 			       || Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp
 				   || Game1.keyboardDispatcher.Subscriber != null // No text inputs
 				   || Game1.player.UsingTool || Game1.pickingTool || Game1.numberOfSelectedItems != -1 // No tools in use
-			       || Game1.fadeToBlack; // None of that
+			       || Game1.fadeToBlack // None of that
+				   || PlayerAgencyBlocked; // ESPECIALLY not that
 		}
 
 		public void CheckTileAction(Vector2 position, GameLocation location)
@@ -1005,7 +1041,7 @@ namespace CooksAssistant
 					{
 						o = new Object(JsonAssets.GetObjectId(DockCrateItem), 1);
 						if (roll < 0.05f && Game1.player.eventsSeen.Contains(1))
-							o = new Object(JsonAssets.GetObjectId(ChocolateBarItem), 1);
+							o = new Object(JsonAssets.GetObjectId(ChocolateName), 1);
 					}
 					if (o != null)
 						Game1.player.addItemByMenuIfNecessary(o.getOne());
@@ -1029,16 +1065,6 @@ namespace CooksAssistant
 				Game1.activeClickableMenu = new CookingMenu(recipes);
 		}
 		
-		internal static void RemoveCookingMenuButton()
-		{
-			foreach (var button in Game1.onScreenMenus.OfType<CookingMenuButton>().ToList())
-			{
-				Log.D($"Removing {nameof(button)}");
-				Game1.onScreenMenus.Remove(button);
-			}
-			CookingMenuButton = null;
-		}
-
 		/// <summary>
 		/// Returns the base health/stamina regeneration rate for some food object.
 		/// </summary>
@@ -1096,7 +1122,7 @@ namespace CooksAssistant
 					var tile = layer.Tiles[x, y];
 					if (tile == null
 					    || Game1.currentLocation.doesTileHaveProperty(x, y, "Action", "Buildings") != "kitchen" 
-					    && !Config.IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
+					    && !IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
 						continue;
 					switch (Game1.currentLocation)
 					{
@@ -1157,6 +1183,10 @@ namespace CooksAssistant
 
 		public int GetFarmersMaxUsableIngredients()
 		{
+			if (!Config.AddCookingTool && !Config.AddCookingSkill)
+			{
+				return Config.AddNewRecipeScaling ? 6 : 5;
+			}
 			return Config.AddCookingTool
 				? 1 + SaveData.CookingToolLevel
 				: 1 + Skills.GetSkillLevel(Game1.player, CookingSkillId) / 2;
@@ -1230,7 +1260,12 @@ namespace CooksAssistant
 			else for (var i = 0; i < newEntry.Length; ++i)
 				if (newEntry[i] != null) 
 					fields[startIndex + i] = append ? $"{fields[startIndex + i]} {newEntry[i]}" : newEntry[i];
-			return fields.Aggregate((entry, field) => $"{entry}{delimiter}{field}").Remove(0, 0);
+			return SplitToString(fields, delimiter);
+		}
+
+		public static string SplitToString(IEnumerable<string> splitString, char delimiter = '/')
+		{
+			return splitString.Aggregate((cur, str) => $"{cur}{delimiter}{str}").Remove(0, 0);
 		}
 		
 		/// <summary>

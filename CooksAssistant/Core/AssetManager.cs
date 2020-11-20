@@ -36,14 +36,17 @@ namespace CooksAssistant
 
 		public bool CanLoad<T>(IAssetInfo asset)
 		{
-			if (asset.DataType == typeof(Texture2D))
-				Log.W($"Check CanLoad texture asset {asset.AssetName}");
-			return (asset.AssetNameEquals(ModEntry.MapTileSheetPath));
+			return asset.AssetNameEquals(ModEntry.SpriteSheetPath)
+				|| asset.AssetNameEquals(ModEntry.MapTileSheetPath);
 		}
 
 		public T Load<T>(IAssetInfo asset)
 		{
 			Log.W($"Loading custom asset {asset.AssetName}");
+			if (asset.AssetNameEquals(ModEntry.SpriteSheetPath))
+			{
+				return (T) (object) ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.SpriteSheetPath}.png");
+			}
 			if (asset.AssetNameEquals(ModEntry.MapTileSheetPath))
 			{
 				// Take bar counter sprite from townInterior sheet
@@ -106,33 +109,86 @@ namespace CooksAssistant
 			{
 				// Make changes to facilitate a new community centre bundle
 
-				if (!Game1.hasLoadedGame)
+				if (ModEntry.JsonAssets == null || !Game1.hasLoadedGame)
 				{
 					return;
 				}
-				if (!ModEntry.Instance.Config.AddCookingToTheCommunityCentre)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
 				{
-					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
+					Log.D($"Did not edit {asset.AssetName}: Community centre additions are disabled in config file.",
 						Config.DebugMode);
 					return;
 				}
 
 				var data = asset.AsDictionary<string, string>().Data;
-				
-				ModEntry.Instance.BundleStartIndex = data.Keys.ToList().Max(key => int.Parse(key.Split('/')[1]));
-				var customBundleData = ModEntry.Instance.Helper.Content.Load<List<string>>($"{ModEntry.BundleDataPath}.json");
-				for (var i = 0; i < customBundleData.Count; ++i)
+
+				foreach (var id in data.Keys)
 				{
+					data[id] = data[id];
+				}
+
+				ModEntry.Instance.BundleStartIndex = data.Keys.ToList().Max(key => int.Parse(key.Split('/')[1]));
+				var sourceBundleList = ModEntry.Instance.Helper.Content.Load<List<List<string>>>($"{ModEntry.BundleDataPath}.json");
+				
+				// Iterate over each custom bundle to add their data to game Bundles dictionary
+				for (var i = 0; i < sourceBundleList.Count; ++i)
+				{
+					// Bundle data
+					var sourceBundle = sourceBundleList[i];
+					var parsedBundle = new List<List<string>>();
+
 					var index = ModEntry.Instance.BundleStartIndex + i + 1;
 					var name = $"{ModEntry.CommunityCentreAreaName}.bundle.{i}";
 					var displayName = i18n.Get($"world.community_centre.bundle.{i + 1}");
+					var itemsToComplete = sourceBundle[sourceBundle.Count - 1];
+					parsedBundle.Add(new List<string>{ displayName.ToString() });
 
-					// Update bundle data
+					// Fill in rewardsData section of the new bundle data
+					var rewardsData = sourceBundle[0].Split(' ');
+					var rewardName = ModEntry.SplitToString(rewardsData.Skip(1).Take(rewardsData.Length - 2), ' ');
+					var rewardId = ModEntry.JsonAssets.GetObjectId(rewardName);
+					if (rewardId < 0)
+					{
+						rewardId = rewardsData[0] == "BO"
+							? Game1.bigCraftablesInformation.FirstOrDefault(o => o.Value.Split('/')[0] == rewardName).Key
+							: Game1.objectInformation.FirstOrDefault(o => o.Value.Split('/')[0] == rewardName).Key;
+					}
+					parsedBundle.Add(new List<string> { rewardsData[0], rewardId.ToString(), rewardsData[rewardsData.Length - 1] });
+
+					// Iterate over each word in the items list, formatted as [<Name With Spaces> <Quantity> <Quality>]
+					parsedBundle.Add(new List<string>());
+					var startIndex = 0;
+					var requirementsData = sourceBundle[1].Split(' ');
+					for (var j = 0; j < requirementsData.Length; ++j)
+					{
+						// Group and parse each [name quantity quality] cluster
+						if (j != startIndex && int.TryParse(requirementsData[j], out var itemQuantity))
+						{
+							var itemName = ModEntry.SplitToString(requirementsData.Skip(startIndex).Take(j - startIndex).ToArray(), ' ');
+							var itemQuality = int.Parse(requirementsData[++j]);
+							var itemId = ModEntry.JsonAssets.GetObjectId(itemName);
+
+							// Add parsed item data to the requiredItems section of the new bundle data
+							if (itemId < 0)
+							{
+								itemId = Game1.objectInformation.FirstOrDefault(o => o.Value.Split('/')[0] == itemName).Key;
+							}
+							if (itemId > 0)
+							{
+								parsedBundle[2].AddRange(new List<int> { itemId, itemQuantity, itemQuality }.ConvertAll(o => o.ToString()));
+							}
+
+							startIndex = ++j;
+						}
+					}
+
+					// Patch new data into the target bundle dictionary, including mininmum completion count and display name
 					var key = $"{ModEntry.CommunityCentreAreaName}/{index}";
-					var value = string.Format(customBundleData[i]
-						//, name
-						, displayName
-						);
+					var value = ModEntry.SplitToString(parsedBundle.Select(list => ModEntry.SplitToString(list, ' ')), '/') + $"/{itemsToComplete}";
+					if (LocalizedContentManager.CurrentLanguageCode.ToString() != "en")
+					{
+						value += $"/{displayName}";
+					}
 					data.Add(key, value);
 				}
 
@@ -144,9 +200,9 @@ namespace CooksAssistant
 
 				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
 					return;
-				if (!Config.MakeChangesToRecipes)
+				if (!Config.AddNewRecipeScaling)
 				{
-					Log.D($"Did not edit {asset.AssetName}: Recipe edits are disabled in config file.",
+					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
 						Config.DebugMode);
 					return;
 				}
@@ -228,9 +284,9 @@ namespace CooksAssistant
 
 				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
 					return;
-				if (!Config.MakeChangesToIngredients)
+				if (!Config.AddNewRecipeScaling)
 				{
-					Log.D($"Did not edit {asset.AssetName}: Ingredients edits are disabled in config file.",
+					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
 						Config.DebugMode);
 					return;
 				}
@@ -250,8 +306,7 @@ namespace CooksAssistant
 					};
 					
 					// Apply above recipe changes
-					foreach (var obj in objectData.Where(o =>
-						Config.GiveLeftoversFromBigFoods || !Config.FoodsThatGiveLeftovers.Contains(o.Value[0])))
+					foreach (var obj in objectData.Where(o => !ModEntry.FoodsThatGiveLeftovers.Contains(o.Value[0])))
 						data[obj.Key] = ModEntry.UpdateEntry(data[obj.Key], obj.Value);
 
 					if (Config.AddNewRecipeScaling)
@@ -274,6 +329,15 @@ namespace CooksAssistant
 
 			if (asset.AssetNameEquals(@"Data/Monsters"))
 			{
+				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
+					return;
+				if (!Config.AddNewCrops)
+				{
+					Log.D($"Did not edit {asset.AssetName}: New crops are disabled in config file.",
+						Config.DebugMode);
+					return;
+				}
+
 				try
 				{
 					var data = asset.AsDictionary<string, string>().Data;
@@ -310,9 +374,9 @@ namespace CooksAssistant
 				return;
 			}
 			
-			if (asset.DataType == typeof(Map) && !Config.MakeChangesToMaps)
+			if (asset.DataType == typeof(Map) && !Config.AddCookingQuestline)
 			{
-				Log.D($"Did not edit {asset.AssetName}: Map edits are disabled in config file.",
+				Log.D($"Did not edit {asset.AssetName}: Cooking questline is disabled in config file.",
 					Config.DebugMode);
 				return;
 			}
@@ -322,7 +386,7 @@ namespace CooksAssistant
 			{
 				// Add icons for a new community centre bundle
 				
-				if (!ModEntry.Instance.Config.AddCookingToTheCommunityCentre)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -403,16 +467,6 @@ namespace CooksAssistant
 				Texture2D sourceImage;
 				var destImage = asset.AsImage();
 
-				// Egg Basket
-				index = ModEntry.JsonAssets.GetObjectId(ModEntry.EasterBasketItem);
-				if (index > 0)
-				{
-					sourceImage = Game1.content.Load<Texture2D>("Maps/Festivals");
-					sourceArea = new Rectangle(32, 16, 16, 16);
-					destArea = Game1.getSourceRectForStandardTileSheet(destImage.Data, index, 16, 16);
-					destImage.PatchImage(sourceImage, sourceArea, destArea, PatchMode.Replace);
-				}
-
 				// Pitta Bread
 				index = ModEntry.JsonAssets.GetObjectId("Pitta Bread");
 				if (index > 0)
@@ -427,7 +481,7 @@ namespace CooksAssistant
 			{
 				// Make changes to facilitate a new community centre star
 				
-				if (!ModEntry.Instance.Config.AddCookingToTheCommunityCentre)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -444,7 +498,7 @@ namespace CooksAssistant
 			{
 				// Make changes to facilitate a new community centre bundle
 
-				if (!ModEntry.Instance.Config.AddCookingToTheCommunityCentre)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -469,7 +523,7 @@ namespace CooksAssistant
 			{
 				// Make changes to facilitate a new community centre bundle
 
-				if (!ModEntry.Instance.Config.AddCookingToTheCommunityCentre)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -512,7 +566,7 @@ namespace CooksAssistant
 				var objectSplit = data[key].Split('/');
 				if (!objectSplit[3].Contains("-7")
 				    || !cookingRecipes.ContainsKey(objectSplit[0]) // v-- Json Assets custom recipe convention for unused fields
-				    || (!Config.ScaleCustomRecipes && cookingRecipes[objectSplit[0]].Split('/')[1].StartsWith("what")))
+				    || cookingRecipes[objectSplit[0]].Split('/')[1].StartsWith("what"))
 					continue;
 				var ingredients = cookingRecipes[objectSplit[0]].Split('/')[0].Split(' ');
 				var buffArray = new[] { "0","0","0","0","0","0","0","0","0","0","0","0" };
@@ -525,7 +579,12 @@ namespace CooksAssistant
 					var buffSplit = ingredientsChart.ContainsKey(o.Name)
 						? ingredientsChart[o.Name].Split(' ')
 						: null;
-					if (o.ParentSheetIndex >= 2000 && Config.AddBuffsToCustomIngredients)
+					if (o.ParentSheetIndex >= 2000
+						)
+					{
+						break;
+					}
+					else
 					{
 						var random = new Random(1337 + o.Name.GetHashCode());
 						if (random.NextDouble() < 0.175f)
@@ -536,7 +595,7 @@ namespace CooksAssistant
 							};
 						}
 					}
-					if (buffSplit == null || ModEntry.Instance.Config.ObjectsToAvoidScaling.Contains(o.Name))
+					if (buffSplit == null || ModEntry.ObjectsToAvoidScaling.Contains(o.Name))
 						continue;
 					for (var j = 0; j < buffSplit.Length; j += 2)
 					{
@@ -569,15 +628,6 @@ namespace CooksAssistant
 				buffDuration = Math.Min(1600, Math.Max(300, (buffDuration / 10) * 10));
 
 				string[] newData;
-				// If the object now has no buffs, remove the unused fields
-				/*
-				if (buffArray.All(i => i == "0"))
-				{
-					newData = new string[6];
-					objectSplit.CopyTo(newData, 0);
-				}
-				else
-				*/
 				{
 					var newBuffs = buffArray.Aggregate((entry, field)
 						=> $"{entry} {field}").Remove(0, 0);

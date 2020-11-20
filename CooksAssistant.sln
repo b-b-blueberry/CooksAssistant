@@ -7,6 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CooksAssistant", "CooksAssi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "[PFM]CooksAssistant", "[PFM]CooksAssistant\[PFM]CooksAssistant.csproj", "{3A66681C-9D8E-4D14-8DC3-0D2DF5021122}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{61AA304D-5227-47A0-B368-721F8FA24984}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

@@ -1,4 +1,6 @@
 ﻿{
+	// 요리 시작!
+
 	// Cooking interface
 	"world.range_gus.rejected": "You're not good enough friends with Gus to use the Cooking Range.",
 	"world.range_npc.rejected": "You're not good enough friends with {{name}} to use their kitchen.",
@@ -22,6 +24,20 @@
 	"menu.cooking_recipe.quantity_label": "How many?",
 	"menu.cooking_recipe.which_label": "Which would you like to make?",
 
+	"menu.cooking_recipe.buff.0": "Farming",
+	"menu.cooking_recipe.buff.1": "Fishing",
+	"menu.cooking_recipe.buff.2": "Mining",
+	"menu.cooking_recipe.buff.3": "Digging",
+	"menu.cooking_recipe.buff.4": "Luck",
+	"menu.cooking_recipe.buff.5": "Foraging",
+	"menu.cooking_recipe.buff.6": "Crafting",
+	"menu.cooking_recipe.buff.7": "Energy",
+	"menu.cooking_recipe.buff.8": "Magnet.",
+	"menu.cooking_recipe.buff.9": "Speed",
+	"menu.cooking_recipe.buff.10": "Defense",
+	"menu.cooking_recipe.buff.11": "Attack",
+	"menu.cooking_recipe.buff.12": "Cooking",
+
 	"menu.cooking_search.order_label": "Ascending/descending order",
 	"menu.cooking_search.view.list": "View list",
 	"menu.cooking_search.view.grid": "View icons",
@@ -29,16 +45,17 @@
 	"menu.cooking_search.filter.1": "Alphabetical order",
 	"menu.cooking_search.filter.2": "Energy restored",
 	"menu.cooking_search.filter.3": "Gold value",
-	"menu.cooking_search.filter.4": "Recipes with known buffs",
+	"menu.cooking_search.filter.4": "Recipes with buffs",
+	"menu.cooking_search.filter.4_alt": "Recipes with known buffs",
 	"menu.cooking_search.filter.5": "Recipes not yet cooked",
 	"menu.cooking_search.filter.6": "Recipes ready to cook",
 	"menu.cooking_search.filter.7": "Favourite recipes",
 	"menu.cooking_search.none_label": "No recipes found.",
-	//"요리" "시작!",
 
 	// Cooking skill
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
 	"menu.cooking_skill.levelupbonus.2": "You can now brew Nettle Tea.",
+
 	// Tier 1:
 	// Path 1: Cooking
 	"menu.cooking_skill.tier1_path1.name": "Sous Chef",
@@ -89,51 +106,7 @@
 	"world.community_centre.kitchen": "Kitchen",
 	"world.community_centre.reward": "Cooking stuff",
 	"world.community_centre.bundle.1": "Picnicker's",
-	"world.community_centre.bundle.2": "Cook's",
+	"world.community_centre.bundle.2": "Baker's",
 	"world.community_centre.bundle.3": "Diner's",
-	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go.",
-
-	// Egg Festival - Year 2
-	"world.bunny_talk.intro_1": "Oh my, oh me, oh fie! I'm late, I'm late!",
-	"world.bunny_talk.intro_2": "You there! I saw your face, I saw that race! You're a natural egg-chaser!",
-	"world.bunny_talk.intro_3": "Take this basket and run! I'll need YOU to deliver these eggs to town!",
-	"world.bunny_talk.intro_4": "Oh no, oh slow, I'm late! I'm late, you know!",
-	"world.bunny_talk.mid_1": "",
-	"world.bunny_talk.outro_1": "",
-
-	"talk.egg_gift.abigail": "Thanks. I'll forgive you this time for stealing the show at the egg hunt!",
-	"talk.egg_gift.alex": "It doesn't match my diet, but I'll make an exception for you. Nice one, @!",
-	"talk.egg_gift.caroline": "Oh my, well I really shouldn't... but maybe this once!",
-	"talk.egg_gift.clint": "Don't bring it near the furnace! I'd rather not get it all over me.",
-	"talk.egg_gift.demetrius": "Chocolates! How nice of you.",
-	"talk.egg_gift.dwarf": "You say this came from a rabbit? I will need to inspect your claims.",
-	"talk.egg_gift.elliott": "The bow's just a darling touch. Thank you.",
-	"talk.egg_gift.emily": "Delicious, chocolatey, and a pretty little ribbon, too! You know me so well, @.",
-	"talk.egg_gift.evelyn": "Thank you, dear! This reminds me of the time spent arranging egg hunts for my own little girl.",
-	"talk.egg_gift.george": "Hmph... chocolate? I suppose it's a thought.",
-	"talk.egg_gift.gunther": "Thanks for the treat, farmer.",
-	"talk.egg_gift.gus": "Ho ho! Cheers for the chocolate, but I'll need to loosen up my belt if I have any more!",
-	"talk.egg_gift.haley": "Chocolates, wrapped in a cute bow! You're sweet, farmer @!",
-	"talk.egg_gift.harvey": "Err, well... The bow's cute!",
-	"talk.egg_gift.jas": "You remembered to share! You're nice!",
-	"talk.egg_gift.jodi": "How very sweet of you! The kids'll love this, I'm sure.",
-	"talk.egg_gift.kent": "This is for Vincent, right? Thanks, farmer.",
-	"talk.egg_gift.krobus": "This egg is painted with striking colours, but it has a dark and welcoming interior. I will keep this one.",
-	"talk.egg_gift.leah": "Well I'm not the biggest fan of chocolate, but it sure is cute!",
-	"talk.egg_gift.lewis": "Oh! This isn't one of the eggs from the festival. Did you make your own?",
-	"talk.egg_gift.linus": "How nice of you to remember me.",
-	"talk.egg_gift.marlon": "This egg? Strange, I was so sure... Oh, thank you.",
-	"talk.egg_gift.marnie": "What an adorable gift, I wonder what sort of chicken would have laid these!",
-	"talk.egg_gift.maru": "Hey, thanks! Is this one of the eggs from the festival? It looks a little different.",
-	"talk.egg_gift.pam": "Cute gift, kid!",
-	"talk.egg_gift.penny": "Very sweet of you, @! Thanks.",
-	"talk.egg_gift.pierre": "Don't mind if I do! Thanks, @.",
-	"talk.egg_gift.robin": "Chocolate egg, huh? Aren't these for the kids?",
-	"talk.egg_gift.sam": "Hey, a chocolate egg! Mom used to get us these from Joja Mart all the time. They tasted like grease, though.",
-	"talk.egg_gift.sandy": "Oh sweetie, you brought this all the way here for me? I'd best have it before it melts!",
-	"talk.egg_gift.sebastian": "Hey, that's cute. Thanks.",
-	"talk.egg_gift.shane": "This egg reminded you of me, huh? I'm not complaining.",
-	"talk.egg_gift.vincent": "I knew you weren't gonna take all the eggs for yourself! Thanks, mister!^I knew you weren't gonna take all the eggs for yourself! Thanks, miss!",
-	"talk.egg_gift.willy": "Why, I haven't had one of these since I was a wee lad!",
-	"talk.egg_gift.wizard": "An egg.. born from an ordinary rabbit, and composed entirely of chocolate. This is worth deep study indeed..."
+	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go."
 }
