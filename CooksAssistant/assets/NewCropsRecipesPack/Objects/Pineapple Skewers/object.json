@@ -1,7 +1,7 @@
 {
 	// Object data
 	"Name": "Pineapple Skewers",
-	"Description": "A summery vegetarian shish kebab of fruit and vegetables.",
+	"Description": "A summery shish kebab of fruit and vegetables.",
 	"Category": "Cooking",
 	"Edibility": 58,
 	"EdibleIsDrink": false,

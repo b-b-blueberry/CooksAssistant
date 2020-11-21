@@ -1,24 +1,12 @@
 {
 	// Object data
-	"Name": "Fish Supper",
-	"Description": "Hot fish, soggy chips and mushy peas all wrapped in newspaper.",
+	"Name": "Cauliflower Fritters",
+	"Description": "???",
 	"Category": "Cooking",
-	"Edibility": 55,
+	"Edibility": 23,
 	"EdibleIsDrink": false,
-	"EdibleBuffs": {
-		"Farming": 0,
-		"Fishing": 2,
-		"Mining": 0,
-		"Luck": 0,
-		"Foraging": 0,
-		"MaxStamina": 27,
-		"MagnetRadius": 0,
-		"Speed": -2,
-		"Defense": 0,
-		"Attack": 0,
-		"Duration": 110
-	},
-	"Price": 180,
+	"EdibleBuffs": null,
+	"Price": 40,
 	"IsColored": false,
 
 	// Object purchase
@@ -32,15 +20,11 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": -4, // Category:Fish
-				"Count": 1
+				"Object": 190, // Cauliflower
+				"Count": 2
 			},
 			{
-				"Object": 192, // Potato
-				"Count": 1
-			},
-			{
-				"Object": 188, // Green Bean
+				"Object": 399, // Spring Onion
 				"Count": 1
 			}
 		],

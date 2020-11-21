@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Big Burger",
-	"Description": "It's so greasy!",
+	"Name": "Ocean Platter",
+	"Description": "???",
 	"Category": "Cooking",
-	"Edibility": 67,
+	"Edibility": 84,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 170,
+	"Price": 410,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,16 +20,20 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 216, // Bread
+				"Object": 198, // Baked Fish
 				"Count": 1
 			},
 			{
-				"Object": 424, // Cheese
+				"Object": "Lobster Bake",
 				"Count": 1
 			},
 			{
-				"Object": "Onion",
+				"Object": 423, // Rice
 				"Count": 1
+			},
+			{
+				"Object": 723, // Oyster
+				"Count": 2
 			}
 		],
 		// Recipe purchase

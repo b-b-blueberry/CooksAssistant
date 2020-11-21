@@ -1,10 +1,10 @@
 {
 	// Object data
 	"Name": "Berry Waffles",
-	"Description": "Whole-grain homemade waffles with a blueberry drizzle.",
+	"Description": "Whole grain waffles with a blueberry drizzle.",
 	"Category": "Cooking",
 	"Edibility": 45,
-	"EdibleIsDrink": true,
+	"EdibleIsDrink": false,
 	"EdibleBuffs": {
 		"Farming": 0,
 		"Fishing": 0,
@@ -37,11 +37,7 @@
 			},
 			{
 				"Object": 258, // Blueberry
-				"Count": 1
-			},
-			{
-				"Object": "Redberries",
-				"Count": 1
+				"Count": 2
 			},
 			{
 				"Object": 724, // Maple Syrup

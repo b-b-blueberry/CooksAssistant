@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Mashed Potatoes",
-	"Description": "A stick-to-your-bones, warm-you-through sort of meal.",
+	"Name": "Cray Mornay",
+	"Description": "???",
 	"Category": "Cooking",
-	"Edibility": 82,
+	"Edibility": 58,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 130,
+	"Price": 260,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,11 +20,11 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 192, // Potato
+				"Object": 716, // Crayfish
 				"Count": 2
 			},
 			{
-				"Object": -6, // Category:Milk
+				"Object": 274, // Artichoke
 				"Count": 1
 			}
 		],

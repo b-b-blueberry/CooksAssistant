@@ -1,24 +1,12 @@
 {
 	// Object data
-	"Name": "Breakfast Bran",
-	"Description": "It's simple, but it helps you start the day.",
+	"Name": "Beet Burger",
+	"Description": "???",
 	"Category": "Cooking",
-	"Edibility": 23,
+	"Edibility": 63,
 	"EdibleIsDrink": false,
-	"EdibleBuffs": {
-		"Farming": 1,
-		"Fishing": 0,
-		"Mining": 0,
-		"Luck": 0,
-		"Foraging": 0,
-		"MaxStamina": 0,
-		"MagnetRadius": 0,
-		"Speed": 0,
-		"Defense": 0,
-		"Attack": 0,
-		"Duration": 120
-	},
-	"Price": 90,
+	"EdibleBuffs": null,
+	"Price": 180,
 	"IsColored": false,
 
 	// Object purchase
@@ -32,11 +20,19 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 262, // Wheat
+				"Object": 216, // Bread
+				"Count": 2
+			},
+			{
+				"Object": 284, // Beet
 				"Count": 1
 			},
 			{
-				"Object": -79, // Category:Fruit
+				"Object": "Onion",
+				"Count": 1
+			},
+			{
+				"Object": 266, // Red Cabbage
 				"Count": 1
 			}
 		],
