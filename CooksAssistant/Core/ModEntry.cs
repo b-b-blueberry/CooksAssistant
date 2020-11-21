@@ -19,6 +19,7 @@ using StardewValley.TerrainFeatures;
 using Object = StardewValley.Object;
 using xTile.Dimensions;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using StardewValley.Objects;
 
 namespace CooksAssistant
 {
@@ -53,7 +54,6 @@ namespace CooksAssistant
 		private const string CookingToolName = "Frying Pan";
 		
 		// Add Cooking Skill
-		// TODO: REFACTOR: Remove ModEntry.CookingSkill and instead use Skills.GetSkill()
 		private static readonly Dictionary<int, string[]> CookingSkillLevelUpRecipes = new Dictionary<int, string[]>
 		{
 			{ 0, new[] { "Fried Egg", "Baked Potato" } },
@@ -61,25 +61,31 @@ namespace CooksAssistant
 			{ 2, new[] { "Porridge", "Quick Breakfast" } },
 			{ 3, new[] { "Lobster Bake", "Loaded Potato", "Stuffed Potato" } },
 			{ 4, new[] { "Cake", "Hot Cocoa", "Berry Waffles" } },
-			{ 5, new[] { "Cray Mornay", "Eel Sushi", "Pitta Bread" } },
-			{ 6, new[] { "Redberry Pie", "Cabbage Pot", "Hearty Stew", "Hunter's Plate" } },
+			{ 5, new[] { "Cray Mornay", "Eel Sushi", "Hearty Stew" } },
+			{ 6, new[] { "Redberry Pie", "Cabbage Pot", "Pitta Bread" } },
 			{ 7, new[] { "Apple Pie", "Pineapple Skewers", "Red Wrap", "Tropical Salad" } },
-			{ 8, new[] { "Admiral Pie", "Dwarven Stew", "Hot Curry" } },
-			{ 9, new[] { "Garden Pie", "Kebab", "Ocean Platter", "Roast Dinner" } },
-			{ 10, new[] { "Egg Sandwich", "Salad Sandwich", "Seafood Sandwich" } },
+			{ 8, new[] { "Admiral Pie", "Dwarven Stew", "Hot Curry", "Hunter's Plate" } },
+			{ 9, new[] { "Garden Pie", "Beet Burger", "Kebab", "Roast Dinner" } },
+			{ 10, new[] { "Ocean Platter", "Egg Sandwich", "Salad Sandwich", "Seafood Sandwich" } },
 		};
 		internal const string CookingSkillId = AssetPrefix + "CookingSkill";
 		internal static readonly Dictionary<int, int> FoodCookedToday = new Dictionary<int, int>();
 		internal const int MaxFoodStackPerDayForExperienceGains = 20;
-		internal CookingSkill CookingSkill;
+		private const int CraftNettleTeaLevel = 3;
+		private const int CraftCampfireLevel = 1;
 		private Buff _watchingBuff;
 		
 		// Add Cooking to the Community Centre
 		internal const string CommunityCentreAreaName = "Kitchen";
 		internal const int CommunityCentreAreaNumber = 6;
 		internal static readonly Rectangle CommunityCentreArea = new Rectangle(0, 0, 10, 11);
-		internal static readonly Point CommunityCentreNotePosition = new Point(8, 6);
+		internal static readonly Point CommunityCentreNotePosition = new Point(7, 6);
+		// We use Linus' tent for the dummy area, since there's surely no conceivable way it'd be in the community centre
+		internal static readonly Rectangle DummyOpenFridgeSpriteArea = new Rectangle(32, 560, 16, 32);
+		internal static readonly Vector2 DummyFridgePosition = new Vector2(6830);
+		internal Vector2 CommunityCentreFridgePosition = Vector2.Zero;
 		internal int BundleStartIndex;
+		private int _menuTab;
 
 		// Add Cooking Questline
 		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
@@ -249,8 +255,7 @@ namespace CooksAssistant
 
 			if (Config.AddCookingSkill)
 			{
-				CookingSkill = new CookingSkill();
-				Skills.RegisterSkill(CookingSkill);
+				Skills.RegisterSkill(new CookingSkill());
 			}
 			if (Config.DebugMode && !_forceConfig)
 			{
@@ -282,8 +287,8 @@ namespace CooksAssistant
 				Skills.AddExperience(Game1.player, CookingSkillId,
 					-1 * Skills.GetExperienceFor(Game1.player, CookingSkillId));
 				for (var i = 0; i < int.Parse(args[0]); ++i)
-					Skills.AddExperience(Game1.player, CookingSkillId, CookingSkill.ExperienceCurve[i]);
-				foreach (var profession in CookingSkill.Professions)
+					Skills.AddExperience(Game1.player, CookingSkillId, Skills.GetSkill(CookingSkillId).ExperienceCurve[i]);
+				foreach (var profession in Skills.GetSkill(CookingSkillId).Professions)
 					if (Game1.player.professions.Contains(profession.GetVanillaId()))
 						Game1.player.professions.Remove(profession.GetVanillaId());
 				Log.D($"Set Cooking skill to {Skills.GetSkillLevel(Game1.player, CookingSkillId)}");
@@ -308,7 +313,7 @@ namespace CooksAssistant
 					Log.D("Cooking skill is not enabled.");
 					return;
 				}
-				Helper.Reflection.GetMethod(CookingSkill, "showLevelMenu").Invoke(
+				Helper.Reflection.GetMethod(typeof(CookingSkill), "showLevelMenu").Invoke(
 					null, new EventArgsShowNightEndMenus());
 				Log.D("Bumped Cooking skill levelup menu.");
 			});
@@ -335,7 +340,7 @@ namespace CooksAssistant
 			{
 				CookingMenu.AnimateForRecipe(new CraftingRecipe(args.Length > 0 ? args[0] : "Fried Egg", true), 1, false);
 			});
-			Helper.ConsoleCommands.Add(cmd + "inv", "Print contents of current menu inventory.", (s, args) =>
+			Helper.ConsoleCommands.Add(cmd + "inv", "Print contents of current cooking menu inventory.", (s, args) =>
 			{
 				if (Game1.activeClickableMenu is CookingMenu menu)
 				{
@@ -447,6 +452,11 @@ namespace CooksAssistant
 			foreach (var recipe in CookingSkillLevelUpRecipes[0])
 				if (!Game1.player.cookingRecipes.ContainsKey(recipe))
 					Game1.player.cookingRecipes.Add(recipe, 0);
+			var level = Skills.GetSkillLevel(Game1.player, CookingSkillId);
+			if (Config.AddCookingSkill && level < CraftCampfireLevel)
+			{
+				Game1.player.craftingRecipes.Remove("Campfire");
+			}
 
 			// Clear daily cooking to free up Cooking experience gains
 			if (Config.AddCookingSkill)
@@ -478,6 +488,18 @@ namespace CooksAssistant
 		private void GameLoopOnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
 		{
 			PlayerAgencyBlocked = false;
+
+			// Clear food history
+			_watchingBuff = null;
+			_lastFoodEaten = null;
+			_lastFoodWasDrink = false;
+
+			// Cancel ongoing regeneration
+			_regenTicksDiff.Clear();
+			_regenTicksCurr = 0;
+			_healthRegeneration = _staminaRegeneration = 0;
+			_healthOnLastTick = _staminaOnLastTick = 0;
+			_debugRegenRate = _debugElapsedTime = 0;
 
 			// Remove Kitchen bundle watcher, assuming one exists
 			if (Config.AddCookingCommunityCentreBundle)
@@ -604,10 +626,11 @@ namespace CooksAssistant
 
 		private void Event_WatchingBuffs(object sender, UpdateTickedEventArgs e)
 		{
-			if (Game1.buffsDisplay.food?.source != _watchingBuff.source
-			    && Game1.buffsDisplay.drink?.source != _watchingBuff.source
-				&& Game1.buffsDisplay.otherBuffs.Any()
-			    && Game1.buffsDisplay.otherBuffs.All(buff => buff?.source != _watchingBuff.source))
+			if (_watchingBuff == null
+				|| (Game1.buffsDisplay.food?.source != _watchingBuff.source
+					&& Game1.buffsDisplay.drink?.source != _watchingBuff.source
+					&& Game1.buffsDisplay.otherBuffs.Any()
+					&& Game1.buffsDisplay.otherBuffs.All(buff => buff?.source != _watchingBuff.source)))
 			{
 				Helper.Events.GameLoop.UpdateTicked -= Event_WatchingBuffs;
 
@@ -645,8 +668,51 @@ namespace CooksAssistant
 			Helper.Events.GameLoop.UpdateTicked -= Event_MoveJunimo;
 		}
 
+		private void Event_ChangeJunimoMenuTab(object sender, UpdateTickedEventArgs e)
+		{
+			Helper.Reflection.GetField<int>((JunimoNoteMenu)Game1.activeClickableMenu, "whichArea").SetValue(_menuTab);
+			if (_menuTab == CommunityCentreAreaNumber)
+			{
+				((JunimoNoteMenu)Game1.activeClickableMenu).bundles.Clear();
+				((JunimoNoteMenu)Game1.activeClickableMenu).setUpMenu(
+					CommunityCentreAreaNumber, ((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).bundlesDict());
+			}
+			Helper.Events.GameLoop.UpdateTicked -= Event_ChangeJunimoMenuTab;
+		}
+
 		private void InputOnButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
+			// Menu interactions
+			if (e.Button.IsUseToolButton())
+			{
+				// Navigate community centre bundles inventory menu
+				var cursor = Utility.Vector2ToPoint(e.Cursor.ScreenPixels);
+				if (Game1.activeClickableMenu is JunimoNoteMenu menu //&& menu.fromGameMenu
+					)
+				{
+					_menuTab = -1;
+					var whichArea = Helper.Reflection.GetField<int>(menu, "whichArea");
+					if (menu.areaBackButton.visible && (menu.areaBackButton.containsPoint(cursor.X, cursor.Y) && whichArea.GetValue() == 0)
+					   || (menu.areaNextButton.visible && menu.areaNextButton.containsPoint(cursor.X, cursor.Y) && whichArea.GetValue() == 5))
+					{
+						_menuTab = CommunityCentreAreaNumber;
+					}
+					else if (whichArea.GetValue() == CommunityCentreAreaNumber)
+					{
+						if (menu.areaBackButton.visible && menu.areaBackButton.containsPoint(cursor.X, cursor.Y))
+							_menuTab = 5;
+						else if (menu.areaNextButton.visible && menu.areaNextButton.containsPoint(cursor.X, cursor.Y))
+							_menuTab = 0;
+					}
+					if (_menuTab >= 0)
+					{
+						Log.D($"Changing JunimoNoteMenu whichArea from {whichArea.GetValue()} to {_menuTab}");
+						Helper.Events.GameLoop.UpdateTicked += Event_ChangeJunimoMenuTab;
+					}
+				}
+			}
+
+			// World interactions
 			if (PlayerAgencyLostCheck())
 				return;
 
@@ -710,25 +776,70 @@ namespace CooksAssistant
 
 					return;
 				}
-				else if (btn.IsUseToolButton())
+
+				// Open Community Centre fridge door
+				if (Config.AddCookingCommunityCentreBundle && Game1.currentLocation is CommunityCenter cc
+					&& tile != null && tile.TileIndex == 634)
 				{
-					// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
-					if ((!Config.AddCookingSkill || Skills.GetSkillLevel(Game1.player, CookingSkillId) < NettlesUsableLevel)
-						&& Game1.player.ActiveObject?.Name == NettlesName
-						&& Game1.currentLocation.Objects[e.Cursor.GrabTile]?.Name == NettlesUsableMachine)
+					CommunityCentreFridgePosition = e.Cursor.GrabTile;
+
+					// Change tile to use custom open-fridge sprite
+					Game1.currentLocation.Map.GetLayer("Front")
+						.Tiles[(int)CommunityCentreFridgePosition.X, (int)CommunityCentreFridgePosition.Y - 1]
+						.TileIndex = 1122;
+					Game1.currentLocation.Map.GetLayer("Buildings")
+						.Tiles[(int)CommunityCentreFridgePosition.X, (int)CommunityCentreFridgePosition.Y]
+						.TileIndex = 1154;
+
+					if (!((CommunityCenter)Game1.currentLocation).Objects.ContainsKey(DummyFridgePosition))
 					{
-						Helper.Input.Suppress(btn);
-						Game1.playSound("cancel");
+						((CommunityCenter)Game1.currentLocation).Objects.Add(
+							DummyFridgePosition, new Chest(true, DummyFridgePosition));
 					}
+
+					// Open the fridge as a chest
+					((Chest)cc.Objects[DummyFridgePosition]).fridge.Value = true;
+					((Chest)cc.Objects[DummyFridgePosition]).checkForAction(Game1.player);
 				}
 
 				// Use tile actions in maps
 				CheckTileAction(e.Cursor.GrabTile, Game1.currentLocation);
 			}
+			else if (btn.IsUseToolButton())
+			{
+				// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
+				if ((!Config.AddCookingSkill || Skills.GetSkillLevel(Game1.player, CookingSkillId) < NettlesUsableLevel)
+					&& Game1.player.ActiveObject?.Name == NettlesName
+					&& Game1.currentLocation.Objects[e.Cursor.GrabTile]?.Name == NettlesUsableMachine)
+				{
+					Helper.Input.Suppress(btn);
+					Game1.playSound("cancel");
+				}
+			}
 		}
 
 		private void DisplayOnMenuChanged(object sender, MenuChangedEventArgs e)
 		{
+			// Add new recipes on level-up for Cooking skill
+			if (e.NewMenu is SpaceCore.Interface.SkillLevelUpMenu levelUpMenu)
+			{
+				var level = Skills.GetSkillLevel(Game1.player, CookingSkillId);
+				var field = Helper.Reflection.GetField<List<CraftingRecipe>>(levelUpMenu, "newCraftingRecipes");
+				var recipes = CookingSkillLevelUpRecipes[level].Where(recipe => !Game1.player.cookingRecipes.ContainsKey(recipe))
+					.ToList().ConvertAll(str => new CraftingRecipe(str, true));
+				//levelUpMenu.height = 64 * recipes.Count + 256 + levelUpMenu.extraInfoForLevel.Count * 64 * 3 / 4;
+				foreach (var recipe in recipes)
+				{
+					Game1.player.cookingRecipes.Add(recipe.name, 0);
+				}
+				if (level == CraftCampfireLevel)
+				{
+					recipes.Insert(0, new CraftingRecipe("Campfire", false));
+					//levelUpMenu.height += 64);
+				}
+				field.SetValue(recipes);
+			}
+
 			// Add new crops and objects to shop menus
 			if (e.NewMenu is ShopMenu menu)
 			{
@@ -769,6 +880,7 @@ namespace CooksAssistant
 				}
 			}
 
+			// Open the new Cooking Menu as a substitute when a cooking CraftingPage is opened
 			if (Config.AddCookingMenu && e.NewMenu is CraftingPage cm)
 			{
 				var cooking = Helper.Reflection.GetField<bool>(cm, "cooking").GetValue();
@@ -781,6 +893,18 @@ namespace CooksAssistant
 				}
 				return;
 			}
+
+			// Close Community Centre fridge door after use
+			if (e.OldMenu is ItemGrabMenu && e.NewMenu == null
+				&& Config.AddCookingCommunityCentreBundle && Game1.currentLocation is CommunityCenter cc)
+			{
+				cc.Map.GetLayer("Front")
+					.Tiles[(int)CommunityCentreFridgePosition.X, (int)CommunityCentreFridgePosition.Y - 1]
+					.TileIndex = 602;
+				cc.Map.GetLayer("Buildings")
+					.Tiles[(int)CommunityCentreFridgePosition.X, (int)CommunityCentreFridgePosition.Y]
+					.TileIndex = 634;
+			}
 		}
 		
 		private void PlayerOnWarped(object sender, WarpedEventArgs e)
@@ -790,6 +914,12 @@ namespace CooksAssistant
 			if (Config.AddCookingTool && e.NewLocation.Name == "Blacksmith")
 			{
 				Helper.Events.GameLoop.UpdateTicked += Event_WatchingToolUpgrades;
+			}
+
+			if ((!(e.NewLocation is CommunityCenter) && e.OldLocation is CommunityCenter)
+				|| !(e.OldLocation is CommunityCenter) && e.NewLocation is CommunityCenter)
+			{
+				Helper.Content.InvalidateCache(@"Maps/townInterior");
 			}
 
 			if (!(e.NewLocation is CommunityCenter) || !Config.AddCookingCommunityCentreBundle)
@@ -852,7 +982,7 @@ namespace CooksAssistant
 				_staminaRegeneration += food.staminaRecoveredOnConsumption();
 			}
 			else if (Config.AddCookingSkill
-			         && Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.Restoration]))
+			         && Game1.player.HasCustomProfession(Skills.GetSkill(CookingSkillId).Professions[(int) CookingSkill.ProfId.Restoration]))
 			{
 				Game1.player.health = (int) Math.Min(Game1.player.maxHealth,
 					Game1.player.health + food.healthRecoveredOnConsumption() * (CookingSkill.RestorationAltValue / 100f));
@@ -866,7 +996,7 @@ namespace CooksAssistant
 			Log.D($"Last buff: {lastBuff?.displaySource ?? "null"} ({lastBuff?.source ?? "null"})"
 			      + $" | Food: {food.DisplayName} ({food.Name})");
 			if ((Config.AddCookingSkill
-			    && Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.BuffDuration]))
+			    && Game1.player.HasCustomProfession(Skills.GetSkill(CookingSkillId).Professions[(int) CookingSkill.ProfId.BuffDuration]))
 			    && food.displayName == lastBuff?.displaySource)
 			{
 				var duration = lastBuff.millisecondsDuration;
@@ -885,9 +1015,9 @@ namespace CooksAssistant
 				SaveData.FoodsEaten.Add(food.Name, 0);
 			++SaveData.FoodsEaten[food.Name];
 
+			// Add leftovers from viable foods to the inventory, or drop it on the ground if full
 			if (FoodsThatGiveLeftovers.Contains(food.Name))
 			{
-				// TODO: TEST: Adding leftovers to a full inventory
 				var leftovers = new Object(
 					JsonAssets.GetObjectId(
 						FoodsWithLeftoversGivenAsSlices.Any(f => food.Name.ToLower().EndsWith(f))
@@ -973,7 +1103,7 @@ namespace CooksAssistant
 			    || (_lastFoodWasDrink && Game1.buffsDisplay.drink?.source == food.Name))
 			{
 				// TODO: SYSTEM: Cooking Skill with added levels
-				CookingSkill.AddedLevel = 0;
+				((CookingSkill) Skills.GetSkill(CookingSkillId)).AddedLevel = 0;
 				Helper.Events.GameLoop.UpdateTicked += Event_WatchingBuffs;
 			}
 		}
@@ -991,7 +1121,7 @@ namespace CooksAssistant
 
 			// Cooking skill professions influence gift value of Cooking objects
 			if (Config.AddCookingSkill
-			    && Game1.player.HasCustomProfession(CookingSkill.Professions[(int) CookingSkill.ProfId.GiftBoost])
+			    && Game1.player.HasCustomProfession(Skills.GetSkill(CookingSkillId).Professions[(int) CookingSkill.ProfId.GiftBoost])
 			    && e.Gift.Category == -7)
 			{
 				Game1.player.changeFriendship(CookingSkill.GiftBoostValue, e.Npc);
@@ -1078,7 +1208,7 @@ namespace CooksAssistant
 			if (Game1.player.hasBuff(17))
 				rate *= 1.3f;
 			if (Config.AddCookingSkill && Game1.player.HasCustomProfession(
-				CookingSkill.Professions[(int) CookingSkill.ProfId.Restoration]))
+				Skills.GetSkill(CookingSkillId).Professions[(int) CookingSkill.ProfId.Restoration]))
 				rate += rate / CookingSkill.RestorationValue;
 			return rate;
 		}
@@ -1097,7 +1227,6 @@ namespace CooksAssistant
 				$"\nUsing Tool: {Config.AddCookingTool} Cooking: {skillLevel} Tool: {toolLevel}" +
 				$" Farmer: {GetFarmersMaxUsableIngredients()} FarmHouse: {farmhouseLevel}");
 
-			// TODO: SYSTEM: Have cooking slots determined by gus ? math.max(gus, level) : math.max(kitchen, math.min(equipment, level))
 			var cookingStationLevel = 0;
 			var radius = 3;
 			// Gus' cooking range uses his own equipment level as a baseline
@@ -1163,6 +1292,12 @@ namespace CooksAssistant
 		/// </summary>
 		public int GetFarmhouseKitchenLevel(FarmHouse farmHouse)
 		{
+			var count = GetDefaultMaxUsableIngredients();
+			if (count > 0)
+			{
+				return count;
+			}
+
 			// A basic (modded) farmhouse has a maximum of 1 slot,
 			// and a farmhouse with a kitchen has a minimum of 2+ slots
 			var level = farmHouse.upgradeLevel < 2
@@ -1183,13 +1318,20 @@ namespace CooksAssistant
 
 		public int GetFarmersMaxUsableIngredients()
 		{
-			if (!Config.AddCookingTool && !Config.AddCookingSkill)
-			{
-				return Config.AddNewRecipeScaling ? 6 : 5;
-			}
-			return Config.AddCookingTool
-				? 1 + SaveData.CookingToolLevel
-				: 1 + Skills.GetSkillLevel(Game1.player, CookingSkillId) / 2;
+			var count = GetDefaultMaxUsableIngredients();
+			return count > 0
+				? count
+				: Config.AddCookingTool
+					? 1 + SaveData.CookingToolLevel
+					: 1 + Skills.GetSkillLevel(Game1.player, CookingSkillId) / 2;
+		}
+
+		public int GetDefaultMaxUsableIngredients()
+		{
+			return !Config.AddCookingTool && !Config.AddCookingSkill
+				? -1
+				//: Config.AddNewRecipeScaling ? 6 : 5;
+				: 5;
 		}
 
 		private bool CanFarmerUpgradeCookingEquipment()

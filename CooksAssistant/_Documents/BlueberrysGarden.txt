@@ -11,11 +11,24 @@
 		?	[helenaneedshugs] Community centre kitchen - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt5tbf/
 		✔	[slugline] Cook in NPC kitchens - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt4pd9/
 		✔	[MazeMagic] Cookbook - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu70qr/
-			[SaltyHeathen] Cooking animation - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu69py/
+		✔	[SaltyHeathen] Cooking animation - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu69py/
 		✔	[Ruittsorf] Select ingredients - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu0j81/
 			[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
 		[YorikTheDestroyer] Cooking festival - https://github.com/StardewModders/mod-ideas/issues/490
 	✔	[killkrazed] Filter, search, sort, grid - https://github.com/StardewModders/mod-ideas/issues/470
+
+	COOK! Sprite translations:
+	✔	Chinese
+	✔	Japanese
+	✔	Korean
+	✔	French
+	✔	Spanish
+	✔	Portuguese
+		Hungarian
+		Turkish
+		Russian
+		Italian
+		German
 
 	Concepts to think on:
 	✔	Cooking levels
@@ -27,24 +40,20 @@
 	✔	Upgrade cooking equipment from Clint
 		✔	Sprites for copper/steel/gold/iridium upgrades
 	✔	Limited Campfire Cooking compatibility
-		Cooking range in the Saloon with a level increasing through questline progression
+	✔	Cooking range in the Saloon with a level increasing through questline progression
 		Rebalance ingredients to foods
 		Community centre cooking bundle items and rewards + big reward
-			Picnicker's Bundle
-				Cooking level 2 recipe
-				Friendship level 2 recipe x2
-			Diner's Bundle
-				Cooking level 4 recipe
-				Friendship level 4 recipe x2
-			Cook's Bundle
-				Cooking level 6 recipe
-				Friendship level 6 recipe x2
+		✔	Picnicker's Bundle
+		✔	Baker's Bundle
+			??? Bundle
+			Reward
+				???
 		Cooking level bonuses
 		✔	Skill professions
 			Skill profession icons
 
 	Events:
-		RELEASE: Cooking festival
+		UPDATE: Cooking festival
 			Queen of Sauce feature: https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
 			Minigame -- cook anything into foods with drop-ins placed in the world like bins in overcooked
 			Festival map
@@ -53,31 +62,8 @@
 				Contestants' areas
 				Contestants work in pairs?
 
-		UPDATE: Easter event
-		✔	Egg basket
-		✔	Chocolate eggs
-		✔	Bunny ears? You bet
-			Dialogue
-			✔	Bunny intro
-				Bunny mid-progress
-				Bunny outro
-			✔	Villager responses
-			Code
-				Spawn in eggs
-			✔	Villager responses
-			Easter bunny sprite
-				Idle: Look left, look right, hop
-				Poof in/out
-
 		LATER: Goblin cooking
 			https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
-
-	Changes:
-	✔	Coleslaw -> Mayo + Cabbage
-	✔	Chocolate Cake -> Cake + Chocolate Bar
-	✔	Pink Cake -> Cake + Melon
-	✔	Maki Roll -> Sashimi + Rice + Seaweed
-	✔	Cookies -> Flour + Egg + Chocolate Bar
 
 	Patches:
 	✔	Cider -> Keg + Apple
@@ -85,13 +71,8 @@
 	✔	Nettle Tea -> Keg + Nettles
 		Marmalade -> Keg + Orange/Lemon/Lime/Citron/Yuzu/Grapefruit/Pomelo
 
-✔	Shops:
-	✔	Chocolate Bar -> Joja Mart
-	✔	Burrito -> Gus
-	✔	Hearty Stew -> Gus
-
 	Ingredients:
-w!	/	Sugar Cane
+w!	🍰	Sugar Cane
 	✔	Onion
 	✔	Cabbage
 F	✔	Watermelon
@@ -104,24 +85,24 @@ w!	🍰	Redberries
 	Artisan:
 	✔	Cider
 	✔	Nettle Tea
+		Marmalade
 
 	Recipes:
 	✔	Admiral Pie				Flour + Milk + Tuna + Salmon						Runescape, fish line up in seasons
 	✔	Apple Pie				Flour + Sugar + Apple x2							Runescape
-	🍰	Baked Lobster			Lobster												Add opportunity value to an appealing ingredient
+d!	🍰	Baked Lobster			Lobster												Add opportunity value to an appealing ingredient
 	✔	Baked Potato			Potato												Populous crop, but recipe has to be augmented
-	?	Beet Burger				Bread + Beet + Onion + Red Cabbage						Too strange?
-	X	Big Burger				Bread + Cheese + Onion									Unappetising
-	X	Breakfast Bran			Wheat + Fruit											No justification, bad sprite / Wheat
-F	✔	Buttered Corn																	?
+	✔	Beet Burger				Bread + Beet + Onion + Red Cabbage					Artisanal burgers / Too strange
+	✔	Berry Waffles			Wheat + Blueberry x2 + Maple Syrup					Personal pref
+F	✔	Buttered Corn																?
 G	✔	Burrito					Tortilla + Rice + Chilli							Rice, Tortilla
 	✔ 	Cabbage Pot				Cabbage x2 + Onion x2								New ingredients
 	✔	Cake					Flour x2 + Egg x2 + Milk (Leftovers)				Runescape
-	🍰	Cauliflower Fritters	Cauliflower + Spring Onion							Balance cheap unused ingredient forage with expensive crop
+d!	🍰	Cauliflower Fritters	Cauliflower + Spring Onion							Balance cheap unused ingredient forage with expensive crop
+d!	🍰	Cray Mornay				Crayfish + Artichoke								Crayfish
 	✔	Dwarven Stew			Hearty Stew + Beer/Ale/Cider						+Attack -Speed
 	✔	Eel Sushi				Eel + Seaweed + Rice								Rice
 U	✔	Egg Sandwich			Bread + Mayonnaise + Egg (Leftovers)				Runescape
-	X	Fish Supper				Red Snapper x2 + Potato + Bean						Unfitting / Personal pref
 	✔	Garden Pie				Flour + Cabbage + Onion + Tomato					Runescape
 G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hot Cocoa				Milk + Chocolate Bar								Personal pref
@@ -129,22 +110,17 @@ G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hunter's Plate			Potato + Cabbage + Horseradish						New ingredients
 	✔	Kebab					Tortilla + Tomato + Onion (Kebab bonus)				Runescape
 	✔	Loaded Potato			Baked Potato + Tuna + Corn							Augmented recipe
-	🍰	Cray Mornay				Crayfish + Artichoke								Crayfish
-	🍰	Ocean Platter			Baked Lobster + Baked Fish + Rice + Oyster x2		Superfood
-	X	Mashed Potatoes			Potato x2 + Milk										Uninteresting
-	X	Onion Soup				Onion + Garlic + Cheese (Garlic Aura)					Outmoded
+	?	Onion Soup				Onion + Garlic + Cheese								Onions / Outmoded
+d!	🍰	Ocean Platter			Baked Lobster + Baked Fish + Rice + Oyster x2		Superfood
+	✔	Pineapple Skewers		Pineapple + Onion + Eggplant						New ingredients
 	✔	Porridge				Wheat x2 + Milk										Wheat
 	✔	Quick Breakfast			Omelet + Coffee										Augmented recipe
-	?	Red Wrap				Tortilla + Red Cabbage + Beet + Onion				Tortilla recipe, strange enough to work
 	✔	Redberry Pie			Flour + Sugar + Redberries x3						Runescape
-		Roast Dinner			Cranberry Sauce + Roots Platter + Stuffing + Potato	Superfood, personal pref
+d!		Roast Dinner			Cranberry Sauce + Roots Platter + Stuffing + Potato	Superfood, personal pref
 U	✔	Salad Sandwich			Bread + Vinegar + Dandelion (Leftovers)				Runescape
 U	✔	Seafood Sandwich		Bread + Mayonnaise + Crab (Leftovers)				Runescape
-	✔	Pineapple Skewers		Pineapple + Onion + Eggplant						New ingredients
 	✔	Stuffed Potato			Potato + Cheese + Common Mushroom					Augmented recipe
-	X	Summer Pie				Flour + Watermelon + Strawberry						Enough pies / Runescape
 	✔	Tropical Salad			Pineapple + Watermelon								New ingredients
-	✔	Berry Waffles			Wheat + Blueberry x2 + Maple Syrup					Personal pref
 
 	KEY:
 	✔	Implementation complete
@@ -154,6 +130,7 @@ U	✔	Seafood Sandwich		Bread + Mayonnaise + Crab (Leftovers)				Runescape
 	?	Considering
 	X	Rejected
 
+	d!	Description required
 	w!	World sprite required
 	U	Unique event
 	L	Cooking level-up reward

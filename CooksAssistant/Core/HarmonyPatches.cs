@@ -44,12 +44,13 @@ namespace CooksAssistant
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNumberFromLocation_Prefix)));
 			
 			// TODO: SYSTEM: Big problem in JunimoNoteMenu.setUpMenu():
-			// if (!Game1.player.hasOrWillReceiveMail("hasSeenAbandonedJunimoNote") && whichArea == 6)
-			// add countermeasures, or otherwise patch it
-
-			// TODO: SYSTEM: Highjack GameMenu/JunimoNoteMenu to add Kitchen to the Community Centre button
+			// >> if (!Game1.player.hasOrWillReceiveMail("hasSeenAbandonedJunimoNote") && whichArea == 6)
+			// Add countermeasures, or otherwise patch it
 
 			// TODO: REWRITE: Move as many routines out of harmony as possible
+
+			// TODO: TEST: Cooking bundle completion junimo spawn-in and dance effects don't seem to play
+			// + Sound effects start after the fade-to-white
 
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "loadArea"),

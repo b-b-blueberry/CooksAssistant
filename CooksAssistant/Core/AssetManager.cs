@@ -122,11 +122,6 @@ namespace CooksAssistant
 
 				var data = asset.AsDictionary<string, string>().Data;
 
-				foreach (var id in data.Keys)
-				{
-					data[id] = data[id];
-				}
-
 				ModEntry.Instance.BundleStartIndex = data.Keys.ToList().Max(key => int.Parse(key.Split('/')[1]));
 				var sourceBundleList = ModEntry.Instance.Helper.Content.Load<List<List<string>>>($"{ModEntry.BundleDataPath}.json");
 				
@@ -429,7 +424,6 @@ namespace CooksAssistant
 				if (data.Layers.All(l => l.Id != "AlwaysFront"))
 					data.InsertLayer(new Layer("AlwaysFront", data,
 						data.Layers[0].LayerSize, data.Layers[0].TileSize), data.Layers.Count); // FDGDFG dfgDFGDF
-				// TODO: DEBUG: Saloon AlwaysFront is broken, refer to PyTK
 
 				// Add a plate
 				var layer = data.GetLayer("Front");
@@ -444,13 +438,17 @@ namespace CooksAssistant
 					data.GetLayer(x == 0 ? "Buildings" : "AlwaysFront").Tiles[position.X + x, position.Y + y]
 						= new StaticTile(data.GetLayer(x == 0 ? "Buildings" : "AlwaysFront"), ts, bm, (1 + x) + (1 + y) * ts.SheetWidth);
 				}
-				// Add cooking range use action and cooking range, top side
+				// Add cooking range, top side
 				layer = data.GetLayer("AlwaysFront");
 				for (var i = 0; i < 2; ++i)
 				{
-					data.GetLayer("Buildings").Tiles[position.X, position.Y + i].Properties.Add(
-						"Action", new xTile.ObjectModel.PropertyValue(ModEntry.ActionRange));
 					layer.Tiles[position.X + i, position.Y - 1] = new StaticTile(layer, ts, bm, 1 + i);
+				}
+				// Add cooking range use action
+				for (var i = 0; i < 3; ++i)
+				{
+					data.GetLayer("Buildings").Tiles[position.X, position.Y - 1 + i].Properties.Add(
+						"Action", new xTile.ObjectModel.PropertyValue(ModEntry.ActionRange));
 				}
 
 				asset.ReplaceWith(data);
@@ -479,19 +477,35 @@ namespace CooksAssistant
 			}
 			else if (asset.AssetNameEquals(@"Maps/townInterior"))
 			{
-				// Make changes to facilitate a new community centre star
-				
+				// Patch in changes for the community centre
+
+				if (!(Game1.currentLocation is StardewValley.Locations.CommunityCenter))
+					return;
+
+				var image = asset.AsImage();
+
+				// Openable fridge in the kitchen
+				var destArea = ModEntry.DummyOpenFridgeSpriteArea; // Target some unused area of the sheet for this location
+
+				var sourceArea = new Rectangle(320, 224, destArea.Width, destArea.Height); // Apply base fridge sprite
+				image.PatchImage(image.Data, sourceArea, destArea, PatchMode.Replace);
+
+				sourceArea = new Rectangle(0, 192, 16, 32); // Patch in opened-door fridge sprite from mouseCursors sheet
+				image.PatchImage(Game1.mouseCursors2, sourceArea, destArea, PatchMode.Overlay);
+
+				// New star on the community centre bundle tracker wall
 				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
-					return;
 				}
-				
-				var sourceArea = new Rectangle(370, 705, 7, 7);
-				var destArea = new Rectangle(380, 710, 7, 7);
-				var image = asset.AsImage();
-				image.PatchImage(image.Data, sourceArea, destArea, PatchMode.Replace);
+				else
+				{
+					sourceArea = new Rectangle(370, 705, 7, 7);
+					destArea = new Rectangle(380, 710, sourceArea.Width, sourceArea.Height);
+					image.PatchImage(image.Data, sourceArea, destArea, PatchMode.Replace);
+				}
+
 				asset.ReplaceWith(image.Data);
 			}
 			else if (asset.AssetNameEquals(@"Strings/Locations"))

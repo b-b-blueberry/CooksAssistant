@@ -176,7 +176,6 @@ namespace CooksAssistant.GameObjects.Menus
 
 
 		// TODO: SYSTEM: Add Ingredients page layout
-		// TODO: SYSTEM: Integrate fridges and minifridges
 		// TODO: TEST: Multiplayer - Using fridge/minifridge/cooking station while another player has it active
 		// + Multiplayer - Adding/removing minifridges while another player has it active
 
@@ -208,7 +207,7 @@ namespace CooksAssistant.GameObjects.Menus
 			_cookingSlots = ModEntry.Instance.CheckForNearbyCookingStation();
 			_cookingSlotsDropIn = new List<Item>(_cookingSlots);
 			CookingSlots.Clear();
-			for (var i = 0; i < 5; ++i)
+			for (var i = 0; i < Math.Max(5, _cookingSlots); ++i)
 			{
 				_cookingSlotsDropIn.Add(null);
 				CookingSlots.Add(new ClickableTextureComponent(
@@ -319,24 +318,45 @@ namespace CooksAssistant.GameObjects.Menus
 				xOffset += pair.Value;
 			}
 
-			var farmHouse = Game1.getLocationFromName("FarmHouse") as FarmHouse;
 			_currentSelectedInventory = -2;
-			_minifridgeList = farmHouse.Objects.Values.Where(o => o is Chest && o.ParentSheetIndex == 216)
-				.Select(o => ((Chest)o).items).Take(6).Cast<IList<Item>>().ToList();
-			if (ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0)
+			var fridgeForFarmHouse = Game1.currentLocation is FarmHouse fh
+				&& ModEntry.Instance.GetFarmhouseKitchenLevel(fh) > 0;
+			var fridgeForCommunityCentre = ModEntry.Instance.Config.AddCookingCommunityCentreBundle
+				&& Game1.currentLocation is CommunityCenter cc
+				&& cc.isBundleComplete(ModEntry.CommunityCentreAreaNumber);
+
+			if (fridgeForCommunityCentre)
 			{
-				InventorySelectButtons.Add(new ClickableTextureComponent("inventorySelect",
+				if (!((CommunityCenter)Game1.currentLocation).Objects.ContainsKey(ModEntry.DummyFridgePosition))
+				{
+					((CommunityCenter)Game1.currentLocation).Objects.Add(
+						ModEntry.DummyFridgePosition, new Chest(true, ModEntry.DummyFridgePosition));
+				}
+			}
+
+			if (Game1.currentLocation is FarmHouse farmHouse)
+			{
+				_minifridgeList = farmHouse.Objects.Values.Where(o => o != null && o.bigCraftable.Value && o is Chest && o.ParentSheetIndex == 216)
+					.Select(o => ((Chest)o).items).Take(6).Cast<IList<Item>>().ToList();
+				for (var i = 0; i < _minifridgeList.Count; ++i)
+				{
+					InventorySelectButtons.Add(new ClickableTextureComponent($"minifridgeSelect{i}",
+						new Rectangle(-1, -1, 16 * Scale, 16 * Scale), null, null,
+						ModEntry.SpriteSheet, new Rectangle(243, 114, 11, 14), Scale, false));
+				}
+			}
+
+			if (fridgeForFarmHouse || fridgeForCommunityCentre || _minifridgeList != null)
+			{
+				if (fridgeForFarmHouse || fridgeForCommunityCentre)
+				{
+					InventorySelectButtons.Insert(0, new ClickableTextureComponent("fridgeSelect",
+						new Rectangle(-1, -1, 14 * Scale, 14 * Scale), null, null,
+						ModEntry.SpriteSheet, new Rectangle(243, 97, 11, 14), Scale, false));
+				}
+				InventorySelectButtons.Insert(0, new ClickableTextureComponent("inventorySelect",
 					new Rectangle(-1, -1, 14 * Scale, 14 * Scale), null, null,
 					ModEntry.SpriteSheet, new Rectangle(243, 81, 11, 14), Scale, false));
-				InventorySelectButtons.Add(new ClickableTextureComponent("fridgeSelect",
-					new Rectangle(-1, -1, 14 * Scale, 14 * Scale), null, null,
-					ModEntry.SpriteSheet, new Rectangle(243, 97, 11, 14), Scale, false));
-			}
-			for (var i = 0; i < _minifridgeList.Count; ++i)
-			{
-				InventorySelectButtons.Add(new ClickableTextureComponent($"minifridgeSelect{i}",
-					new Rectangle(-1, -1, 16 * Scale, 16 * Scale), null, null,
-					ModEntry.SpriteSheet, new Rectangle(243, 114, 11, 14), Scale, false));
 			}
 
 			// Setup menu elements layout
@@ -490,6 +510,7 @@ namespace CooksAssistant.GameObjects.Menus
 			CookQuantityUpButton.bounds.X = CookQuantityDownButton.bounds.X = xOffset;
 			CookQuantityUpButton.bounds.Y = yOffset - 12;
 
+			// TODO: DEBUG: Have QuantityTextBox wide enough for 2 characters, but only allow 1-digit numbers
 			var textSize = _quantityTextBox.Font.MeasureString(
 				Game1.parseText("99", _quantityTextBox.Font, 96));
 			_quantityTextBox.Text = QuantityTextBoxDefaultText;
@@ -647,7 +668,7 @@ namespace CooksAssistant.GameObjects.Menus
 				{
 					var hasOilPerk =
 						ModEntry.Instance.Config.AddCookingSkill && Game1.player.HasCustomProfession(
-							ModEntry.Instance.CookingSkill.Professions[(int) CookingSkill.ProfId.ImprovedOil]);
+							Skills.GetSkill(ModEntry.CookingSkillId).Professions[(int) CookingSkill.ProfId.ImprovedOil]);
 					switch (items[i].ParentSheetIndex)
 					{
 						case 247: // Oil
@@ -668,10 +689,10 @@ namespace CooksAssistant.GameObjects.Menus
 
 			if (ModEntry.Instance.Config.AddCookingSkill) {
 				if (Game1.player.HasCustomProfession(
-					ModEntry.Instance.CookingSkill.Professions[(int) CookingSkill.ProfId.SaleValue]))
+					Skills.GetSkill(ModEntry.CookingSkillId).Professions[(int) CookingSkill.ProfId.SaleValue]))
 					result.Price += result.Price / CookingSkill.SaleValue;
 				if (Game1.random.NextDouble() * 10 < CookingSkill.ExtraPortionChance && Game1.player.HasCustomProfession(
-					ModEntry.Instance.CookingSkill.Professions[(int) CookingSkill.ProfId.ExtraPortion]))
+					Skills.GetSkill(ModEntry.CookingSkillId).Professions[(int) CookingSkill.ProfId.ExtraPortion]))
 					++result.Stack;
 			}
 			
@@ -715,9 +736,8 @@ namespace CooksAssistant.GameObjects.Menus
 			var ingredientsBonus
 				= 1f + ingredientsCount * 0.2f;
 			var baseExperience = 4f * ingredientsBonus;
-			// TODO: TEST: Limit experience gains to 1 level per day
 			// Limit experience gains to 1 level per day, because let's be reasonable here
-			var requiredExperience = ModEntry.Instance.CookingSkill.ExperienceCurve
+			var requiredExperience = Skills.GetSkill(ModEntry.CookingSkillId).ExperienceCurve
 				[Skills.GetSkillLevel(Game1.player, ModEntry.CookingSkillId)];
 			var currentExperience = Skills.GetExperienceFor(Game1.player, ModEntry.CookingSkillId);
 			var experience = Math.Min(requiredExperience - currentExperience,
@@ -1198,7 +1218,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 		private void ValidateNumericalTextBox(TextBox sender)
 		{
-			sender.Text = Math.Max(1, Math.Min(99,
+			sender.Text = Math.Max(1, Math.Min(9,
 				Math.Min(int.Parse(sender.Text.Trim()), GetAmountCraftable(_recipeIngredients, _cookingSlotsDropIn)))).ToString();
 			sender.Text = sender.Text.PadLeft(2, ' ');
 			sender.Selected = false;
@@ -1422,10 +1442,14 @@ namespace CooksAssistant.GameObjects.Menus
 			if (_cookingSlotsDropIn[ingredientsIndex] == null)
 			{
 				if (inventoryIndex == -1)
+				{
+					Log.D("No inventory index or ingredients dropIn index, aborting move");
 					return 0;
+				}
 
 				_cookingSlotsDropIn[ingredientsIndex] = inventory.actualInventory[inventoryIndex].getOne();
 				_cookingSlotsDropIn[ingredientsIndex].Stack = 0;
+				Log.D($"Adding {_cookingSlotsDropIn[ingredientsIndex]?.Name ?? "null" } to ingredients dropIn");
 			}
 			if (inventoryIndex == -1)
 			{
@@ -1433,6 +1457,7 @@ namespace CooksAssistant.GameObjects.Menus
 				dropOut.Stack = 0;
 				var item = inventory.actualInventory.FirstOrDefault(i => dropOut.canStackWith(i));
 				inventoryIndex = inventory.actualInventory.IndexOf(item);
+				Log.D($"Removing {dropOut.Name} from ingredients dropIn");
 				if (item == null)
 				{
 					if (_currentSelectedInventory > -2)
@@ -1901,7 +1926,9 @@ namespace CooksAssistant.GameObjects.Menus
 					}
 					else if (clickable.name == "fridgeSelect")
 					{
-						inventory.actualInventory = ((FarmHouse)Game1.getLocationFromName("FarmHouse")).fridge.Value.items;
+						inventory.actualInventory = Game1.currentLocation is CommunityCenter
+							? ((Chest)((CommunityCenter)Game1.currentLocation).Objects[ModEntry.DummyFridgePosition]).items
+							: ((FarmHouse)Game1.getLocationFromName("FarmHouse")).fridge.Value.items;
 						_currentSelectedInventory = -1;
 					}
 					else
@@ -2367,12 +2394,12 @@ namespace CooksAssistant.GameObjects.Menus
 					var requiredItem = id;
 					var bagCount = Game1.player.getItemCount(requiredItem, 8);
 					var dropInCount = getIngredientsCount(id, _cookingSlotsDropIn);
-					var fridge = Game1.getLocationFromName("FarmHouse") is FarmHouse farmHouse
+					var fridge = Game1.currentLocation is FarmHouse farmHouse
 						&& ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0
 							? farmHouse.fridge.Value
 							: null;
 					var fridgeCount = fridge != null ? getIngredientsCount(id, fridge.items) : 0;
-					var miniFridgeCount = fridge != null ? _minifridgeList.SelectMany(mf => mf.Where(item => item?.ParentSheetIndex == id))
+					var miniFridgeCount = _minifridgeList != null ? _minifridgeList.SelectMany(mf => mf.Where(item => item?.ParentSheetIndex == id))
 						.Aggregate(0, (current, item) => current + item.Stack) : 0;
 					requiredCount -= bagCount + dropInCount + fridgeCount + miniFridgeCount;
 					var ingredientNameText = _filteredRecipeList[_currentRecipe].getNameFromIndex(id);

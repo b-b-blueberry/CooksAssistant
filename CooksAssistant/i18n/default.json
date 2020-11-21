@@ -1,13 +1,12 @@
 ﻿{
-	// 요리 시작!
-
-	// Cooking interface
+	// General strings
 	"world.range_gus.rejected": "You're not good enough friends with Gus to use the Cooking Range.",
 	"world.range_npc.rejected": "You're not good enough friends with {{name}} to use their kitchen.",
 
 	"menu.cooking_equipment.name": "Frying Pan",
 	"menu.cooking_equipment.description": "When cooking, allows the use of up to {{level}} ingredients.",
 
+	// Cooking menu
 	"menu.cooking_station.none": "No cooking station nearby.",
 	"menu.cooking_station.busy": "Something's already cooking here.",
 	"menu.cooking_station.done": "The {{recipe}} is ready!",
@@ -108,5 +107,10 @@
 	"world.community_centre.bundle.1": "Picnicker's",
 	"world.community_centre.bundle.2": "Baker's",
 	"world.community_centre.bundle.3": "Diner's",
-	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go."
+	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go.",
+
+	// Object names
+	"item.burntfood.name": "Burnt Food",
+	// Object descriptions
+	"item.burntfood.description": "Can be sold. It didn't turn out so good..."
 }
