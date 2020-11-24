@@ -1,7 +1,7 @@
 {
 	// Object data
 	"Name": "Ocean Platter",
-	"Description": "???",
+	"Description": "A bountiful hot-and-cold selection of fresh seafood.",
 	"Category": "Cooking",
 	"Edibility": 84,
 	"EdibleIsDrink": false,

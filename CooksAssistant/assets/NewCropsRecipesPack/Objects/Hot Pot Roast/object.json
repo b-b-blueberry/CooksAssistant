@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Cauliflower Fritters",
-	"Description": "Cauliflower florets, battered and gently fried.",
+	"Name": "Hot Pot Roast",
+	"Description": "A bountiful stew with all the trimmings.",
 	"Category": "Cooking",
-	"Edibility": 23,
+	"Edibility": 89,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 40,
+	"Price": 440,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,12 +20,20 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 190, // Cauliflower
-				"Count": 2
+				"Object": 238, // Cran. Sauce
+				"Count": 1
 			},
 			{
-				"Object": 399, // Spring Onion
+				"Object": 244, // Roots Platter
 				"Count": 1
+			},
+			{
+				"Object": 239, // Stuffing
+				"Count": 1
+			},
+			{
+				"Object": "Onion",
+				"Count": 2
 			}
 		],
 		// Recipe purchase

@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Cauliflower Fritters",
-	"Description": "Cauliflower florets, battered and gently fried.",
+	"Name": "Lobster Bake",
+	"Description": "A classic islander's recipe.",
 	"Category": "Cooking",
-	"Edibility": 23,
+	"Edibility": 24,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 40,
+	"Price": 150,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,11 +20,7 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 190, // Cauliflower
-				"Count": 2
-			},
-			{
-				"Object": 399, // Spring Onion
+				"Object": 715, // Lobster
 				"Count": 1
 			}
 		],

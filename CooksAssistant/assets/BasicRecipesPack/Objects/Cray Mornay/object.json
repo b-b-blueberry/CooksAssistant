@@ -1,12 +1,12 @@
 {
 	// Object data
 	"Name": "Cray Mornay",
-	"Description": "???",
+	"Description": "A freshwater bug slathered with a rich cream sauce.",
 	"Category": "Cooking",
-	"Edibility": 58,
+	"Edibility": 52,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 260,
+	"Price": 180,
 	"IsColored": false,
 
 	// Object purchase
