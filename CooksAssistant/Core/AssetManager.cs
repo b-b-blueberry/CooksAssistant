@@ -559,7 +559,7 @@ namespace CooksAssistant
 					return;
 				}
 
-				var sourceArea = new Rectangle(0, 272, 16 * 4, 16);
+				var sourceArea = new Rectangle(192, 272, 16 * 4, 16);
 				var destImage = asset.AsImage();
 				var destArea = new Rectangle(272, 0, sourceArea.Width, sourceArea.Height);
 				destImage.PatchImage(ModEntry.SpriteSheet, sourceArea, destArea, PatchMode.Replace);
@@ -622,7 +622,7 @@ namespace CooksAssistant
 						}
 						else if (buffName == "Cooking")
 						{
-							// TODO: SYSTEM: Cooking buff representation in foods
+							// TODO: SYSTEM: Cooking Skill added level buffs in foods
 						}
 						else
 						{

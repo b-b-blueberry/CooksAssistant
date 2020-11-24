@@ -19,7 +19,7 @@
 	"menu.cooking_recipe.time_label": "Cooking time:",
 	"menu.cooking_recipe.time_value": "{{duration}} min",
 	"menu.cooking_recipe.search_label": "Search",
-	"menu.cooking_recipe.favourite_label": "Search",
+	"menu.cooking_recipe.favourite_label": "Favourite",
 	"menu.cooking_recipe.quantity_label": "How many?",
 	"menu.cooking_recipe.which_label": "Which would you like to make?",
 
@@ -85,6 +85,11 @@
 	// Cooking ingredients descriptions
 	"item.oil.description": "All purpose cooking oil. Improves the quality of a dish.",
 	"item.truffleoil.description": "A gourmet cooking ingredient. Greatly enhances the quality of a dish.",
+	"item.fruit.label": "Fruit (Any)",
+	"item.flower.label": "Flower (Any)",
+	"item.vegetable.label": "Vegetable (Any)",
+	"item.meat.label": "Meat (Any)",
+	"item.forage.label": "Forage (Any)",
 
 	// Kebab item interactions
 	"buff.kebab.quality_worst": "Rotten ",

@@ -1,7 +1,7 @@
 ﻿{
 	"Name": "Cook's Assistant",
 	"Author": "blueberry",
-	"Version": "0.0.3-alpha",
+	"Version": "0.0.5-alpha",
 	"Description": "..?",
 	"UniqueID": "blueberry.CooksAssistant",
 	"EntryDll": "CooksAssistant.dll",

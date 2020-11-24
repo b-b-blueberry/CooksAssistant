@@ -51,6 +51,13 @@
 		Cooking level bonuses
 		✔	Skill professions
 			Skill profession icons
+			✔	Sous Chef
+			✔	Quick Eater
+				Head Chef
+				Five Star Cook
+				Gourmet
+				Glutton
+		Rework ingredients slots sprites
 
 	Events:
 		UPDATE: Cooking festival
@@ -90,16 +97,15 @@ w!	🍰	Redberries
 	Recipes:
 	✔	Admiral Pie				Flour + Milk + Tuna + Salmon						Runescape, fish line up in seasons
 	✔	Apple Pie				Flour + Sugar + Apple x2							Runescape
-d!	🍰	Baked Lobster			Lobster												Add opportunity value to an appealing ingredient
 	✔	Baked Potato			Potato												Populous crop, but recipe has to be augmented
-	✔	Beet Burger				Bread + Beet + Onion + Red Cabbage					Artisanal burgers / Too strange
+	✔	Beet Burger				Bread + Beet + Red Cabbage							Artisanal burgers / Too strange
 	✔	Berry Waffles			Wheat + Blueberry x2 + Maple Syrup					Personal pref
 F	✔	Buttered Corn																?
 G	✔	Burrito					Tortilla + Rice + Chilli							Rice, Tortilla
 	✔ 	Cabbage Pot				Cabbage x2 + Onion x2								New ingredients
 	✔	Cake					Flour x2 + Egg x2 + Milk (Leftovers)				Runescape
-d!	🍰	Cauliflower Fritters	Cauliflower + Spring Onion							Balance cheap unused ingredient forage with expensive crop
-d!	🍰	Cray Mornay				Crayfish + Artichoke								Crayfish
+	✔	Cauliflower Fritters	Cauliflower + Spring Onion							Balance cheap unused ingredient forage with expensive crop
+	✔	Cray Mornay				Crayfish + Artichoke								Crayfish
 	✔	Dwarven Stew			Hearty Stew + Beer/Ale/Cider						+Attack -Speed
 	✔	Eel Sushi				Eel + Seaweed + Rice								Rice
 U	✔	Egg Sandwich			Bread + Mayonnaise + Egg (Leftovers)				Runescape
@@ -107,16 +113,17 @@ U	✔	Egg Sandwich			Bread + Mayonnaise + Egg (Leftovers)				Runescape
 G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hot Cocoa				Milk + Chocolate Bar								Personal pref
 	✔	Hot Curry				Hearty Stew + Hot Pepper + Rice						+Speed -Defence
+	✔	Hot Pot Roast			Cranberry Sauce + Roots Platter + Stuffing + Onion	Superfood, personal pref
 	✔	Hunter's Plate			Potato + Cabbage + Horseradish						New ingredients
-	✔	Kebab					Tortilla + Tomato + Onion (Kebab bonus)				Runescape
+	✔	Kebab					Pitta/Tortilla + Tomato + Onion (Kebab bonus)		Runescape, pitta/tortilla
 	✔	Loaded Potato			Baked Potato + Tuna + Corn							Augmented recipe
-	?	Onion Soup				Onion + Garlic + Cheese								Onions / Outmoded
-d!	🍰	Ocean Platter			Baked Lobster + Baked Fish + Rice + Oyster x2		Superfood
+	✔	Lobster Bake			Lobster												Add opportunity value to an appealing ingredient
+	?	Onion Soup				Onion + Garlic + Cheese								Onion / Outmoded
+	✔	Ocean Platter			Baked Lobster + Baked Fish + Rice + Oyster x2		Superfood
 	✔	Pineapple Skewers		Pineapple + Onion + Eggplant						New ingredients
 	✔	Porridge				Wheat x2 + Milk										Wheat
 	✔	Quick Breakfast			Omelet + Coffee										Augmented recipe
 	✔	Redberry Pie			Flour + Sugar + Redberries x3						Runescape
-d!		Roast Dinner			Cranberry Sauce + Roots Platter + Stuffing + Potato	Superfood, personal pref
 U	✔	Salad Sandwich			Bread + Vinegar + Dandelion (Leftovers)				Runescape
 U	✔	Seafood Sandwich		Bread + Mayonnaise + Crab (Leftovers)				Runescape
 	✔	Stuffed Potato			Potato + Cheese + Common Mushroom					Augmented recipe

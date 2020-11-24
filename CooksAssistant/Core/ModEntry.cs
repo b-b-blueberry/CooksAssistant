@@ -29,7 +29,7 @@ namespace CooksAssistant
 		internal Config Config;
 		internal ModSaveData SaveData;
 
-		private bool _forceConfig = false;
+		private bool _forceConfig = true;
 
 		internal ITranslationHelper i18n => Helper.Translation;
 		internal static IJsonAssetsApi JsonAssets;
@@ -37,7 +37,8 @@ namespace CooksAssistant
 
 		// Assets
 		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
-		internal static readonly string BasicRecipesPackPath = Path.Combine("assets", "BasicRecipesPack");
+		internal static readonly string BasicRecipesPackPath = Path.Combine("assets", "BasicRecipesPack"); 
+		internal static readonly string NettlesPackPath = Path.Combine("assets", "NettlesPack");
 		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
 		internal static readonly string NewCropsRecipesPackPath = Path.Combine("assets", "NewCropsRecipesPack");
 		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
@@ -63,9 +64,9 @@ namespace CooksAssistant
 			{ 4, new[] { "Cake", "Hot Cocoa", "Berry Waffles" } },
 			{ 5, new[] { "Cray Mornay", "Eel Sushi", "Hearty Stew" } },
 			{ 6, new[] { "Redberry Pie", "Cabbage Pot", "Pitta Bread" } },
-			{ 7, new[] { "Apple Pie", "Pineapple Skewers", "Red Wrap", "Tropical Salad" } },
-			{ 8, new[] { "Admiral Pie", "Dwarven Stew", "Hot Curry", "Hunter's Plate" } },
-			{ 9, new[] { "Garden Pie", "Beet Burger", "Kebab", "Roast Dinner" } },
+			{ 7, new[] { "Apple Pie", "Pineapple Skewers", "Beet Burger", "Tropical Salad" } },
+			{ 8, new[] { "Admiral Pie", "Dwarven Stew", "Hot Pot Roast", "Hunter's Plate" } },
+			{ 9, new[] { "Garden Pie", "Hot Curry", "Kebab" } },
 			{ 10, new[] { "Ocean Platter", "Egg Sandwich", "Salad Sandwich", "Seafood Sandwich" } },
 		};
 		internal const string CookingSkillId = AssetPrefix + "CookingSkill";
@@ -191,6 +192,13 @@ namespace CooksAssistant
 			"sushi",
 			"sandwich",
 		};
+		public static readonly string[] BakeyFoods = new[]
+		{
+			"cookie",
+			"roast",
+			"bake",
+			"cupcake",
+		};
 		public static readonly string[] CakeyFoods = new[]
 		{
 			"bread",
@@ -207,6 +215,8 @@ namespace CooksAssistant
 			"cookie",
 			"cookies",
 			"crumble",
+			"cupcake",
+			"fingers",
 			"muffin",
 			"tart",
 			"turnover",
@@ -371,7 +381,7 @@ namespace CooksAssistant
 			else
 				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsPackPath));
 
-			if (!Config.AddNewRecipes)
+			if (Config.AddCookingSkill)//(!Config.AddNewRecipes)
 			{
 				Log.D("Did not add new recipes: Recipe additions are disabled in config file.");
 			}
@@ -380,6 +390,15 @@ namespace CooksAssistant
 				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, BasicRecipesPackPath));
 				if (Config.AddNewCrops && !Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
 					JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsRecipesPackPath));
+			}
+
+			if (Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops"))
+			{
+				Log.D("Did not add nettles: Winter Crops is enabled.");
+			}
+			else
+			{
+				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NettlesPackPath));
 			}
 		}
 
@@ -391,14 +410,15 @@ namespace CooksAssistant
 			Config.AddCookingTool = false;
 			Config.AddCookingQuestline = false;
 			Config.AddNewCrops = false;
-			Config.AddNewRecipes = false;
+			//Config.AddNewRecipes = false;
 			Config.AddNewRecipeScaling = false;
-			Config.PlayCookingAnimation = false;
-			Config.CookingTakesTime = false;
+			Config.PlayCookingAnimation = true;
+			//Config.CookingTakesTime = false;
 			Config.FoodHealingTakesTime = false;
 			Config.FoodCanBurn = false;
 			Config.HideFoodBuffsUntilEaten = false;
 			//Config.DebugMode = true;
+			Config.DebugRegenTracker = false;
 			Config.ConsoleCommandPrefix = "cac";
 		}
 		
@@ -687,13 +707,15 @@ namespace CooksAssistant
 			{
 				// Navigate community centre bundles inventory menu
 				var cursor = Utility.Vector2ToPoint(e.Cursor.ScreenPixels);
-				if (Game1.activeClickableMenu is JunimoNoteMenu menu //&& menu.fromGameMenu
-					)
+				if (Config.AddCookingCommunityCentreBundle && Game1.activeClickableMenu is JunimoNoteMenu menu
+					&& !((CommunityCenter)Game1.getLocationFromName("CommunityCenter")).isBundleComplete(CommunityCentreAreaNumber))
 				{
 					_menuTab = -1;
 					var whichArea = Helper.Reflection.GetField<int>(menu, "whichArea");
-					if (menu.areaBackButton.visible && (menu.areaBackButton.containsPoint(cursor.X, cursor.Y) && whichArea.GetValue() == 0)
-					   || (menu.areaNextButton.visible && menu.areaNextButton.containsPoint(cursor.X, cursor.Y) && whichArea.GetValue() == 5))
+					if (menu.areaBackButton != null && menu.areaBackButton.visible
+							&& (menu.areaBackButton.containsPoint(cursor.X, cursor.Y) && whichArea.GetValue() == 0)
+					   || (menu.areaNextButton != null && menu.areaNextButton.visible
+							&& menu.areaNextButton.containsPoint(cursor.X, cursor.Y) && whichArea.GetValue() == 5))
 					{
 						_menuTab = CommunityCentreAreaNumber;
 					}
@@ -1099,8 +1121,9 @@ namespace CooksAssistant
 					Game1.buffsDisplay.tryToAddFoodBuff(buff, duration);
 			}
 
-			if ((!_lastFoodWasDrink && Game1.buffsDisplay.food?.source == food.Name)
-			    || (_lastFoodWasDrink && Game1.buffsDisplay.drink?.source == food.Name))
+			if (Config.AddCookingSkill
+				&& ((!_lastFoodWasDrink && Game1.buffsDisplay.food?.source == food.Name)
+					|| (_lastFoodWasDrink && Game1.buffsDisplay.drink?.source == food.Name)))
 			{
 				// TODO: SYSTEM: Cooking Skill with added levels
 				((CookingSkill) Skills.GetSkill(CookingSkillId)).AddedLevel = 0;
@@ -1218,7 +1241,7 @@ namespace CooksAssistant
 		/// A cooking station's level influences the number of ingredients slots available to the player.
 		/// </summary>
 		/// <returns>Level of the best cooking station in range, defaults to 0.</returns>
-		public int CheckForNearbyCookingStation()
+		public int GetNearbyCookingStationLevel()
 		{
 			var toolLevel = SaveData.CookingToolLevel;
 			var skillLevel = Skills.GetSkillLevel(Game1.player, CookingSkillId);
@@ -1319,16 +1342,18 @@ namespace CooksAssistant
 		public int GetFarmersMaxUsableIngredients()
 		{
 			var count = GetDefaultMaxUsableIngredients();
-			return count > 0
-				? count
-				: Config.AddCookingTool
+			if (count > 0)
+			{
+				return count;
+			}
+			return Config.AddCookingTool
 					? 1 + SaveData.CookingToolLevel
 					: 1 + Skills.GetSkillLevel(Game1.player, CookingSkillId) / 2;
 		}
 
 		public int GetDefaultMaxUsableIngredients()
 		{
-			return !Config.AddCookingTool && !Config.AddCookingSkill
+			return Config.AddCookingTool || Config.AddCookingSkill
 				? -1
 				//: Config.AddNewRecipeScaling ? 6 : 5;
 				: 5;
