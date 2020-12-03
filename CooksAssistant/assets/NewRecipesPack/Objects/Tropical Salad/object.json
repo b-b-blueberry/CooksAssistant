@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Pineapple Skewers",
-	"Description": "A summery shish kebab of fruit and vegetables.",
+	"Name": "Tropical Salad",
+	"Description": "A refreshing fruit salad with a tropical twist.",
 	"Category": "Cooking",
-	"Edibility": 58,
+	"Edibility": 98,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 280,
+	"Price": 425,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,15 +20,15 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Pineapple",
+				"Object": 398, // Grape
 				"Count": 1
 			},
 			{
-				"Object": "Onion",
+				"Object": 613, // Apple
 				"Count": 1
-			},
+			}
 			{
-				"Object": 272, // Eggplant
+				"Object": 637, // Pomegranate
 				"Count": 1
 			}
 		],

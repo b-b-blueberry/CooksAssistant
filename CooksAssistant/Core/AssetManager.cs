@@ -207,7 +207,7 @@ namespace CooksAssistant
 					var data = asset.AsDictionary<string, string>().Data;
 					var recipeData = new Dictionary<string, string>
 					{
-						// Maki Roll: // Sashimi 1 Seaweed 1 Rice 1
+						// Maki Roll: Sashimi 1 Seaweed 1 Rice 1
 						{
 							"Maki Roll",
 							"227 1 152 1 423 1"
@@ -215,12 +215,14 @@ namespace CooksAssistant
 						// Coleslaw: Vinegar 1 Mayonnaise 1
 						{
 							"Coleslaw",
-							$"{ModEntry.JsonAssets.GetObjectId("Cabbage")} 1" + " 419 1 306 1"
+							$"{ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
+							+ " 419 1 306 1"
 						},
 						// Pink Cake: Cake 1 Melon 1
 						{
 							"Pink Cake",
-							$"{ModEntry.JsonAssets.GetObjectId("Cake")} 1" + " 254 1"
+							$"{ModEntry.JsonAssets.GetObjectId("Cake")} 1"
+							+ " 254 1"
 						},
 						// Chocolate Cake: Cake 1 Chocolate Bar 1
 						{
@@ -231,7 +233,8 @@ namespace CooksAssistant
 						// Cookies: Flour 1 Category:Egg 1 Chocolate Bar 1
 						{
 							"Cookies",
-							"246 1 -5 1" + $" {ModEntry.JsonAssets.GetObjectId("Chocolate Bar")} 1"
+							"246 1 -5 1"
+							+ $" {ModEntry.JsonAssets.GetObjectId("Chocolate Bar")} 1"
 						},
 						// Pizza: Flour 2 Tomato 2 Cheese 2
 						{
@@ -241,6 +244,89 @@ namespace CooksAssistant
 					};
 					foreach (var recipe in recipeData)
 						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new [] {recipe.Value});
+
+					// Substitute in the actual custom ingredients for custom recipes if custom objects are enabled
+					if (//ModEntry.Instance.Config.AddNewCrops
+						ModEntry.Instance.Config.AddNewStuff
+						&& ModEntry.Instance.Config.AddCookingSkill)
+					{
+						recipeData = new Dictionary<string, string>
+						{
+							// Beet Burger: Bread 1 Beet 1 Onion 1 Red Cabbage 1
+							{
+								"Beet Burger",
+								"216 1 284 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ " 266 1"
+							},
+							// Cabbage Pot: Cabbage 2 Onion 2
+							{
+								"Cabbage Pot",
+								$"{ModEntry.JsonAssets.GetObjectId("Cabbage")} 2"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 2"
+							},
+							// Garden Pie: Flour 1 Cabbage 1 Onion 1 Tomato 1
+							{
+								"Garden Pie",
+								"246 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ " 256 1"
+							},
+							// Hearty Stew: Carrot 2 Potato 1
+							{
+								"Hearty Stew",
+								$"{ModEntry.JsonAssets.GetObjectId("Carrot")} 2" + "192 1"
+							},
+							// Hot Pot Roast: Cranberry Sauce 1 Roots Platter 1 Stuffing 1 Onion 1
+							{
+								"Hot Pot Roast",
+								"238 1 244 1 239 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+							},
+							// Hunter's Plate: Potato 1 Cabbage 1 Horseradish 1
+							{
+								"Hunter's Plate",
+								"192 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
+								+ " 16 1"
+							},
+							// Kebab: Tortilla 1 Tomato 1 Onion 1
+							{
+								"Hunter's Plate",
+								"229 1 256 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
+							},
+							// Onion Soup: Onion 1 Garlic 1 Cheese 1
+							{
+								"Onion Soup",
+								$"{ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ " 248 1 424 1"
+							},
+							// Pineapple Skewers: Pineapple 1 Onion 1 Eggplant 1
+							{
+								"Pineapple Skewers",
+								$"{ModEntry.JsonAssets.GetObjectId("Pineapple")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ " 272 1"
+							},
+							// Redberry Pie: Flour 1 Sugar 1 Redberries 3
+							{
+								"Redberry Pie",
+								"246 1 245 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Redberries")} 3"
+							},
+							// Tropical Salad: Pineapple 1 Apple 1 Watermelon 1
+							{
+								"Tropical Salad",
+								$"{ModEntry.JsonAssets.GetObjectId("Pineapple")} 1"
+								+ " 613 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId("Watermelon")} 1"
+							},
+						};
+						foreach (var recipe in recipeData)
+							data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new[] { recipe.Value });
+					}
 					
 					foreach (var recipe in data.ToDictionary(pair => pair.Key, pair => pair.Value))
 					{
@@ -326,7 +412,7 @@ namespace CooksAssistant
 			{
 				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
 					return;
-				if (!Config.AddNewCrops)
+				if (!ModEntry.Instance.Config.AddNewStuff)
 				{
 					Log.D($"Did not edit {asset.AssetName}: New crops are disabled in config file.",
 						Config.DebugMode);
@@ -460,9 +546,11 @@ namespace CooksAssistant
 				if (ModEntry.JsonAssets == null)
 					return;
 
+				if (true)
+					return;
+
 				int index;
 				Rectangle sourceArea, destArea;
-				Texture2D sourceImage;
 				var destImage = asset.AsImage();
 
 				// Pitta Bread
@@ -571,7 +659,7 @@ namespace CooksAssistant
 		{
 			// Reconstruct buffs of all cooking items in the game using our ingredients-to-buffs chart
 			var ingredientsChart =
-				ModEntry.Instance.Helper.Content.Load<Dictionary<string, string>>($"{ModEntry.BuffChartPath}.json");
+				ModEntry.Instance.Helper.Content.Load<Dictionary<string, string>>($"{ModEntry.BuffDataPath}.json");
 			var cookingRecipes = Game1.content.Load<Dictionary<string, string>>(@"Data/CookingRecipes");
 			var keys = new int[data.Keys.Count];
 			data.Keys.CopyTo(keys, 0);

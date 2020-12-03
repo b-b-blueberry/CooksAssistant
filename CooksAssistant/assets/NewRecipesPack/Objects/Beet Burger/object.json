@@ -1,26 +1,34 @@
 {
 	// Object data
-	"Name": "Pitta Bread",
-	"Description": "Nicely baked pitta bread. Good for kebabs.",
+	"Name": "Beet Burger",
+	"Description": "It's a mix of bitter and sweet flavours in a shocking pink look.",
 	"Category": "Cooking",
-	"Edibility": 20,
+	"Edibility": 63,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 60,
+	"Price": 180,
 	"IsColored": false,
 
 	// Object purchase
 	"CanPurchase": false,
 	"PurchaseFrom": "Gus",
-	"PurchasePrice": 220,
-	"PurchaseRequirements": [ "y 2" ],
+	"PurchasePrice": 300,
+	"PurchaseRequirements": null,
 
 	// Recipe
 	"Recipe": {
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 246, // Wheat Flour
+				"Object": 216, // Bread
+				"Count": 1
+			},
+			{
+				"Object": 284, // Beet
+				"Count": 1
+			},
+			{
+				"Object": 266, // Red Cabbage
 				"Count": 1
 			}
 		],
@@ -28,7 +36,7 @@
 		"CanPurchase": false,
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
-		"PurchaseRequirements": [ "y 2" ]
+		"PurchaseRequirements": null
 	},
 
 	// Localisation

@@ -1,18 +1,18 @@
 {
 	// Object data
-	"Name": "Redberry Pie",
-	"Description": "Looks tasty. Smells gorgeous.",
+	"Name": "Kebab",
+	"Description": "The filling seems dubious. Who knows how it'll taste?",
 	"Category": "Cooking",
-	"Edibility": 75,
+	"Edibility": 48,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 460,
+	"Price": 97,
 	"IsColored": false,
 
 	// Object purchase
 	"CanPurchase": false,
 	"PurchaseFrom": "Gus",
-	"PurchasePrice": 880,
+	"PurchasePrice": 300,
 	"PurchaseRequirements": null,
 
 	// Recipe
@@ -20,16 +20,16 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 246, // Wheat Flour
+				"Object": 229, // Tortilla
 				"Count": 1
 			},
 			{
-				"Object": 245, // Sugar
+				"Object": 256, // Tomato
 				"Count": 1
 			},
 			{
-				"Object": "Redberries",
-				"Count": 3
+				"Object": 259, // Fiddlehead Fern
+				"Count": 1
 			}
 		],
 		// Recipe purchase

@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Kebab",
-	"Description": "The filling seems dubious. Who knows how it'll taste?",
+	"Name": "Hot Pot Roast",
+	"Description": "A bountiful stew with all the trimmings.",
 	"Category": "Cooking",
-	"Edibility": 48,
+	"Edibility": 89,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 97,
+	"Price": 440,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,15 +20,19 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 229, // Tortilla
+				"Object": 238, // Cran. Sauce
 				"Count": 1
 			},
 			{
-				"Object": 256, // Tomato
+				"Object": 244, // Roots Platter
 				"Count": 1
 			},
 			{
-				"Object": "Onion",
+				"Object": 239, // Stuffing
+				"Count": 1
+			},
+			{
+				"Object": 192, // Potato
 				"Count": 1
 			}
 		],

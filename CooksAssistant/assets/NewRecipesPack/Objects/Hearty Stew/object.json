@@ -32,7 +32,7 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Carrot",
+				"Object": 78, // Cave Carrot
 				"Count": 2
 			},
 			{

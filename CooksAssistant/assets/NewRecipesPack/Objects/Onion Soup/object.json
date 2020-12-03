@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Hot Pot Roast",
-	"Description": "A bountiful stew with all the trimmings.",
+	"Name": "Onion Soup",
+	"Description": "An earthen terrine full of a hearty onion broth. It's topped with delicious cheese.",
 	"Category": "Cooking",
-	"Edibility": 89,
-	"EdibleIsDrink": false,
+	"Edibility": 68,
+	"EdibleIsDrink": true,
 	"EdibleBuffs": null,
-	"Price": 440,
+	"Price": 320,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,20 +20,12 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 238, // Cran. Sauce
-				"Count": 1
+				"Object": 248, // Garlic
+				"Count": 3
 			},
 			{
-				"Object": 244, // Roots Platter
+				"Object": 424, // Cheese
 				"Count": 1
-			},
-			{
-				"Object": 239, // Stuffing
-				"Count": 1
-			},
-			{
-				"Object": "Onion",
-				"Count": 2
 			}
 		],
 		// Recipe purchase

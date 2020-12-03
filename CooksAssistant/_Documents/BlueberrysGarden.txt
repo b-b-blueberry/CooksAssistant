@@ -98,7 +98,7 @@ w!	🍰	Redberries
 	✔	Admiral Pie				Flour + Milk + Tuna + Salmon						Runescape, fish line up in seasons
 	✔	Apple Pie				Flour + Sugar + Apple x2							Runescape
 	✔	Baked Potato			Potato												Populous crop, but recipe has to be augmented
-	✔	Beet Burger				Bread + Beet + Red Cabbage							Artisanal burgers / Too strange
+	✔	Beet Burger				Bread + Beet + Onion + Red Cabbage					Artisanal burgers / Too strange
 	✔	Berry Waffles			Wheat + Blueberry x2 + Maple Syrup					Personal pref
 F	✔	Buttered Corn																?
 G	✔	Burrito					Tortilla + Rice + Chilli							Rice, Tortilla
@@ -115,7 +115,7 @@ G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hot Curry				Hearty Stew + Hot Pepper + Rice						+Speed -Defence
 	✔	Hot Pot Roast			Cranberry Sauce + Roots Platter + Stuffing + Onion	Superfood, personal pref
 	✔	Hunter's Plate			Potato + Cabbage + Horseradish						New ingredients
-	✔	Kebab					Pitta/Tortilla + Tomato + Onion (Kebab bonus)		Runescape, pitta/tortilla
+	✔	Kebab					Tortilla + Tomato + Onion (Kebab bonus)				Runescape, tortilla
 	✔	Loaded Potato			Baked Potato + Tuna + Corn							Augmented recipe
 	✔	Lobster Bake			Lobster												Add opportunity value to an appealing ingredient
 	?	Onion Soup				Onion + Garlic + Cheese								Onion / Outmoded
@@ -127,7 +127,7 @@ G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 U	✔	Salad Sandwich			Bread + Vinegar + Dandelion (Leftovers)				Runescape
 U	✔	Seafood Sandwich		Bread + Mayonnaise + Crab (Leftovers)				Runescape
 	✔	Stuffed Potato			Potato + Cheese + Common Mushroom					Augmented recipe
-	✔	Tropical Salad			Pineapple + Watermelon								New ingredients
+	✔	Tropical Salad			Pineapple + Apple + Watermelon						New ingredients
 
 	KEY:
 	✔	Implementation complete

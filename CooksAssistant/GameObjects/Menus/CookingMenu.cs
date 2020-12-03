@@ -776,7 +776,7 @@ namespace CooksAssistant.GameObjects.Menus
 		{
 			var xpTable = new List<int>();
 			var burntCount = 0;
-			Item result = null, burntResult = null, recipeItem = recipe.createItem();
+			Item result = null, recipeItem = recipe.createItem();
 			for (var i = 0; i < quantity; ++i)
 			{
 				result = CraftItemAndConsumeIngredients(recipeItem, requiredItems, ref items);

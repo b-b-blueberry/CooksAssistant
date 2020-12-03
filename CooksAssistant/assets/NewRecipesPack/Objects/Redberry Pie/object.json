@@ -1,30 +1,18 @@
 {
 	// Object data
-	"Name": "Hunter's Plate",
-	"Description": "Come home to a hot plate of classic vegetables.",
+	"Name": "Redberry Pie",
+	"Description": "Looks tasty. Smells gorgeous.",
 	"Category": "Cooking",
-	"Edibility": 65,
+	"Edibility": 75,
 	"EdibleIsDrink": false,
-	"EdibleBuffs": {
-		"Farming": 0,
-		"Fishing": 0,
-		"Mining": 0,
-		"Luck": 0,
-		"Foraging": 1,
-		"MaxStamina": 0,
-		"MagnetRadius": 0,
-		"Speed": 0,
-		"Defense": 0,
-		"Attack": 0,
-		"Duration": 210
-	},
-	"Price": 170,
+	"EdibleBuffs": null,
+	"Price": 460,
 	"IsColored": false,
 
 	// Object purchase
 	"CanPurchase": false,
 	"PurchaseFrom": "Gus",
-	"PurchasePrice": 300,
+	"PurchasePrice": 880,
 	"PurchaseRequirements": null,
 
 	// Recipe
@@ -32,16 +20,20 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": 192, // Potato
+				"Object": 246, // Wheat Flour
 				"Count": 1
 			},
 			{
-				"Object": "Cabbage",
+				"Object": 245, // Sugar
 				"Count": 1
 			},
 			{
-				"Object": 16, // Wild Horseradish
-				"Count": 1
+				"Object": 282, // Cranberries
+				"Count": 2
+			}
+			{
+				"Object": 638, // Cherry
+				"Count": 2
 			}
 		],
 		// Recipe purchase

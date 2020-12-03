@@ -36,11 +36,11 @@
 				"Count": 1
 			},
 			{
-				"Object": "Cabbage",
+				"Object": 274, // Artichoke
 				"Count": 1
 			},
 			{
-				"Object": "Onion",
+				"Object": 248, // Garlic
 				"Count": 1
 			},
 			{

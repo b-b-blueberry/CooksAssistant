@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Onion Soup",
-	"Description": "An earthen terrine full of a hearty onion broth. It's topped with delicious cheese.",
+	"Name": "Pineapple Skewers",
+	"Description": "A summery shish kebab of fruit and vegetables.",
 	"Category": "Cooking",
-	"Edibility": 68,
-	"EdibleIsDrink": true,
+	"Edibility": 58,
+	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 320,
+	"Price": 280,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,15 +20,15 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Onion",
-				"Count": 3
-			},
-			{
-				"Object": 248, // Garlic
+				"Object": 613, // Apple
 				"Count": 1
 			},
 			{
-				"Object": 424, // Cheese
+				"Object": 24, // Parsnip
+				"Count": 1
+			},
+			{
+				"Object": 272, // Eggplant
 				"Count": 1
 			}
 		],

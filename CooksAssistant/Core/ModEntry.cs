@@ -35,21 +35,20 @@ namespace CooksAssistant
 		internal static IJsonAssetsApi JsonAssets;
 		internal static Texture2D SpriteSheet;
 
-		// Assets
-		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
-		internal static readonly string BasicRecipesPackPath = Path.Combine("assets", "BasicRecipesPack"); 
-		internal static readonly string NettlesPackPath = Path.Combine("assets", "NettlesPack");
-		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
-		internal static readonly string NewCropsRecipesPackPath = Path.Combine("assets", "NewCropsRecipesPack");
-		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
-		internal static readonly string BundleDataPath = Path.Combine("assets", "bundles");
-		internal static readonly string BuffChartPath = Path.Combine("assets", "ingredientBuffChart");
-		internal static readonly string SkillIconPath = Path.Combine("assets", "skill");
-		internal static readonly string LevelUpIconPath = Path.Combine("assets", "levelup");
-		internal static readonly string MapTileSheetPath = Path.Combine("assets", "maptiles");
-
 		internal const string SaveDataKey = "SaveData";
 		internal const string AssetPrefix = "blueberry.CooksAssistant.";
+
+		// Assets
+		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
+		internal static readonly string NewRecipesPackPath = Path.Combine("assets", "NewRecipesPack");
+		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
+		internal static readonly string NettlesPackPath = Path.Combine("assets", "NettlesPack");
+		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
+		internal static readonly string MapTileSheetPath = Path.Combine("assets", "maptiles");
+		internal static readonly string SkillIconPath = Path.Combine("assets", "skill");
+		internal static readonly string LevelUpIconPath = Path.Combine("assets", "levelup");
+		internal static readonly string BundleDataPath = Path.Combine("assets", "bundles");
+		internal static readonly string BuffDataPath = Path.Combine("assets", "ingredientBuffChart");
 
 		// Add Cooking Tool
 		private const string CookingToolName = "Frying Pan";
@@ -114,47 +113,7 @@ namespace CooksAssistant
 		private float _debugRegenRate;
 		private uint _debugElapsedTime;
 
-		// Others:
-		internal static bool PlayerAgencyBlocked;
-		private const string ChocolateName = "Chocolate Bar";
-		private const string NettlesName = "Nettles";
-		private const string NettlesUsableMachine = "Keg";
-		private const int NettlesUsableLevel = 2;
-		// kebab
-		private const string KebabBuffSource = AssetPrefix + "Kebab";
-		private const int KebabBonusDuration = 220;
-		private const int KebabMalusDuration = 140;
-		private const int KebabCombatBonus = 3;
-		private const int KebabNonCombatBonus = 2;
-		// configuration
-		public static readonly List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
-		{
-			498, 499, 632, 633
-		};
-		public static readonly List<string> FoodsThatGiveLeftovers = new List<string>
-		{
-			"Seafood Sandwich",
-			"Egg Sandwich",
-			"Salad Sandwich",
-			"Pizza",
-			"Cake",
-			"Chocolate Cake",
-			"Pink Cake",
-			"Watermelon"
-		};
-		public static readonly List<string> FoodsWithLeftoversGivenAsSlices = new List<string>
-		{
-			"pizza",
-			"cake"
-		};
-		public static readonly List<string> ObjectsToAvoidScaling = new List<string>
-		{
-
-		};
-		public static readonly Dictionary<string, int> ObjectsWithCookingBuffs = new Dictionary<string, int>
-		{
-
-		};
+		// Play Cooking Animation
 		public static readonly string[] SoupyFoods = new[]
 		{
 			"soup",
@@ -233,6 +192,48 @@ namespace CooksAssistant
 			"pitta",
 			"calzone",
 			"tortilla",
+		};
+
+		// Others:
+		internal static bool PlayerAgencyBlocked;
+		private const string ChocolateName = "Chocolate Bar";
+		private const string NettlesName = "Nettles";
+		private const string NettlesUsableMachine = "Keg";
+		private const int NettlesUsableLevel = 2;
+		// kebab
+		private const string KebabBuffSource = AssetPrefix + "Kebab";
+		private const int KebabBonusDuration = 220;
+		private const int KebabMalusDuration = 140;
+		private const int KebabCombatBonus = 3;
+		private const int KebabNonCombatBonus = 2;
+		// configuration
+		public static readonly List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
+		{
+			498, 499, 632, 633
+		};
+		public static readonly List<string> FoodsThatGiveLeftovers = new List<string>
+		{
+			"Seafood Sandwich",
+			"Egg Sandwich",
+			"Salad Sandwich",
+			"Pizza",
+			"Cake",
+			"Chocolate Cake",
+			"Pink Cake",
+			"Watermelon"
+		};
+		public static readonly List<string> FoodsWithLeftoversGivenAsSlices = new List<string>
+		{
+			"pizza",
+			"cake"
+		};
+		public static readonly List<string> ObjectsToAvoidScaling = new List<string>
+		{
+
+		};
+		public static readonly Dictionary<string, int> ObjectsWithCookingBuffs = new Dictionary<string, int>
+		{
+
 		};
 
 
@@ -374,22 +375,27 @@ namespace CooksAssistant
 			}
 			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, BasicObjectsPack));
 
-			if (!Config.AddNewCrops)
-				Log.D("Did not add new crops: Crop additions are disabled in config file.");
-			else if (Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
-				Log.D("Did not add new crops: [PPJA] Fruits and Veggies already adds these objects.");
-			else
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsPackPath));
-
-			if (Config.AddCookingSkill)//(!Config.AddNewRecipes)
+			if (Config.AddCookingSkill)
 			{
 				Log.D("Did not add new recipes: Recipe additions are disabled in config file.");
 			}
 			else
 			{
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, BasicRecipesPackPath));
-				if (Config.AddNewCrops && !Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
-					JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsRecipesPackPath));
+				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewRecipesPackPath));
+			}
+
+			if (!Config.AddNewStuff)
+			{
+				Log.D("Did not add new objects: New stuff is disabled in config file.");
+				return;
+			}
+			else if (Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
+			{
+				Log.D("Did not add new crops: [PPJA] Fruits and Veggies already adds these objects.");
+			}
+			else
+			{
+				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsPackPath));
 			}
 
 			if (Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops"))
@@ -409,11 +415,9 @@ namespace CooksAssistant
 			Config.AddCookingSkill = false;
 			Config.AddCookingTool = false;
 			Config.AddCookingQuestline = false;
-			Config.AddNewCrops = false;
-			//Config.AddNewRecipes = false;
+			Config.AddNewStuff = false;
 			Config.AddNewRecipeScaling = false;
 			Config.PlayCookingAnimation = true;
-			//Config.CookingTakesTime = false;
 			Config.FoodHealingTakesTime = false;
 			Config.FoodCanBurn = false;
 			Config.HideFoodBuffsUntilEaten = false;
@@ -865,7 +869,7 @@ namespace CooksAssistant
 			// Add new crops and objects to shop menus
 			if (e.NewMenu is ShopMenu menu)
 			{
-				if (Config.AddNewCrops && Game1.currentLocation is SeedShop)
+				if (Game1.currentLocation is SeedShop)
 				{
 					SortSeedShopStock(ref menu);
 				}

@@ -1,12 +1,12 @@
 {
 	// Object data
-	"Name": "Tropical Salad",
-	"Description": "A refreshing fruit salad with a tropical twist.",
+	"Name": "Cabbage Pot",
+	"Description": "A big pot of soggy cabbage, good for a couple of meals.",
 	"Category": "Cooking",
-	"Edibility": 98,
+	"Edibility": 30,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": null,
-	"Price": 425,
+	"Price": 65,
 	"IsColored": false,
 
 	// Object purchase
@@ -20,16 +20,12 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Pineapple",
-				"Count": 1
+				"Object": 266, // Red Cabbage
+				"Count": 2
 			},
 			{
-				"Object": "Watermelon",
-				"Count": 1
-			},
-			{
-				"Object": 400, // Strawberry
-				"Count": 1
+				"Object": 24, // Parsnip
+				"Count": 2
 			}
 		],
 		// Recipe purchase
