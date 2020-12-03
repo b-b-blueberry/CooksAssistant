@@ -123,13 +123,13 @@ namespace CooksAssistant
 				var data = asset.AsDictionary<string, string>().Data;
 
 				ModEntry.Instance.BundleStartIndex = data.Keys.ToList().Max(key => int.Parse(key.Split('/')[1]));
-				var sourceBundleList = ModEntry.Instance.Helper.Content.Load<List<List<string>>>($"{ModEntry.BundleDataPath}.json");
+				var sourceBundleList = ModEntry.Instance.Helper.Content.Load<Dictionary<string, List<List<string>>>>($"{ModEntry.BundleDataPath}.json");
 				
 				// Iterate over each custom bundle to add their data to game Bundles dictionary
 				for (var i = 0; i < sourceBundleList.Count; ++i)
 				{
 					// Bundle data
-					var sourceBundle = sourceBundleList[i];
+					var sourceBundle = sourceBundleList[ModEntry.Instance.Config.AddNewStuff ? "Custom" : "Vanilla"][i];
 					var parsedBundle = new List<List<string>>();
 
 					var index = ModEntry.Instance.BundleStartIndex + i + 1;
@@ -254,74 +254,80 @@ namespace CooksAssistant
 						{
 							// Beet Burger: Bread 1 Beet 1 Onion 1 Red Cabbage 1
 							{
-								"Beet Burger",
+								ModEntry.ObjectPrefix + "burger",
 								"216 1 284 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
 								+ " 266 1"
 							},
 							// Cabbage Pot: Cabbage 2 Onion 2
 							{
-								"Cabbage Pot",
-								$"{ModEntry.JsonAssets.GetObjectId("Cabbage")} 2"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 2"
+								ModEntry.ObjectPrefix + "cabbagepot",
+								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 2"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 2"
 							},
 							// Garden Pie: Flour 1 Cabbage 1 Onion 1 Tomato 1
 							{
-								"Garden Pie",
+								ModEntry.ObjectPrefix + "gardenpie",
 								"246 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
 								+ " 256 1"
 							},
 							// Hearty Stew: Carrot 2 Potato 1
 							{
-								"Hearty Stew",
-								$"{ModEntry.JsonAssets.GetObjectId("Carrot")} 2" + "192 1"
+								ModEntry.ObjectPrefix + "stew",
+								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "carrot")} 2" + "192 1"
+							},
+							// Hot Cocoa: Milk (Any) 1 Chocolate Bar 1
+							{
+								ModEntry.ObjectPrefix + "hotcocoa",
+								"-6 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "chocolate")} 1"
 							},
 							// Hot Pot Roast: Cranberry Sauce 1 Roots Platter 1 Stuffing 1 Onion 1
 							{
-								"Hot Pot Roast",
+								ModEntry.ObjectPrefix + "roast",
 								"238 1 244 1 239 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
 							},
 							// Hunter's Plate: Potato 1 Cabbage 1 Horseradish 1
 							{
-								"Hunter's Plate",
+								ModEntry.ObjectPrefix + "hunters",
 								"192 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
 								+ " 16 1"
 							},
 							// Kebab: Tortilla 1 Tomato 1 Onion 1
 							{
-								"Hunter's Plate",
+								ModEntry.ObjectPrefix + "kebab",
 								"229 1 256 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Cabbage")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
 							},
 							// Onion Soup: Onion 1 Garlic 1 Cheese 1
 							{
-								"Onion Soup",
-								$"{ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								ModEntry.ObjectPrefix + "onionsoup",
+								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
 								+ " 248 1 424 1"
 							},
 							// Pineapple Skewers: Pineapple 1 Onion 1 Eggplant 1
 							{
-								"Pineapple Skewers",
-								$"{ModEntry.JsonAssets.GetObjectId("Pineapple")} 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Onion")} 1"
+								ModEntry.ObjectPrefix + "skewers",
+								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "pineapple")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
 								+ " 272 1"
 							},
 							// Redberry Pie: Flour 1 Sugar 1 Redberries 3
 							{
-								"Redberry Pie",
+								ModEntry.ObjectPrefix + "redberrypie",
 								"246 1 245 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Redberries")} 3"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry")} 3"
 							},
 							// Tropical Salad: Pineapple 1 Apple 1 Watermelon 1
 							{
-								"Tropical Salad",
-								$"{ModEntry.JsonAssets.GetObjectId("Pineapple")} 1"
+								ModEntry.ObjectPrefix + "tropicalsalad",
+								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "pineapple")} 1"
 								+ " 613 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId("Watermelon")} 1"
+								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "watermelon")} 1"
 							},
 						};
 						foreach (var recipe in recipeData)
@@ -365,6 +371,20 @@ namespace CooksAssistant
 
 				if (ModEntry.JsonAssets == null || Game1.currentLocation == null)
 					return;
+
+				var data = asset.AsDictionary<int, string>().Data;
+
+				// Add localised names and descriptions for new objects
+				foreach (var pair in data.Where(pair => pair.Value.Split('/') is string[] split && split[0].StartsWith(ModEntry.ObjectPrefix)).ToList())
+				{
+					var name = pair.Value.Split('/')[0].Split(new [] { '.' }, 3);
+					data[pair.Key] = ModEntry.UpdateEntry(data[pair.Key],
+						new[] { i18n.Get($"item.{name[2]}.name").ToString(),
+							i18n.Get($"item.{name[2]}.description").ToString() },
+						false, false, 4);
+					Log.W($"Named {name[2]} ({i18n.Get($"item.{name[2]}.name")})");
+				}
+
 				if (!Config.AddNewRecipeScaling)
 				{
 					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
@@ -374,7 +394,6 @@ namespace CooksAssistant
 
 				try
 				{
-					var data = asset.AsDictionary<int, string>().Data;
 					var objectData = new Dictionary<int, string[]>
 					{
 						{206, new[] {null, null, "45"}}, // Pizza
@@ -697,7 +716,7 @@ namespace CooksAssistant
 							};
 						}
 					}
-					if (buffSplit == null || ModEntry.ObjectsToAvoidScaling.Contains(o.Name))
+					if (buffSplit == null)
 						continue;
 					for (var j = 0; j < buffSplit.Length; j += 2)
 					{

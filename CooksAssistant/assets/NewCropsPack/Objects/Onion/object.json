@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Onion",
-    "Description": "The culinary workhorse. Guaranteed to add a depth of flavour to anything, stewed or fried.",
+    "Name": "blueberry.cac.onion",
+    "Description": "...",
     "Category": "Vegetable",
     "Edibility": 10,
     "EdibleIsDrink": false,
@@ -19,10 +19,4 @@
     // Gifting
     "GiftTastes": {
     },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
 }

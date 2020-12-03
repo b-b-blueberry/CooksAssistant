@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Watermelon",
-    "Description": "An iconic summer treat, sweet as a daisy and chock-full of seeds.",
+    "Name": "blueberry.cac.watermelon",
+    "Description": "...",
     "Category": "Fruit",
     "Edibility": 16,
     "EdibleIsDrink": false,
@@ -18,14 +18,8 @@
 
     // Gifting
     "GiftTastes": {
-        "Love": [ "Sandy"  ],
+        "Love": [ "Sandy" ],
         "Dislike": [ "Shane" ],
         "Hate": [ "Lewis" ]
     },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
 }

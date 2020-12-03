@@ -3,7 +3,7 @@
     "ProducerName": "Keg",
     "InputIdentifier": "Apple",
     "MinutesUntilReady": 1450,
-    "OutputIdentifier": "Cider",
+    "OutputIdentifier": "blueberry.cac.cider",
     "Sounds": [ "Ship", "bubbles" ],
     "PlacingAnimation": "Bubbles",
     "PlacingAnimationColorName": "Yellow"
@@ -39,9 +39,9 @@
   },
   { // Nettle Tea
     "ProducerName": "Keg",
-    "InputIdentifier": "Nettles",
+    "InputIdentifier": "blueberry.cac.nettle",
     "MinutesUntilReady": 180,
-    "OutputIdentifier": "Nettle Tea",
+    "OutputIdentifier": "blueberry.cac.nettletea",
     "Sounds": [ "Ship", "bubbles" ],
     "PlacingAnimation": "Bubbles",
     "PlacingAnimationColorName": "LightGreen"

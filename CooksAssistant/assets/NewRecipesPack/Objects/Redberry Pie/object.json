@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Redberry Pie",
-	"Description": "Looks tasty. Smells gorgeous.",
+	"Name": "blueberry.cac.redberrypie",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 75,
 	"EdibleIsDrink": false,
@@ -30,7 +30,7 @@
 			{
 				"Object": 282, // Cranberries
 				"Count": 2
-			}
+			},
 			{
 				"Object": 638, // Cherry
 				"Count": 2
@@ -41,11 +41,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

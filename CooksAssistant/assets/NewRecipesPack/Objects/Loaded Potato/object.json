@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Loaded Potato",
-	"Description": "The classic baked potato, topped with tuna and sweetcorn.",
+	"Name": "blueberry.cac.loadedpotato",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 75,
 	"EdibleIsDrink": false,
@@ -32,7 +32,7 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Baked Potato",
+				"Object": "blueberry.cac.bakedpotato",
 				"Count": 1
 			},
 			{
@@ -49,11 +49,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

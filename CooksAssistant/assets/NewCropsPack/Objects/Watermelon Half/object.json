@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Watermelon Half",
-    "Description": "It's so good you couldn't just eat it all at once.",
+    "Name": "blueberry.cac.watermelon_half",
+    "Description": "...",
     "Category": "Junk",
     "CategoryTextOverride": "",
     "CategoryColorOverride": "0, 0, 0, 0",
@@ -23,10 +23,4 @@
         "Dislike": [ "Shane" ],
         "Hate": [ "Lewis" ]
     },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
 }

@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Chocolate Bar",
-    "Description": "Mmmmm... chocolate.",
+    "Name": "blueberry.cac.chocolate",
+    "Description": "...",
     "Category": "Junk",
     "CategoryTextOverride": "",
     "CategoryColorOverride": "0, 0, 0, 0",
@@ -36,11 +36,5 @@
         "Like": [ "Gus", "Penny", "Shane", "Marnie", "Clint", "Sebastian", "Abigail", "Alex", "Caroline", "Elliott", "Emily", "Evelyn", "Haley", "Harvey", "Jodi", "Lewis", "Linus", "Maru", "Pierre", "Robin", "Sam", "Willy" ],
         "Neutral": [ "Krobus", "Dwarf", "Demetrius", "Wizard" ],
         "Dislike": [ "Kent", "George", "Leah" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

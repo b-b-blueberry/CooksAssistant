@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Cake",
-	"Description": "A super simple sponge cake. Perfect for decorating!",
+	"Name": "blueberry.cac.cake",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 45,
 	"EdibleIsDrink": false,
@@ -37,11 +37,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

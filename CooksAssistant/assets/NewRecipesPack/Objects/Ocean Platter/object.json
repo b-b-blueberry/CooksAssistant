@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Ocean Platter",
-	"Description": "A bountiful hot-and-cold selection of fresh seafood.",
+	"Name": "blueberry.cac.oceanplatter",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 84,
 	"EdibleIsDrink": false,
@@ -24,7 +24,7 @@
 				"Count": 1
 			},
 			{
-				"Object": "Lobster Bake",
+				"Object": "blueberry.cac.lobster",
 				"Count": 1
 			},
 			{
@@ -41,11 +41,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

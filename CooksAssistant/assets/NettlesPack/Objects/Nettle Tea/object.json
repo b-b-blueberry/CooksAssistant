@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Nettle Tea",
-    "Description": "A bitter herbal tea brewed from wild stinging nettles.",
+    "Name": "blueberry.cac.nettletea",
+    "Description": "...",
     "Category": "ArtisanGoods",
     "Edibility": 20,
     "EdibleIsDrink": true,
@@ -35,11 +35,5 @@
         "Neutral": [ "Marnie", "Clint", "George", "Sebastian", "Abigail", "Elliott", "Emily", "Haley", "Jodi", "Kent", "Krobus", "Lewis", "Linus", "Maru", "Pierre", "Robin", "Willy", "Wizard" ],
         "Dislike": [ "Sam", "Haley", "Alex", "Kent", "Sandy", "Dwarf", "Demetrius" ],
         "Hate": [ "Shane", "Jas", "" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

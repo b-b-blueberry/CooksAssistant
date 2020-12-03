@@ -1,3 +1,121 @@
 ﻿{
-	"menu.cooking_recipe.search_label": "검색"
+	// General strings
+	"world.range_gus.rejected": "You're not good enough friends with Gus to use the Cooking Range.",
+	"world.range_npc.rejected": "You're not good enough friends with {{name}} to use their kitchen.",
+
+	"menu.cooking_equipment.name": "Frying Pan",
+	"menu.cooking_equipment.description": "When cooking, allows the use of up to {{level}} ingredients.",
+
+	// Cooking menu
+	"menu.cooking_station.none": "No cooking station nearby.",
+	"menu.cooking_station.busy": "Something's already cooking here.",
+	"menu.cooking_station.done": "The {{recipe}} is ready!",
+	"menu.cooking_station.done_improv": "You wrote the recipe down in Mom's Cookbook.",
+
+	"menu.cooking_recipe.title_unknown": "???",
+	"menu.cooking_recipe.notes_unknown": "You've not eaten this recipe.",
+	"menu.cooking_recipe.ingredients_label": "Ingredients:",
+	"menu.cooking_recipe.notes_label": "Notes:",
+	"menu.cooking_recipe.time_label": "Cooking time:",
+	"menu.cooking_recipe.time_value": "{{duration}} min",
+	"menu.cooking_recipe.search_label": "검색",
+	"menu.cooking_recipe.favourite_label": "Favourite",
+	"menu.cooking_recipe.quantity_label": "How many?",
+	"menu.cooking_recipe.which_label": "Which would you like to make?",
+
+	"menu.cooking_recipe.buff.0": "Farming",
+	"menu.cooking_recipe.buff.1": "Fishing",
+	"menu.cooking_recipe.buff.2": "Mining",
+	"menu.cooking_recipe.buff.3": "Digging",
+	"menu.cooking_recipe.buff.4": "Luck",
+	"menu.cooking_recipe.buff.5": "Foraging",
+	"menu.cooking_recipe.buff.6": "Crafting",
+	"menu.cooking_recipe.buff.7": "Energy",
+	"menu.cooking_recipe.buff.8": "Magnet.",
+	"menu.cooking_recipe.buff.9": "Speed",
+	"menu.cooking_recipe.buff.10": "Defense",
+	"menu.cooking_recipe.buff.11": "Attack",
+	"menu.cooking_recipe.buff.12": "Cooking",
+
+	"menu.cooking_search.order_label": "정렬 순서 바꾸기",
+	"menu.cooking_search.view.list": "목록으로 보기",
+	"menu.cooking_search.view.grid": "아이콘으로 보기",
+	"menu.cooking_search.filter_label": "레시피 필터링",
+	"menu.cooking_search.filter.1": "가나다순",
+	"menu.cooking_search.filter.2": "에너지 회복량",
+	"menu.cooking_search.filter.3": "판매 가격",
+	"menu.cooking_search.filter.4": "버프",
+	"menu.cooking_search.filter.4_alt": "Recipes with known buffs",
+	"menu.cooking_search.filter.5": "만든 적 없는 레시피만 보기",
+	"menu.cooking_search.filter.6": "만들 수 있는 레시피",
+	"menu.cooking_search.filter.7": "즐겨찾기",
+	"menu.cooking_search.none_label": "No recipes found.",
+
+	// Cooking skill
+	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
+	"menu.cooking_skill.levelupbonus.2": "You can now brew Nettle Tea.",
+
+	// Tier 1:
+	// Path 1: Cooking
+	"menu.cooking_skill.tier1_path1.name": "Sous Chef",
+	"menu.cooking_skill.tier1_path1.description": "Cooking oil further improves the quality of recipes.",
+	// Path 2: Eating (CONFIG: Food restores over time)
+	"menu.cooking_skill.tier1_path2.name": "Quick Eater",
+	"menu.cooking_skill.tier1_path2.description": "Food restores your energy more quickly.",
+	// Path 2: Eating (CONFIG: Food restores instantly)
+	"menu.cooking_skill.tier1_path2_alt.name": "Big Eater",
+	"menu.cooking_skill.tier1_path2_alt.description": "Cooked food restores {{RestorationAltValue}}% more.",
+
+	// Tier 2: Path 1
+	// Choice A: Gifting
+	"menu.cooking_skill.tier2_path1a.name": "Head Chef",
+	"menu.cooking_skill.tier2_path1a.description": "Cooked foods given as gifts befriend quicker.",
+	// Choice B: Selling
+	"menu.cooking_skill.tier2_path1b.name": "Five Star Cook",
+	"menu.cooking_skill.tier2_path1b.description": "Cooked foods worth {{SaleValue}}% more.",
+
+	// Tier 2: Path B
+	// Choice A: Crafting
+	"menu.cooking_skill.tier2_path2a.name": "Gourmet",
+	"menu.cooking_skill.tier2_path2a.description": "Chance to craft an extra portion when cooking.",
+	// Choice B: Healing
+	"menu.cooking_skill.tier2_path2b.name": "Glutton",
+	"menu.cooking_skill.tier2_path2b.description": "Buff duration from food and drinks increased when at full energy.",
+
+	// Cooking ingredients descriptions
+	"item.oil.description": "All purpose cooking oil. Improves the quality of a dish.",
+	"item.truffleoil.description": "A gourmet cooking ingredient. Greatly enhances the quality of a dish.",
+	"item.fruit.label": "Fruit (Any)",
+	"item.flower.label": "Flower (Any)",
+	"item.vegetable.label": "Vegetable (Any)",
+	"item.meat.label": "Meat (Any)",
+	"item.forage.label": "Forage (Any)",
+
+	// Kebab item interactions
+	"buff.kebab.quality_worst": "Rotten ",
+	"buff.kebab.quality_best": "Delicious ",
+	"buff.kebab.inspect": "{{quality}}Kebab",
+	"item.kebab.worst": "That was a pretty rotten kebab! You feel quite ill.",
+	"item.kebab.bad": "That kebab wasn't so good at all...",
+	"item.kebab.best": "That kebab really hit the spot! You feel much better.",
+
+	// Other world interactions
+	"buff.nettles.inspect": "Stung by nettles!",
+
+	"world.fisherman.inspect_1": "Nice night for a fish, eh?$b#Here, kid. This one was a good catch.[{{id}}]",
+	"world.fisherman.inspect_2": "You ever seen a river troll, kid? Heh heh...$b#Ahh, you're too old for fairy tales.",
+	"world.fisherman.inspect_3": "There's no good catches with those travelling market folks in the bay...",
+
+	// Community Centre edits when using the Cooking bundle
+	"world.community_centre.kitchen": "Kitchen",
+	"world.community_centre.reward": "Cooking stuff",
+	"world.community_centre.bundle.1": "Picnicker's",
+	"world.community_centre.bundle.2": "Baker's",
+	"world.community_centre.bundle.3": "Diner's",
+	"world.community_centre.newjunimoline": "To show our gratitude... We'll tidy up as you go.",
+
+	// Object names
+	"item.burntfood.name": "Burnt Food",
+	// Object descriptions
+	"item.burntfood.description": "Can be sold. It didn't turn out so good..."
 }

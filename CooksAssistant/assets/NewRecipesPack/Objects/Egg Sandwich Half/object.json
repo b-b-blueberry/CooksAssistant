@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Egg Sandwich Half",
-    "Description": "Another one.",
+    "Name": "blueberry.cac.eggsando_half",
+    "Description": "...",
     "Category": "Junk",
     "CategoryTextOverride": "",
     "CategoryColorOverride": "0, 0, 0, 0",
@@ -24,11 +24,5 @@
         "Neutral": [ "Kent", "Wizard" ],
         "Dislike": [ "Leah", "Sebastian", "Dwarf", "Harvey" ],
         "Hate": [ "Krobus" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

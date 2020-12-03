@@ -1,13 +1,29 @@
-[
-    // EASY: Picnicker's Bundle
-    [ "O Chocolate Bar 5", "Hashbrowns 1 0 Cheese Cauliflower 1 0 Burrito 1 0 Farmer's Lunch 1 0", "4" ],
+{
+    // TODO: CONTENT: Add vanilla-substitute bundles for Config.AddNewStuff false
+    "Custom": [
+        // EASY: Picnicker's Bundle
+        [ "O blueberry.cac.chocolate 5", "Hashbrowns 1 0 Cheese Cauliflower 1 0 blueberry.cac.burrito 1 0 Farmer's Lunch 1 0", "4" ],
 
-    // HARD: Baker's Bundle
-    [ "BO Oil Maker 1", "Rhubarb Pie 1 0 Strange Bun 1 0 Apple Pie 1 0 Chocolate Cake 1 0 Maple Bar 1 0", "5" ],
+        // HARD: Baker's Bundle
+        [ "BO Oil Maker 1", "Rhubarb Pie 1 0 Strange Bun 1 0 blueberry.cac.applepie 1 0 Chocolate Cake 1 0 Maple Bar 1 0", "5" ]
 
-    // TODO: CONTENT: Bundle 3 contents
-    // ???: ???
-    // Reward: ???
-    // Something with a gold star
-    //[ "???", "???" ]
-]
+        // TODO: CONTENT: Bundle 3 contents
+        // ???: ???
+        // Reward: ???
+        // Something with a gold star
+        //[ "???", "???" ]
+    ],
+    "Vanilla": [
+        // EASY: Picnicker's Bundle
+        [ "O ??? 5", "Hashbrowns 1 0 Cheese Cauliflower 1 0 ??? 1 0 Farmer's Lunch 1 0", "4" ],
+
+        // HARD: Baker's Bundle
+        [ "BO Oil Maker 1", "Rhubarb Pie 1 0 Strange Bun 1 0 ??? 1 0 Chocolate Cake 1 0 Maple Bar 1 0", "5" ]
+
+        // TODO: CONTENT: Bundle 3 contents
+        // ???: ???
+        // Reward: ???
+        // Something with a gold star
+        //[ "???", "???" ]
+    ]
+}

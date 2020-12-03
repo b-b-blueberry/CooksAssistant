@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Hot Curry",
-	"Description": "It'll set your breath on fire!",
+	"Name": "blueberry.cac.curry",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 80,
 	"EdibleIsDrink": true,
@@ -32,7 +32,7 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Hearty Stew",
+				"Object": "blueberry.cac.stew",
 				"Count": 1
 			},
 			{
@@ -49,11 +49,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

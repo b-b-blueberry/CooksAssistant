@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Buttered Corn",
-	"Description": "Sweet and buttery. You can taste the grill on it.",
+	"Name": "blueberry.cac.butteredcorn",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 17,
 	"EdibleIsDrink": false,
@@ -29,11 +29,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": [ "y 2" ]
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

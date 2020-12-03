@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Sugar Cane",
-    "Description": "A hardy crop only used for producing sweet, sweet sugar.",
+    "Name": "blueberry.cac.sugarcane",
+    "Description": "...",
     "Category": "Vegetable",
     "Edibility": 8,
     "EdibleIsDrink": false,
@@ -15,10 +15,4 @@
     "PurchaseFrom": "Gus",
     "PurchasePrice": 405,
     "PurchaseRequirements": null,
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
 }

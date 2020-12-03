@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Hot Pot Roast",
-	"Description": "A bountiful stew with all the trimmings.",
+	"Name": "blueberry.cac.roast",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 89,
 	"EdibleIsDrink": false,
@@ -41,11 +41,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Seafood Sandwich",
-    "Description": "A freshly made sandwich, stuffed with crab and cress.",
+    "Name": "blueberry.cac.seafoodsando",
+    "Description": "...",
     "Category": "Junk",
     "CategoryTextOverride": "",
     "CategoryColorOverride": "0, 0, 0, 0",
@@ -25,11 +25,5 @@
         "Neutral": [ "Kent", "Wizard" ],
         "Dislike": [ "Shane", "Sebastian", "Dwarf", "Harvey" ],
         "Hate": [ "Krobus" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

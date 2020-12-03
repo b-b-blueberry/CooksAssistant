@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Porridge",
-	"Description": "A warming breakfast staple of creamy blended grains.",
+	"Name": "blueberry.cac.porridge",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 36,
 	"EdibleIsDrink": true,
@@ -33,11 +33,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

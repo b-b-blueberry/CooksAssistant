@@ -30,7 +30,7 @@ namespace CooksAssistant
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_shake_Prefix)));
 
 			if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle
-			    || Game1.getLocationFromName("CommunityCenter") is CommunityCenter cc && cc.areAllAreasComplete())
+			    || (Game1.getLocationFromName("CommunityCenter") is CommunityCenter cc && cc.areAllAreasComplete()))
 				return;
 
 			harmony.Patch(

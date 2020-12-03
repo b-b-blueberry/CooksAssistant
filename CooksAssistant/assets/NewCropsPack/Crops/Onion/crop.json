@@ -1,9 +1,9 @@
 {
 	// Crop data
-	"Name": "Onion",
-	"Product": "Onion",
-	"SeedName": "Onion Seeds",
-	"SeedDescription": "Plant these in the spring. Takes 4 days to mature.",
+	"Name": "blueberry.cac.onion",
+	"Product": "blueberry.cac.onion",
+	"SeedName": "blueberry.cac.onion_seeds",
+	"SeedDescription": "...",
 	"Type": "Vegetable",
 	"CropType": "Normal", // Available types are: Normal, IndoorsOnly, Paddy.
 	"Seasons": [ "spring" ],
@@ -22,11 +22,5 @@
 	},
 	"SeedPurchaseRequirements": [ "y 2" ],
 	"SeedPurchaseFrom": "Pierre",
-	"SeedPurchasePrice": 45,
-
-	// Localisations
-	"SeedNameLocalization": {
-	},
-	"SeedDescriptionLocalization": {
-	}
+	"SeedPurchasePrice": 45
 }

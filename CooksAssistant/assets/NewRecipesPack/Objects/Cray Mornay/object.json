@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Cray Mornay",
-	"Description": "A freshwater bug slathered with a rich cream sauce.",
+	"Name": "blueberry.cac.mornay",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 52,
 	"EdibleIsDrink": false,
@@ -33,11 +33,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

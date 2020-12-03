@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using CooksAssistant.GameObjects;
+﻿using CooksAssistant.GameObjects;
 using CooksAssistant.GameObjects.Menus;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,11 +11,15 @@ using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.Menus;
-using StardewValley.TerrainFeatures;
-using Object = StardewValley.Object;
-using xTile.Dimensions;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
 using StardewValley.Objects;
+using StardewValley.TerrainFeatures;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using xTile.Dimensions;
+using Object = StardewValley.Object;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace CooksAssistant
 {
@@ -29,7 +29,7 @@ namespace CooksAssistant
 		internal Config Config;
 		internal ModSaveData SaveData;
 
-		private bool _forceConfig = true;
+		private bool _forceConfig = false;
 
 		internal ITranslationHelper i18n => Helper.Translation;
 		internal static IJsonAssetsApi JsonAssets;
@@ -37,6 +37,7 @@ namespace CooksAssistant
 
 		internal const string SaveDataKey = "SaveData";
 		internal const string AssetPrefix = "blueberry.CooksAssistant.";
+		internal const string ObjectPrefix = "blueberry.cac.";
 
 		// Assets
 		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
@@ -51,22 +52,22 @@ namespace CooksAssistant
 		internal static readonly string BuffDataPath = Path.Combine("assets", "ingredientBuffChart");
 
 		// Add Cooking Tool
-		private const string CookingToolName = "Frying Pan";
+		private const string CookingToolName = AssetPrefix + "tool";
 		
 		// Add Cooking Skill
 		private static readonly Dictionary<int, string[]> CookingSkillLevelUpRecipes = new Dictionary<int, string[]>
 		{
-			{ 0, new[] { "Fried Egg", "Baked Potato" } },
-			{ 1, new[] { "Burrito", "Cauliflower Fritters" } },
-			{ 2, new[] { "Porridge", "Quick Breakfast" } },
-			{ 3, new[] { "Lobster Bake", "Loaded Potato", "Stuffed Potato" } },
-			{ 4, new[] { "Cake", "Hot Cocoa", "Berry Waffles" } },
-			{ 5, new[] { "Cray Mornay", "Eel Sushi", "Hearty Stew" } },
-			{ 6, new[] { "Redberry Pie", "Cabbage Pot", "Pitta Bread" } },
-			{ 7, new[] { "Apple Pie", "Pineapple Skewers", "Beet Burger", "Tropical Salad" } },
-			{ 8, new[] { "Admiral Pie", "Dwarven Stew", "Hot Pot Roast", "Hunter's Plate" } },
-			{ 9, new[] { "Garden Pie", "Hot Curry", "Kebab" } },
-			{ 10, new[] { "Ocean Platter", "Egg Sandwich", "Salad Sandwich", "Seafood Sandwich" } },
+			{ 0, new[] { "Fried Egg", ObjectPrefix + "bakedpotato" } },
+			{ 1, new[] { "burrito", "fritters" } },
+			{ 2, new[] { "porridge", "breakfast" } },
+			{ 3, new[] { "lobster", "loadedpotato", "stuffedpotato" } },
+			{ 4, new[] { "cake", "hotcocoa", "waffles" } },
+			{ 5, new[] { "mornay", "unagi" } },
+			{ 6, new[] { "redberrypie", "cabbagepot", "stew" } },
+			{ 7, new[] { "applepie", "skewers", "burger", "tropicalsalad" } },
+			{ 8, new[] { "admiralpie", "dwarfstew", "roast", "hunters" } },
+			{ 9, new[] { "gardenpie", "curry", "kebab" } },
+			{ 10, new[] { "oceanplatter", "eggsando", "saladsando", "seafoodsando" } },
 		};
 		internal const string CookingSkillId = AssetPrefix + "CookingSkill";
 		internal static readonly Dictionary<int, int> FoodCookedToday = new Dictionary<int, int>();
@@ -150,6 +151,7 @@ namespace CooksAssistant
 			"sashimi",
 			"sushi",
 			"sandwich",
+			"unagi",
 		};
 		public static readonly string[] BakeyFoods = new[]
 		{
@@ -196,12 +198,12 @@ namespace CooksAssistant
 
 		// Others:
 		internal static bool PlayerAgencyBlocked;
-		private const string ChocolateName = "Chocolate Bar";
-		private const string NettlesName = "Nettles";
+		private const string ChocolateName = ObjectPrefix + "chocolate";
+		private const string NettlesName = ObjectPrefix + "nettle";
 		private const string NettlesUsableMachine = "Keg";
 		private const int NettlesUsableLevel = 2;
 		// kebab
-		private const string KebabBuffSource = AssetPrefix + "Kebab";
+		private const string KebabBuffSource = AssetPrefix + "kebab";
 		private const int KebabBonusDuration = 220;
 		private const int KebabMalusDuration = 140;
 		private const int KebabCombatBonus = 3;
@@ -213,27 +215,14 @@ namespace CooksAssistant
 		};
 		public static readonly List<string> FoodsThatGiveLeftovers = new List<string>
 		{
-			"Seafood Sandwich",
-			"Egg Sandwich",
-			"Salad Sandwich",
 			"Pizza",
 			"Cake",
 			"Chocolate Cake",
 			"Pink Cake",
-			"Watermelon"
-		};
-		public static readonly List<string> FoodsWithLeftoversGivenAsSlices = new List<string>
-		{
-			"pizza",
-			"cake"
-		};
-		public static readonly List<string> ObjectsToAvoidScaling = new List<string>
-		{
-
-		};
-		public static readonly Dictionary<string, int> ObjectsWithCookingBuffs = new Dictionary<string, int>
-		{
-
+			ObjectPrefix + "seafoodsando",
+			ObjectPrefix + "eggsando",
+			ObjectPrefix + "saladsando",
+			ObjectPrefix + "watermelon",
 		};
 
 
@@ -846,13 +835,15 @@ namespace CooksAssistant
 
 		private void DisplayOnMenuChanged(object sender, MenuChangedEventArgs e)
 		{
+			// TODO: DEBUG: Maybe remove and reapply all cooking recipes for level-down testing?
+
 			// Add new recipes on level-up for Cooking skill
 			if (e.NewMenu is SpaceCore.Interface.SkillLevelUpMenu levelUpMenu)
 			{
 				var level = Skills.GetSkillLevel(Game1.player, CookingSkillId);
 				var field = Helper.Reflection.GetField<List<CraftingRecipe>>(levelUpMenu, "newCraftingRecipes");
-				var recipes = CookingSkillLevelUpRecipes[level].Where(recipe => !Game1.player.cookingRecipes.ContainsKey(recipe))
-					.ToList().ConvertAll(str => new CraftingRecipe(str, true));
+				var recipes = CookingSkillLevelUpRecipes[level].Where(recipe => !Game1.player.cookingRecipes.ContainsKey(ObjectPrefix + recipe))
+					.ToList().ConvertAll(recipe => new CraftingRecipe(ObjectPrefix + recipe, true));
 				//levelUpMenu.height = 64 * recipes.Count + 256 + levelUpMenu.extraInfoForLevel.Count * 64 * 3 / 4;
 				foreach (var recipe in recipes)
 				{
@@ -1045,11 +1036,7 @@ namespace CooksAssistant
 			if (FoodsThatGiveLeftovers.Contains(food.Name))
 			{
 				var leftovers = new Object(
-					JsonAssets.GetObjectId(
-						FoodsWithLeftoversGivenAsSlices.Any(f => food.Name.ToLower().EndsWith(f))
-							? $"{food.Name} Slice" 
-							: $"{food.Name} Half"), 
-					1);
+					JsonAssets.GetObjectId($"{food.Name}_half"), 1);
 				if (Game1.player.couldInventoryAcceptThisItem(leftovers))
 					Game1.player.addItemToInventory(leftovers);
 				else
@@ -1397,25 +1384,32 @@ namespace CooksAssistant
 		private void SortSeedShopStock(ref ShopMenu menu)
 		{
 			// Pair a suffix grouping some common items together with the name of the lowest-index (first-found) item in the group
+			var itemList = menu.forSale;
+			Log.D(itemList.Aggregate("Shop stock:", (total, cur) => $"{total}\n{cur.Name}"));
 			var suffixes = new Dictionary<string, string>
-				{{"Seeds", null}, {"Bulb", null}, {"Starter", null}, {"Shoot", null}, {"Sapling", null}};
-			for (var i = 0; i < menu.forSale.Count; ++i)
+				{{"seeds", null}, {"bulb", null}, {"starter", null}, {"Shoot", null}, {"sapling", null}};
+			var debugCount = 0;
+			for (var i = 0; i < itemList.Count; ++i)
 			{
 				// Ignore items without one of our group suffixes
-				var split = menu.forSale[i].Name.Split(' ');
-				if (!menu.forSale[i].Name.Contains(' ') || !suffixes.ContainsKey(split[1]))
+				var suffix = suffixes.Keys.FirstOrDefault(s => itemList[i].Name.ToLower().EndsWith(s));
+				if (suffix == null)
 					continue;
 				// Set the move-to-this-item name to be the first-found item in the group
-				suffixes[split[1]] ??= menu.forSale[i].Name;
-				if (suffixes[split[1]] == menu.forSale[i].Name)
+				suffixes[suffix] ??= itemList[i].Name;
+				if (suffixes[suffix] == itemList[i].Name)
 					continue;
-				// Move newly-found items of a group up to the first item in the group, and change the move-to name to this item.
-				var item = menu.forSale[i];
-				var index = 1 + menu.forSale.FindIndex(i => i.Name == suffixes[split[1]]);
-				menu.forSale.RemoveAt(i);
-				menu.forSale.Insert(index, item);
-				suffixes[split[1]] = menu.forSale[index].Name;
+				// Move newly-found items of a group up to the first item in the group, and change the move-to name to this item
+				var item = itemList[i];
+				var index = 1 + itemList.FindIndex(i => i.Name == suffixes[suffix]);
+				itemList.RemoveAt(i);
+				itemList.Insert(index, item);
+				suffixes[suffix] = itemList[index].Name;
+				++debugCount;
+				Log.D($"Moved {item.Name} to {itemList[index - 1].Name} at {index}");
 			}
+			Log.D($"Sorted seed shop stock, {debugCount} moves.");
+			menu.forSale = itemList;
 		}
 
 		/// <summary>

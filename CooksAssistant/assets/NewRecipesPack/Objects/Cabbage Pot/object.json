@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Cabbage Pot",
-	"Description": "A big pot of soggy cabbage, good for a couple of meals.",
+	"Name": "blueberry.cac.cabbagepot",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 30,
 	"EdibleIsDrink": false,
@@ -33,11 +33,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Redberries",
-    "Description": "Very bright red berries. Tart and sweet, perfect for baking.",
+    "Name": "blueberry.cac.redberry",
+    "Description": "...",
     "Category": "Fruit",
     "Edibility": 12,
     "EdibleIsDrink": false,
@@ -14,11 +14,5 @@
     "CanPurchase": false,
     "PurchaseFrom": "Gus",
     "PurchasePrice": 405,
-    "PurchaseRequirements": null,
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
+    "PurchaseRequirements": null
 }

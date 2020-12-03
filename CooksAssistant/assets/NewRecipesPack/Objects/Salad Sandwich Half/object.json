@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Salad Sandwich Half",
-    "Description": ".. Hey, there's tomato in this half!",
+    "Name": "blueberry.cac.saladsando_half",
+    "Description": "...",
     "Category": "Junk",
     "CategoryTextOverride": "",
     "CategoryColorOverride": "0, 0, 0, 0",
@@ -24,11 +24,5 @@
         "Neutral": [ "Kent", "Wizard" ],
         "Dislike": [ "Shane", "Sebastian", "Dwarf", "Harvey" ],
         "Hate": [ "Krobus" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

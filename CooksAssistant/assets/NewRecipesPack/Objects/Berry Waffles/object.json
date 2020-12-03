@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Berry Waffles",
-	"Description": "Whole grain waffles with a blueberry drizzle.",
+	"Name": "blueberry.cac.waffles",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 45,
 	"EdibleIsDrink": false,
@@ -49,11 +49,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

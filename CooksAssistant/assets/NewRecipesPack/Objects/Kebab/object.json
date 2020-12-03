@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Kebab",
-	"Description": "The filling seems dubious. Who knows how it'll taste?",
+	"Name": "blueberry.cac.kebab",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 48,
 	"EdibleIsDrink": false,
@@ -37,11 +37,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Cauliflower Fritters",
-	"Description": "Cauliflower florets, battered and gently fried.",
+	"Name": "blueberry.cac.fritters",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 23,
 	"EdibleIsDrink": false,
@@ -33,11 +33,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Eel Sushi",
-	"Description": "It's even more slippery for the seaweed.",
+	"Name": "blueberry.cac.unagi",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 40,
 	"EdibleIsDrink": false,
@@ -37,11 +37,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

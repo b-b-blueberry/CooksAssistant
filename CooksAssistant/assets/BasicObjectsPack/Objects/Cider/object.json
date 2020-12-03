@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Cider",
-    "Description": "Drink in moderation.",
+    "Name": "blueberry.cac.cider",
+    "Description": "...",
     "Category": "ArtisanGoods",
     "Edibility": 22,
     "EdibleIsDrink": true,
@@ -23,11 +23,5 @@
         "Neutral": null,
         "Dislike": null,
         "Hate": [ "Vincent", "Jas", "Penny" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

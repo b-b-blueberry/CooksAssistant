@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Hot Cocoa",
-	"Description": "Warms you up. There's a big marshmallow on top!",
+	"Name": "blueberry.cac.hotcocoa",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 75,
 	"EdibleIsDrink": true,
@@ -37,7 +37,7 @@
 				"Count": 1
 			},
 			{
-				"Object": "Chocolate Bar",
+				"Object": 223, // Cookie
 				"Count": 1
 			}
 		],
@@ -46,11 +46,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

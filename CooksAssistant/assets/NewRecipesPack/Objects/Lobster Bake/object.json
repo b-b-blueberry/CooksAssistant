@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Lobster Bake",
-	"Description": "A classic islander's recipe.",
+	"Name": "blueberry.cac.lobster",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 24,
 	"EdibleIsDrink": false,
@@ -29,11 +29,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

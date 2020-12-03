@@ -1,9 +1,9 @@
 {
 	// Crop data
-	"Name": "Cabbage",
-	"Product": "Cabbage",
-	"SeedName": "Cabbage Seeds",
-	"SeedDescription": "Plant these in the summer. Takes 9 days to produce a large cabbage.",
+	"Name": "blueberry.cac.cabbage",
+	"Product": "blueberry.cac.cabbage",
+	"SeedName": "blueberry.cac.cabbage_seeds",
+	"SeedDescription": "...",
 	"Type": "Vegetable",
 	"CropType": "Normal", // Available types are: Normal, IndoorsOnly, Paddy.
 	"Seasons": [ "summer" ],
@@ -22,11 +22,5 @@
 	},
 	"SeedPurchaseRequirements": [ "y 2" ],
 	"SeedPurchaseFrom": "Pierre",
-	"SeedPurchasePrice": 80,
-
-	// Localisations
-	"SeedNameLocalization": {
-	},
-	"SeedDescriptionLocalization": {
-	}
+	"SeedPurchasePrice": 80
 }

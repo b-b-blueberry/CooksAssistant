@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Baked Potato",
-	"Description": "A humble potato, stuffed with mash and cheese.",
+	"Name": "blueberry.cac.bakedpotato",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 16,
 	"EdibleIsDrink": false,
@@ -29,11 +29,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

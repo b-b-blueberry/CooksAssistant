@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Pink Cake Slice",
-    "Description": "I wish I still had the other half.",
+    "Name": "blueberry.cac.pinkcake_half",
+    "Description": "...",
     "Category": "Cooking",
     "Edibility": 60,
     "EdibleIsDrink": false,
@@ -20,11 +20,5 @@
     "GiftTastes": {
         "Like": [ "Haley", "Jas", "Marnie", "Vincent", "Gus", "Clint", "George", "Sebastian", "Abigail", "Alex", "Caroline", "Demetrius", "Dwarf", "Elliott", "Emily", "Evelyn", "Jodi", "Kent", "Lewis", "Penny", "Linus", "Maru", "Pierre", "Pam", "Shane", "Robin", "Sam", "Sandy", "Wizard" ],
         "Dislike": [ "Harvey", "Krobus", "Leah", "Willy" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

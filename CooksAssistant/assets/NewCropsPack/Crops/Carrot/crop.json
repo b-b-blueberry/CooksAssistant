@@ -1,9 +1,9 @@
 {
 	// Crop data
-	"Name": "Carrot",
-	"Product": "Carrot",
-	"SeedName": "Carrot Seeds",
-	"SeedDescription": "Plant these in the fall. Takes 4 days to mature.",
+	"Name": "blueberry.cac.carrot",
+	"Product": "blueberry.cac.carrot",
+	"SeedName": "blueberry.cac.carrot_seeds",
+	"SeedDescription": "...",
 	"Type": "Vegetable",
 	"CropType": "Normal", // Available types are: Normal, IndoorsOnly, Paddy.
 	"Seasons": [ "fall" ],
@@ -22,11 +22,5 @@
 	},
 	"SeedPurchaseRequirements": [ "y 2" ],
 	"SeedPurchaseFrom": "Pierre",
-	"SeedPurchasePrice": 25,
-
-	// Localisations
-	"SeedNameLocalization": {
-	},
-	"SeedDescriptionLocalization": {
-	}
+	"SeedPurchasePrice": 25
 }

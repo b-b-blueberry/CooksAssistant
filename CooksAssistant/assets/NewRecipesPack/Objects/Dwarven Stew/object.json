@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Dwarven Stew",
-	"Description": "A pint of beer beside a rich stew. Do dwarves actually drink beer?",
+	"Name": "blueberry.cac.dwarfstew",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 45,
 	"EdibleIsDrink": true,
@@ -32,7 +32,7 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Hearty Stew",
+				"Object": "blueberry.cac.stew",
 				"Count": 1
 			},
 			{
@@ -40,11 +40,5 @@
 				"Count": 1
 			}
 		]
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

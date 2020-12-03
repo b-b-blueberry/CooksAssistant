@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Beet Burger",
-	"Description": "It's a mix of bitter and sweet flavours in a shocking pink look.",
+	"Name": "blueberry.cac.burger",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 63,
 	"EdibleIsDrink": false,
@@ -37,11 +37,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Apple Pie",
-	"Description": "Smells of fresh cooking apples and cinnamon spice.",
+	"Name": "blueberry.cac.applepie",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 88,
 	"EdibleIsDrink": false,
@@ -41,13 +41,6 @@
 	},
 
 	// Gifting
-    "GiftTastes":
-    {
-    },
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
+	"GiftTastes": {
 	}
 }

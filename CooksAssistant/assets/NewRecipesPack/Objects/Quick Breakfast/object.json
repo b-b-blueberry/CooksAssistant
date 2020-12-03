@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Quick Breakfast",
-	"Description": "This'll give you a jump start!",
+	"Name": "blueberry.cac.breakfast",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 48,
 	"EdibleIsDrink": false,
@@ -45,11 +45,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Stuffed Potato",
-	"Description": "Double-stuffed with cheese and mushroom.",
+	"Name": "blueberry.cac.stuffedpotato",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 133,
 	"EdibleIsDrink": false,
@@ -32,7 +32,7 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
-				"Object": "Baked Potato",
+				"Object": "blueberry.cac.bakedpotato",
 				"Count": 1
 			},
 			{
@@ -49,11 +49,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

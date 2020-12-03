@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Pineapple",
-    "Description": "The only fruit-bearing member of the bromeliad family, the spiny fruit packs a sweet, acidic punch.",
+    "Name": "blueberry.cac.pineapple",
+    "Description": "...",
     "Category": "Fruit",
     "Edibility": 28,
     "EdibleIsDrink": false,
@@ -15,10 +15,4 @@
     "PurchaseFrom": "Gus",
     "PurchasePrice": 405,
     "PurchaseRequirements": null,
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
 }

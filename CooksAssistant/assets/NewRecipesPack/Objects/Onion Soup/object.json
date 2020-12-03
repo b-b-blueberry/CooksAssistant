@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Onion Soup",
-	"Description": "An earthen terrine full of a hearty onion broth. It's topped with delicious cheese.",
+	"Name": "blueberry.cac.onionsoup",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 68,
 	"EdibleIsDrink": true,
@@ -33,11 +33,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": null
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }

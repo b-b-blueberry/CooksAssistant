@@ -1,9 +1,9 @@
 {
 	// Crop data
-	"Name": "Watermelon",
-	"Product": "Watermelon",
-	"SeedName": "Watermelon Seeds",
-	"SeedDescription": "Plant these in the summer. Takes 10 days to mature.",
+	"Name": "blueberry.cac.watermelon",
+	"Product": "blueberry.cac.watermelon",
+	"SeedName": "blueberry.cac.watermelon_seeds",
+	"SeedDescription": "...",
 	"Type": "Fruit",
 	"CropType": "Normal", // Available types are: Normal, IndoorsOnly, Paddy.
 	"Seasons": [ "summer" ],
@@ -22,11 +22,5 @@
 	},
 	"SeedPurchaseRequirements": [ "y 999" ],
 	"SeedPurchaseFrom": "Pierre",
-	"SeedPurchasePrice": 80,
-
-	// Localisations
-	"SeedNameLocalization": {
-	},
-	"SeedDescriptionLocalization": {
-	}
+	"SeedPurchasePrice": 80
 }

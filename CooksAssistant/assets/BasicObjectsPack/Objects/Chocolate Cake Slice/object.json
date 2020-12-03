@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Chocolate Cake Slice",
-    "Description": "That was delicious!",
+    "Name": "blueberry.cac.chocolatecake_half",
+    "Description": "...",
     "Category": "Junk",
     "CategoryTextOverride": "",
     "CategoryColorOverride": "0, 0, 0, 0",
@@ -23,11 +23,5 @@
         "Like": [ "Haley", "Sandy", "Vincent", "Jas", "Gus", "Penny", "Shane", "Marnie", "Clint", "Sebastian", "Abigail", "Alex", "Caroline", "Elliott", "Emily", "Evelyn", "Haley", "Harvey", "Jodi", "Lewis", "Linus", "Maru", "Pierre", "Robin", "Sam", "Willy" ],
         "Neutral": [ "Krobus", "Dwarf", "Demetrius", "Wizard" ],
         "Dislike": [ "Kent", "George", "Leah" ]
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

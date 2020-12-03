@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Redberry Sapling",
-    "Description": "Takes 17 days to mature. Gradually produces big bunches of berries across seasons.",
+    "Name": "blueberry.cac.redberry_seeds",
+    "Description": "...",
     "Category": "Seeds",
     "Edibility": -300,
     "EdibleIsDrink": false,
@@ -18,11 +18,5 @@
 
     // Gifting
     "GiftTastes": {
-    },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
     }
 }

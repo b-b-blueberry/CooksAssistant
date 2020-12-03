@@ -1,7 +1,7 @@
 {
     // Object data
-    "Name": "Carrot",
-    "Description": "A cultured relative of the humble cave carrot.",
+    "Name": "blueberry.cac.carrot",
+    "Description": "...",
     "Category": "Vegetable",
     "Edibility": 16,
     "EdibleIsDrink": false,
@@ -19,10 +19,4 @@
     // Gifting
     "GiftTastes": {
     },
-
-    // Localisation
-    "NameLocalization": {
-    },
-    "DescriptionLocalization": {
-    }
 }

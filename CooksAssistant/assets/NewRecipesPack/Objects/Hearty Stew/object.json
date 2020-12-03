@@ -1,7 +1,7 @@
 {
 	// Object data
-	"Name": "Hearty Stew",
-	"Description": "Root vegetables in a thick gravy sauce, it's so warming.",
+	"Name": "blueberry.cac.stew",
+	"Description": "...",
 	"Category": "Cooking",
 	"Edibility": 35,
 	"EdibleIsDrink": true,
@@ -45,11 +45,5 @@
 		"PurchaseFrom": "Gus",
 		"PurchasePrice": 500,
 		"PurchaseRequirements": [ "y 1" ]
-	},
-
-	// Localisation
-	"NameLocalization": {
-	},
-	"DescriptionLocalization": {
 	}
 }
