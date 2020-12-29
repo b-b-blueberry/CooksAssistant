@@ -9,21 +9,19 @@
 
         // TODO: CONTENT: Bundle 3 contents
         // ???: ???
-        // Reward: ???
         // Something with a gold star
-        //[ "???", "???" ]
+        //[ "BO blueberry.cac.cookingcraftable 1", "???" ]
     ],
     "Vanilla": [
         // EASY: Picnicker's Bundle
-        [ "O ??? 5", "Hashbrowns 1 0 Cheese Cauliflower 1 0 ??? 1 0 Farmer's Lunch 1 0", "4" ],
+        [ "O ??? 5", "Hashbrowns 1 0 Cheese Cauliflower 1 0 Cookie 1 0 Farmer's Lunch 1 0", "4" ],
 
         // HARD: Baker's Bundle
-        [ "BO Oil Maker 1", "Rhubarb Pie 1 0 Strange Bun 1 0 ??? 1 0 Chocolate Cake 1 0 Maple Bar 1 0", "5" ]
+        [ "BO Oil Maker 1", "Rhubarb Pie 1 0 Strange Bun 1 0 Fruit Salad 1 0 Chocolate Cake 1 0 Maple Bar 1 0", "5" ]
 
         // TODO: CONTENT: Bundle 3 contents
         // ???: ???
-        // Reward: ???
         // Something with a gold star
-        //[ "???", "???" ]
+        //[ "BO blueberry.cac.cookingcraftable 1", "???" ]
     ]
 }

@@ -8,7 +8,7 @@
 			[chichago_] Cooking competition - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbsxg76/
 		?	[Deltron_Zed] Queen of Sauce event - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbszsxh/
 		?	[meFalloutnerd93] Mix-and-match cooking - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fcjq2zn/
-		?	[helenaneedshugs] Community centre kitchen - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt5tbf/
+		✔	[helenaneedshugs] Community centre kitchen - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt5tbf/
 		✔	[slugline] Cook in NPC kitchens - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbt4pd9/
 		✔	[MazeMagic] Cookbook - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu70qr/
 		✔	[SaltyHeathen] Cooking animation - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu69py/
@@ -41,22 +41,22 @@
 		✔	Sprites for copper/steel/gold/iridium upgrades
 	✔	Limited Campfire Cooking compatibility
 	✔	Cooking range in the Saloon with a level increasing through questline progression
-		Rebalance ingredients to foods
+	?	Rebalance ingredients to foods
 		Community centre cooking bundle items and rewards + big reward
 		✔	Picnicker's Bundle
 		✔	Baker's Bundle
 			??? Bundle
 			Reward
 				???
-		Cooking level bonuses
+	✔	Cooking level bonuses
 		✔	Skill professions
-			Skill profession icons
+		✔	Skill profession icons
 			✔	Sous Chef
 			✔	Quick Eater
-				Head Chef
-				Five Star Cook
-				Gourmet
-				Glutton
+			✔	Head Chef
+			✔	Five Star Cook
+			✔	Gourmet
+			✔	Glutton
 		Rework ingredients slots sprites
 
 	Events:
@@ -76,7 +76,7 @@
 	✔	Cider -> Keg + Apple
 	✔	Vinegar -> Keg + Wine/Cider
 	✔	Nettle Tea -> Keg + Nettles
-		Marmalade -> Keg + Orange/Lemon/Lime/Citron/Yuzu/Grapefruit/Pomelo
+	?	Marmalade -> Keg + Orange/Lemon/Lime/Citron/Yuzu/Grapefruit/Pomelo
 
 	Ingredients:
 w!	🍰	Sugar Cane
@@ -100,7 +100,6 @@ w!	🍰	Redberries
 	✔	Baked Potato			Potato												Populous crop, but recipe has to be augmented
 	✔	Beet Burger				Bread + Beet + Onion + Red Cabbage					Artisanal burgers / Too strange
 	✔	Berry Waffles			Wheat + Blueberry x2 + Maple Syrup					Personal pref
-F	✔	Buttered Corn																?
 G	✔	Burrito					Tortilla + Rice + Chilli							Rice, Tortilla
 	✔ 	Cabbage Pot				Cabbage x2 + Onion x2								New ingredients
 	✔	Cake					Flour x2 + Egg x2 + Milk (Leftovers)				Runescape

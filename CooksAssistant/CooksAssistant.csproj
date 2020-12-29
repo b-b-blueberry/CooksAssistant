@@ -15,6 +15,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
+    <EmbeddedResource Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
+    <None Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Include="..\.editorconfig" Link=".editorconfig" />
   </ItemGroup>
 

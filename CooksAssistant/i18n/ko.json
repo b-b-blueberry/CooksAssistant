@@ -53,7 +53,8 @@
 
 	// Cooking skill
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
-	"menu.cooking_skill.levelupbonus.2": "You can now brew Nettle Tea.",
+	"menu.cooking_skill.levelupbonus.2": "You can now brew {{Name}}.",
+	"menu.cooking_skill.levelupbonus.3": "You can now craft {{Name}}.",
 
 	// Tier 1:
 	// Path 1: Cooking

@@ -2,6 +2,7 @@
 	// General strings
 	"world.range_gus.rejected": "You're not good enough friends with Gus to use the Cooking Range.",
 	"world.range_npc.rejected": "You're not good enough friends with {{name}} to use their kitchen.",
+	"world.cooking_craftable.rejected_indoors": "Can't be placed indoors.",
 
 	"menu.cooking_equipment.name": "Frying Pan",
 	"menu.cooking_equipment.description": "When cooking, allows the use of up to {{level}} ingredients.",
@@ -54,6 +55,8 @@
 	// Cooking skill
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
 	"menu.cooking_skill.levelupbonus.2": "You can now brew Nettle Tea.",
+	//"menu.cooking_skill.levelupbonus.3": "You can now craft {{Name}}.",
+	"menu.cooking_skill.levelup_burn": "Food burns {{Number}}% less often",
 
 	// Tier 1:
 	// Path 1: Cooking
@@ -102,9 +105,9 @@
 	// Other world interactions
 	"buff.nettles.inspect": "Stung by nettles!",
 
-	"world.fisherman.inspect_1": "Nice night for a fish, eh?$b#Here, kid. This one was a good catch.[{{id}}]",
-	"world.fisherman.inspect_2": "You ever seen a river troll, kid? Heh heh...$b#Ahh, you're too old for fairy tales.",
-	"world.fisherman.inspect_3": "There's no good catches with those travelling market folks in the bay...",
+	"world.fisherman.talk_1": "Nice night for a fish, eh?$b#Here, kid. This one was a good catch.[{{id}}]",
+	"world.fisherman.talk_2": "You ever seen a river troll, kid? Heh heh...$b#Ahh, you're too old for fairy tales.",
+	"world.fisherman.talk_3": "There's no good catches with those travelling market folks in the bay...",
 
 	// Community Centre edits when using the Cooking bundle
 	"world.community_centre.kitchen": "Kitchen",
@@ -125,6 +128,7 @@
 	"item.burrito.name": "Burrito",
 	"item.butteredcorn.name": "Buttered Corn",
 	"item.cabbagepot.name": "Cabbage Pot",
+	"item.cabbagepot_half.name": "Cabbage Pot Half",
 	"item.cake.name": "Cake",
 	"item.cake_half.name": "Cake Slice",
 	"item.fritters.name": "Cauliflower Fritters",
@@ -182,6 +186,8 @@
 	"item.watermelon.name": "Watermelon",
 	"item.watermelon_seeds.name": "Watermelon Seeds",
 	"item.watermelon_half.name": "Watermelon Half",
+	// others
+	"item.cookingcraftable.name": "Portable Grill",
 
 	// Object descriptions
 	// recipes
@@ -193,6 +199,7 @@
 	"item.burrito.description": "A wrap of all things nice.",
 	"item.butteredcorn.description": "Sweet and buttery. Tastes like a grilltop.",
 	"item.cabbagepot.description": "A big pot of soggy cabbage, good for a couple of meals.",
+	"item.cabbagepot_half.description": "Leftovers have never looks so unappetising.",
 	"item.cake.description": "A super simple sponge cake. Perfect for decorating!",
 	"item.cake_half.description": "I'd rather have a whole cake.",
 	"item.fritters.description": "Cauliflower florets, battered and gently fried.",
@@ -249,5 +256,7 @@
 	"item.sugarcane_seeds.description": "...",
 	"item.watermelon.description": "An iconic summer treat, sweet as a daisy and chock-full of seeds.",
 	"item.watermelon_seeds.description": "Plant these in the summer. Takes 10 days to mature.",
-	"item.watermelon_half.description": "It's so good you couldn't just eat it all at once."
+	"item.watermelon_half.description": "It's so good you couldn't just eat it all at once.",
+	// others
+	"item.cookingcraftable.description": "Usable for cooking outdoors."
 }

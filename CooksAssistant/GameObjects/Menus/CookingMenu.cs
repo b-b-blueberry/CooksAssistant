@@ -1,18 +1,16 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
+using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Menus;
 using StardewValley.Objects;
-using Object = StardewValley.Object;
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using SpaceCore;
-using StardewValley.Locations;
+using Object = StardewValley.Object;
 
 namespace CooksAssistant.GameObjects.Menus
 {
@@ -47,10 +45,9 @@ namespace CooksAssistant.GameObjects.Menus
 		private static readonly Rectangle NoButtonSource = new Rectangle(192, 256, 64, 64);
 		// Other values
 		private const int Scale = 4;
-		private float KoHeightScale = //0.825f;
-			1f;
-		private float KoWidthScale = //1.25f;
-			1f;
+		private float KoHeightScale = 0.825f;
+		private float KoWidthScale = 1.25f;
+		private bool _resizeKoreanFonts;
 		private static readonly Dictionary<string, Rectangle> CookTextSource = new Dictionary<string, Rectangle>();
 		private static readonly Point CookTextSourceOrigin = new Point(0, 240);
 		private readonly Dictionary<string, int> _cookTextSourceWidths = new Dictionary<string, int>
@@ -177,19 +174,24 @@ namespace CooksAssistant.GameObjects.Menus
 
 		// Others
 		private readonly IReflectedField<Dictionary<int, double>> _iconShakeTimerField;
-		private static readonly int _spriteId = (int)Game1.player.UniqueMultiplayerID + 5050505;
+		internal static readonly int SpriteId = (int)Game1.player.UniqueMultiplayerID + 5050505;
 
 		private const bool IsIngredientsPageEnabled = false;
 
 
-		// TODO: SYSTEM: Add Ingredients page layout
+		// TODO: UPDATE: Add Ingredients page layout
 		// TODO: TEST: Multiplayer - Using fridge/minifridge/cooking station while another player has it active
 		// + Multiplayer - Adding/removing minifridges while another player has it active
 
 		public CookingMenu(List<CraftingRecipe> recipes, bool addDummyState = false, string initialRecipe = null) : base(null)
 		{
-			Game1.displayHUD = false;
+			Game1.displayHUD = true; // Prevents hidden HUD on crash when initialising menu, set to false at the end of this method
 			_locale = LocalizedContentManager.CurrentLanguageCode.ToString();
+			if (!_cookTextSourceWidths.ContainsKey(_locale))
+			{
+				_locale = "en";
+			}
+			_resizeKoreanFonts = ModEntry.Instance.Config.ResizeKoreanFonts;
 			initializeUpperRightCloseButton();
 			trashCan = null;
 
@@ -204,8 +206,13 @@ namespace CooksAssistant.GameObjects.Menus
 				: _unlockedCookingRecipes = Utility.GetAllPlayerUnlockedCookingRecipes()
 					.Select(str => new CraftingRecipe(str, true))
 					.Where(recipe => recipe.name != "Torch").ToList();
+
+			ModEntry.Instance.UpdateEnglishRecipeDisplayNames(ref _unlockedCookingRecipes);
+
+			// Apply default filter to the default recipe list
 			_unlockedCookingRecipes = FilterRecipes();
 
+			// Initialise filtered search lists
 			_filteredRecipeList = _unlockedCookingRecipes;
 			_searchRecipes = new List<CraftingRecipe>();
 			_lastFilterUsed = Filter.None;
@@ -329,9 +336,9 @@ namespace CooksAssistant.GameObjects.Menus
 			_currentSelectedInventory = -2;
 			var fridgeForFarmHouse = Game1.currentLocation is FarmHouse fh
 				&& ModEntry.Instance.GetFarmhouseKitchenLevel(fh) > 0;
-			var fridgeForCommunityCentre = ModEntry.Instance.Config.AddCookingCommunityCentreBundle
+			var fridgeForCommunityCentre = ModEntry.Instance.IsNewCommunityCentreBundleEnabled()
 				&& Game1.currentLocation is CommunityCenter cc
-				&& cc.isBundleComplete(ModEntry.CommunityCentreAreaNumber);
+				&& cc.areasComplete[ModEntry.CommunityCentreAreaNumber];
 			// Check for fridge
 			if (fridgeForCommunityCentre)
 			{
@@ -380,6 +387,7 @@ namespace CooksAssistant.GameObjects.Menus
 				ChangeCurrentRecipe(initialRecipe);
 				OpenRecipePage();
 			}
+			Game1.displayHUD = false;
 		}
 
 		private void RealignElements()
@@ -388,8 +396,8 @@ namespace CooksAssistant.GameObjects.Menus
 			var centre = Utility.PointToVector2(view.Center);
 
 			// Menu
-			xPositionOnScreen = (int)(centre.X - CookbookSource.Center.X * Scale);
-			yPositionOnScreen = (int)(centre.Y - CookbookSource.Center.Y * Scale + 216);
+			xPositionOnScreen = (int)(centre.X - CookbookSource.Center.X * Scale * Game1.options.uiScale);
+			yPositionOnScreen = (int)(centre.Y - CookbookSource.Center.Y * Scale * Game1.options.uiScale + 216);
 
 			// Cookbook menu
 			_cookbookLeftRect.X = xPositionOnScreen;
@@ -694,8 +702,8 @@ namespace CooksAssistant.GameObjects.Menus
 				if (i > 0)
 				{
 					var hasOilPerk =
-						ModEntry.Instance.Config.AddCookingSkill && Game1.player.HasCustomProfession(
-							Skills.GetSkill(ModEntry.CookingSkillId).Professions[(int) CookingSkill.ProfId.ImprovedOil]);
+						ModEntry.Instance.Config.AddCookingSkillAndRecipes && Game1.player.HasCustomProfession(
+							CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.ImprovedOil]);
 					switch (items[i].ParentSheetIndex)
 					{
 						case 247: // Oil
@@ -714,12 +722,12 @@ namespace CooksAssistant.GameObjects.Menus
 				}
 			}
 
-			if (ModEntry.Instance.Config.AddCookingSkill) {
+			if (ModEntry.Instance.Config.AddCookingSkillAndRecipes) {
 				if (Game1.player.HasCustomProfession(
-					Skills.GetSkill(ModEntry.CookingSkillId).Professions[(int) CookingSkill.ProfId.SaleValue]))
+					CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.SaleValue]))
 					result.Price += result.Price / CookingSkill.SaleValue;
 				if (Game1.random.NextDouble() * 10 < CookingSkill.ExtraPortionChance && Game1.player.HasCustomProfession(
-					Skills.GetSkill(ModEntry.CookingSkillId).Professions[(int) CookingSkill.ProfId.ExtraPortion]))
+					CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.ExtraPortion]))
 					++result.Stack;
 			}
 			
@@ -737,17 +745,16 @@ namespace CooksAssistant.GameObjects.Menus
 				results.Add(Math.Log(i, Math.E));
 			}
 
-			var item = recipe.createItem();
-			var chance = 0f;
-			var cookingLevel = Skills.GetSkillLevel(Game1.player, ModEntry.CookingSkillId);
+			var cookingLevel = CookingSkill.GetLevel();
 			var baseRate = 0.22f;
-			chance = (baseRate + 0.0035f * recipe.getNumberOfIngredients())
-				- cookingLevel * 1.5f * CookingSkill.BurnChanceReduction;
+			var chance = Math.Max(0f, (baseRate + 0.0035f * recipe.getNumberOfIngredients())
+				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
+				- (ModEntry.Instance.SaveData.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
 
 			return chance;
 		}
 
-		private int CalculateCookingExperience(Item item, int ingredientsCount)
+		private int CalculateCookingExperience(Item item, int ingredientsCount, bool apply)
 		{
 			// Reward players for cooking brand new recipes
 			var newBonus
@@ -762,13 +769,34 @@ namespace CooksAssistant.GameObjects.Menus
 			// Gain more experience for recipe complexity
 			var ingredientsBonus
 				= 1f + ingredientsCount * 0.2f;
-			var baseExperience = 4f * ingredientsBonus;
+			var baseExperience = 5 + 4f * ingredientsBonus;
 			// Limit experience gains to 1 level per day, because let's be reasonable here
-			var requiredExperience = Skills.GetSkill(ModEntry.CookingSkillId).ExperienceCurve
-				[Skills.GetSkillLevel(Game1.player, ModEntry.CookingSkillId)];
-			var currentExperience = Skills.GetExperienceFor(Game1.player, ModEntry.CookingSkillId);
-			var experience = Math.Min(requiredExperience - currentExperience,
-				(int) (newBonus + dailyBonus + baseExperience * stackBonus));
+			var remainingExperience = CookingSkill.GetExperienceRemainingUntilNextLevel();
+			var requiredExperience = CookingSkill.GetExperienceRequiredForNextLevel();
+			var experience = Math.Min(remainingExperience,
+				(int) (newBonus + dailyBonus + baseExperience * stackBonus * (ModEntry.Instance.Config.DebugMode ? ModEntry.DebugExperienceRate : 1)));
+			if (!ModEntry.HasLevelledUpToday && apply)
+			{
+				Log.D($"Cooked up {item.Name} with {ingredientsCount} ingredients"
+					+ $"\nExperience until level {CookingSkill.GetLevel() + 1}:"
+					+ $" ({requiredExperience - remainingExperience}/{requiredExperience})"
+					+ $"\nTotal experience: ({CookingSkill.GetTotalCurrentExperience()}/{CookingSkill.GetTotalExperienceRequiredForNextLevel()})"
+					+ $"\n+{experience} experience!",
+					ModEntry.Instance.Config.DebugMode);
+				CookingSkill.AddExperience(experience);
+
+				if (experience >= remainingExperience)
+				{
+					ModEntry.HasLevelledUpToday = true;
+					Log.D($"Experience reached {requiredExperience}, levelling up!",
+						ModEntry.Instance.Config.DebugMode);
+				}
+			}
+			else
+			{
+				Log.D($"No experience was applied.",
+					ModEntry.Instance.Config.DebugMode);
+			}
 			return experience;
 		}
 
@@ -785,7 +813,7 @@ namespace CooksAssistant.GameObjects.Menus
 			}
 			result.Stack = quantity - burntCount;
 
-			if (ModEntry.Instance.Config.AddCookingSkill)
+			if (ModEntry.Instance.Config.AddCookingSkillAndRecipes)
 			{
 				if (!ModEntry.FoodCookedToday.ContainsKey(result.ParentSheetIndex))
 					ModEntry.FoodCookedToday[result.ParentSheetIndex] = 0;
@@ -797,18 +825,17 @@ namespace CooksAssistant.GameObjects.Menus
 					for (var i = 0; i < 20; ++i)
 					{
 						result.Stack = i;
-						xpTable.Add(CalculateCookingExperience(result, requiredItems.Count));
+						xpTable.Add(CalculateCookingExperience(result, requiredItems.Count, apply: false));
 					}
 				// DEBUGGING
 
-				Skills.AddExperience(Game1.player, ModEntry.CookingSkillId,
-					CalculateCookingExperience(result, requiredItems.Count));
+				var experience = CalculateCookingExperience(result, requiredItems.Count, apply: true);
 				Game1.player.cookedRecipe(result.ParentSheetIndex);
 			}
 			if (result?.Stack > 0)
 				Game1.player.addItemByMenuIfNecessary(result);
 			if (burntCount > 0)
-				Game1.player.addItemByMenuIfNecessary(new Object(ModEntry.JsonAssets.GetObjectId("Burnt Food"), burntCount));
+				Game1.player.addItemByMenuIfNecessary(new Object(ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), burntCount));
 			return true;
 		}
 
@@ -825,6 +852,7 @@ namespace CooksAssistant.GameObjects.Menus
 			CookRecipe(recipe, requiredItems, ref items, craftableCount);
 			if (ModEntry.Instance.Config.PlayCookingAnimation)
 			{
+				Game1.displayHUD = true;
 				AnimateForRecipe(recipe, quantity, requiredItems.Any(pair => new Object(pair.Key, 0).Category == -4));
 				PopMenuStack(false, true);
 			}
@@ -838,7 +866,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 		internal static List<FarmerSprite.AnimationFrame> AnimateForRecipe(CraftingRecipe recipe, int quantity, bool containsFish)
 		{
-			ModEntry.PlayerAgencyBlocked = true;
+			Game1.freezeControls = true;
 
 			var name = recipe.name.ToLower();
 			var isBaked = ModEntry.BakeyFoods.Any(o => name.StartsWith(o) || ModEntry.CakeyFoods.Any(o => name.EndsWith(o)));
@@ -887,9 +915,9 @@ namespace CooksAssistant.GameObjects.Menus
 			var multiplayer = ModEntry.Instance.Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
 			var spritePosition = Vector2.Zero;
 			TemporaryAnimatedSprite sprite = null;
-			Game1.currentLocation.removeTemporarySpritesWithID(_spriteId);
+			Game1.currentLocation.removeTemporarySpritesWithID(SpriteId);
 
-			// TODO: CONTENT: Provide alternate animation frames for cooking at the Saloon
+			// TODO: UPDATE: Provide alternate animation frames for cooking at the Saloon
 
 			// Use frames 66 or 44 or 36
 			var ms = 330;
@@ -945,7 +973,7 @@ namespace CooksAssistant.GameObjects.Menus
 						frameEndBehavior = delegate
 						{
 							multiplayer.broadcastSprites(Game1.currentLocation, sprite);
-							ModEntry.Instance.Helper.Events.Display.RenderedWorld += Event_RenderSpriteOverWorld;
+							ModEntry.Instance.Helper.Events.Display.RenderedWorld += ModEntry.Event_RenderTempSpriteOverWorld;
 						}
 					},
 					new FarmerSprite.AnimationFrame(54, ms)
@@ -970,7 +998,7 @@ namespace CooksAssistant.GameObjects.Menus
 						flicker: false, flipped: false)
 				{
 					scale = Game1.pixelZoom,
-					id = _spriteId
+					id = SpriteId
 				};
 
 				// Compile frames
@@ -1011,7 +1039,7 @@ namespace CooksAssistant.GameObjects.Menus
 						flicker: false, flipped: false)
 						{
 							scale = Game1.pixelZoom,
-							id = _spriteId
+							id = SpriteId
 						};
 
 				frames[frames.Count - 1] = new FarmerSprite.AnimationFrame(
@@ -1020,7 +1048,7 @@ namespace CooksAssistant.GameObjects.Menus
 						frameEndBehavior = delegate
 						{
 							multiplayer.broadcastSprites(Game1.currentLocation, sprite);
-							ModEntry.Instance.Helper.Events.Display.RenderedWorld += Event_RenderSpriteOverWorld;
+							ModEntry.Instance.Helper.Events.Display.RenderedWorld += ModEntry.Event_RenderTempSpriteOverWorld;
 						}
 					};
 
@@ -1035,7 +1063,7 @@ namespace CooksAssistant.GameObjects.Menus
 				(frames[frames.Count - 1].frame, frames[frames.Count - 1].milliseconds)
 				{
 					frameEndBehavior = delegate {
-						ModEntry.PlayerAgencyBlocked = false;
+						Game1.freezeControls = false;
 						Game1.player.FacingDirection = 2;
 						//Game1.playSound("reward");
 						Game1.addHUDMessage(new HUDMessage("item", quantity, true, Color.White, recipe.createItem()));
@@ -1046,21 +1074,6 @@ namespace CooksAssistant.GameObjects.Menus
 			//Game1.player.holdUpItemThenMessage(recipe.createItem(), false);
 
 			return frames;
-		}
-
-		/// <summary>
-		/// TemporaryAnimatedSprite shows behind player and game objects in its default position,
-		/// so all this hub-bub is needed to draw above other game elements.
-		/// </summary>
-		private static void Event_RenderSpriteOverWorld(object sender, StardewModdingAPI.Events.RenderedWorldEventArgs e)
-		{
-			var sprite = Game1.currentLocation.getTemporarySpriteByID(_spriteId);
-			if (sprite == null)
-			{
-				ModEntry.Instance.Helper.Events.Display.RenderedWorld -= Event_RenderSpriteOverWorld;
-				return;
-			}
-			sprite.draw(e.SpriteBatch, localPosition: false, xOffset: 0, yOffset: 0, extraAlpha: 1f);
 		}
 
 		private bool ShouldDrawCookButton()
@@ -1324,6 +1337,32 @@ namespace CooksAssistant.GameObjects.Menus
 			_cookingSlotsDropIn.ForEach(item => item = null);
 		}
 
+		private void ChangeInventory(bool isChangingToNext)
+		{
+			var delta = isChangingToNext ? 1 : -1;
+			var index = _currentSelectedInventory;
+			var hasFridge = (Game1.currentLocation is FarmHouse farmHouse && ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0)
+					|| (Game1.currentLocation is CommunityCenter cc && cc.Objects.ContainsKey(ModEntry.DummyFridgePosition));
+			if (hasFridge || _minifridgeList.Count > 0)
+			{
+				index += delta;
+				if (index < -2)
+					index = _minifridgeList.Count - 1;
+				if (index == -1 && !hasFridge)
+					index += delta;
+				if (index > -1 && _minifridgeList.Count < 1)
+					index = hasFridge
+						? index == 0
+							? -2
+							: -1
+						: -2;
+				if (index == _minifridgeList.Count)
+					index = -2;
+			}
+
+			ChangeInventory(index);
+		}
+
 		private void ChangeInventory(int index)
 		{
 			inventory.showGrayedOutSlots = false;
@@ -1345,6 +1384,8 @@ namespace CooksAssistant.GameObjects.Menus
 				inventory.actualInventory = _minifridgeList[index];
 				_currentSelectedInventory = _minifridgeList.IndexOf(inventory.actualInventory);
 			}
+			Log.D($"New inventory: {_currentSelectedInventory}",
+				ModEntry.Instance.Config.DebugMode);
 		}
 
 		private void TryClickNavButton(int x, int y, bool playSound)
@@ -1512,20 +1553,23 @@ namespace CooksAssistant.GameObjects.Menus
 		private int AddToIngredientsDropIn(int inventoryIndex, int ingredientsIndex,
 			bool moveEntireStack, bool reverse, string sound = null)
 		{
-			Log.D($"AddToIngredientsDropIn() => Inventory: {_currentSelectedInventory}");
+			Log.D($"AddToIngredientsDropIn() => Inventory: {_currentSelectedInventory}",
+				ModEntry.Instance.Config.DebugMode);
 
 			// Add items to fill in empty slots at our indexes
 			if (_cookingSlotsDropIn[ingredientsIndex] == null)
 			{
 				if (inventoryIndex == -1)
 				{
-					Log.D("No inventory index or ingredients dropIn index, aborting move");
+					Log.D("No inventory index or ingredients dropIn index, aborting move",
+						ModEntry.Instance.Config.DebugMode);
 					return 0;
 				}
 
 				_cookingSlotsDropIn[ingredientsIndex] = inventory.actualInventory[inventoryIndex].getOne();
 				_cookingSlotsDropIn[ingredientsIndex].Stack = 0;
-				Log.D($"Adding {_cookingSlotsDropIn[ingredientsIndex]?.Name ?? "null" } to ingredients dropIn");
+				Log.D($"Adding {_cookingSlotsDropIn[ingredientsIndex]?.Name ?? "null" } to ingredients dropIn",
+					ModEntry.Instance.Config.DebugMode);
 			}
 			if (inventoryIndex == -1)
 			{
@@ -1533,14 +1577,16 @@ namespace CooksAssistant.GameObjects.Menus
 				dropOut.Stack = 0;
 				var item = inventory.actualInventory.FirstOrDefault(i => dropOut.canStackWith(i));
 				inventoryIndex = inventory.actualInventory.IndexOf(item);
-				Log.D($"Removing {dropOut.Name} from ingredients dropIn");
+				Log.D($"Removing {dropOut.Name} from ingredients dropIn",
+					ModEntry.Instance.Config.DebugMode);
 				if (item == null)
 				{
 					if (_currentSelectedInventory > -2)
 					{
 						if (inventory.actualInventory.Count > 35)
 						{
-							Log.D($"Failed to return item {dropOut.Name}: Fridge inventory full");
+							Log.D($"Failed to return item {dropOut.Name}: Fridge inventory full",
+								ModEntry.Instance.Config.DebugMode);
 							Game1.playSound("cancel");
 							return 0;
 						}
@@ -1552,20 +1598,23 @@ namespace CooksAssistant.GameObjects.Menus
 								: inventory.actualInventory.IndexOf(item);
 							if (inventoryIndex < 0)
 							{
-								Log.D($"Adding item {dropOut.Name} to new fridge slot");
+								Log.D($"Adding item {dropOut.Name} to new fridge slot",
+									ModEntry.Instance.Config.DebugMode);
 								inventoryIndex = inventory.actualInventory.Count;
 								inventory.actualInventory.Add(_cookingSlotsDropIn[ingredientsIndex]);
 							}
 							else
 							{
-								Log.D($"Returning item {dropOut.Name} to some fridge slot {inventoryIndex}");
+								Log.D($"Returning item {dropOut.Name} to some fridge slot {inventoryIndex}",
+									ModEntry.Instance.Config.DebugMode);
 								inventory.actualInventory[inventoryIndex] = _cookingSlotsDropIn[ingredientsIndex];
 							}
 						}
 					}
 					else if (inventoryIndex >= 0)
 					{
-						Log.D($"Returning {dropOut.Name} to inventory at {inventoryIndex}");
+						Log.D($"Returning {dropOut.Name} to inventory at {inventoryIndex}",
+							ModEntry.Instance.Config.DebugMode);
 						inventory.actualInventory[inventoryIndex] = dropOut;
 					}
 					else
@@ -1577,12 +1626,14 @@ namespace CooksAssistant.GameObjects.Menus
 						}
 						if (inventoryIndex > 0)
 						{
-							Log.D($"Returning {dropOut.Name} to inventory at {inventoryIndex} after double-check");
+							Log.D($"Returning {dropOut.Name} to inventory at {inventoryIndex} after double-check",
+								ModEntry.Instance.Config.DebugMode);
 							inventory.actualInventory[inventoryIndex] = dropOut;
 						}
 						else
 						{
-							Log.D($"Failed to return item {dropOut.Name}: No player inventory slot found");
+							Log.D($"Failed to return item {dropOut.Name}: No player inventory slot found",
+								ModEntry.Instance.Config.DebugMode);
 							Game1.playSound("cancel");
 							return 0;
 						}
@@ -1992,7 +2043,6 @@ namespace CooksAssistant.GameObjects.Menus
 					ChangeInventory(index);
 					//Game1.playSound("select");
 				}
-				Log.D($"New inventory: {_currentSelectedInventory}");
 			}
 
 			// Up/down/left/right contextual navigation buttons
@@ -2097,26 +2147,7 @@ namespace CooksAssistant.GameObjects.Menus
 			else if (inventory.isWithinBounds(cursor.X, cursor.Y) || InventoriesScrollableArea.Contains(cursor))
 			{
 				// Scroll wheel navigates between backpack, fridge, and minifridge inventories
-				var delta = direction < 0 ? 1 : -1;
-				var hasFridge = (Game1.currentLocation is FarmHouse farmHouse && ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0)
-						|| (Game1.currentLocation is CommunityCenter cc && cc.Objects.ContainsKey(ModEntry.DummyFridgePosition));
-				if (hasFridge || _minifridgeList.Count > 0)
-				{
-					_currentSelectedInventory += delta;
-					if (_currentSelectedInventory < -2)
-						_currentSelectedInventory = _minifridgeList.Count - 1;
-					if (_currentSelectedInventory == -1 && !hasFridge)
-						_currentSelectedInventory += delta;
-					if (_currentSelectedInventory > -1 && _minifridgeList.Count < 1)
-						_currentSelectedInventory = hasFridge
-							? _currentSelectedInventory == 0
-								? -2
-								: -1
-							: -2;
-					if (_currentSelectedInventory == _minifridgeList.Count)
-						_currentSelectedInventory = -2;
-				}
-				ChangeInventory(_currentSelectedInventory);
+				ChangeInventory(isChangingToNext: direction < 0);
 			}
 			else
 			{
@@ -2141,9 +2172,27 @@ namespace CooksAssistant.GameObjects.Menus
 			{
 				case State.Search:
 				{
-					// Navigate left/right buttons
-					if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
-						break;
+					// Navigate left/right/up/down buttons traverse search results
+					if ((Game1.options.doesInputListContain(Game1.options.moveLeftButton, key) || Game1.options.doesInputListContain(Game1.options.moveUpButton, key)) && NavUpButton.visible)
+						TryClickNavButton(NavUpButton.bounds.X, NavUpButton.bounds.Y, false);
+					if ((Game1.options.doesInputListContain(Game1.options.moveRightButton, key) || Game1.options.doesInputListContain(Game1.options.moveDownButton, key)) && NavDownButton.visible)
+						TryClickNavButton(NavDownButton.bounds.X, NavDownButton.bounds.Y, false);
+
+					break;
+				}
+				case State.Recipe:
+				{
+					// Navigate left/right buttons select recipe
+					if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key) && NavLeftButton.visible)
+						ChangeCurrentRecipe(--_currentRecipe);
+					if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key) && NavLeftButton.visible)
+						ChangeCurrentRecipe(++_currentRecipe);
+					// Navigate up/down buttons control inventory
+					if (Game1.options.doesInputListContain(Game1.options.moveUpButton, key) && NavLeftButton.visible)
+						ChangeInventory(isChangingToNext: false);
+					if (Game1.options.doesInputListContain(Game1.options.moveDownButton, key) && NavLeftButton.visible)
+						ChangeInventory(isChangingToNext: true);
+
 					break;
 				}
 			}
@@ -2383,11 +2432,11 @@ namespace CooksAssistant.GameObjects.Menus
 		{
 			var cookingTime = "30";
 
-			var xScale = _locale == "ko" ? KoWidthScale : 1f;
-			var yScale = _locale == "ko" ? KoHeightScale : 1f;
+			var xScale = _locale == "ko" && _resizeKoreanFonts ? KoWidthScale : 1f;
+			var yScale = _locale == "ko" && _resizeKoreanFonts ? KoHeightScale : 1f;
 			var textHeightCheck = 0f;
 			var textPosition = Vector2.Zero;
-			var textWidth = _textWidth;
+			var textWidth = (int)(_textWidth * xScale);
 			string text;
 
 			// Clickables
@@ -2571,8 +2620,8 @@ namespace CooksAssistant.GameObjects.Menus
 
 		private void DrawCraftingPage(SpriteBatch b)
 		{
-			var xScale = _locale == "ko" ? KoWidthScale : 1f;
-			var yScale = _locale == "ko" ? KoHeightScale : 1f;
+			var xScale = _locale == "ko" && _resizeKoreanFonts ? KoWidthScale : 1f;
+			var yScale = _locale == "ko" && _resizeKoreanFonts ? KoHeightScale : 1f;
 
 			// Cooking slots
 			foreach (var clickable in CookingSlots)
@@ -2614,6 +2663,11 @@ namespace CooksAssistant.GameObjects.Menus
 				return;
 			}
 
+			if (_stack.Count < 1 || _stack.Peek() != State.Recipe)
+			{
+				return;
+			}
+
 			DrawHorizontalDivider(b, 0, textPosition.Y, _lineWidth, false);
 			textPosition.Y += TextDividerGap;
 			DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, false, SubtextColour);
@@ -2628,21 +2682,22 @@ namespace CooksAssistant.GameObjects.Menus
 			{
 				textPosition.Y += 16;
 				textPosition.X = _rightContent.X + _cookbookRightRect.Width / 2 - MarginRight;
+				var frypanWidth = ModEntry.Instance.Config.AddCookingTool ? 16 + 4 : 0;
 
 				// Cook! button
 				var extraHeight = _locale == "ko" || _locale == "ja" || _locale == "zh" ? 4 : 0;
 				var source = CookButtonSource;
 				source.X += _animFrame * CookButtonSource.Width;
 				var dest = new Rectangle(
-					(int)textPosition.X,
+					(int)textPosition.X - frypanWidth / 2 * Scale,
 					(int)textPosition.Y - extraHeight,
 					source.Width * Scale,
 					source.Height * Scale + extraHeight);
-				dest.X -= (_cookTextSourceWidths[_locale] / 2 * Scale - CookTextSideWidth * Scale) + MarginLeft;
+				dest.X -= (_cookTextSourceWidths[_locale] / 2 * Scale - CookTextSideWidth * Scale) + MarginLeft - frypanWidth / 2;
 				var clickableArea = new Rectangle(
 					dest.X,
 					dest.Y - extraHeight,
-					CookTextSideWidth * Scale * 2 + _cookTextMiddleWidth * Scale,
+					CookTextSideWidth * Scale * 2 + (_cookTextMiddleWidth + frypanWidth) * Scale,
 					dest.Height + extraHeight);
 				if (clickableArea.Contains(Game1.getMouseX(), Game1.getMouseY()))
 					source.Y += source.Height;
@@ -2652,10 +2707,10 @@ namespace CooksAssistant.GameObjects.Menus
 				b.Draw(
 					Texture, dest, source,
 					Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
-				// middle and text
+				// middle and text and frypan
 				source.X = _animFrame * CookButtonSource.Width + CookButtonSource.X + CookTextSideWidth;
 				source.Width = 1;
-				dest.Width = _cookTextMiddleWidth * Scale;
+				dest.Width = (_cookTextMiddleWidth + frypanWidth) * Scale;
 				dest.X += CookTextSideWidth * Scale;
 				b.Draw(
 					Texture, dest, source,
@@ -2670,11 +2725,22 @@ namespace CooksAssistant.GameObjects.Menus
 						CookTextSource[_locale].Height * Scale + extraHeight),
 					CookTextSource[_locale],
 					Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+				dest.X += _cookTextMiddleWidth * Scale;
+				dest.Width = 16 * Scale;
+				if (ModEntry.Instance.Config.AddCookingTool)
+				{
+					b.Draw(
+						Texture,
+						new Rectangle(dest.X + 4 * Scale, dest.Y + (1 + AnimTextOffsetPerFrame[_animFrame]) * Scale, 16 * Scale, 16 * Scale),
+						new Rectangle(176 + ModEntry.Instance.SaveData.CookingToolLevel * 16, 272, 16, 16),
+						Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
+				}
+
 				// right
 				source.X = _animFrame * CookButtonSource.Width + CookButtonSource.X + CookButtonSource.Width - CookTextSideWidth;
 				source.Width = CookTextSideWidth;
 				dest.Width = source.Width * Scale;
-				dest.X += _cookTextMiddleWidth * Scale;
+				dest.X += frypanWidth * Scale;
 				b.Draw(
 					Texture, dest, source,
 					Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
@@ -2954,7 +3020,7 @@ namespace CooksAssistant.GameObjects.Menus
 			var position = isLeftSide ? _leftContent : _rightContent;
 			position.Y -= yPositionOnScreen;
 			w ??= Game1.smallFont.MeasureString(text).X + (_locale == "ja" || _locale == "zh" ? 20 : 0);
-			if (_locale == "ko")
+			if (_locale == "ko" && _resizeKoreanFonts)
 				scale *= KoHeightScale;
 			Utility.drawTextWithShadow(b, Game1.parseText(text, Game1.smallFont, (int)w), Game1.smallFont,
 				new Vector2(position.X + x, position.Y + y), colour ?? Game1.textColor, scale);
