@@ -101,8 +101,6 @@ namespace CooksAssistant.GameObjects
 				textures[i] = new Texture2D(Game1.graphics.GraphicsDevice, size, size); // Unique texture created, no shared references
 				textures[i].SetData(pixels); // Texture has pixel data applied
 
-				// TODO: FIX: Profession pairs icons are the same
-
 				// Set metadata for this profession
 				var id = string.Format(ProfessionI18nId,
 					i < 2 ? 1 : 2, // Tier
@@ -115,7 +113,7 @@ namespace CooksAssistant.GameObjects
 					Name = i18n.Get($"{id}{extra}.name"),
 					Description = i18n.Get($"{id}{extra}.description", new {SaleValue, RestorationAltValue})
 				};
-				// Skill profession is paired and applied
+				// Skill professions are paired and applied
 				Professions.Add(profession);
 				if (i > 0 && i % 2 == 1)
 					ProfessionsForLevels.Add(new ProfessionPair(ProfessionsForLevels.Count == 0 ? 5 : 10,
@@ -131,8 +129,6 @@ namespace CooksAssistant.GameObjects
 		public override List<string> GetExtraLevelUpInfo(int level)
 		{
 			var list = new List<string>();
-			if (!ModEntry.Instance.Config.AddCookingTool && level % 2 == 0)
-				list.Add(i18n.Get("menu.cooking_skill.levelupbonus", new { Number = 1 + level / 2 }));
 			if (ModEntry.Instance.Config.FoodCanBurn)
 				list.Add(i18n.Get("menu.cooking_skill.levelup_burn", new { Number = level * BurnChanceModifier * BurnChanceReduction }));
 
@@ -146,11 +142,6 @@ namespace CooksAssistant.GameObjects
 		public override string GetSkillPageHoverText(int level)
 		{
 			var str = "";
-
-			var areSlotsLimited = !ModEntry.Instance.Config.LockCookingSlots
-				&& (ModEntry.Instance.Config.AddCookingTool || ModEntry.Instance.Config.AddCookingSkillAndRecipes);
-			if (areSlotsLimited)
-				i18n.Get("menu.cooking_skill.levelupbonus", new { Number = ModEntry.Instance.GetFarmersMaxUsableIngredients() });
 
 			if (ModEntry.Instance.Config.FoodCanBurn)
 				str += "\n" + i18n.Get("menu.cooking_skill.levelup_burn", new { Number = level * BurnChanceModifier * BurnChanceReduction });

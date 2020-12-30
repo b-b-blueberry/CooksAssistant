@@ -8,6 +8,8 @@
 	"menu.cooking_equipment.description": "When cooking, allows the use of up to {{level}} ingredients.",
 
 	// Cooking menu
+	"menu.cooking_station.no_cookbook": "You don't have a cookbook.",
+	"menu.cooking_station.locked": "Someone else is cooking here.",
 	"menu.cooking_station.none": "No cooking station nearby.",
 	"menu.cooking_station.busy": "Something's already cooking here.",
 	"menu.cooking_station.done": "The {{recipe}} is ready!",
@@ -51,6 +53,9 @@
 	"menu.cooking_search.filter.6": "Recipes ready to cook",
 	"menu.cooking_search.filter.7": "Favourite recipes",
 	"menu.cooking_search.none_label": "No recipes found.",
+
+	"mail.cookbook_unlocked": "Dear @,^  I was looking through some old things last night, and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. Take care honey, and remember to eat well! ^   Love, Mom.[#]From Mom",
+	"mail.cookbook_unlocked.after": "You received Mom's Cookbook. You can now save recipes to cook at kitchens in town.",
 
 	// Cooking skill
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",

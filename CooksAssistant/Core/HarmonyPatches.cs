@@ -1,7 +1,6 @@
 ﻿using Harmony; // el diavolo
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
-using Netcode;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
@@ -551,7 +550,7 @@ namespace CooksAssistant
 
 									// THIS IS AN IMPORTANT BIT:
 									// Add some mail to flag this bundle as having been completed
-									var mailReceived = ModEntry.MailPrefix + "bundle_complete";
+									var mailReceived = ModEntry.MailBundleCompleted;
 									Log.D($"Sending mail for Cooking bundle completion ({mailReceived})");
 									Game1.player.mailForTomorrow.Add(mailReceived + "%&NL&%");
 								}

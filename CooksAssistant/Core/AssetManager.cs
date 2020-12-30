@@ -86,6 +86,7 @@ namespace CooksAssistant
 			       && (asset.AssetNameEquals(@"Data/Bundles")
 			           || asset.AssetNameEquals(@"Data/BigCraftablesInformation")
 			           || asset.AssetNameEquals(@"Data/CookingRecipes")
+			           || asset.AssetNameEquals(@"Data/mail")
 					   || asset.AssetNameEquals(@"Data/ObjectInformation")
 			           || asset.AssetNameEquals(@"Data/Events/Saloon")
 			           || asset.AssetNameEquals(@"Data/Events/Mountain")
@@ -331,6 +332,15 @@ namespace CooksAssistant
 					Log.D($"Did not patch {asset.AssetName}: {(!Config.DebugMode ? e.Message : e.ToString())}",
 						Config.DebugMode);
 				}
+
+				return;
+			}
+
+			if (asset.AssetNameEquals(@"Data/mail"))
+			{
+				var data = asset.AsDictionary<string, string>().Data;
+				data.Add(ModEntry.MailCookbookUnlocked, i18n.Get("mail.cookbook_unlocked"));
+				asset.ReplaceWith(data);
 
 				return;
 			}

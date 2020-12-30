@@ -1,18 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.TerrainFeatures;
-
-using PyTK.CustomElementHandler;
+using System;
 
 namespace CooksAssistant
 {
-	public class CustomBush : Bush, ISaveElement
+	public class CustomBush : Bush
 	{
 		public enum BushVariety
 		{
@@ -250,37 +245,6 @@ namespace CooksAssistant
 					0, 0, -1, 0, 0, 10,
 					NettleBuffSource, ModEntry.Instance.Helper.Translation.Get("buff.nettles.inspect")));
 			}
-		}
-
-		/* PyTK.CustomEventHandler.ISaveElement*/ 
-
-		public object getReplacement()
-		{
-			return new Bush(currentTileLocation, size, currentLocation, datePlanted) { health = health };
-		}
-
-		public Dictionary<string, string> getAdditionalSaveData()
-		{
-			return new Dictionary<string, string>
-			{
-				{ "Variety", Variety.ToString() },
-				{ "HeldItemQuantity", HeldItemQuantity.ToString() }
-			};
-		}
-
-		public void rebuild(Dictionary<string, string> additionalSaveData, object replacement)
-		{
-			Variety = (BushVariety) Enum.Parse(typeof(BushVariety), additionalSaveData["Variety"]);
-			HeldItemQuantity = int.Parse(additionalSaveData["HeldItemQuantity"]);
-			
-			var bush = replacement as CustomBush;
-			currentTileLocation = bush.currentTileLocation;
-			currentLocation = bush.currentLocation;
-			health = bush.health;
-			datePlanted.Set(bush.datePlanted.Value);
-
-			Init();
-			loadSprite();
 		}
 	}
 }

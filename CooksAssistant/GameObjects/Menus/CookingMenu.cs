@@ -266,7 +266,7 @@ namespace CooksAssistant.GameObjects.Menus
 			ToggleViewButton = new ClickableTextureComponent(
 				"toggleView", new Rectangle(-1, -1, ToggleViewButtonSource.Width * Scale, ToggleViewButtonSource.Height * Scale),
 				null, i18n.Get("menu.cooking_search.view."
-				               + (ModEntry.Instance.SaveData.IsUsingRecipeGridView ? "grid" : "list")),
+				               + (ModEntry.Instance.LocalData.IsUsingRecipeGridView ? "grid" : "list")),
 				Texture, ToggleViewButtonSource, Scale, true);
 			SearchButton = new ClickableTextureComponent(
 				"search", new Rectangle(-1, -1, SearchButtonSource.Width * Scale, SearchButtonSource.Height * Scale),
@@ -390,6 +390,12 @@ namespace CooksAssistant.GameObjects.Menus
 			Game1.displayHUD = false;
 		}
 
+		public override void emergencyShutDown()
+		{
+			exitFunction();
+			base.emergencyShutDown();
+		}
+
 		private void RealignElements()
 		{
 			var view = Game1.graphics.GraphicsDevice.Viewport.GetTitleSafeArea();
@@ -441,7 +447,7 @@ namespace CooksAssistant.GameObjects.Menus
 			ToggleViewButton.bounds.X = ToggleOrderButton.bounds.X + ToggleOrderButton.bounds.Width + xOffsetExtra;
 			ToggleViewButton.bounds.Y = ToggleOrderButton.bounds.Y = ToggleFilterButton.bounds.Y = _leftContent.Y + yOffset;
 			
-			ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (ModEntry.Instance.SaveData.IsUsingRecipeGridView
+			ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (ModEntry.Instance.LocalData.IsUsingRecipeGridView
 				? ToggleViewButtonSource.Width : 0);
 
 			SearchButton.bounds = ToggleViewButton.bounds;
@@ -749,7 +755,7 @@ namespace CooksAssistant.GameObjects.Menus
 			var baseRate = 0.22f;
 			var chance = Math.Max(0f, (baseRate + 0.0035f * recipe.getNumberOfIngredients())
 				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
-				- (ModEntry.Instance.SaveData.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
+				- (ModEntry.Instance.LocalData.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
 
 			return chance;
 		}
@@ -1170,8 +1176,7 @@ namespace CooksAssistant.GameObjects.Menus
 				case Filter.Buffs:
 					filter = recipe =>
 						(!ModEntry.Instance.Config.HideFoodBuffsUntilEaten
-						|| (ModEntry.Instance.SaveData.FoodsEaten.ContainsKey(recipe.name) 
-							&& ModEntry.Instance.SaveData.FoodsEaten[recipe.name] > 0))
+						|| (ModEntry.Instance.LocalData.FoodsEaten.Contains(recipe.name)))
 						&& Game1.objectInformation[recipe.createItem().ParentSheetIndex].Split('/').Length > 6
 						&& Game1.objectInformation[recipe.createItem().ParentSheetIndex].Split('/')[7].Split(' ').Any(i => int.Parse(i) != 0);
 					break;
@@ -1188,7 +1193,7 @@ namespace CooksAssistant.GameObjects.Menus
 							_minifridgeList.Any(mf => recipe.doesFarmerHaveIngredientsInInventory(mf)));
 					break;
 				case Filter.Favourite:
-					filter = recipe => ModEntry.Instance.SaveData.FavouriteRecipes.Contains(recipe.name);
+					filter = recipe => ModEntry.Instance.LocalData.FavouriteRecipes.Contains(recipe.name);
 					break;
 				default:
 					order = recipe => recipe.DisplayName;
@@ -1229,7 +1234,7 @@ namespace CooksAssistant.GameObjects.Menus
 			SearchResultsArea.Y = NavUpButton.bounds.Y - 8;
 			SearchResultsArea.Height = NavDownButton.bounds.Y + NavDownButton.bounds.Height - NavUpButton.bounds.Y + 16;
 
-			var isGridView = ModEntry.Instance.SaveData.IsUsingRecipeGridView;
+			var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
 			_recipeHeight = isGridView
 				? 64 + 8
 				: 64;
@@ -1271,7 +1276,7 @@ namespace CooksAssistant.GameObjects.Menus
 				Math.Min(_filteredRecipeList.Count - _searchRecipes.Count / 2 - 1, _currentRecipe));
 
 			// Avoid showing whitespace after end of list
-			if (ModEntry.Instance.SaveData.IsUsingRecipeGridView)
+			if (ModEntry.Instance.LocalData.IsUsingRecipeGridView)
 			{
 				_currentRecipe = 4 * (_currentRecipe / 4) + 4;
 				if (_filteredRecipeList.Count - 1 - _currentRecipe < _searchRecipes.Count / 2)
@@ -1394,7 +1399,7 @@ namespace CooksAssistant.GameObjects.Menus
 				return;
 			var lastRecipe = _currentRecipe;
 			var state = _stack.Peek();
-			var isGridView = ModEntry.Instance.SaveData.IsUsingRecipeGridView;
+			var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
 			var max = _filteredRecipeList.Count - 1;
 			if (isGridView)
 			{
@@ -1534,7 +1539,7 @@ namespace CooksAssistant.GameObjects.Menus
 				return index;
 			var yIndex = (y - SearchResultsArea.Y - (SearchResultsArea.Height % _recipeHeight) / 2) / _recipeHeight;
 			var xIndex = (x - SearchResultsArea.X) / _recipeHeight;
-			if (ModEntry.Instance.SaveData.IsUsingRecipeGridView)
+			if (ModEntry.Instance.LocalData.IsUsingRecipeGridView)
 				index = yIndex * (SearchResultsArea.Width / _recipeHeight) + xIndex;
 			else
 				index = yIndex;
@@ -1691,42 +1696,53 @@ namespace CooksAssistant.GameObjects.Menus
 
 		internal bool PopMenuStack(bool playSound, bool tryToQuit = false)
 		{
-			if (_stack.Count < 1)
-				return false;
-
-			if (_showCookingConfirmPopup)
+			try
 			{
-				ToggleCookingConfirmPopup(true);
-				if (!tryToQuit)
+				if (_stack.Count < 1)
 					return false;
+
+				if (_showCookingConfirmPopup)
+				{
+					ToggleCookingConfirmPopup(true);
+					if (!tryToQuit)
+						return false;
+				}
+
+				ReturnIngredientsToInventory();
+
+				var state = _stack.Peek();
+				if (state == State.Search)
+				{
+					_stack.Pop();
+				}
+				else if (state == State.Recipe)
+				{
+					CloseRecipePage();
+				}
+				else if (state == State.Ingredients)
+				{
+					CloseIngredientsPage();
+				}
+
+				while (tryToQuit && _stack.Count > 0)
+					_stack.Pop();
+
+				if (!readyToClose() || _stack.Count > 0)
+					return false;
+
+				if (playSound)
+					Game1.playSound("bigDeSelect");
+
+				Log.D("Closing cooking menu.");
+
+				exitThisMenuNoSound();
 			}
-
-			ReturnIngredientsToInventory();
-
-			var state = _stack.Peek();
-			if (state == State.Search)
+			catch (Exception e)
 			{
-				_stack.Pop();
+				Log.E($"Hit error on pop stack, emergency shutdown.\n{e}");
+				emergencyShutDown();
+				exitFunction();
 			}
-			else if (state == State.Recipe)
-			{
-				CloseRecipePage();
-			}
-			else if (state == State.Ingredients)
-			{
-				CloseIngredientsPage();
-			}
-
-			while (tryToQuit && _stack.Count > 0)
-				_stack.Pop();
-
-			if (playSound)
-				Game1.playSound("bigDeSelect");
-
-			if (!readyToClose() || _stack.Count > 0)
-				return false;
-			Game1.exitActiveMenu();
-			cleanupBeforeExit();
 			return true;
 		}
 
@@ -1818,7 +1834,7 @@ namespace CooksAssistant.GameObjects.Menus
 						}
 					}
 
-					if (!ModEntry.Instance.SaveData.IsUsingRecipeGridView)
+					if (!ModEntry.Instance.LocalData.IsUsingRecipeGridView)
 						break;
 
 					// Hover text over recipe search results when in grid view, which unlike list view, has names hidden
@@ -1928,13 +1944,13 @@ namespace CooksAssistant.GameObjects.Menus
 						// Search results grid/list view button
 						else if (ToggleViewButton.containsPoint(x, y))
 						{
-							var isGridView = ModEntry.Instance.SaveData.IsUsingRecipeGridView;
+							var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
 							ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X
 							                                + (isGridView ? 0 : ToggleViewButtonSource.Width);
 
 							KeepRecipeIndexInSearchBounds();
 
-							ModEntry.Instance.SaveData.IsUsingRecipeGridView = !isGridView;
+							ModEntry.Instance.LocalData.IsUsingRecipeGridView = !isGridView;
 							Game1.playSound("shwip");
 							ToggleViewButton.hoverText =
 								i18n.Get($"menu.cooking_search.view.{(isGridView ? "grid" : "list")}");
@@ -1956,14 +1972,14 @@ namespace CooksAssistant.GameObjects.Menus
 					// Favourite recipe button
 					if (RecipeIconButton.containsPoint(x, y))
 					{
-						if (ModEntry.Instance.SaveData.FavouriteRecipes.Contains(_recipeItem.Name))
+						if (ModEntry.Instance.LocalData.FavouriteRecipes.Contains(_recipeItem.Name))
 						{
-							ModEntry.Instance.SaveData.FavouriteRecipes.Remove(_recipeItem.Name);
+							ModEntry.Instance.LocalData.FavouriteRecipes.Remove(_recipeItem.Name);
 							Game1.playSound("throwDownITem"); // not a typo
 						}
 						else
 						{
-							ModEntry.Instance.SaveData.FavouriteRecipes.Add(_recipeItem.Name);
+							ModEntry.Instance.LocalData.FavouriteRecipes.Add(_recipeItem.Name);
 							Game1.playSound("pickUpItem");
 						}
 					}
@@ -2297,7 +2313,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 		private void DrawSearchPage(SpriteBatch b)
 		{
-			var isGridView = ModEntry.Instance.SaveData.IsUsingRecipeGridView;
+			var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
 
 			// Search nav buttons
 			if (_currentRecipe > _searchRecipes.Count / 2)
@@ -2450,7 +2466,7 @@ namespace CooksAssistant.GameObjects.Menus
 				Game1.objectSpriteSheet, _recipeItem.ParentSheetIndex, 16, 16);
 			RecipeIconButton.draw(b);
 			
-			if (ModEntry.Instance.SaveData.FavouriteRecipes.Contains(_recipeItem.Name))
+			if (ModEntry.Instance.LocalData.FavouriteRecipes.Contains(_recipeItem.Name))
 			{
 				b.Draw(Texture,
 					new Rectangle(
@@ -2732,7 +2748,7 @@ namespace CooksAssistant.GameObjects.Menus
 					b.Draw(
 						Texture,
 						new Rectangle(dest.X + 4 * Scale, dest.Y + (1 + AnimTextOffsetPerFrame[_animFrame]) * Scale, 16 * Scale, 16 * Scale),
-						new Rectangle(176 + ModEntry.Instance.SaveData.CookingToolLevel * 16, 272, 16, 16),
+						new Rectangle(176 + ModEntry.Instance.LocalData.CookingToolLevel * 16, 272, 16, 16),
 						Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 				}
 
@@ -2760,8 +2776,7 @@ namespace CooksAssistant.GameObjects.Menus
 				}*/
 			}
 			else if (ModEntry.Instance.Config.HideFoodBuffsUntilEaten
-				&& (!ModEntry.Instance.SaveData.FoodsEaten.ContainsKey(_recipeItem.Name)
-					|| ModEntry.Instance.SaveData.FoodsEaten[_recipeItem.Name] < 1))
+				&& (!ModEntry.Instance.LocalData.FoodsEaten.Contains(_recipeItem.Name)))
 			{
 				text = i18n.Get("menu.cooking_recipe.notes_unknown");
 				DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, SubtextColour);
