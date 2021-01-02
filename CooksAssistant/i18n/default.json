@@ -55,7 +55,7 @@
 	"menu.cooking_search.none_label": "No recipes found.",
 
 	"mail.cookbook_unlocked": "Dear @,^  I was looking through some old things last night, and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. Take care honey, and remember to eat well! ^   Love, Mom.[#]From Mom",
-	"mail.cookbook_unlocked.after": "You received Mom's Cookbook. You can now save recipes to cook at kitchens in town.",
+	"mail.cookbook_unlocked.after": "You received Mom's Cookbook. Recipes you learn will be saved here to cook at kitchens in town.",
 
 	// Cooking skill
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
@@ -154,7 +154,7 @@
 	"item.oceanplatter.name": "Ocean Platter",
 	"item.onionsoup.name": "Onion Soup",
 	"item.skewers.name": "Pineapple Skewers",
-	"item.porridge.name": "Porridge",
+	"item.porridge.name": "Plum Porridge",
 	"item.breakfast.name": "Quick Breakfast",
 	"item.redberrypie.name": "Redberry Pie",
 	"item.saladsando.name": "Salad Sandwich",
@@ -173,13 +173,15 @@
 	"item.pizza_half.name": "Pizza Slice",
 	"item.nettletea.name": "Nettle Tea",
 	"item.marmalade.name": "Marmalade",
+	"item.cookbook.description": "Mom's Cookbook",
+	"item.cookingcraftable.name": "Portable Grill",
 	// crops
 	"item.cabbage.name": "Cabbage",
 	"item.cabbage_seeds.name": "Cabbage Seeds",
 	"item.carrot.name": "Carrot",
 	"item.carrot_seeds.name": "Carrot Seeds",
-	"item.nettle.name": "Nettles",
-	"item.nettle_seeds.name": "Nettle Seeds",
+	"item.nettles.name": "Nettles",
+	"item.nettles_seeds.name": "Nettle Seeds",
 	"item.onion.name": "Onion",
 	"item.onion_seeds.name": "Onion Seeds",
 	"item.pineapple.name": "Pineapple",
@@ -191,8 +193,6 @@
 	"item.watermelon.name": "Watermelon",
 	"item.watermelon_seeds.name": "Watermelon Seeds",
 	"item.watermelon_half.name": "Watermelon Half",
-	// others
-	"item.cookingcraftable.name": "Portable Grill",
 
 	// Object descriptions
 	// recipes
@@ -243,7 +243,9 @@
 	"item.pinkcake_half.description": "I wish I still had the other half.",
 	"item.pizza_half.description": "Save some for later!",
 	"item.nettletea.description": "A bitter herbal tea brewed from wild stinging nettles.",
-	"item.marmalade.description": "Marmalade",
+	"item.marmalade.description": "...",
+	"item.cookbook.description": "It's a tattered old cookbook. Better find some new recipes!",
+	"item.cookingcraftable.description": "Usable for cooking outdoors.",
 	// crops
 	"item.cabbage.description": "This nutritious leafy green features in the most cuisines worldwide of any vegetable.",
 	"item.cabbage_seeds.description": "Plant these in the summer. Takes 9 days to produce a large cabbage.",
@@ -261,7 +263,5 @@
 	"item.sugarcane_seeds.description": "...",
 	"item.watermelon.description": "An iconic summer treat, sweet as a daisy and chock-full of seeds.",
 	"item.watermelon_seeds.description": "Plant these in the summer. Takes 10 days to mature.",
-	"item.watermelon_half.description": "It's so good you couldn't just eat it all at once.",
-	// others
-	"item.cookingcraftable.description": "Usable for cooking outdoors."
+	"item.watermelon_half.description": "It's so good you couldn't just eat it all at once."
 }

@@ -13,7 +13,7 @@
 		✔	[MazeMagic] Cookbook - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu70qr/
 		✔	[SaltyHeathen] Cooking animation - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu69py/
 		✔	[Ruittsorf] Select ingredients - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbu0j81/
-			[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
+		✔	[Realbadatnames] Make a mod - https://www.reddit.com/r/StardewValley/comments/eecpzy/cooking_could_use_an_overhaul/fbtnf3l/
 		[YorikTheDestroyer] Cooking festival - https://github.com/StardewModders/mod-ideas/issues/490
 	✔	[killkrazed] Filter, search, sort, grid - https://github.com/StardewModders/mod-ideas/issues/470
 
@@ -26,7 +26,7 @@
 	✔	Portuguese
 		Hungarian
 		Turkish
-		Russian
+	✔	Russian
 		Italian
 		German
 
@@ -45,7 +45,7 @@
 		Community centre cooking bundle items and rewards + big reward
 		✔	Picnicker's Bundle
 		✔	Baker's Bundle
-			??? Bundle
+		✔	Diner's Bundle
 			Reward
 				???
 	✔	Cooking level bonuses
@@ -57,7 +57,7 @@
 			✔	Five Star Cook
 			✔	Gourmet
 			✔	Glutton
-		Rework ingredients slots sprites
+	?	Rework ingredients slots sprites
 
 	Events:
 		UPDATE: Cooking festival
@@ -88,11 +88,6 @@ F	✔	Watermelon
 	✔	Nettles
 	✔	Chocolate Bar
 w!	🍰	Redberries
-
-	Artisan:
-	✔	Cider
-	✔	Nettle Tea
-		Marmalade
 
 	Recipes:
 	✔	Admiral Pie				Flour + Milk + Tuna + Salmon						Runescape, fish line up in seasons

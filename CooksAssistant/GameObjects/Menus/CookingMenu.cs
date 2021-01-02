@@ -59,6 +59,7 @@ namespace CooksAssistant.GameObjects.Menus
 			{"ja", 50},
 			{"zh", 36},
 			{"ko", 48},
+			{"ru", 53},
 		};
 		private const int CookTextSourceHeight = 16;
 		private const int CookTextSideWidth = 5;
@@ -179,10 +180,6 @@ namespace CooksAssistant.GameObjects.Menus
 		private const bool IsIngredientsPageEnabled = false;
 
 
-		// TODO: UPDATE: Add Ingredients page layout
-		// TODO: TEST: Multiplayer - Using fridge/minifridge/cooking station while another player has it active
-		// + Multiplayer - Adding/removing minifridges while another player has it active
-
 		public CookingMenu(List<CraftingRecipe> recipes, bool addDummyState = false, string initialRecipe = null) : base(null)
 		{
 			Game1.displayHUD = true; // Prevents hidden HUD on crash when initialising menu, set to false at the end of this method
@@ -266,7 +263,7 @@ namespace CooksAssistant.GameObjects.Menus
 			ToggleViewButton = new ClickableTextureComponent(
 				"toggleView", new Rectangle(-1, -1, ToggleViewButtonSource.Width * Scale, ToggleViewButtonSource.Height * Scale),
 				null, i18n.Get("menu.cooking_search.view."
-				               + (ModEntry.Instance.LocalData.IsUsingRecipeGridView ? "grid" : "list")),
+				               + (ModEntry.Instance.IsUsingRecipeGridView ? "grid" : "list")),
 				Texture, ToggleViewButtonSource, Scale, true);
 			SearchButton = new ClickableTextureComponent(
 				"search", new Rectangle(-1, -1, SearchButtonSource.Width * Scale, SearchButtonSource.Height * Scale),
@@ -447,7 +444,7 @@ namespace CooksAssistant.GameObjects.Menus
 			ToggleViewButton.bounds.X = ToggleOrderButton.bounds.X + ToggleOrderButton.bounds.Width + xOffsetExtra;
 			ToggleViewButton.bounds.Y = ToggleOrderButton.bounds.Y = ToggleFilterButton.bounds.Y = _leftContent.Y + yOffset;
 			
-			ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (ModEntry.Instance.LocalData.IsUsingRecipeGridView
+			ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (ModEntry.Instance.IsUsingRecipeGridView
 				? ToggleViewButtonSource.Width : 0);
 
 			SearchButton.bounds = ToggleViewButton.bounds;
@@ -755,7 +752,7 @@ namespace CooksAssistant.GameObjects.Menus
 			var baseRate = 0.22f;
 			var chance = Math.Max(0f, (baseRate + 0.0035f * recipe.getNumberOfIngredients())
 				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
-				- (ModEntry.Instance.LocalData.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
+				- (ModEntry.Instance.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
 
 			return chance;
 		}
@@ -1176,7 +1173,7 @@ namespace CooksAssistant.GameObjects.Menus
 				case Filter.Buffs:
 					filter = recipe =>
 						(!ModEntry.Instance.Config.HideFoodBuffsUntilEaten
-						|| (ModEntry.Instance.LocalData.FoodsEaten.Contains(recipe.name)))
+						|| (ModEntry.Instance.FoodsEaten.Contains(recipe.name)))
 						&& Game1.objectInformation[recipe.createItem().ParentSheetIndex].Split('/').Length > 6
 						&& Game1.objectInformation[recipe.createItem().ParentSheetIndex].Split('/')[7].Split(' ').Any(i => int.Parse(i) != 0);
 					break;
@@ -1193,7 +1190,7 @@ namespace CooksAssistant.GameObjects.Menus
 							_minifridgeList.Any(mf => recipe.doesFarmerHaveIngredientsInInventory(mf)));
 					break;
 				case Filter.Favourite:
-					filter = recipe => ModEntry.Instance.LocalData.FavouriteRecipes.Contains(recipe.name);
+					filter = recipe => ModEntry.Instance.FavouriteRecipes.Contains(recipe.name);
 					break;
 				default:
 					order = recipe => recipe.DisplayName;
@@ -1234,7 +1231,7 @@ namespace CooksAssistant.GameObjects.Menus
 			SearchResultsArea.Y = NavUpButton.bounds.Y - 8;
 			SearchResultsArea.Height = NavDownButton.bounds.Y + NavDownButton.bounds.Height - NavUpButton.bounds.Y + 16;
 
-			var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
+			var isGridView = ModEntry.Instance.IsUsingRecipeGridView;
 			_recipeHeight = isGridView
 				? 64 + 8
 				: 64;
@@ -1276,7 +1273,7 @@ namespace CooksAssistant.GameObjects.Menus
 				Math.Min(_filteredRecipeList.Count - _searchRecipes.Count / 2 - 1, _currentRecipe));
 
 			// Avoid showing whitespace after end of list
-			if (ModEntry.Instance.LocalData.IsUsingRecipeGridView)
+			if (ModEntry.Instance.IsUsingRecipeGridView)
 			{
 				_currentRecipe = 4 * (_currentRecipe / 4) + 4;
 				if (_filteredRecipeList.Count - 1 - _currentRecipe < _searchRecipes.Count / 2)
@@ -1399,7 +1396,7 @@ namespace CooksAssistant.GameObjects.Menus
 				return;
 			var lastRecipe = _currentRecipe;
 			var state = _stack.Peek();
-			var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
+			var isGridView = ModEntry.Instance.IsUsingRecipeGridView;
 			var max = _filteredRecipeList.Count - 1;
 			if (isGridView)
 			{
@@ -1539,7 +1536,7 @@ namespace CooksAssistant.GameObjects.Menus
 				return index;
 			var yIndex = (y - SearchResultsArea.Y - (SearchResultsArea.Height % _recipeHeight) / 2) / _recipeHeight;
 			var xIndex = (x - SearchResultsArea.X) / _recipeHeight;
-			if (ModEntry.Instance.LocalData.IsUsingRecipeGridView)
+			if (ModEntry.Instance.IsUsingRecipeGridView)
 				index = yIndex * (SearchResultsArea.Width / _recipeHeight) + xIndex;
 			else
 				index = yIndex;
@@ -1834,7 +1831,7 @@ namespace CooksAssistant.GameObjects.Menus
 						}
 					}
 
-					if (!ModEntry.Instance.LocalData.IsUsingRecipeGridView)
+					if (!ModEntry.Instance.IsUsingRecipeGridView)
 						break;
 
 					// Hover text over recipe search results when in grid view, which unlike list view, has names hidden
@@ -1944,13 +1941,13 @@ namespace CooksAssistant.GameObjects.Menus
 						// Search results grid/list view button
 						else if (ToggleViewButton.containsPoint(x, y))
 						{
-							var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
+							var isGridView = ModEntry.Instance.IsUsingRecipeGridView;
 							ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X
 							                                + (isGridView ? 0 : ToggleViewButtonSource.Width);
 
 							KeepRecipeIndexInSearchBounds();
 
-							ModEntry.Instance.LocalData.IsUsingRecipeGridView = !isGridView;
+							ModEntry.Instance.IsUsingRecipeGridView = !isGridView;
 							Game1.playSound("shwip");
 							ToggleViewButton.hoverText =
 								i18n.Get($"menu.cooking_search.view.{(isGridView ? "grid" : "list")}");
@@ -1972,14 +1969,14 @@ namespace CooksAssistant.GameObjects.Menus
 					// Favourite recipe button
 					if (RecipeIconButton.containsPoint(x, y))
 					{
-						if (ModEntry.Instance.LocalData.FavouriteRecipes.Contains(_recipeItem.Name))
+						if (ModEntry.Instance.FavouriteRecipes.Contains(_recipeItem.Name))
 						{
-							ModEntry.Instance.LocalData.FavouriteRecipes.Remove(_recipeItem.Name);
+							ModEntry.Instance.FavouriteRecipes.Remove(_recipeItem.Name);
 							Game1.playSound("throwDownITem"); // not a typo
 						}
 						else
 						{
-							ModEntry.Instance.LocalData.FavouriteRecipes.Add(_recipeItem.Name);
+							ModEntry.Instance.FavouriteRecipes.Add(_recipeItem.Name);
 							Game1.playSound("pickUpItem");
 						}
 					}
@@ -1995,7 +1992,7 @@ namespace CooksAssistant.GameObjects.Menus
 				Game1.playSound("bigSelect");
 			}
 			// Ingredients tab
-			else if (IsIngredientsPageEnabled && ModEntry.Instance.Config.AddNewRecipeScaling
+			else if (IsIngredientsPageEnabled && ModEntry.Instance.Config.AddRecipeRebalancing
 			         && state != State.Ingredients && IngredientsTabButton.containsPoint(x, y))
 			{
 				_stack.Pop();
@@ -2313,7 +2310,7 @@ namespace CooksAssistant.GameObjects.Menus
 
 		private void DrawSearchPage(SpriteBatch b)
 		{
-			var isGridView = ModEntry.Instance.LocalData.IsUsingRecipeGridView;
+			var isGridView = ModEntry.Instance.IsUsingRecipeGridView;
 
 			// Search nav buttons
 			if (_currentRecipe > _searchRecipes.Count / 2)
@@ -2466,7 +2463,7 @@ namespace CooksAssistant.GameObjects.Menus
 				Game1.objectSpriteSheet, _recipeItem.ParentSheetIndex, 16, 16);
 			RecipeIconButton.draw(b);
 			
-			if (ModEntry.Instance.LocalData.FavouriteRecipes.Contains(_recipeItem.Name))
+			if (ModEntry.Instance.FavouriteRecipes.Contains(_recipeItem.Name))
 			{
 				b.Draw(Texture,
 					new Rectangle(
@@ -2698,7 +2695,7 @@ namespace CooksAssistant.GameObjects.Menus
 			{
 				textPosition.Y += 16;
 				textPosition.X = _rightContent.X + _cookbookRightRect.Width / 2 - MarginRight;
-				var frypanWidth = ModEntry.Instance.Config.AddCookingTool ? 16 + 4 : 0;
+				var frypanWidth = ModEntry.Instance.Config.AddCookingToolProgression ? 16 + 4 : 0;
 
 				// Cook! button
 				var extraHeight = _locale == "ko" || _locale == "ja" || _locale == "zh" ? 4 : 0;
@@ -2743,12 +2740,12 @@ namespace CooksAssistant.GameObjects.Menus
 					Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 				dest.X += _cookTextMiddleWidth * Scale;
 				dest.Width = 16 * Scale;
-				if (ModEntry.Instance.Config.AddCookingTool)
+				if (ModEntry.Instance.Config.AddCookingToolProgression)
 				{
 					b.Draw(
 						Texture,
 						new Rectangle(dest.X + 4 * Scale, dest.Y + (1 + AnimTextOffsetPerFrame[_animFrame]) * Scale, 16 * Scale, 16 * Scale),
-						new Rectangle(176 + ModEntry.Instance.LocalData.CookingToolLevel * 16, 272, 16, 16),
+						new Rectangle(176 + ModEntry.Instance.CookingToolLevel * 16, 272, 16, 16),
 						Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 				}
 
@@ -2776,7 +2773,7 @@ namespace CooksAssistant.GameObjects.Menus
 				}*/
 			}
 			else if (ModEntry.Instance.Config.HideFoodBuffsUntilEaten
-				&& (!ModEntry.Instance.LocalData.FoodsEaten.Contains(_recipeItem.Name)))
+				&& (!ModEntry.Instance.FoodsEaten.Contains(_recipeItem.Name)))
 			{
 				text = i18n.Get("menu.cooking_recipe.notes_unknown");
 				DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, SubtextColour);

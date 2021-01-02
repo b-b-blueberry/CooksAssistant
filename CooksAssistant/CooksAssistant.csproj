@@ -15,8 +15,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="assets\CookingBundlePack\**" />
+    <Compile Remove="assets\NewCropsPack\Objects\Sugar Cane\**" />
     <Compile Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
+    <EmbeddedResource Remove="assets\CookingBundlePack\**" />
+    <EmbeddedResource Remove="assets\NewCropsPack\Objects\Sugar Cane\**" />
     <EmbeddedResource Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
+    <None Remove="assets\CookingBundlePack\**" />
+    <None Remove="assets\NewCropsPack\Objects\Sugar Cane\**" />
     <None Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
   </ItemGroup>
 

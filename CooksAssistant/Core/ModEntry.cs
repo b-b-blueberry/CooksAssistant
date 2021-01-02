@@ -30,7 +30,9 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 // TODO: UPDATE: Restore Limited Campfire Cooking compatibility
 //		In DisplayMenuChanged intercept for CraftingPage, OpenCookingMenu is delayed a tick for mutex request on fridges
 //		Campfires have their menu intercepted correctly, but no longer have the limited crafting recipe list passed on
+// TODO: UPDATE: Add alternate ways to get Chocolate Bar; unobtainable once JojaMart is removed
 
+// TODO: CONTENT: Hot chocolate at the ice festival
 
 namespace CooksAssistant
 {
@@ -38,22 +40,15 @@ namespace CooksAssistant
 	{
 		internal static ModEntry Instance;
 		internal Config Config;
-		internal ModSharedData SharedData;
-		internal ModSaveData LocalData;
 
 		internal ITranslationHelper i18n => Helper.Translation;
 		internal static IJsonAssetsApi JsonAssets;
 		internal static Texture2D SpriteSheet;
 
-		internal const string SharedDataKey = "SaveData";
-		internal const string LocalDataKey = "LocalData";
+		internal const string SaveDataKey = "SaveData";
 		internal const string AssetPrefix = "blueberry.CooksAssistant.";
 		internal const string ObjectPrefix = "blueberry.cac.";
 		internal const string MailPrefix = "blueberry.cac.mail.";
-
-		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked";
-		internal static readonly string MailBundleCompleted = $"cc{CommunityCentreAreaName}";
-		internal static readonly string MailBundleCompletedFollowup = MailPrefix + "bundle_completed_followup";
 
 		// Assets
 		internal static readonly string BasicObjectsPack = Path.Combine("assets", "BasicObjectsPack");
@@ -68,6 +63,23 @@ namespace CooksAssistant
 		internal static readonly string BundleDataPath = Path.Combine("assets", "bundles");
 		internal static readonly string BuffDataPath = Path.Combine("assets", "ingredientBuffChart");
 
+		// Persistent player data
+		public int CookingToolLevel = 0;
+		public bool IsUsingRecipeGridView = false;
+		public List<string> FoodsEaten = new List<string>();
+		public List<string> FavouriteRecipes = new List<string>();
+
+		// Persistent community centre data
+		public bool IsCommunityCentreAreaComplete = false;
+		public Dictionary<int, bool> CommunityCentreBundleRewards = new Dictionary<int, bool>();
+		public Dictionary<int, bool> CommunityCentreBundlesComplete = new Dictionary<int, bool>();
+		public Dictionary<int, bool[]> CommunityCentreBundleValues = new Dictionary<int, bool[]>();
+
+		// Mail titles
+		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked";
+		internal static readonly string MailBundleCompleted = $"cc{CommunityCentreAreaName}";
+		internal static readonly string MailBundleCompletedFollowup = MailPrefix + "bundle_completed_followup";
+
 		// Add Cooking Menu
 		public const int CookbookMailDate = 14;
 
@@ -80,9 +92,8 @@ namespace CooksAssistant
 		public const int MaxFoodStackPerDayForExperienceGains = 20;
 		public const int CraftNettleTeaLevel = 3;
 		public const int CraftCampfireLevel = 1;
+		internal const float DebugExperienceRate = 1f;
 		private Buff _watchingBuff;
-		// debug
-		internal static readonly float DebugExperienceRate = 10f;
 
 		// Add Cooking to the Community Centre
 		public static readonly string CommunityCentreAreaName = "Kitchen";
@@ -102,13 +113,6 @@ namespace CooksAssistant
 		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
 		internal const string ActionRange = AssetPrefix + "Range";
 		internal const string DockCrateItem = "Pineapple";
-
-		// Cook At Kitchens
-		internal static readonly Location SaloonCookingRangePosition = new Location(18, 17);
-		internal static Dictionary<string, string> NpcHomeLocations;
-		
-		// Food Can Burn
-		private const string BurntFoodName = "Burnt Food";
 
 		// Food Healing Takes Time
 		private const float CombatRegenModifier = 0.02f;
@@ -210,6 +214,10 @@ namespace CooksAssistant
 		private const string ChocolateName = ObjectPrefix + "chocolate";
 		private const string NettlesUsableMachine = "Keg";
 		private const int NettlesUsableLevel = 2;
+		// cook at kitchens
+		internal static readonly Location SaloonCookingRangePosition = new Location(18, 17);
+		internal static Dictionary<string, string> NpcHomeLocations;
+		internal const int NpcKitchenFriendshipRequired = 7;
 		// kebab
 		private const string KebabBuffSource = AssetPrefix + "kebab";
 		private const int KebabBonusDuration = 220;
@@ -232,19 +240,32 @@ namespace CooksAssistant
 			ObjectPrefix + "saladsando",
 			ObjectPrefix + "watermelon",
 		};
+		// extra keg products
+		public static readonly List<string> MarmaladeFoods = new List<string>
+		{
+			"Lemon", "Lime", "Citron", "Yuzu", "Grapefruit", "Pomelo", "Orange", "Mandarin", "Satsuma"
+		};
 
 
-		internal static readonly bool _printRename = false;
+		internal static readonly bool CiderEnabled = true;
+		internal static readonly bool PerryEnabled = false;
+		internal static readonly bool MarmaladeEnabled = false;
+		internal static readonly bool NettlesEnabled = false;
+		internal static readonly bool RedberriesEnabled = false;
+		internal static readonly bool CookingAddedLevelsEnabled = false;
+		internal static readonly bool SendBundleFollowupMail = false;
+		internal static readonly bool PrintRename = false;
+
 		private static readonly bool _forceConfig = false;
 		private void ForceConfig()
 		{
 			Config.AddCookingMenu = true;
-			Config.AddCookingCommunityCentreBundle = true;
+			Config.AddCookingCommunityCentreBundles = true;
 			Config.AddCookingSkillAndRecipes = true;
-			Config.AddCookingTool = true;
+			Config.AddCookingToolProgression = true;
 			//Config.AddCookingQuestline = false;
 			Config.AddNewCropsAndStuff = true;
-			Config.AddNewRecipeScaling = true;
+			Config.AddRecipeRebalancing = true;
 			Config.PlayCookingAnimation = true;
 			Config.FoodHealingTakesTime = true;
 			Config.HideFoodBuffsUntilEaten = true;
@@ -261,11 +282,11 @@ namespace CooksAssistant
 			{
 				Log.D("\n== CONFIG SUMMARY ==\n"
 					  + $"\nNew Cooking Menu:   {Config.AddCookingMenu}"
-					  + $"\nNew CC Bundle:      {Config.AddCookingCommunityCentreBundle}"
+					  + $"\nNew CC Bundles:     {Config.AddCookingCommunityCentreBundles}"
 					  + $"\nNew Cooking Skill:  {Config.AddCookingSkillAndRecipes}"
-					  + $"\nNew Cooking Tool:   {Config.AddCookingTool}"
+					  + $"\nNew Cooking Tool:   {Config.AddCookingToolProgression}"
 					  + $"\nNew Crops & Stuff:  {Config.AddNewCropsAndStuff}"
-					  + $"\nNew Recipe Scaling: {Config.AddNewRecipeScaling}"
+					  + $"\nNew Recipe Scaling: {Config.AddRecipeRebalancing}"
 					  + $"\nCooking Animation:  {Config.PlayCookingAnimation}"
 					  + $"\nHealing Takes Time: {Config.FoodHealingTakesTime}"
 					  + $"\nHide Food Buffs:    {Config.HideFoodBuffsUntilEaten}"
@@ -276,7 +297,7 @@ namespace CooksAssistant
 					  + $"\nCommand prefix: {Config.ConsoleCommandPrefix}"
 					  + $"\nForce config:   {_forceConfig}"
 					  + $"\nLanguage:       {LocalizedContentManager.CurrentLanguageCode.ToString().ToUpper()}"
-					  + $"\nResize korean:  {Config.ResizeKoreanFonts}\n",
+					  + $"\nResize Korean:  {Config.ResizeKoreanFonts}\n",
 					Config.DebugMode);
 			}
 			catch (Exception e)
@@ -289,26 +310,12 @@ namespace CooksAssistant
 		{
 			try
 			{
-				if (Game1.IsMasterGame)
-				{
-					Log.D("\n== SHARED DATA ==\n"
-						+ $"\nSaloonRangeLevel: {SharedData.SaloonCookingRangeLevel}"
-						+ $"\nCookingToolLevel: {SharedData.CookingToolLevels.Aggregate("", (s, cur) => $"{s} ({cur.Key}: {cur.Value})")}"
-						+ $"\nRecipeGridView:   {SharedData.FarmersUsingRecipeGridView.Aggregate("", (s, cur) => $"{s} ({cur.Key}: {cur.Value})")}"
-						+ $"\nFavouriteRecipes: {SharedData.FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur.Key}: {cur.Value.Count})")}"
-						+ $"\nFoodsEaten:       {SharedData.FoodsEaten.Aggregate("", (s, cur) => $"{s} ({cur.Key}: {cur.Value.Count})")}"
-						+ $"\nCookingBundleProgress: {SharedData.CookingBundleProgress.Aggregate("", (s, cur) => $"{s} ({cur.Key}: {cur.Value.Aggregate("", (s1, cur1) => $"{s1} {cur1}")})")}"
-						+ $"\nCookingBundleRewards:  {SharedData.CookingBundleRewards.Aggregate("", (s, cur) => $"{s} ({cur.Key}: {cur.Value})")}\n",
-						Config.DebugMode);
-				}
-
 				Log.D("\n== LOCAL DATA ==\n"
-					+ $"\nRecipeGridView:   {LocalData.IsUsingRecipeGridView}"
-					+ $"\nCookingToolLevel: {LocalData.CookingToolLevel}"
-					+ $"\nFoodsEaten:       {LocalData.FoodsEaten.Count}"
-					+ $"\nFavouriteRecipes: {LocalData.FavouriteRecipes.Count}",
+					+ $"\nRecipeGridView:   {IsUsingRecipeGridView}"
+					+ $"\nCookingToolLevel: {CookingToolLevel}"
+					+ $"\nFoodsEaten:       {FoodsEaten.Aggregate("", (s, cur) => $"{s} ({cur})")}"
+					+ $"\nFavouriteRecipes: {FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur})")}\n",
 					Config.DebugMode);
-
 			}
 			catch (Exception e)
 			{
@@ -369,16 +376,15 @@ namespace CooksAssistant
 			// Game events
 			Helper.Events.GameLoop.GameLaunched += GameLoopOnGameLaunched;
 			Helper.Events.GameLoop.SaveLoaded += GameLoopOnSaveLoaded;
-			Helper.Events.GameLoop.Saving += GameLoopOnSaving;
 			Helper.Events.GameLoop.DayStarted += GameLoopOnDayStarted;
 			Helper.Events.GameLoop.DayEnding += GameLoopOnDayEnding;
 			Helper.Events.GameLoop.ReturnedToTitle += GameLoopOnReturnedToTitle;
 			Helper.Events.GameLoop.UpdateTicked += GameLoopUpdateTicked;
 			Helper.Events.Player.Warped += PlayerOnWarped;
+			Helper.Events.Player.InventoryChanged += PlayerOnInventoryChanged;
 			Helper.Events.Input.ButtonPressed += InputOnButtonPressed;
 			Helper.Events.Display.MenuChanged += DisplayOnMenuChanged;
 			Helper.Events.Multiplayer.PeerConnected += MultiplayerOnPeerConnected;
-			Helper.Events.Multiplayer.ModMessageReceived += MultiplayerModMessageReceived;
 
 			if (Config.AddCookingSkillAndRecipes)
 			{
@@ -386,7 +392,7 @@ namespace CooksAssistant
 			}
 			if (Config.DebugMode && Config.DebugRegenTracker)
 			{
-				Helper.Events.Display.RenderedHud += Event_DrawDebugHud;
+				Helper.Events.Display.RenderedHud += Event_DrawDebugRegenTracker;
 			}
 			SpaceEvents.OnItemEaten += SpaceEventsOnItemEaten;
 			SpaceEvents.BeforeGiftGiven += SpaceEventsOnBeforeGiftGiven;
@@ -450,7 +456,7 @@ namespace CooksAssistant
 			});
 			Helper.ConsoleCommands.Add(cmd + "tool", "Set cooking tool level.", (s, args) =>
 			{
-				if (!Config.AddCookingTool)
+				if (!Config.AddCookingToolProgression)
 				{
 					Log.D("Cooking tool is not enabled.");
 					return;
@@ -458,8 +464,8 @@ namespace CooksAssistant
 				if (args.Length < 1)
 					return;
 
-				LocalData.CookingToolLevel = int.Parse(args[0]);
-				Log.D($"Set Cooking tool to {SharedData.CookingToolLevels}");
+				CookingToolLevel = int.Parse(args[0]);
+				Log.D($"Set Cooking tool to {CookingToolLevel}");
 			});
 			Helper.ConsoleCommands.Add(cmd + "lvlmenu", "Show cooking level menu.", (s, args) =>
 			{
@@ -560,6 +566,7 @@ namespace CooksAssistant
 			else if (Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies"))
 			{
 				Log.W("Did not add new crops: [PPJA] Fruits and Veggies already adds these objects.");
+				Config.AddNewCropsAndStuff = false;
 			}
 			else
 			{
@@ -587,41 +594,17 @@ namespace CooksAssistant
 
 		private void GameLoopOnSaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
-			// Harmony patches
 			HarmonyPatches.Patch();
 
-			// TODO: SYSTEM: Solve for farmhands with non-persistent save data
-			try
-			{
-				SharedData = Game1.IsMasterGame ? Helper.Data.ReadSaveData<ModSharedData>(SharedDataKey) ?? new ModSharedData() : null;
-				LocalData = new ModSaveData();
-			}
-			catch (Exception ex)
-			{
-				Log.E($"Error while parsing local/shared save data:\n{ex}");
-				SharedData = Game1.IsMasterGame ? new ModSharedData() : null;
-				LocalData = new ModSaveData();
-			}
-
-			if (Game1.IsMasterGame)
-			{
-				Log.D("Loading master game LocalData from SharedData",
-					Config.DebugMode);
-				var who = Game1.player.UniqueMultiplayerID;
-
-				if (!SharedData.FarmersUsingRecipeGridView.ContainsKey(who))
-				{
-					SharedData.FarmersUsingRecipeGridView[who] = false;
-					SharedData.CookingToolLevels[who] = 0;
-					SharedData.FoodsEaten[who] = new List<string>();
-					SharedData.FavouriteRecipes[who] = new List<string>();
-				}
-
-				LocalData.IsUsingRecipeGridView = SharedData.FarmersUsingRecipeGridView[who];
-				LocalData.CookingToolLevel = SharedData.CookingToolLevels[who];
-				LocalData.FoodsEaten = SharedData.FoodsEaten[who];
-				LocalData.FavouriteRecipes = SharedData.FavouriteRecipes[who];
-			}
+			// Load local persistent data from saved modData
+			IsUsingRecipeGridView = Game1.player.modData.TryGetValue(
+				AssetPrefix + "grid_view", out var gridView) ? bool.Parse(gridView) : false;
+			CookingToolLevel = Game1.player.modData.TryGetValue(
+				AssetPrefix + "tool_level", out var toolLevel) ? int.Parse(toolLevel) : 0;
+			FoodsEaten = Game1.player.modData.TryGetValue(
+				AssetPrefix + "foods_eaten", out var foodsEaten) ? foodsEaten.Split(',').ToList() : new List<string>();
+			FavouriteRecipes = Game1.player.modData.TryGetValue(
+				AssetPrefix + "favourite_recipes", out var favouriteRecipes) ? favouriteRecipes.Split(',').ToList() : new List<string>();
 
 			PrintModData();
 
@@ -631,16 +614,11 @@ namespace CooksAssistant
 			}
 
 			// Invalidate and reload assets requiring JA indexes
+			Log.D("Invalidating assets on save loaded.",
+				Config.DebugMode);
 			Helper.Content.InvalidateCache(@"Data/ObjectInformation");
 			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
-			Log.I("Invalidated assets late.");
-			
-			// Add watcher to check for first-time Kitchen bundle completion
-			if (IsNewCommunityCentreBundleEnabled())
-			{
-				Helper.Content.InvalidateCache(@"Data/Bundles");
-				Helper.Events.GameLoop.DayEnding += Event_WatchingKitchenBundle;
-			}
+			Helper.Content.InvalidateCache(@"Data/Bundles");
 
 			// Populate NPC home locations for cooking range usage
 			var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
@@ -649,41 +627,23 @@ namespace CooksAssistant
 			{
 				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
 			}
-		}
 
-		private void GameLoopOnSaving(object sender, SavingEventArgs e)
-		{
-			if (Game1.IsMasterGame)
+			if (!Game1.IsMasterGame)
 			{
-				SaveAndUnloadBundleData();
+				ReloadBundleData();
 			}
 		}
 
 		private void GameLoopOnDayEnding(object sender, DayEndingEventArgs e)
 		{
-			if (Game1.IsMasterGame)
-			{
-				Log.D("Saving LocalData to SharedData for master player.",
-					Config.DebugMode);
-				var who = Game1.player.UniqueMultiplayerID;
-				SharedData.FarmersUsingRecipeGridView[who] = LocalData.IsUsingRecipeGridView;
-				SharedData.CookingToolLevels[who] = LocalData.CookingToolLevel;
-				SharedData.FavouriteRecipes[who] = LocalData.FavouriteRecipes;
-				SharedData.FoodsEaten[who] = LocalData.FoodsEaten;
-			}
-			else
-			{
-				Log.D("Sending LocalData to master player for SharedData.",
-					Config.DebugMode);
-				var data = new []
-				{
-					new KeyValuePair<string, string>("grid_view", LocalData.IsUsingRecipeGridView.ToString()),
-					new KeyValuePair<string, string>("tool_level", LocalData.CookingToolLevel.ToString()),
-					new KeyValuePair<string, string>("foods_eaten", string.Join(",", LocalData.FoodsEaten)),
-					new KeyValuePair<string, string>("favourite_recipes", string.Join(",", LocalData.FavouriteRecipes)),
-				};
-				new Core.Message(data).Send(Core.Message.Type.PeerToHost);
-			}
+			// Save persistent player data to player
+			Game1.player.modData[AssetPrefix + "grid_view"] = IsUsingRecipeGridView.ToString();
+			Game1.player.modData[AssetPrefix + "tool_level"] = CookingToolLevel.ToString();
+			Game1.player.modData[AssetPrefix + "foods_eaten"] = string.Join(",", FoodsEaten);
+			Game1.player.modData[AssetPrefix + "favourite_recipes"] = string.Join(",", FavouriteRecipes);
+
+			// Save local (and/or persistent) community centre data
+			SaveAndUnloadBundleData();
 		}
 
 		private void GameLoopOnDayStarted(object sender, DayStartedEventArgs e)
@@ -717,20 +677,19 @@ namespace CooksAssistant
 			// Add the cookbook for the player after some days
 			if (Config.AddCookingMenu
 				&& (Game1.dayOfMonth > CookbookMailDate || Game1.currentSeason != "spring")
-				&& !Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
+				&& !Game1.player.mailReceived.Contains(MailCookbookUnlocked))
 			{
-				// TODO: CONTENT: Cookbook unlock mail, and cookbook locked behaviours
 				Game1.player.mailbox.Add(MailCookbookUnlocked);
 			}
 
-			// TODO: UPDATE: Send mail when the kitchen bundle is completed
-			if (false && (IsNewCommunityCentreBundleEnabled() && Game1.MasterPlayer.hasOrWillReceiveMail(MailBundleCompleted)))
+			// TODO: UPDATE: Send followup mail when the kitchen bundle is completed
+			if (SendBundleFollowupMail && (IsNewCommunityCentreBundleEnabled() && Game1.MasterPlayer.hasOrWillReceiveMail(MailBundleCompleted)))
 			{
 				Game1.addMailForTomorrow(MailBundleCompletedFollowup);
 			}
 
 			// Attempt to place a wild nettle as forage around other weeds
-			if (Game1.currentSeason == "summer" || ((Game1.currentSeason == "spring" || Game1.currentSeason == "fall") && Game1.dayOfMonth % 2 == 0))
+			if (NettlesEnabled && (Game1.currentSeason == "summer" || ((Game1.currentSeason == "spring" || Game1.currentSeason == "fall") && Game1.dayOfMonth % 2 == 0)))
 			{
 				foreach (var l in new[] {"Mountain", "Forest", "Railroad", "Farm"})
 				{
@@ -748,22 +707,18 @@ namespace CooksAssistant
 			// Hosts must have the Community Centre changes enabled, and hosts/farmhands must be joining a world with custom bundles apparently enabled
 			if (IsCommunityCentreComplete())
 			{
-				if (Game1.netWorldState.Value.BundleData.Keys.Any(key => key.Split('/')[0].StartsWith(CommunityCentreAreaName)))
+				Log.D("Community centre complete, unloading any bundle data.",
+					Config.DebugMode);
+				if (Game1.netWorldState.Value.Bundles.Count() > BundleStartIndex)
 				{
 					SaveAndUnloadBundleData();
 				}
 			}
 			else if (IsNewCommunityCentreBundleEnabled())
 			{
-				try
-				{
-					LoadBundleData();
-				}
-				catch (InvalidOperationException e1)
-				{
-					Log.E($"DayStarted LoadBundles error, retrying:\n{e1}");
-					Helper.Events.GameLoop.UpdateTicked += Event_RetryLoadBundles;
-				}
+				Log.D("Community centre enabled, loading bundle data.",
+					Config.DebugMode);
+				LoadBundleData();
 			}
 		}
 
@@ -780,22 +735,18 @@ namespace CooksAssistant
 			_healthRegeneration = _staminaRegeneration = 0;
 			_healthOnLastTick = _staminaOnLastTick = 0;
 			_debugRegenRate = _debugElapsedTime = 0;
-
-			// Remove Kitchen bundle watcher, assuming one exists
-			if (Config.AddCookingCommunityCentreBundle)
-			{
-				Helper.Events.GameLoop.DayEnding -= Event_WatchingKitchenBundle;
-			}
 		}
 
 		private void GameLoopUpdateTicked(object sender, UpdateTickedEventArgs e)
 		{
-			//Log.D($"UpdateTicked e.Ticks: {e.Ticks}");
-			_healthOnLastTick = Game1.player.health;
-			_staminaOnLastTick = Game1.player.Stamina;
+			if (Game1.player != null)
+			{
+				_healthOnLastTick = Game1.player.health;
+				_staminaOnLastTick = Game1.player.Stamina;
+			}
 		}
 		
-		private void Event_DrawDebugHud(object sender, RenderedHudEventArgs e)
+		private void Event_DrawDebugRegenTracker(object sender, RenderedHudEventArgs e)
 		{
 			for (var i = 0; i < _regenTicksDiff.Count; ++i)
 			{
@@ -829,7 +780,7 @@ namespace CooksAssistant
 
 		private void Event_FoodRegeneration(object sender, UpdateTickedEventArgs e)
 		{
-			if (PlayerAgencyLostCheck())
+			if (!Game1.IsMultiplayer && PlayerAgencyLostCheck())
 				return;
 			if (Game1.player.health < 1 || _healthRegeneration < 1 && _staminaRegeneration < 1)
 			{
@@ -850,7 +801,7 @@ namespace CooksAssistant
 				   + (Config.AddCookingSkillAndRecipes ? 10 * CookingRegenModifier : 0)
 				   + 10 * ForagingRegenModifier);
 			var rate = (baseRate - baseRate * scaling) * regenRate * 100d;
-			rate = Math.Floor(Math.Max(32 - cookingLevel * 1.75f, rate * panicRate));
+			rate = Math.Floor(Math.Max(36 - cookingLevel * 1.75f, rate * panicRate));
 
 			_debugRegenRate = (float) rate;
 			_debugElapsedTime = e.Ticks;
@@ -882,7 +833,8 @@ namespace CooksAssistant
 		private void Event_WatchingToolUpgrades(object sender, UpdateTickedEventArgs e)
 		{
 			// Checks for purchasing a cooking tool upgrade from Clint's upgrade menu
-			if (Game1.activeClickableMenu is ShopMenu menu
+			if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is ShopMenu menu
+				&& menu.heldItem != null
 				&& menu.heldItem is StardewValley.Tools.GenericTool tool
 				&& tool.Name.EndsWith(CookingToolName)
 				&& tool.IndexOfMenuItemView - 17 < 3)
@@ -896,20 +848,23 @@ namespace CooksAssistant
 			}
 
 			// Checks for collecting your upgraded cooking tool from Clint after waiting the upgrade period
-			if (Game1.player.mostRecentlyGrabbedItem is StardewValley.Tools.GenericTool tool1
+			if (Game1.player.mostRecentlyGrabbedItem != null
+				&& Game1.player.mostRecentlyGrabbedItem is StardewValley.Tools.GenericTool tool1
 				&& tool1.Name.EndsWith(CookingToolName)
-				&& tool1.IndexOfMenuItemView - 17 > LocalData.CookingToolLevel - 1)
+				&& tool1.IndexOfMenuItemView - 17 > CookingToolLevel - 1)
 			{
-				++LocalData.CookingToolLevel;
+				++CookingToolLevel;
 			}
 
-			if (Game1.currentLocation.Name != "Blacksmith")
+			if (Game1.currentLocation == null || Game1.currentLocation.Name != "Blacksmith")
 				Helper.Events.GameLoop.UpdateTicked -= Event_WatchingToolUpgrades;
 		}
 
 		private void Event_WatchingBuffs(object sender, UpdateTickedEventArgs e)
 		{
-			if (_watchingBuff == null
+			if ((Game1.activeClickableMenu != null && Game1.activeClickableMenu is TitleMenu)
+				|| Game1.player == null
+				|| _watchingBuff == null
 				|| (Game1.buffsDisplay.food?.source != _watchingBuff.source
 					&& Game1.buffsDisplay.drink?.source != _watchingBuff.source
 					&& Game1.buffsDisplay.otherBuffs.Any()
@@ -921,17 +876,6 @@ namespace CooksAssistant
 			}
 		}
 		
-		private void Event_WatchingKitchenBundle(object sender, DayEndingEventArgs e)
-		{
-			// Send mail when completing the Kitchen in the community centre
-			var cc = GetCommunityCenter();
-			if (cc.areasComplete.Count <= CommunityCentreAreaNumber || !cc.areasComplete[CommunityCentreAreaNumber]
-				|| Game1.player.mailReceived.Contains(MailBundleCompleted))
-				return;
-
-			Game1.player.mailForTomorrow.Add(MailBundleCompleted + "%&NL&%");
-		}
-
 		private void Event_MoveJunimo(object sender, UpdateTickedEventArgs e)
 		{
 			var cc = GetCommunityCenter();
@@ -961,12 +905,6 @@ namespace CooksAssistant
 				((JunimoNoteMenu)Game1.activeClickableMenu).setUpMenu(CommunityCentreAreaNumber, GetCommunityCenter().bundlesDict());
 			}
 			Helper.Events.GameLoop.UpdateTicked -= Event_ChangeJunimoMenuTab;
-		}
-
-		private void Event_RetryLoadBundles(object sender, UpdateTickedEventArgs e)
-		{
-			Helper.Events.GameLoop.UpdateTicked -= Event_RetryLoadBundles;
-			LoadBundleData();
 		}
 
 		/// <summary>
@@ -1098,8 +1036,8 @@ namespace CooksAssistant
 					else if (IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
 					{
 						if (NpcHomeLocations.Any(pair => pair.Value == Game1.currentLocation.Name
-														 && Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= 5)
-						|| NpcHomeLocations.All(pair => pair.Value != Game1.currentLocation.Name))
+								&& Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= NpcKitchenFriendshipRequired)
+							|| NpcHomeLocations.All(pair => pair.Value != Game1.currentLocation.Name))
 						{
 							Log.D($"Clicked the kitchen at {Game1.currentLocation.Name}",
 								Config.DebugMode);
@@ -1267,14 +1205,13 @@ namespace CooksAssistant
 					menu.itemPriceAndStock.Add(o, new [] {(int) (o.Price * Game1.MasterPlayer.difficultyModifier), int.MaxValue});
 					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Sugar"), o);
 				}
-				return;
 			}
 
 			// Upgrade cooking equipment at the blacksmith
-			if (Config.AddCookingTool && Game1.currentLocation?.Name == "Blacksmith")
+			if (Config.AddCookingToolProgression && Game1.currentLocation?.Name == "Blacksmith")
 			{
 				var canUpgrade = CanFarmerUpgradeCookingEquipment();
-				var level = LocalData.CookingToolLevel;
+				var level = CookingToolLevel;
 				if (canUpgrade)
 				{
 					if (e.NewMenu is ShopMenu upgradeMenu)
@@ -1339,9 +1276,55 @@ namespace CooksAssistant
 			return null;
 		}
 
+		private void PlayerOnInventoryChanged(object sender, InventoryChangedEventArgs e)
+		{
+			// Handle unique craftable input/output
+			if (Game1.activeClickableMenu == null
+				&& Game1.currentLocation.Objects.ContainsKey(Game1.currentLocation.getTileAtMousePosition())
+				&& Game1.currentLocation.Objects[Game1.currentLocation.getTileAtMousePosition()] is Object craftable
+				&& craftable != null && craftable.bigCraftable.Value)
+			{
+				if (craftable.Name == "Keg")
+				{
+					if (NettlesEnabled && Game1.player.mostRecentlyGrabbedItem?.Name == ObjectPrefix + "nettles")
+					{
+						var name = ObjectPrefix + "nettletea";
+						craftable.heldObject.Value = new Object(Vector2.Zero, JsonAssets.GetObjectId(name), name,
+							canBeSetDown: false, canBeGrabbed: true, isHoedirt: false, isSpawnedObject: false);
+						craftable.MinutesUntilReady = 180;
+					}
+					else if (CiderEnabled && Game1.player.mostRecentlyGrabbedItem != null && Game1.player.mostRecentlyGrabbedItem.Name.EndsWith("Apple"))
+					{
+						var name = ObjectPrefix + "cider";
+						craftable.heldObject.Value = new Object(Vector2.Zero, JsonAssets.GetObjectId(name), name,
+							canBeSetDown: false, canBeGrabbed: true, isHoedirt: false, isSpawnedObject: false);
+						craftable.MinutesUntilReady = 1900;
+					}
+					else if (PerryEnabled && Game1.player.mostRecentlyGrabbedItem != null && Game1.player.mostRecentlyGrabbedItem.Name.EndsWith("Pear"))
+					{
+						var name = ObjectPrefix + "perry";
+						craftable.heldObject.Value = new Object(Vector2.Zero, JsonAssets.GetObjectId(name), name,
+							canBeSetDown: false, canBeGrabbed: true, isHoedirt: false, isSpawnedObject: false);
+						craftable.MinutesUntilReady = 1900;
+					}
+				}
+				else if (craftable.Name == "Preserves Jar")
+				{
+					if (MarmaladeEnabled && e.Removed.FirstOrDefault(o => MarmaladeFoods.Contains(o.Name)) is Object dropIn && dropIn != null)
+					{
+						craftable.heldObject.Value = new Object(Vector2.Zero, JsonAssets.GetObjectId(ObjectPrefix + "marmalade"), dropIn.Name + " Marmalade",
+							canBeSetDown: false, canBeGrabbed: true, isHoedirt: false, isSpawnedObject: false);
+						craftable.heldObject.Value.Price = 65 + dropIn.Price * 2;
+						craftable.heldObject.Value.name = dropIn.Name + " Marmalade";
+						craftable.MinutesUntilReady = 4600;
+					}
+				}
+			}
+		}
+
 		private void PlayerOnWarped(object sender, WarpedEventArgs e)
 		{
-			if (Config.AddCookingTool && e.NewLocation.Name == "Blacksmith")
+			if (Config.AddCookingToolProgression && e.NewLocation.Name == "Blacksmith")
 			{
 				Helper.Events.GameLoop.UpdateTicked += Event_WatchingToolUpgrades;
 			}
@@ -1398,59 +1381,19 @@ namespace CooksAssistant
 
 		private void MultiplayerOnPeerConnected(object sender, PeerConnectedEventArgs e)
 		{
-			if (!Game1.IsMasterGame)
-				return;
-
 			Log.D($"Peer connected to host: {e.Peer.PlayerID} : SMAPI:{e.Peer.HasSmapi}" +
 				$" CAC:{(e.Peer.Mods?.ToList().FirstOrDefault(mod => mod.ID == Helper.ModRegistry.ModID) is IMultiplayerPeerMod mod && mod != null ? mod.Version.ToString() : "null")}",
 				Config.DebugMode);
-			ReloadBundleData();
-
-			// Send the peer their saved LocalData from SharedData
-			BroadcastPeerData(e.Peer.PlayerID);
-		}
-
-		private void MultiplayerModMessageReceived(object sender, ModMessageReceivedEventArgs e)
-		{
-			if (e.FromModID != ModManifest.UniqueID || !Enum.TryParse(e.Type, out Core.Message.Type type))
-				return;
-
-			Log.D($"Received message from {e.FromPlayerID}: {e.Type}",
-				Config.DebugMode);
-
-			var message = e.ReadAs<Core.Message>();
-			switch (type)
+			if (Game1.IsMasterGame)
 			{
-				case Core.Message.Type.HostToPeer:
-				{
-					if (message.Data.TryGetValue("grid_view", out var gridView))
-						LocalData.IsUsingRecipeGridView = bool.Parse(gridView);
-					if (message.Data.TryGetValue("tool_level", out var toolLevel))
-						LocalData.CookingToolLevel = int.Parse(toolLevel);
-					if (message.Data.TryGetValue("foods_eaten", out var foodsEaten))
-						LocalData.FoodsEaten = foodsEaten.Split(',').ToList();
-					if (message.Data.TryGetValue("favourite_recipes", out var favouriteRecipes))
-						LocalData.FavouriteRecipes = favouriteRecipes.Split(',').ToList();
+				//ReloadBundleData();
 
-					break;
-				}
-
-				case Core.Message.Type.PeerToHost:
-				{
-					if (message.Data.TryGetValue("grid_view", out var gridView))
-						SharedData.FarmersUsingRecipeGridView[e.FromPlayerID] = bool.Parse(gridView);
-					if (message.Data.TryGetValue("tool_level", out var toolLevel))
-						SharedData.CookingToolLevels[e.FromPlayerID] = int.Parse(toolLevel);
-					if (message.Data.TryGetValue("foods_eaten", out var foodsEaten))
-						SharedData.FoodsEaten[e.FromPlayerID] = foodsEaten.Split(',').ToList();
-					if (message.Data.TryGetValue("favourite_recipes", out var favouriteRecipes))
-						SharedData.FavouriteRecipes[e.FromPlayerID] = favouriteRecipes.Split(',').ToList();
-
-					break;
-				}
-
-				default:
-					throw new NotImplementedException($"Unhandled {nameof(Core.Message.Type)} value in ModMessage: {e.Type}");
+				// Send the peer their saved LocalData from SharedData
+				//BroadcastPeerData(e.Peer.PlayerID);
+			}
+			else
+			{
+				//ReloadBundleData();
 			}
 		}
 
@@ -1465,8 +1408,11 @@ namespace CooksAssistant
 
 			Log.D($"Ate food: {food.Name}\nBuffs: (food) {Game1.buffsDisplay.food?.displaySource} (drink) {Game1.buffsDisplay.drink?.displaySource}",
 				Config.DebugMode);
+
+			// Determine food healing
 			if (Config.FoodHealingTakesTime)
 			{
+				// Regenerate health/energy over time
 				Helper.Events.GameLoop.UpdateTicked += Event_FoodRegeneration;
 				Game1.player.health = (int)_healthOnLastTick;
 				Game1.player.Stamina = _staminaOnLastTick;
@@ -1476,6 +1422,7 @@ namespace CooksAssistant
 			else if (Config.AddCookingSkillAndRecipes
 			         && Game1.player.HasCustomProfession(CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.Restoration]))
 			{
+				// Add additional health
 				Game1.player.health = (int) Math.Min(Game1.player.maxHealth,
 					Game1.player.health + food.healthRecoveredOnConsumption() * (CookingSkill.RestorationAltValue / 100f));
 				Game1.player.Stamina = (int) Math.Min(Game1.player.MaxStamina,
@@ -1485,8 +1432,12 @@ namespace CooksAssistant
 			var lastBuff = _lastFoodWasDrink
 				? Game1.buffsDisplay.drink
 				: Game1.buffsDisplay.food;
-			Log.D($"Last buff: {lastBuff?.displaySource ?? "null"} ({lastBuff?.source ?? "null"})"
-			      + $" | Food: {food.DisplayName} ({food.Name})", Config.DebugMode);
+			Log.D($"OnItemEaten"
+				+ $" | Ate food:  {food.Name}"
+				+ $" | Last buff: {lastBuff?.displaySource ?? "null"} (source: {lastBuff?.source ?? "null"})",
+				Config.DebugMode);
+
+			// Check to boost buff duration
 			if ((Config.AddCookingSkillAndRecipes
 			    && Game1.player.HasCustomProfession(CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.BuffDuration]))
 			    && food.displayName == lastBuff?.displaySource)
@@ -1501,12 +1452,13 @@ namespace CooksAssistant
 				}
 			}
 
+			// Track buffs received
 			_watchingBuff = lastBuff;
 
-			if (SharedData != null)
+			// Track foods eaten
+			if (!FoodsEaten.Contains(food.Name))
 			{
-				if (!LocalData.FoodsEaten.Contains(food.Name))
-					LocalData.FoodsEaten.Add(food.Name);
+				FoodsEaten.Add(food.Name);
 			}
 
 			// Add leftovers from viable foods to the inventory, or drop it on the ground if full
@@ -1520,6 +1472,7 @@ namespace CooksAssistant
 					Game1.createItemDebris(leftovers, Game1.player.Position, -1);
 			}
 
+			// Handle unique kebab effects
 			if (food.Name == "Kebab")
 			{
 				var roll = Game1.random.NextDouble();
@@ -1589,7 +1542,8 @@ namespace CooksAssistant
 					Game1.buffsDisplay.tryToAddFoodBuff(buff, duration);
 			}
 
-			if (Config.AddCookingSkillAndRecipes
+			// Track added buffs
+			if (CookingAddedLevelsEnabled && Config.AddCookingSkillAndRecipes
 				&& ((!_lastFoodWasDrink && Game1.buffsDisplay.food?.source == food.Name)
 					|| (_lastFoodWasDrink && Game1.buffsDisplay.drink?.source == food.Name)))
 			{
@@ -1680,7 +1634,7 @@ namespace CooksAssistant
 		
 		private void OpenNewCookingMenu(List<CraftingRecipe> recipes = null)
 		{
-			Log.D("Check for cooking menu.",
+			Log.D("Check to open new cooking menu.",
 				Config.DebugMode);
 
 			void CreateCookingMenu(NetRef<Chest> fridge, List<Chest> miniFridges)
@@ -1721,8 +1675,6 @@ namespace CooksAssistant
 						Config.DebugMode);
 					Game1.activeClickableMenu = craftingMenu;
 				}
-				Log.D("...",
-					Config.DebugMode);
 			}
 
 			if (Game1.player.mailReceived.Contains(MailCookbookUnlocked))
@@ -1749,7 +1701,7 @@ namespace CooksAssistant
 				{
 					Log.D($"Mutex locked, did not open new cooking menu for fridge at {Game1.currentLocation.Name} {fridge.Value.TileLocation.ToString()}",
 						Config.DebugMode);
-					Game1.showRedMessage(i18n.Get("menu.cooking_station.locked"));
+					Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
 				}
 				else if (fridge.Value == null)
 				{
@@ -1780,14 +1732,14 @@ namespace CooksAssistant
 						{
 							Log.D($"Mutex locked, did not open new cooking menu for fridge at {Game1.currentLocation.Name} {fridge.Value.TileLocation.ToString()}",
 								Config.DebugMode);
-							Game1.showRedMessage(i18n.Get("menu.cooking_station.locked"));
+							Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
 							multiple_mutex_request.ReleaseLocks();
 						});
 					}, delegate
 					{
 						Log.D($"Mutex locked, did not open new cooking menu for fridge at {Game1.currentLocation.Name} {fridge.Value.TileLocation.ToString()}",
 							Config.DebugMode);
-						Game1.showRedMessage(i18n.Get("menu.cooking_station.locked"));
+						Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
 					});
 				}
 			}
@@ -1806,7 +1758,7 @@ namespace CooksAssistant
 		public float GetFoodRegenRate(Object food)
 		{
 			// Regen slower with drinks
-			var rate = _lastFoodWasDrink ? 0.1f : 0.15f;
+			var rate = _lastFoodWasDrink ? 0.15f : 0.2f;
 			// Regen faster with quality
 			rate += food.Quality * 0.008f;
 			// Regen faster when drunk
@@ -1825,29 +1777,11 @@ namespace CooksAssistant
 		/// <returns>Level of the best cooking station in range, defaults to 0.</returns>
 		public int GetNearbyCookingStationLevel()
 		{
-			var toolLevel = SharedData.CookingToolLevels;
-			var skillLevel = CookingSkill.GetLevel();
-			var farmhouseLevel = GetFarmhouseKitchenLevel(Game1.getLocationFromName("FarmHouse") as FarmHouse);
-			Log.D($"CheckForNearbyCookingStation()" +
-				$"\nUsing Tool: {Config.AddCookingTool} Cooking: {skillLevel} Tool: {toolLevel}" +
-				$" Farmer: {GetFarmersMaxUsableIngredients()} FarmHouse: {farmhouseLevel}",
-				Config.DebugMode);
-
+			const int radius = 3;
 			var cookingStationLevel = 0;
-			var radius = 3;
-			// Gus' cooking range uses his own equipment level as a baseline
-			if (false && Game1.currentLocation.Name == "Saloon")
-			{
-				if (Utility.tileWithinRadiusOfPlayer(SaloonCookingRangePosition.X, SaloonCookingRangePosition.Y,
-					radius, Game1.player))
-				{
-					cookingStationLevel = Math.Max(SharedData.SaloonCookingRangeLevel, GetFarmersMaxUsableIngredients());
-					Log.D($"Cooking station: {cookingStationLevel}",
-						Config.DebugMode);
-				}
-			}
+
 			// If indoors, use the farmhouse or cabin level as a base for cooking levels
-			else if (!Game1.currentLocation.IsOutdoors)
+			if (!Game1.currentLocation.IsOutdoors)
 			{
 				var layer = Game1.currentLocation.Map.GetLayer("Buildings");
 				var xLimit = Game1.player.getTileX() + radius;
@@ -1921,36 +1855,18 @@ namespace CooksAssistant
 
 		public int GetFarmersMaxUsableIngredients()
 		{
-			return Config.AddCookingTool
-				? 1 + LocalData.CookingToolLevel
+			return Config.AddCookingToolProgression
+				? 1 + CookingToolLevel
 				: 5;
 		}
 
 		private bool CanFarmerUpgradeCookingEquipment()
 		{
-			var results = new Dictionary<int, List<bool>>();
 			bool canUpgrade(int skill, int tool)
 			{
 				return (skill / 2) / (tool + 1) >= 1;
 			}
-			void calculateLevelupTable()
-			{
-				for (var i = 0; i < 10; ++i)
-				{
-					var list = new List<bool>();
-					for (var j = 0; j < 5; ++j)
-					{
-						var r = canUpgrade(i, j);
-						list.Add(r);
-					}
-					results.Add(i, list);
-				}
-			}
-			var skillLevel = CookingSkill.GetLevel();
-			var toolLevel = LocalData.CookingToolLevel;
-			var result = canUpgrade(skillLevel, toolLevel);
-			//calculateLevelupTable();
-			return result;
+			return canUpgrade(CookingSkill.GetLevel(), CookingToolLevel);
 		}
 		
 		/// <summary>
@@ -1961,7 +1877,7 @@ namespace CooksAssistant
 		{
 			// Pair a suffix grouping some common items together with the name of the lowest-index (first-found) item in the group
 			var itemList = menu.forSale;
-			Log.D(itemList.Aggregate("Shop stock:", (total, cur) => $"{total}\n{cur.Name}"));
+			//Log.D(itemList.Aggregate("Shop stock:", (total, cur) => $"{total}\n{cur.Name}"));
 			var suffixes = new Dictionary<string, string>
 				{{"seeds", null}, {"bulb", null}, {"starter", null}, {"shoot", null}, {"sapling", null}};
 			var debugCount = 0;
@@ -1984,8 +1900,7 @@ namespace CooksAssistant
 				++debugCount;
 				//Log.D($"Moved {item.Name} to {itemList[index - 1].Name} at {index}");
 			}
-			Log.D($"Sorted seed shop stock, {debugCount} moves.",
-				Config.DebugMode);
+			//Log.D($"Sorted seed shop stock, {debugCount} moves.", Config.DebugMode);
 			menu.forSale = itemList;
 		}
 
@@ -2038,8 +1953,8 @@ namespace CooksAssistant
 
 		public bool IsNewCommunityCentreBundleEnabled()
 		{
-			return (Game1.IsMasterGame && Config.AddCookingCommunityCentreBundle)
-				|| (Game1.netWorldState.Value.Bundles.Keys.Any(key => key > BundleStartIndex && GetCommunityCenter().areasComplete.Count > CommunityCentreAreaNumber));
+			return (Game1.IsMasterGame && Config.AddCookingCommunityCentreBundles)
+				|| (Game1.netWorldState.Value.Bundles.Keys.Any(key => key > BundleStartIndex) || GetCommunityCenter().areasComplete.Count > CommunityCentreAreaNumber);
 		}
 
 		public bool IsNewCommunityCentreBundleCompleted()
@@ -2082,21 +1997,7 @@ namespace CooksAssistant
 				cc.addJunimoNote(CommunityCentreAreaNumber);
 			}
 		}
-
-		private void BroadcastPeerData(long who)
-		{
-			Log.D($"Sending peer data for {who}",
-				Config.DebugMode);
-			var data = new[]
-			{
-				new KeyValuePair<string, string>("grid_view", SharedData.FarmersUsingRecipeGridView[who].ToString()),
-				new KeyValuePair<string, string>("tool_level", SharedData.CookingToolLevels[who].ToString()),
-				new KeyValuePair<string, string>("foods_eaten", string.Join(",", SharedData.FoodsEaten[who])),
-				new KeyValuePair<string, string>("favourite_recipes", string.Join(",", SharedData.FavouriteRecipes[who])),
-			};
-			new Core.Message(data).Send(Core.Message.Type.HostToPeer);
-		}
-
+		
 		private void ReloadBundleData()
 		{
 			Log.D("CACBUNDLES Reloading custom bundle data",
@@ -2108,23 +2009,23 @@ namespace CooksAssistant
 		private void LoadBundleData()
 		{
 			var cc = GetCommunityCenter();
-			var customBundleData = ParseCustomCookingBundleData();
+			var customBundleData = ParseBundleData();
 			BundleCount = customBundleData.Count;
 
 			Log.D(customBundleData.Aggregate("CACBUNDLES customBundleData: ", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 				Config.DebugMode);
 
 			// First-time load for bundle additions
-			if (SharedData != null && (SharedData.CookingBundleProgress == null || SharedData.CookingBundleProgress.Count == 0))
+			if (CommunityCentreBundleValues.Count == 0)
 			{
 				foreach (var bundle in customBundleData)
 				{
 					// Populate mod savedata with parsed custom bundle data from source data files
-					var count = bundle.Value.Split('/')[2].Split(' ').Length;
-					SharedData.CookingBundleProgress[bundle.Key] = new bool[count];
-					SharedData.CookingBundleRewards[bundle.Key] = false;
-					Log.D($"CACBUNDLES Added first-time bundle data for {bundle.Key}",
+					Log.D($"CACBUNDLES Adding first-time bundle data for {bundle.Key}",
 						Config.DebugMode);
+					var count = bundle.Value.Split('/')[2].Split(' ').Length;
+					CommunityCentreBundleValues[bundle.Key] = new bool[count];
+					CommunityCentreBundleRewards[bundle.Key] = false;
 				}
 			}
 
@@ -2154,17 +2055,17 @@ namespace CooksAssistant
 				// Quality control
 				for (var key = BundleStartIndex; key < BundleStartIndex + BundleCount; ++key)
 				{
-					var currentLength = SharedData.CookingBundleProgress[key].Length;
+					var currentLength = CommunityCentreBundleValues[key].Length;
 					var expectedLength = customBundleData[key].Split('/')[2].Split(' ').Length;
 					if (currentLength != expectedLength)
 					{
 						Log.D($"Correcting bundle {key} ({currentLength} -> {expectedLength} elems)",
 							Config.DebugMode);
-						SharedData.CookingBundleProgress[key] = new bool[expectedLength];
+						CommunityCentreBundleValues[key] = new bool[expectedLength];
 					}
 				}
-				bundles = bundles.Concat(SharedData.CookingBundleProgress).ToDictionary(pair => pair.Key, pair => pair.Value);
-				bundleRewards = bundleRewards.Concat(SharedData.CookingBundleRewards).ToDictionary(pair => pair.Key, pair => pair.Value);
+				bundles = bundles.Concat(CommunityCentreBundleValues).ToDictionary(pair => pair.Key, pair => pair.Value);
+				bundleRewards = bundleRewards.Concat(CommunityCentreBundleRewards).ToDictionary(pair => pair.Key, pair => pair.Value);
 				// Apply merged bundle data to world state
 				Game1.netWorldState.Value.Bundles.Clear();
 				Game1.netWorldState.Value.BundleRewards.Clear();
@@ -2225,24 +2126,34 @@ namespace CooksAssistant
 		private void SaveAndUnloadBundleData()
 		{
 			var cc = GetCommunityCenter();
-			SharedData?.CookingBundleProgress.Clear();
+			CommunityCentreBundleValues?.Clear();
 			if (cc.areasComplete.Count > 6)
 			{
 				for (var i = 0; i < BundleCount; ++i)
 				{
 					var key = BundleStartIndex + i;
-					// Add custom bundle data to mod savedata for data persistence, because...
-					SharedData.CookingBundleProgress[key] = Game1.netWorldState.Value.Bundles.ContainsKey(key) ? Game1.netWorldState.Value.Bundles[key] : new bool[0];
-					SharedData.CookingBundleRewards[key] = Game1.netWorldState.Value.BundleRewards.ContainsKey(key) ? Game1.netWorldState.Value.BundleRewards[key] : false;
 
-					// We remove custom bundle data from game savedata to avoid failed save loading
-					Game1.netWorldState.Value.BundleData.Remove(key.ToString());
-					Game1.netWorldState.Value.BundleRewards.Remove(key);
+					if (Game1.IsMasterGame)
+					{
+						// Add custom bundle data to mod savedata for data persistence, because...
+						CommunityCentreBundleValues[key] = Game1.netWorldState.Value.Bundles.ContainsKey(key) ? Game1.netWorldState.Value.Bundles[key] : new bool[0];
+						CommunityCentreBundleRewards[key] = Game1.netWorldState.Value.BundleRewards.ContainsKey(key) ? Game1.netWorldState.Value.BundleRewards[key] : false;
 
-					// Also remove custom bundle metadata
-					Game1.netWorldState.Value.BundleData.Remove($"{CommunityCentreAreaName}/{key}");
+						// We remove custom bundle data from game savedata to avoid failed save loading
+						Game1.netWorldState.Value.BundleData.Remove(key.ToString());
+						Game1.netWorldState.Value.BundleRewards.Remove(key);
 
-					// Remove community centre data
+						// Also remove custom bundle metadata
+						Game1.netWorldState.Value.BundleData.Remove($"{CommunityCentreAreaName}/{key}");
+
+						// Now we add to persistent location data
+						cc.modData[AssetPrefix + "area_completed"] = IsCommunityCentreAreaComplete.ToString();
+						cc.modData[AssetPrefix + "bundles_completed"] = string.Join(",", CommunityCentreBundlesComplete);
+						cc.modData[AssetPrefix + "bundle_values"] = string.Join(",", CommunityCentreBundleValues);
+						cc.modData[AssetPrefix + "bundle_rewards"] = string.Join(",", CommunityCentreBundleRewards);
+					}
+
+					// Remove local community centre data
 					try
 					{
 						var areas = new bool[CommunityCentreAreaNumber];
@@ -2263,18 +2174,9 @@ namespace CooksAssistant
 							+ $"\n{e}");
 					}
 
-					Log.D($"CACBUNDLES Saved bundle progress for {key}",
+					Log.D($"CACBUNDLES Saved and unloaded bundle progress for {key}",
 						Config.DebugMode);
 				}
-			}
-			if (Game1.IsMasterGame)
-			{
-				Helper.Data.WriteSaveData(LocalDataKey, SharedData);
-			}
-			else
-			{
-				Log.D("CACBUNDLES Did not write save data, peer was not host game.",
-					Config.DebugMode);
 			}
 		}
 
@@ -2286,9 +2188,10 @@ namespace CooksAssistant
 			var bad = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary").GetValue();
 
 			Log.D($"CACBUNDLES Host game: ({Game1.IsMasterGame}), Host player: ({Game1.MasterPlayer.UniqueMultiplayerID == Game1.player.UniqueMultiplayerID})");
-			Log.D($"CACBUNDLES CC IsCommunityCentreComplete: {IsCommunityCentreComplete()}");
-			Log.D($"CACBUNDLES CC NumOfAreasComplete: {Helper.Reflection.GetMethod(cc, "getNumberOfAreasComplete").Invoke<int>()}", Config.DebugMode);
-			Log.D(cc.areasComplete.Aggregate("CACBUNDLES CC areasComplete: ", (s, b) => $"{s} ({b})"), Config.DebugMode);
+			Log.D($"CACBUNDLES CC IsCommunityCentreComplete: {IsCommunityCentreComplete()}"); 
+			Log.D($"CACBUNDLES CC IsNewBundleEnabled:        {IsNewCommunityCentreBundleEnabled()}");
+			Log.D($"CACBUNDLES CC NumOfAreasComplete:        {Helper.Reflection.GetMethod(cc, "getNumberOfAreasComplete").Invoke<int>()}", Config.DebugMode);
+			Log.D(cc.areasComplete.Aggregate($"CACBUNDLES CC areasComplete[{cc.areasComplete.Count}]:    ", (s, b) => $"{s} ({b})"), Config.DebugMode);
 			Log.D(bad.Aggregate("CACBUNDLES CC bundleToAreaDictionary:", (s, pair) => $"{s} ({pair.Key}: {pair.Value})"), Config.DebugMode);
 
 			// World state data (SYNCHRONISED)
@@ -2300,26 +2203,27 @@ namespace CooksAssistant
 				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1} ({pair.Key}: {pair.Value})")}" : "(none)"), Config.DebugMode);
 		}
 
-		internal Dictionary<int, string> ParseCustomCookingBundleData()
+		internal Dictionary<int, string> ParseBundleData()
 		{
 			var newData = new Dictionary<int, string>();
 			var sourceBundleList = Helper.Content.Load<Dictionary<string, List<List<string>>>>($"{BundleDataPath}.json");
+			var sourceBundle = sourceBundleList[Config.AddNewCropsAndStuff ? "Custom" : "Vanilla"];
 
 			// Iterate over each custom bundle to add their data to game Bundles dictionary
-			for (var i = 0; i < sourceBundleList.Count; ++i)
+			for (var i = 0; i < sourceBundle.Count; ++i)
 			{
 				// Bundle data
-				var sourceBundle = sourceBundleList[Config.AddNewCropsAndStuff ? "Custom" : "Vanilla"][i];
 				var parsedBundle = new List<List<string>>();
 
 				var index = BundleStartIndex + i;
 				var name = $"{CommunityCentreAreaName}.bundle.{i}";
 				var displayName = i18n.Get($"world.community_centre.bundle.{i + 1}");
-				var itemsToComplete = sourceBundle[sourceBundle.Count - 1];
+				var itemsToComplete = sourceBundle[i][2];
+				var colour = sourceBundle[i][3];
 				parsedBundle.Add(new List<string> { displayName.ToString() });
 
 				// Fill in rewardsData section of the new bundle data
-				var rewardsData = sourceBundle[0].Split(' ');
+				var rewardsData = sourceBundle[i][0].Split(' ');
 				var rewardName = SplitToString(rewardsData.Skip(1).Take(rewardsData.Length - 2), ' ');
 				var rewardId = JsonAssets.GetObjectId(rewardName);
 				if (rewardId < 0)
@@ -2333,7 +2237,7 @@ namespace CooksAssistant
 				// Iterate over each word in the items list, formatted as [<Name With Spaces> <Quantity> <Quality>]
 				parsedBundle.Add(new List<string>());
 				var startIndex = 0;
-				var requirementsData = sourceBundle[1].Split(' ');
+				var requirementsData = sourceBundle[i][1].Split(' ');
 				for (var j = 0; j < requirementsData.Length; ++j)
 				{
 					// Group and parse each [name quantity quality] cluster
@@ -2358,7 +2262,7 @@ namespace CooksAssistant
 				}
 
 				// Patch new data into the target bundle dictionary, including mininmum completion count and display name
-				var value = SplitToString(parsedBundle.Select(list => SplitToString(list, ' ')), '/') + $"/{itemsToComplete}";
+				var value = SplitToString(parsedBundle.Select(list => SplitToString(list, ' ')), '/') + $"/{colour}/{itemsToComplete}";
 				if (LocalizedContentManager.CurrentLanguageCode.ToString() != "en")
 				{
 					value += $"/{displayName}";

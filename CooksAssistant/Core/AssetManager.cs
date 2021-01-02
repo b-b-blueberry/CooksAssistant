@@ -5,10 +5,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using xTile.Tiles;
-using Layer = xTile.Layers.Layer;
 using Object = StardewValley.Object;
-using Size = xTile.Dimensions.Size;
 
 namespace CooksAssistant
 {
@@ -43,7 +40,8 @@ namespace CooksAssistant
 
 		public T Load<T>(IAssetInfo asset)
 		{
-			Log.W($"Loading custom asset {asset.AssetName}");
+			Log.D($"Loading custom asset {asset.AssetName}",
+				ModEntry.Instance.Config.DebugMode);
 			if (asset.AssetNameEquals(ModEntry.SpriteSheetPath))
 			{
 				return (T) (object) ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.SpriteSheetPath}.png");
@@ -93,7 +91,6 @@ namespace CooksAssistant
 			           || asset.AssetNameEquals(@"Data/Events/JoshHouse")
 			           || asset.AssetNameEquals(@"LooseSprites/JunimoNote")
 			           || asset.AssetNameEquals(@"Maps/Beach")
-			           || asset.AssetNameEquals(@"Maps/Saloon")
 			           || asset.AssetNameEquals(@"Maps/springobjects")
 			           || asset.AssetNameEquals(@"Maps/townInterior")
 			           || asset.AssetNameEquals(@"Strings/UI")
@@ -108,7 +105,8 @@ namespace CooksAssistant
 
 		private void EditAsset(ref IAssetData asset)
 		{
-			Log.W($"Editing {asset.AssetName}");
+			Log.D($"Editing {asset.AssetName}",
+				ModEntry.Instance.Config.DebugMode);
 			if (asset.AssetNameEquals(@"Data/Bundles"))
 			{
 				// Make no changes for the new community centre bundle, but set our base values from the data
@@ -135,7 +133,7 @@ namespace CooksAssistant
 					split[4] = i18n.Get($"item.{name[2]}.description").ToString();
 					split[8] = i18n.Get($"item.{name[2]}.name").ToString();
 					data[pair.Key] = ModEntry.SplitToString(split);
-					if (ModEntry._printRename)
+					if (ModEntry.PrintRename)
 						Log.D($"Named craftable {name[2]} ({data[pair.Key].Split('/')[5]})", ModEntry.Instance.Config.DebugMode);
 				}
 
@@ -160,12 +158,12 @@ namespace CooksAssistant
 					data[pair.Key].Split('/').CopyTo(split, 0);
 					split[5] = i18n.Get($"item.{name[2]}.name").ToString();
 					data[pair.Key] = ModEntry.SplitToString(split);
-					if (ModEntry._printRename)
+					if (ModEntry.PrintRename)
 						Log.D($"Named recipe {name[2]} ({data[pair.Key].Split('/')[5]})", ModEntry.Instance.Config.DebugMode);
 				}
 				asset.AsDictionary<string, string>().ReplaceWith(data);
 
-				if (!Config.AddNewRecipeScaling)
+				if (!Config.AddRecipeRebalancing)
 				{
 					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
 						Config.DebugMode);
@@ -322,7 +320,7 @@ namespace CooksAssistant
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
 
-					if (ModEntry._printRename)
+					if (ModEntry.PrintRename)
 						Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
 							.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 							ModEntry.Instance.Config.DebugMode);
@@ -362,12 +360,12 @@ namespace CooksAssistant
 						new[] { i18n.Get($"item.{name[2]}.name").ToString(),
 							i18n.Get($"item.{name[2]}.description").ToString() },
 						false, false, 4);
-					if (ModEntry._printRename)
+					if (ModEntry.PrintRename)
 						Log.D($"Named {name[2]} ({i18n.Get($"item.{name[2]}.name")})", ModEntry.Instance.Config.DebugMode);
 				}
 				asset.AsDictionary<int, string>().ReplaceWith(data);
 
-				if (!Config.AddNewRecipeScaling || true)
+				if (!Config.AddRecipeRebalancing)
 				{
 					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
 						Config.DebugMode);
@@ -384,21 +382,22 @@ namespace CooksAssistant
 						{419, new[] {null, "220", "-300", "Basic -26"}}, // Vinegar
 						{247, new[] {null, null, "-300", "Basic -26", null, i18n.Get("item.oil.description")}}, // Oil
 						{432, new[] {null, null, "-300", null, null, i18n.Get("item.truffleoil.description")}}, // Truffle Oil
-						{ModEntry.JsonAssets.GetObjectId("Sugar Cane"), new[] {null, null, null, "Basic"}},
+						//{ModEntry.JsonAssets.GetObjectId(ObjectPrefix + "sugarcane"), new[] {null, null, null, "Basic"}},
 					};
 					
 					// Apply above recipe changes
-					foreach (var obj in objectData.Where(o => !ModEntry.FoodsThatGiveLeftovers.Contains(o.Value[0])))
+					foreach (var obj in objectData.Where(o => !ModEntry.FoodsThatGiveLeftovers.Contains(data[o.Key].Split('/')[0])))
 						data[obj.Key] = ModEntry.UpdateEntry(data[obj.Key], obj.Value);
 
-					if (Config.AddNewRecipeScaling)
+					if (Config.AddRecipeRebalancing)
 						RebuildBuffs(ref data);
 
 					asset.AsDictionary<int, string>().ReplaceWith(data);
 
-					Log.W($"Edited {asset.AssetName}:" + data.Where(
+					Log.D($"Edited {asset.AssetName}:" + data.Where(
 							pair => objectData.ContainsKey(pair.Key))
-						.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"));
+						.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+						ModEntry.Instance.Config.DebugMode);
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
@@ -420,25 +419,33 @@ namespace CooksAssistant
 					return;
 				}
 
+				if (!ModEntry.RedberriesEnabled)
+				{
+					Log.D($"Did not edit {asset.AssetName}: Redberries are disabled in system.",
+						Config.DebugMode);
+					return;
+				}
+
 				try
 				{
 					var data = asset.AsDictionary<string, string>().Data;
 					var monsterData = new Dictionary<string, string[]>
 					{
-						{"Shadow Shaman", new[] {$"{ModEntry.JsonAssets.GetObjectId("Redberry Sapling")} .0035"
-						                         + $" {ModEntry.JsonAssets.GetObjectId("Nettles")} .05"}},
-						{"Wilderness Golem", new[] {$"{ModEntry.JsonAssets.GetObjectId("Redberry Sapling")} .0065"}},
-						{"Mummy", new[] {$"{ModEntry.JsonAssets.GetObjectId("Redberry Sapling")} .0022"}},
-						{"Pepper Rex", new[] {$"{ModEntry.JsonAssets.GetObjectId("Redberry Sapling")} .02"}},
+						{"Shadow Shaman", new[] {$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .0035"
+						                         + (ModEntry.NettlesEnabled ? $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "nettles")} .05" : "")}},
+						{"Wilderness Golem", new[] {$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .0065"}},
+						{"Mummy", new[] {$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .0022"}},
+						{"Pepper Rex", new[] {$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .02"}},
 					};
 					foreach (var monster in monsterData)
 						data[monster.Key] = ModEntry.UpdateEntry(data[monster.Key], monster.Value, true);
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
 					
-					Log.W($"Edited {asset.AssetName}:" + data.Where(
+					Log.D($"Edited {asset.AssetName}:" + data.Where(
 							pair => monsterData.ContainsKey(pair.Key))
-						.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"));
+						.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+						ModEntry.Instance.Config.DebugMode);
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
@@ -449,6 +456,7 @@ namespace CooksAssistant
 				return;
 			}
 
+			/*
 			if (asset.DataType == typeof(IDictionary<string, string>)// && !Config.AddCookingQuestline)
 				)
 			{
@@ -456,12 +464,13 @@ namespace CooksAssistant
 					Config.DebugMode);
 				return;
 			}
+			*/
 			
 			if (asset.AssetNameEquals(@"LooseSprites/JunimoNote"))
 			{
 				// Add icons for a new community centre bundle
 				
-				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -486,66 +495,6 @@ namespace CooksAssistant
 				// Add dock wares to the secret beach
 
 				// . . .
-			}
-			else if (asset.AssetNameEquals(@"Maps/Saloon") && false)
-			{
-				//if (!Config.AddCookingQuestline)
-				{
-					Log.D($"Did not edit {asset.AssetName}: Cooking questline is disabled in config file.",
-						Config.DebugMode);
-					return;
-				}
-
-				// Add a cooking range to Gus' saloon
-
-				var data = asset.AsMap().Data;
-
-				// Add our custom tilesheet
-				var tilesheetPath = ModEntry.MapTileSheetPath;
-				var tilesheetImage = ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.MapTileSheetPath}.png");
-				var tilesheetId = "z_blueberry_cac_maptiles";
-				data.AddTileSheet(new TileSheet(
-					tilesheetId,
-					data,
-					tilesheetPath,
-					new Size(tilesheetImage.Width / 16, tilesheetImage.Height / 16),
-					data.Layers[0].TileSize));
-				data.LoadTileSheets(Game1.mapDisplayDevice);
-				var ts = data.GetTileSheet(tilesheetId);
-				var bm = BlendMode.Alpha;
-
-				// Add AlwaysFront layer to add our new tiles to
-				if (data.Layers.All(l => l.Id != "AlwaysFront"))
-					data.InsertLayer(new Layer("AlwaysFront", data,
-						data.Layers[0].LayerSize, data.Layers[0].TileSize), data.Layers.Count); // FDGDFG dfgDFGDF
-
-				// Add a plate
-				var layer = data.GetLayer("Front");
-				layer.Tiles[17, 18] = new StaticTile(layer, ts, bm, 0);
-				// semicolon - indicates the end of the statement ----^
-
-				// Add cooking range, left and right side
-				var position = ModEntry.SaloonCookingRangePosition;
-				for (var x = 0; x < 2; ++x)
-				for (var y = 0; y < 2; ++y)
-				{
-					data.GetLayer(x == 0 ? "Buildings" : "AlwaysFront").Tiles[position.X + x, position.Y + y]
-						= new StaticTile(data.GetLayer(x == 0 ? "Buildings" : "AlwaysFront"), ts, bm, (1 + x) + (1 + y) * ts.SheetWidth);
-				}
-				// Add cooking range, top side
-				layer = data.GetLayer("AlwaysFront");
-				for (var i = 0; i < 2; ++i)
-				{
-					layer.Tiles[position.X + i, position.Y - 1] = new StaticTile(layer, ts, bm, 1 + i);
-				}
-				// Add cooking range use action
-				for (var i = 0; i < 3; ++i)
-				{
-					data.GetLayer("Buildings").Tiles[position.X, position.Y - 1 + i].Properties.Add(
-						"Action", new xTile.ObjectModel.PropertyValue(ModEntry.ActionRange));
-				}
-
-				asset.ReplaceWith(data);
 			}
 			else if (asset.AssetNameEquals(@"Maps/springobjects"))
 			{
@@ -590,7 +539,7 @@ namespace CooksAssistant
 				image.PatchImage(Game1.mouseCursors2, sourceArea, destArea, PatchMode.Overlay);
 
 				// New star on the community centre bundle tracker wall
-				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -608,7 +557,7 @@ namespace CooksAssistant
 			{
 				// Make changes to facilitate a new community centre bundle
 
-				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -633,7 +582,7 @@ namespace CooksAssistant
 			{
 				// Make changes to facilitate a new community centre bundle
 
-				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundle)
+				if (!ModEntry.Instance.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
 						Config.DebugMode);
@@ -648,7 +597,7 @@ namespace CooksAssistant
 			{
 				// Patch in tool sprites for cooking equipment
 
-				if (!ModEntry.Instance.Config.AddCookingTool)
+				if (!ModEntry.Instance.Config.AddCookingToolProgression)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Cooking equipment is disabled in config file.",
 						Config.DebugMode);
@@ -716,7 +665,7 @@ namespace CooksAssistant
 							objectSplit[1] =
 								(int.Parse(objectSplit[1]) + o.Edibility / 8 * buffValue).ToString();
 						}
-						else if (buffName == "Cooking")
+						else if (ModEntry.CookingAddedLevelsEnabled && buffName == "Cooking")
 						{
 							// TODO: UPDATE: Cooking Skill added level buffs in foods
 						}

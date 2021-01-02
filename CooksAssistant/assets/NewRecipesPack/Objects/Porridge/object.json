@@ -20,6 +20,10 @@
 		"ResultCount": 1,
 		"Ingredients": [
 			{
+				"Object": 406, // Wild Plum
+				"Count": 1
+			},
+			{
 				"Object": 262, // Wheat
 				"Count": 1
 			},

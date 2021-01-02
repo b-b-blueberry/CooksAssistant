@@ -43,12 +43,15 @@ namespace CooksAssistant
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNumberFromLocation"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNumberFromLocation_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaEnglishDisplayNameFromNumber"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaEnglishDisplayNameFromNumber_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaDisplayNameFromNumber"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaDisplayNameFromNumber_Prefix)));
+			if (false)
+			{
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CommunityCenter), "getAreaEnglishDisplayNameFromNumber"),
+					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaEnglishDisplayNameFromNumber_Prefix)));
+				harmony.Patch(
+					original: AccessTools.Method(typeof(CommunityCenter), "getAreaDisplayNameFromNumber"),
+					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaDisplayNameFromNumber_Prefix)));
+			}
 
 			// TODO: TEST: Big problem in JunimoNoteMenu.setUpMenu():
 			// >> if (!Game1.player.hasOrWillReceiveMail("hasSeenAbandonedJunimoNote") && whichArea == 6)
@@ -550,9 +553,9 @@ namespace CooksAssistant
 
 									// THIS IS AN IMPORTANT BIT:
 									// Add some mail to flag this bundle as having been completed
-									var mailReceived = ModEntry.MailBundleCompleted;
-									Log.D($"Sending mail for Cooking bundle completion ({mailReceived})");
-									Game1.player.mailForTomorrow.Add(mailReceived + "%&NL&%");
+									Log.D($"Sending mail for Cooking bundle completion ({ModEntry.MailBundleCompleted})",
+										ModEntry.Instance.Config.DebugMode);
+									Game1.player.mailForTomorrow.Add(ModEntry.MailBundleCompleted + "%&NL&%");
 								}
 							}
 							break;

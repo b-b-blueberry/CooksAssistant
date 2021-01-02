@@ -133,7 +133,7 @@ namespace CooksAssistant.GameObjects
 				list.Add(i18n.Get("menu.cooking_skill.levelup_burn", new { Number = level * BurnChanceModifier * BurnChanceReduction }));
 
 			var extra = i18n.Get($"menu.cooking_skill.levelupbonus.{level}");
-			if (extra.HasValue())
+			if (extra.HasValue() && (level != ModEntry.CraftNettleTeaLevel || ModEntry.NettlesEnabled))
 				list.Add(extra);
 
 			return list;
