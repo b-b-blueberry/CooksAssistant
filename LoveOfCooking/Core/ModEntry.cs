@@ -502,6 +502,11 @@ namespace LoveOfCooking
 			{
 				PrintCookingSkill();
 			});
+			Helper.ConsoleCommands.Add(cmd + "printcc", "Print Community Centre bundle states.", (s, args) =>
+			{
+				var cc = GetCommunityCenter();
+				PrintBundleData(cc);
+			});
 		}
 
 		private void LoadJsonAssetsObjects()
@@ -907,12 +912,6 @@ namespace LoveOfCooking
 			if (!Game1.game1.IsActive || Game1.currentLocation == null)
 			{
 				return;
-			}
-
-			if (e.Button == SButton.Y)
-			{
-				var cc = GetCommunityCenter();
-				PrintBundleData(cc);
 			}
 
 			// Menu interactions
@@ -2097,10 +2096,7 @@ namespace LoveOfCooking
 			}
 			badField.SetValue(bad);
 
-			if (Config.DebugMode)
-			{
-				PrintBundleData(cc);
-			}
+			PrintBundleData(cc);
 
 			Log.D($"CACBUNDLES Loaded CC bundle progress",
 				Config.DebugMode);

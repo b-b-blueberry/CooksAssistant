@@ -60,6 +60,7 @@ namespace LoveOfCooking.GameObjects.Menus
 			{"zh", 36},
 			{"ko", 48},
 			{"ru", 53},
+			{"de", 40},
 		};
 		private const int CookTextSourceHeight = 16;
 		private const int CookTextSideWidth = 5;
@@ -119,7 +120,7 @@ namespace LoveOfCooking.GameObjects.Menus
 		private Rectangle _quantityTextBoxBounds;
 		private Rectangle _searchBarTextBoxBounds;
 		private int _searchBarTextBoxMaxWidth;
-		private const int SearchBarTextBoxMinWidth = 132;
+		private int SearchBarTextBoxMinWidth;
 		private const string QuantityTextBoxDefaultText = "1";
 
 		// Menu data
@@ -449,6 +450,10 @@ namespace LoveOfCooking.GameObjects.Menus
 
 			SearchButton.bounds = ToggleViewButton.bounds;
 			_searchBarTextBoxMaxWidth = SearchButton.bounds.X - _searchBarTextBox.X - 24;
+
+			var minWidth = 132;
+			SearchBarTextBoxMinWidth = Math.Min(ToggleFilterButton.bounds.X - _searchBarTextBoxBounds.X,
+				Math.Max(minWidth, 24 + (int)Math.Ceiling(Game1.smallFont.MeasureString(_searchBarTextBox.Text).X)));
 
 			NavUpButton.bounds.X = NavDownButton.bounds.X = SearchButton.bounds.X;
 			NavUpButton.bounds.Y = SearchButton.bounds.Y + SearchButton.bounds.Height + 16;
@@ -2513,18 +2518,29 @@ namespace LoveOfCooking.GameObjects.Menus
 						FavouriteIconSource.Width * 3, FavouriteIconSource.Height * 3),
 					FavouriteIconSource, Color.White);
 			}
-			textWidth = (int)(154 * xScale);
+			var titleScale = 1f;
+			textWidth = (int)(162 * xScale);
 			text = Game1.player.knowsRecipe(_filteredRecipeList[_currentRecipe].name)
 				? _filteredRecipeList[_currentRecipe].DisplayName
 				: i18n.Get("menu.cooking_recipe.title_unknown");
 			textPosition.X = NavLeftButton.bounds.Width + 56;
+
+			// Attempt to fix for Deutsch lange names
+			if (_locale == "de" && Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X > textWidth)
+				text = text.Replace("-", "\n").Trim();
+
+			if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X * 0.8 > textWidth)
+				titleScale = 0.735f;
+			else if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X > textWidth)
+				titleScale = 0.95f;
+
 			textPosition.Y = NavLeftButton.bounds.Y + 4;
 			textPosition.Y -= (Game1.smallFont.MeasureString(
 				Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 24) * yScale;
-			textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale;
-			if (textHeightCheck > 60)
+			textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale * titleScale;
+			if (textHeightCheck * titleScale > 60)
 				textPosition.Y += (textHeightCheck - 60) / 2;
-			DrawText(b, text, 1.5f, textPosition.X, textPosition.Y, textWidth, true);
+			DrawText(b, text, 1.5f * titleScale, textPosition.X, textPosition.Y, textWidth, true);
 
 			// Recipe description
 			textPosition.X = 0;
@@ -2542,7 +2558,10 @@ namespace LoveOfCooking.GameObjects.Menus
 			// Recipe ingredients
 			if (textHeightCheck > 60 && Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y < 80)
 				textPosition.Y -= 6 * Scale;
-			if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y > 100 && _recipeIngredients.Count < 6)
+			textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale;
+			if (textHeightCheck > 120) 
+				textPosition.Y += 6 * Scale;
+			if (textHeightCheck > 100 && _recipeIngredients.Count < 6)
 				textPosition.Y += 6 * Scale;
 			textPosition.Y += TextDividerGap + Game1.smallFont.MeasureString(
 				Game1.parseText(yScale < 1 ? "Hoplite!\nHoplite!" : "Hoplite!\nHoplite!\nHoplite!", Game1.smallFont, textWidth)).Y * yScale;
