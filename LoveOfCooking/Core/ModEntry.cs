@@ -80,6 +80,7 @@ namespace LoveOfCooking
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked";
 		internal static readonly string MailBundleCompleted = $"cc{CommunityCentreAreaName}";
 		internal static readonly string MailBundleCompletedFollowup = MailPrefix + "bundle_completed_followup";
+		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan";
 
 		// Add Cooking Menu
 		public const int CookbookMailDate = 14;
@@ -110,7 +111,6 @@ namespace LoveOfCooking
 		// Add Cooking Questline
 		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
 		internal const string ActionRange = AssetPrefix + "Range";
-		internal const string DockCrateItem = "Pineapple";
 
 		// Food Healing Takes Time
 		private const float CombatRegenModifier = 0.02f;
@@ -230,9 +230,9 @@ namespace LoveOfCooking
 		public static readonly List<string> FoodsThatGiveLeftovers = new List<string>
 		{
 			"Pizza",
-			"Cake",
 			"Chocolate Cake",
 			"Pink Cake",
+			ObjectPrefix + "cake",
 			ObjectPrefix + "seafoodsando",
 			ObjectPrefix + "eggsando",
 			ObjectPrefix + "saladsando",
@@ -291,7 +291,12 @@ namespace LoveOfCooking
 					+ $"\nRecipeGridView:   {IsUsingRecipeGridView}"
 					+ $"\nCookingToolLevel: {CookingToolLevel}"
 					+ $"\nFoodsEaten:       {FoodsEaten.Aggregate("", (s, cur) => $"{s} ({cur})")}"
-					+ $"\nFavouriteRecipes: {FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur})")}\n",
+					+ $"\nFavouriteRecipes: {FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur})")}\n"
+					+ "-- OTHERS --"
+					+ $"\nCookbookUnlockedMail: {Game1.player.mailReceived.Contains(MailCookbookUnlocked)}"
+					+ $"\nBundleCompleteMail:   {Game1.player.mailReceived.Contains(MailBundleCompleted)}"
+					+ $"\nBundleFollowupMail:   {Game1.player.mailReceived.Contains(MailBundleCompletedFollowup)}"
+					+ $"\nFryingPanWhoopsMail:  {Game1.player.mailReceived.Contains(MailFryingPanWhoops)}",
 					Config.DebugMode);
 			}
 			catch (Exception e)
@@ -504,8 +509,20 @@ namespace LoveOfCooking
 			});
 			Helper.ConsoleCommands.Add(cmd + "printcc", "Print Community Centre bundle states.", (s, args) =>
 			{
-				var cc = GetCommunityCenter();
+				var cc = GetCommunityCentre();
 				PrintBundleData(cc);
+			});
+			Helper.ConsoleCommands.Add(cmd + "spawnpan", "Add a broken frying pan object to inventory.", (s, args) =>
+			{
+				var level = args.Length > 0 ? int.Parse(args[0]) : 0;
+				level = Math.Max(0, Math.Min(3, level));
+				var tool = GenerateCookingTool(level);
+				Game1.player.addItemByMenuIfNecessary(tool);
+			});
+			Helper.ConsoleCommands.Add(cmd + "addcookbook", "Flag cookbook mail as read, allowing kitchens to be used.", (s, args) =>
+			{
+				if (!Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
+					Game1.player.mailReceived.Add(MailCookbookUnlocked);
 			});
 		}
 
@@ -611,6 +628,8 @@ namespace LoveOfCooking
 			{
 				ReloadBundleData();
 			}
+
+			PurgeBrokenFryingPans();
 		}
 
 		private void GameLoopOnDayEnding(object sender, DayEndingEventArgs e)
@@ -655,8 +674,8 @@ namespace LoveOfCooking
 
 			// Add the cookbook for the player after some days
 			if (Config.AddCookingMenu
-				&& (Game1.dayOfMonth > CookbookMailDate || Game1.currentSeason != "spring")
-				&& !Game1.player.mailReceived.Contains(MailCookbookUnlocked))
+				&& (Game1.year > 1 || Game1.dayOfMonth > CookbookMailDate || Game1.currentSeason != "spring")
+				&& !Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
 			{
 				Game1.player.mailbox.Add(MailCookbookUnlocked);
 			}
@@ -863,7 +882,7 @@ namespace LoveOfCooking
 		
 		private void Event_MoveJunimo(object sender, UpdateTickedEventArgs e)
 		{
-			var cc = GetCommunityCenter();
+			var cc = GetCommunityCentre();
 			var p = CommunityCentreNotePosition;
 			if (cc.characters.FirstOrDefault(c => c is Junimo j && j.whichArea.Value == CommunityCentreAreaNumber)
 			    == null)
@@ -887,7 +906,7 @@ namespace LoveOfCooking
 			if (_menuTab == CommunityCentreAreaNumber)
 			{
 				((JunimoNoteMenu)Game1.activeClickableMenu).bundles.Clear();
-				((JunimoNoteMenu)Game1.activeClickableMenu).setUpMenu(CommunityCentreAreaNumber, GetCommunityCenter().bundlesDict());
+				((JunimoNoteMenu)Game1.activeClickableMenu).setUpMenu(CommunityCentreAreaNumber, GetCommunityCentre().bundlesDict());
 			}
 			Helper.Events.GameLoop.UpdateTicked -= Event_ChangeJunimoMenuTab;
 		}
@@ -920,7 +939,7 @@ namespace LoveOfCooking
 				// Navigate community centre bundles inventory menu
 				var cursor = Utility.Vector2ToPoint(e.Cursor.ScreenPixels);
 				if (IsNewCommunityCentreBundleEnabledByHost() && Game1.activeClickableMenu is JunimoNoteMenu menu && menu != null
-					&& GetCommunityCenter().areasComplete.Count > CommunityCentreAreaNumber && !GetCommunityCenter().areasComplete[CommunityCentreAreaNumber])
+					&& GetCommunityCentre().areasComplete.Count > CommunityCentreAreaNumber && !GetCommunityCentre().areasComplete[CommunityCentreAreaNumber])
 				{
 					if (!Game1.player.hasOrWillReceiveMail("canReadJunimoText"))
 					{
@@ -1153,6 +1172,13 @@ namespace LoveOfCooking
 					Game1.player.mostRecentlyGrabbedItem = new Object(JsonAssets.GetObjectId(ObjectPrefix + "cookbook"), 0);
 					Game1.player.canMove = false;
 				}
+
+				// Cooking tool whoops mail
+				if (letter.mailTitle == MailFryingPanWhoops)
+				{
+					Game1.player.addUnearnedMoney(1000);
+				}
+
 				return;
 			}
 
@@ -1164,10 +1190,13 @@ namespace LoveOfCooking
 			}
 
 			// Counteract the silly check for (whichArea == 6) in JunimoNoteMenu.setUpMenu(whichArea, bundlesComplete)
-			if (IsNewCommunityCentreBundleEnabledByHost() && e.OldMenu is JunimoNoteMenu && e.NewMenu == null
-				&& Game1.player.mailReceived.Contains("hasSeenAbandonedJunimoNote") && !IsCommunityCentreComplete())
+			if (IsNewCommunityCentreBundleEnabledByHost() && e.OldMenu is JunimoNoteMenu && e.NewMenu == null && !IsCommunityCentreComplete())
 			{
-				Game1.player.mailReceived.Remove("hasSeenAbandonedJunimoNote");
+				var whichMail = "hasSeenAbandonedJunimoNote";
+				if (Game1.player.mailReceived.Contains(whichMail))
+					Game1.player.mailReceived.Remove(whichMail);
+				if (Game1.player.mailForTomorrow.Contains(whichMail))
+					Game1.player.mailForTomorrow.Remove(whichMail);
 				return;
 			}
 
@@ -1195,12 +1224,7 @@ namespace LoveOfCooking
 				{
 					if (e.NewMenu is ShopMenu upgradeMenu)
 					{
-						var toolName = string.Format(
-							$"{Game1.content.LoadString("Strings\\StringsFromCSFiles:Tool.cs." + (14299 + level))}",
-							i18n.Get("menu.cooking_equipment.name").ToString());
-						var toolDescription = i18n.Get("menu.cooking_equipment.description", new { level = level + 2 }).ToString();
-						var cookingTool = new StardewValley.Tools.GenericTool(
-							toolName, toolDescription, level + 1, 17 + level, 17 + level);
+						var cookingTool = GenerateCookingTool(level);
 						var price = Helper.Reflection.GetMethod(
 							typeof(Utility), "priceForToolUpgradeLevel").Invoke<int>(level + 1);
 						var index = Helper.Reflection.GetMethod(
@@ -1322,7 +1346,7 @@ namespace LoveOfCooking
 			{
 				// TODO: SYSTEM???: Add failsafe for delivering community centre completed mail with all bundles complete,
 				// assuming that our bundle was removed when the usual number of bundles were completed
-				if (false && GetCommunityCenter().areAllAreasComplete()
+				if (false && GetCommunityCentre().areAllAreasComplete()
 					&& !Game1.MasterPlayer.mailReceived.Contains("JojaMember"))
 				{
 					Log.W("Hit unusual failsafe for all CC areas completed without CC considered complete");
@@ -1447,8 +1471,8 @@ namespace LoveOfCooking
 			// Add leftovers from viable foods to the inventory, or drop it on the ground if full
 			if (FoodsThatGiveLeftovers.Contains(food.Name) && Config.AddRecipeRebalancing && JsonAssets != null)
 			{
-				var leftovers = new Object(
-					JsonAssets.GetObjectId($"{food.Name}_half"), 1);
+				var name = food.Name.StartsWith(ObjectPrefix) ? $"{food.Name}_half" : $"{food.Name.ToLower().Split(' ').Aggregate(ObjectPrefix, (s, s1) => s + s1)}" + "_half";
+				var leftovers = new Object(JsonAssets.GetObjectId(name), 1);
 				if (Game1.player.couldInventoryAcceptThisItem(leftovers))
 					Game1.player.addItemToInventory(leftovers);
 				else
@@ -1599,7 +1623,7 @@ namespace LoveOfCooking
 						Object o = null;
 						if (roll < 0.2f && Game1.player.eventsSeen.Contains(0))
 						{
-							o = new Object(JsonAssets.GetObjectId(DockCrateItem), 1);
+							o = new Object(832, 1); // Pineapple
 							if (roll < 0.05f && Game1.player.eventsSeen.Contains(1))
 								o = new Object(JsonAssets.GetObjectId(ChocolateName), 1);
 						}
@@ -1663,7 +1687,7 @@ namespace LoveOfCooking
 				}
 			}
 
-			if (Game1.player.mailReceived.Contains(MailCookbookUnlocked))
+			if (Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
 			{
 				var ccFridge = Game1.currentLocation is CommunityCenter cc
 					&& (IsCommunityCentreComplete() || (IsNewCommunityCentreBundleEnabledByHost() && IsNewCommunityCentreBundleCompleted()))
@@ -1743,10 +1767,10 @@ namespace LoveOfCooking
 		/// </summary>
 		public float GetFoodRegenRate(Object food)
 		{
-			// Regen slower with drinks
-			var rate = _lastFoodWasDrink ? 0.15f : 0.2f;
+			// Regen faster with drinks
+			var rate = _lastFoodWasDrink ? 0.12f : 0.075f;
 			// Regen faster with quality
-			rate += food.Quality * 0.008f;
+			rate += food.Quality * 0.0085f;
 			// Regen faster when drunk
 			if (Game1.player.hasBuff(17))
 				rate *= 1.3f;
@@ -1922,26 +1946,32 @@ namespace LoveOfCooking
 			return splitString.Aggregate((cur, str) => $"{cur}{delimiter}{str}").Remove(0, 0);
 		}
 
-		public static CommunityCenter GetCommunityCenter()
+		public static CommunityCenter GetCommunityCentre()
 		{
 			return Game1.getLocationFromName("CommunityCenter") as CommunityCenter;
 		}
 
 		public static bool IsCommunityCentreComplete()
 		{
-			var cc = GetCommunityCenter();
+			var cc = GetCommunityCentre();
 			return cc != null && (cc.areAllAreasComplete() || Game1.MasterPlayer.hasCompletedCommunityCenter());
 		}
 
 		public bool IsNewCommunityCentreBundleEnabledByHost()
 		{
 			return (Game1.IsMasterGame && Config.AddCookingCommunityCentreBundles)
-				|| (Game1.netWorldState.Value.Bundles.Keys.Any(key => key > BundleStartIndex) || GetCommunityCenter().areasComplete.Count > CommunityCentreAreaNumber);
+				|| (Game1.netWorldState.Value.Bundles.Keys.Any(key => key > BundleStartIndex) || GetCommunityCentre().areasComplete.Count > CommunityCentreAreaNumber);
 		}
 
 		public bool IsNewCommunityCentreBundleCompleted()
 		{
-			return GetCommunityCenter().areasComplete.Count <= CommunityCentreAreaNumber || GetCommunityCenter().areasComplete[CommunityCentreAreaNumber];
+			return GetCommunityCentre().areasComplete.Count <= CommunityCentreAreaNumber || GetCommunityCentre().areasComplete[CommunityCentreAreaNumber];
+		}
+
+		public static bool IsAbandonedJojaMartBundleAvailable()
+		{
+			return Game1.MasterPlayer != null && !Game1.MasterPlayer.hasOrWillReceiveMail("ccMovieTheater")
+				&& Utility.doesMasterPlayerHaveMailReceivedButNotMailForTomorrow("abandonedJojaMartAccessible");
 		}
 
 		/// <summary>
@@ -1953,7 +1983,7 @@ namespace LoveOfCooking
 			Log.D($"Checking to unrenovate area for kitchen",
 				Config.DebugMode);
 
-			var cc = GetCommunityCenter();
+			var cc = GetCommunityCentre();
 			if (cc.areasComplete.Count <= CommunityCentreAreaNumber || cc.areasComplete[CommunityCentreAreaNumber])
 				return;
 
@@ -1990,7 +2020,7 @@ namespace LoveOfCooking
 
 		private void LoadBundleData()
 		{
-			var cc = GetCommunityCenter();
+			var cc = GetCommunityCentre();
 			var customBundleData = ParseBundleData();
 			BundleCount = customBundleData.Count;
 
@@ -2019,7 +2049,7 @@ namespace LoveOfCooking
 			}
 
 			// Regular load-in for custom bundles
-			if (Game1.IsMasterGame)
+			if (IsNewCommunityCentreBundleEnabledByHost() && !IsCommunityCentreComplete())
 			{
 				// Reload custom bundle data to game savedata
 				// World state cannot be added to: it has an expected length once set
@@ -2046,13 +2076,25 @@ namespace LoveOfCooking
 						CommunityCentreBundleValues[key] = new bool[expectedLength];
 					}
 				}
+
 				bundles = bundles.Concat(CommunityCentreBundleValues).ToDictionary(pair => pair.Key, pair => pair.Value);
 				bundleRewards = bundleRewards.Concat(CommunityCentreBundleRewards).ToDictionary(pair => pair.Key, pair => pair.Value);
+
 				// Apply merged bundle data to world state
-				Game1.netWorldState.Value.Bundles.Clear();
-				Game1.netWorldState.Value.BundleRewards.Clear();
-				Game1.netWorldState.Value.Bundles.Set(bundles);
-				Game1.netWorldState.Value.BundleRewards.Set(bundleRewards);
+				if (CommunityCentreBundleValues.Any(bundle => !Game1.netWorldState.Value.Bundles.ContainsKey(bundle.Key)))
+				{
+					Log.D("Adding missing GW bundle entries with reset",
+						Config.DebugMode);
+					Game1.netWorldState.Value.Bundles.Clear();
+					Game1.netWorldState.Value.Bundles.Set(bundles);
+				}
+				if (CommunityCentreBundleRewards.Any(bundleReward => !Game1.netWorldState.Value.BundleRewards.ContainsKey(bundleReward.Key)))
+				{
+					Log.D("Adding missing GW bundleReward entries with reset",
+						Config.DebugMode);
+					Game1.netWorldState.Value.BundleRewards.Clear();
+					Game1.netWorldState.Value.BundleRewards.Set(bundleRewards);
+				}
 
 				Log.D($"CACBUNDLES Loaded GW bundle progress",
 					Config.DebugMode);
@@ -2104,7 +2146,7 @@ namespace LoveOfCooking
 
 		private void SaveAndUnloadBundleData()
 		{
-			var cc = GetCommunityCenter();
+			var cc = GetCommunityCentre();
 			CommunityCentreBundleValues?.Clear();
 			if (cc.areasComplete.Count > 6)
 			{
@@ -2157,6 +2199,9 @@ namespace LoveOfCooking
 						Config.DebugMode);
 				}
 			}
+
+			// Reapply Harmony patches
+			HarmonyPatches.Patch();
 		}
 
 		internal void PrintBundleData(CommunityCenter cc)
@@ -2249,6 +2294,64 @@ namespace LoveOfCooking
 				newData.Add(index, value);
 			}
 			return newData;
+		}
+
+		public StardewValley.Tools.GenericTool GenerateCookingTool(int level)
+		{
+			var toolName = string.Format(
+						$"{Game1.content.LoadString("Strings\\StringsFromCSFiles:Tool.cs." + (14299 + level))}",
+						i18n.Get("menu.cooking_equipment.name").ToString());
+			var toolDescription = i18n.Get("menu.cooking_equipment.description", new { level = level + 2 }).ToString();
+			return new StardewValley.Tools.GenericTool(toolName, toolDescription, level + 1, 17 + level, 17 + level);
+		}
+
+		public void PurgeBrokenFryingPans()
+		{
+			Log.D("Checking for broken cooking tools.",
+				Config.DebugMode);
+
+			var name = i18n.Get("menu.cooking_equipment.name");
+			var found = 0;
+
+			for (var i = Game1.player.Items.Count - 1; i >= 0; --i)
+			{
+				if (Game1.player.Items[i] == null
+					|| (!Game1.player.Items[i].Name.EndsWith(name) && !Game1.player.Items[i].Name.EndsWith(AssetPrefix + "tool")))
+					continue;
+
+				Log.D($"Removing a broken Cooking tool in {Game1.player.Name}'s inventory slot {i}.",
+					Config.DebugMode);
+
+				++found;
+				Game1.player.removeItemFromInventory(Game1.player.Items[i]);
+			}
+
+			foreach (var location in Game1.locations)
+			{
+				foreach (var chest in location.Objects.Values.Where(o => o != null && o is Chest chest && chest.items.Count > 0))
+				{
+					for (var i = ((Chest)chest).items.Count - 1; i >= 0; --i)
+					{
+						if (((Chest)chest).items[i] == null
+							|| (!((Chest)chest).items[i].Name.EndsWith(name) && !((Chest)chest).items[i].Name.EndsWith(AssetPrefix + "tool")))
+							continue;
+
+						Log.D($"Removing a broken Cooking tool in chest at {location.Name} {chest.TileLocation.ToString()} item slot {i}.",
+							Config.DebugMode);
+
+						++found;
+						((Chest)chest).items.RemoveAt(i);
+					}
+				}
+			}
+
+			if (found > 0)
+			{
+				if (!Game1.player.mailReceived.Contains(MailFryingPanWhoops))
+				{
+					Game1.player.mailbox.Add(MailFryingPanWhoops);
+				}
+			}
 		}
 	}
 }

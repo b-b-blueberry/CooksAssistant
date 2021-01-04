@@ -279,7 +279,7 @@ namespace LoveOfCooking
 							// Pineapple Skewers: Pineapple 1 Onion 1 Eggplant 1
 							{
 								ModEntry.ObjectPrefix + "skewers",
-								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "pineapple")} 1"
+								"832 1"
 								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
 								+ " 272 1"
 							},
@@ -292,8 +292,7 @@ namespace LoveOfCooking
 							// Tropical Salad: Pineapple 1 Apple 1 Watermelon 1
 							{
 								ModEntry.ObjectPrefix + "tropicalsalad",
-								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "pineapple")} 1"
-								+ " 613 1"
+								"832 1 613 1"
 								//+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "watermelon")} 1"
 								+ " 637 1" // pomegranate
 							},
@@ -338,6 +337,17 @@ namespace LoveOfCooking
 			{
 				var data = asset.AsDictionary<string, string>().Data;
 				data.Add(ModEntry.MailCookbookUnlocked, i18n.Get("mail.cookbook_unlocked"));
+
+				// lol pan
+				var whoops = "Umm, hello @."
+					+ $"^There was a mix-up at the forge with your {i18n.Get("menu.cooking_equipment.name")}."
+						+ $" This is a bit embarrassing, so I'll return your materials as an apology."
+					+ "^Come back to the shop and we'll see about getting you that upgrade."
+					+ "^ - Clint, the blacksmith"
+					+ "^^^                     $ 1000g"
+					+ " %item object 334 5 %% [#] Love of Cooking Meta Menu Mix-Up";
+				data.Add(ModEntry.MailFryingPanWhoops, whoops);
+
 				asset.ReplaceWith(data);
 
 				return;

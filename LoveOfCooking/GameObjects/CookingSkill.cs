@@ -123,7 +123,7 @@ namespace LoveOfCooking.GameObjects
 
 		public override string GetName()
 		{
-			return "Cooking";
+			return ModEntry.AssetPrefix + "Cooking";
 		}
 		
 		public override List<string> GetExtraLevelUpInfo(int level)

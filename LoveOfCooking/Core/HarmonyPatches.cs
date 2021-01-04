@@ -16,7 +16,10 @@ namespace LoveOfCooking
 	{
 		public static void Patch()
 		{
-			var harmony = HarmonyInstance.Create(ModEntry.Instance.Helper.ModRegistry.ModID);
+			var id = ModEntry.Instance.Helper.ModRegistry.ModID;
+			var harmony = HarmonyInstance.Create(id);
+			if (harmony.HasAnyPatches(id))
+				harmony.UnpatchAll(id);
 
 			harmony.Patch(
 				original: AccessTools.Method(typeof(Bush), nameof(Bush.inBloom)),
@@ -99,7 +102,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				if (areaNumber != ModEntry.CommunityCentreAreaNumber)
+				if (areaNumber != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 				__result = ModEntry.CommunityCentreAreaName;
 				return false;
@@ -119,7 +122,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				if (name != ModEntry.CommunityCentreAreaName)
+				if (name != ModEntry.CommunityCentreAreaName || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 				__result = ModEntry.CommunityCentreAreaNumber;
 				return false;
@@ -140,7 +143,7 @@ namespace LoveOfCooking
 			try
 			{
 				Log.T($"CC_AreaNumberFromLocation_Prefix(tileLocation={tileLocation.ToString()})");
-				if (!new Rectangle(0, 0, 11, 11).Contains(Utility.Vector2ToPoint(tileLocation)))
+				if (!new Rectangle(0, 0, 11, 11).Contains(Utility.Vector2ToPoint(tileLocation)) || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 				__result = ModEntry.CommunityCentreAreaNumber;
 				return false;
@@ -160,7 +163,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				if (areaNumber != ModEntry.CommunityCentreAreaNumber)
+				if (areaNumber != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 				__result = ModEntry.Instance.Helper.Translation.Get("world.community_centre.kitchen");
 				return false;
@@ -180,7 +183,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				if (areaNumber != ModEntry.CommunityCentreAreaNumber)
+				if (areaNumber != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 				__result = ModEntry.Instance.Helper.Translation.Get("world.community_centre.kitchen");
 				return false;
@@ -202,7 +205,7 @@ namespace LoveOfCooking
 			try
 			{
 				Log.T($"CC_LoadArea_Prefix(area={area})");
-				if (area != ModEntry.CommunityCentreAreaNumber)
+				if (area != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
 				var areaToRefurbish = area != ModEntry.CommunityCentreAreaNumber 
@@ -295,7 +298,7 @@ namespace LoveOfCooking
 			try
 			{
 				Log.T($"CC_IsJunimoNoteAtArea_Prefix(area={area})");
-				if (area != ModEntry.CommunityCentreAreaNumber)
+				if (area != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
 				var p = ModEntry.CommunityCentreNotePosition;
@@ -318,8 +321,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				Log.T($"CC_ShouldNoteAppearInArea_Prefix(area={area})");
-				if (area != ModEntry.CommunityCentreAreaNumber)
+				if (area != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 				__result = !__instance.areasComplete[area] && __instance.numberOfCompleteBundles() > (ModEntry.Instance.Config.DebugMode ? 0 : 2);
 				return false;
@@ -348,7 +350,7 @@ namespace LoveOfCooking
 			{
 				Log.T($"CC_AddJunimoNote_Prefix(area={area})");
 
-				if (area != ModEntry.CommunityCentreAreaNumber)
+				if (area != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
 				var p = ModEntry.CommunityCentreNotePosition;
@@ -424,9 +426,7 @@ namespace LoveOfCooking
 				var endFunction = ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "setViewportToNextJunimoNoteTarget");
 
 				var p = ModEntry.CommunityCentreNotePosition;
-				Game1.moveViewportTo(new Vector2(p.X, p.Y) * 64f, 5f, 2000,
-					(Game1.afterFadeFunction)Delegate.CreateDelegate(typeof(Game1.afterFadeFunction), reachedTarget.MethodInfo),
-					(Game1.afterFadeFunction)Delegate.CreateDelegate(typeof(Game1.afterFadeFunction), endFunction.MethodInfo));
+				Game1.moveViewportTo(new Vector2(p.X, p.Y) * 64f, 5f, 2000, () => reachedTarget.Invoke(), () => endFunction.Invoke());
 				return false;
 			}
 			catch (ArgumentException e)
