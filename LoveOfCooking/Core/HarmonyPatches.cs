@@ -18,8 +18,15 @@ namespace LoveOfCooking
 		{
 			var id = ModEntry.Instance.Helper.ModRegistry.ModID;
 			var harmony = HarmonyInstance.Create(id);
-			if (harmony.HasAnyPatches(id))
-				harmony.UnpatchAll(id);
+			try
+			{
+				if (harmony.HasAnyPatches(id))
+					harmony.UnpatchAll(id);
+			}
+			catch (Exception e)
+			{
+				Log.D($"Error occurred while unpatching methods, may not be fatal.\n{e}", ModEntry.Instance.Config.DebugMode);
+			}
 
 			harmony.Patch(
 				original: AccessTools.Method(typeof(Bush), nameof(Bush.inBloom)),
@@ -34,8 +41,11 @@ namespace LoveOfCooking
 				original: AccessTools.Method(typeof(Bush), "shake"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_shake_Prefix)));
 
-			if (!ModEntry.Instance.IsNewCommunityCentreBundleEnabledByHost())
+			if (!ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
+			{
+				Log.D($"Did not patch CC methods: host player kitchen is not enabled.");
 				return;
+			}
 
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNameFromNumber"),
@@ -315,15 +325,23 @@ namespace LoveOfCooking
 
 		/// <summary>
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
-		/// Mimics ShouldNoteAppearInArea() using a static p value in place of GetNotePosition().
+		/// Mimics ShouldNoteAppearInArea() using a static position in place of GetNotePosition().
 		/// </summary>
 		public static bool CC_ShouldNoteAppearInArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
 		{
 			try
 			{
-				if (area != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
+				Log.D($"ShouldNoteAppearInArea({area})",
+					ModEntry.Instance.Config.DebugMode);
+				if (ModEntry.IsCommunityCentreComplete() && ModEntry.IsAbandonedJojaMartBundleAvailable())
+				{
+					ModEntry.Instance.SaveAndUnloadBundleData();
+				}
+
+				if (area != ModEntry.CommunityCentreAreaNumber)
 					return true;
-				__result = !__instance.areasComplete[area] && __instance.numberOfCompleteBundles() > (ModEntry.Instance.Config.DebugMode ? 0 : 2);
+				__result = ModEntry.Instance.IsCommunityCentreKitchenCompleted()
+					&& __instance.numberOfCompleteBundles() > (ModEntry.Instance.Config.DebugMode ? 0 : 2);
 				return false;
 			}
 			catch (ArgumentOutOfRangeException e)
@@ -552,9 +570,9 @@ namespace LoveOfCooking
 
 									// THIS IS AN IMPORTANT BIT:
 									// Add some mail to flag this bundle as having been completed
-									Log.D($"Sending mail for Cooking bundle completion ({ModEntry.MailBundleCompleted})",
+									Log.D($"Sending mail for Cooking bundle completion ({ModEntry.MailKitchenCompleted})",
 										ModEntry.Instance.Config.DebugMode);
-									Game1.player.mailForTomorrow.Add(ModEntry.MailBundleCompleted + "%&NL&%");
+									Game1.player.mailForTomorrow.Add(ModEntry.MailKitchenCompleted + "%&NL&%");
 								}
 							}
 							break;

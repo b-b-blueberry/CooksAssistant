@@ -57,7 +57,8 @@ namespace LoveOfCooking
 		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
 		internal static readonly string NettlesPackPath = Path.Combine("assets", "NettlesPack");
 		//internal static readonly string CookingBundlePackPath = Path.Combine("assets", "CookingBundlePack");
-		internal static readonly string SpriteSheetPath = Path.Combine("assets", "sprites");
+		internal static readonly string GameContentSpriteSheetPath = @"LooseSprites/blueberry/LoveOfCooking/SpriteSheet";
+		internal static readonly string LocalSpriteSheetPath = Path.Combine("assets", "sprites");
 		internal static readonly string MapTileSheetPath = Path.Combine("assets", "maptiles");
 		internal static readonly string SkillIconPath = Path.Combine("assets", "skill");
 		internal static readonly string LevelUpIconPath = Path.Combine("assets", "levelup");
@@ -70,16 +71,11 @@ namespace LoveOfCooking
 		public List<string> FoodsEaten = new List<string>();
 		public List<string> FavouriteRecipes = new List<string>();
 
-		// Persistent community centre data
-		public bool IsCommunityCentreAreaComplete = false;
-		public Dictionary<int, bool> CommunityCentreBundleRewards = new Dictionary<int, bool>();
-		public Dictionary<int, bool> CommunityCentreBundlesComplete = new Dictionary<int, bool>();
-		public Dictionary<int, bool[]> CommunityCentreBundleValues = new Dictionary<int, bool[]>();
-
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked";
-		internal static readonly string MailBundleCompleted = $"cc{CommunityCentreAreaName}";
-		internal static readonly string MailBundleCompletedFollowup = MailPrefix + "bundle_completed_followup";
+		internal static readonly string MailKitchenCompleted = $"cc{CommunityCentreAreaName}";
+		internal static readonly string MailKitchenCompletedFollowup = MailPrefix + "kitchen_completed_followup";
+		internal static readonly string MailKitchenLastBundleCompleteRewardDelivery = MailPrefix + "kitchen_reward_guarantee";
 		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan";
 
 		// Add Cooking Menu
@@ -294,9 +290,9 @@ namespace LoveOfCooking
 					+ $"\nFavouriteRecipes: {FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur})")}\n"
 					+ "-- OTHERS --"
 					+ $"\nCookbookUnlockedMail: {Game1.player.mailReceived.Contains(MailCookbookUnlocked)}"
-					+ $"\nBundleCompleteMail:   {Game1.player.mailReceived.Contains(MailBundleCompleted)}"
-					+ $"\nBundleFollowupMail:   {Game1.player.mailReceived.Contains(MailBundleCompletedFollowup)}"
-					+ $"\nFryingPanWhoopsMail:  {Game1.player.mailReceived.Contains(MailFryingPanWhoops)}",
+					+ $"\nBundleCompleteMail:   {Game1.player.mailReceived.Contains(MailKitchenCompleted)}"
+					+ $"\nBundleFollowupMail:   {Game1.player.mailReceived.Contains(MailKitchenCompletedFollowup)}"
+					+ $"\nFryingPanWhoopsMail:  {Game1.player.mailReceived.Contains(MailFryingPanWhoops)}\n",
 					Config.DebugMode);
 			}
 			catch (Exception e)
@@ -348,7 +344,7 @@ namespace LoveOfCooking
 			var assetManager = new AssetManager();
 			Helper.Content.AssetEditors.Add(assetManager);
 			Helper.Content.AssetLoaders.Add(assetManager);
-			SpriteSheet = Game1.content.Load<Texture2D>(SpriteSheetPath);
+			SpriteSheet = Game1.content.Load<Texture2D>(GameContentSpriteSheetPath);
 			
 			// Game events
 			Helper.Events.GameLoop.GameLaunched += GameLoopOnGameLaunched;
@@ -524,6 +520,24 @@ namespace LoveOfCooking
 				if (!Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
 					Game1.player.mailReceived.Add(MailCookbookUnlocked);
 			});
+			Helper.ConsoleCommands.Add(cmd + "loadbundles", "Load custom bundle data into the game.", (s, args) =>
+			{
+				if (!IsCommunityCentreKitchenEnabledByHost())
+				{
+					Log.D("Custom bundles not enabled by host.");
+					return;
+				}
+				LoadBundleData();
+			});
+			Helper.ConsoleCommands.Add(cmd + "unloadbundles", "Clear all bundle data from the game.", (s, args) =>
+			{
+				if (!IsCommunityCentreKitchenEnabledByHost())
+				{
+					Log.D("Custom bundles not enabled by host.");
+					return;
+				}
+				SaveAndUnloadBundleData();
+			});
 		}
 
 		private void LoadJsonAssetsObjects()
@@ -624,6 +638,10 @@ namespace LoveOfCooking
 				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
 			}
 
+			PrintBundleData(GetCommunityCentre());
+			Log.D("End of default world bundle data.",
+				Config.DebugMode);
+
 			if (!Game1.IsMasterGame)
 			{
 				ReloadBundleData();
@@ -681,9 +699,9 @@ namespace LoveOfCooking
 			}
 
 			// TODO: UPDATE: Send followup mail when the kitchen bundle is completed
-			if (SendBundleFollowupMail && (IsNewCommunityCentreBundleEnabledByHost() && Game1.MasterPlayer.hasOrWillReceiveMail(MailBundleCompleted)))
+			if (SendBundleFollowupMail && (IsCommunityCentreKitchenEnabledByHost() && Game1.MasterPlayer.hasOrWillReceiveMail(MailKitchenCompleted)))
 			{
-				Game1.addMailForTomorrow(MailBundleCompletedFollowup);
+				Game1.addMailForTomorrow(MailKitchenCompletedFollowup);
 			}
 
 			// Attempt to place a wild nettle as forage around other weeds
@@ -712,12 +730,15 @@ namespace LoveOfCooking
 					SaveAndUnloadBundleData();
 				}
 			}
-			else if (IsNewCommunityCentreBundleEnabledByHost())
+			else
 			{
-				Log.D("Community centre enabled, loading bundle data.",
+				Log.D("Community centre incomplete, loading bundle data.",
 					Config.DebugMode);
 				LoadBundleData();
 			}
+
+			// Reapply Harmony patches
+			HarmonyPatches.Patch();
 		}
 
 		private void GameLoopOnReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
@@ -938,7 +959,7 @@ namespace LoveOfCooking
 			{
 				// Navigate community centre bundles inventory menu
 				var cursor = Utility.Vector2ToPoint(e.Cursor.ScreenPixels);
-				if (IsNewCommunityCentreBundleEnabledByHost() && Game1.activeClickableMenu is JunimoNoteMenu menu && menu != null
+				if (IsCommunityCentreKitchenEnabledByHost() && Game1.activeClickableMenu is JunimoNoteMenu menu && menu != null
 					&& GetCommunityCentre().areasComplete.Count > CommunityCentreAreaNumber && !GetCommunityCentre().areasComplete[CommunityCentreAreaNumber])
 				{
 					if (!Game1.player.hasOrWillReceiveMail("canReadJunimoText"))
@@ -1060,7 +1081,7 @@ namespace LoveOfCooking
 				}
 
 				// Open Community Centre fridge door
-				if (IsNewCommunityCentreBundleEnabledByHost() && Game1.currentLocation is CommunityCenter cc
+				if (IsCommunityCentreKitchenEnabledByHost() && Game1.currentLocation is CommunityCenter cc
 					&& tile != null && tile.TileIndex == 634)
 				{
 					CommunityCentreFridgePosition = e.Cursor.GrabTile;
@@ -1190,7 +1211,7 @@ namespace LoveOfCooking
 			}
 
 			// Counteract the silly check for (whichArea == 6) in JunimoNoteMenu.setUpMenu(whichArea, bundlesComplete)
-			if (IsNewCommunityCentreBundleEnabledByHost() && e.OldMenu is JunimoNoteMenu && e.NewMenu == null && !IsCommunityCentreComplete())
+			if (IsCommunityCentreKitchenEnabledByHost() && e.OldMenu is JunimoNoteMenu && e.NewMenu == null && !IsCommunityCentreComplete())
 			{
 				var whichMail = "hasSeenAbandonedJunimoNote";
 				if (Game1.player.mailReceived.Contains(whichMail))
@@ -1247,7 +1268,7 @@ namespace LoveOfCooking
 
 			// Close Community Centre fridge door after use in the renovated kitchen
 			if (e.OldMenu is ItemGrabMenu && e.NewMenu == null
-				&& IsNewCommunityCentreBundleEnabledByHost() && Game1.currentLocation is CommunityCenter cc
+				&& IsCommunityCentreKitchenEnabledByHost() && Game1.currentLocation is CommunityCenter cc
 				&& (IsCommunityCentreComplete() || (cc.areasComplete.Count > CommunityCentreAreaNumber && cc.areasComplete[CommunityCentreAreaNumber])))
 			{
 				cc.Map.GetLayer("Front")
@@ -1356,7 +1377,7 @@ namespace LoveOfCooking
 					cc.junimoGoodbyeDance();
 				}
 
-				if (IsNewCommunityCentreBundleEnabledByHost())
+				if (IsCommunityCentreKitchenEnabledByHost())
 				{
 					Helper.Events.GameLoop.UpdateTicked += Event_MoveJunimo; // fgs fds
 					Log.D($"Warped to CC: areasComplete count: {cc.areasComplete.Count}, complete: {IsCommunityCentreComplete()}",
@@ -1690,7 +1711,7 @@ namespace LoveOfCooking
 			if (Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
 			{
 				var ccFridge = Game1.currentLocation is CommunityCenter cc
-					&& (IsCommunityCentreComplete() || (IsNewCommunityCentreBundleEnabledByHost() && IsNewCommunityCentreBundleCompleted()))
+					&& (IsCommunityCentreComplete() || (IsCommunityCentreKitchenEnabledByHost() && IsCommunityCentreKitchenCompleted()))
 						? cc.Objects.ContainsKey(CommunityCentreFridgePosition) ? (Chest)cc.Objects[CommunityCentreFridgePosition] : null
 						: null;
 				var fridge = new NetRef<Chest>();
@@ -1848,9 +1869,7 @@ namespace LoveOfCooking
 		{
 			// A basic (modded) farmhouse has a maximum of 1 slot,
 			// and a farmhouse with a kitchen has a minimum of 2+ slots
-			var level = farmHouse.upgradeLevel < 2
-				? Math.Min(farmHouse.upgradeLevel, GetFarmersMaxUsableIngredients())
-				: Math.Max(farmHouse.upgradeLevel, GetFarmersMaxUsableIngredients());
+			var level = Math.Max(farmHouse.upgradeLevel, GetFarmersMaxUsableIngredients());
 			// Thanks Lenne
 			if (farmHouse.upgradeLevel == 0
 				&& (Helper.ModRegistry.IsLoaded("Allayna.Kitchen")
@@ -1954,18 +1973,38 @@ namespace LoveOfCooking
 		public static bool IsCommunityCentreComplete()
 		{
 			var cc = GetCommunityCentre();
-			return cc != null && (cc.areAllAreasComplete() || Game1.MasterPlayer.hasCompletedCommunityCenter());
+			if (cc == null)
+				return false;
+
+			var ccMasterPlayerComplete = Game1.MasterPlayer.hasCompletedCommunityCenter();
+			var ccAreasComplete = cc.areAllAreasComplete();
+			return ccAreasComplete || ccMasterPlayerComplete;
 		}
 
-		public bool IsNewCommunityCentreBundleEnabledByHost()
+		public bool IsCommunityCentreKitchenEnabledByHost()
 		{
-			return (Game1.IsMasterGame && Config.AddCookingCommunityCentreBundles)
-				|| (Game1.netWorldState.Value.Bundles.Keys.Any(key => key > BundleStartIndex) || GetCommunityCentre().areasComplete.Count > CommunityCentreAreaNumber);
+			var cc = GetCommunityCentre();
+			if (cc == null)
+				return false;
+
+			var hostEnabled = Game1.IsMasterGame && Config.AddCookingCommunityCentreBundles;
+			var bundlesExist = Game1.netWorldState.Value.Bundles.Keys.Any(key => key > BundleStartIndex);
+			var areasCompleteEntriesExist = cc.areasComplete.Count > CommunityCentreAreaNumber;
+			return hostEnabled || (bundlesExist || areasCompleteEntriesExist);
 		}
 
-		public bool IsNewCommunityCentreBundleCompleted()
+		public bool IsCommunityCentreKitchenCompleted()
 		{
-			return GetCommunityCentre().areasComplete.Count <= CommunityCentreAreaNumber || GetCommunityCentre().areasComplete[CommunityCentreAreaNumber];
+			var cc = GetCommunityCentre();
+			if (cc == null)
+				return false;
+
+			var receivedMail = Game1.MasterPlayer != null && Game1.MasterPlayer.mailReceived.Contains(MailKitchenCompleted);
+			var missingAreasCompleteEntries = cc.areasComplete.Count <= CommunityCentreAreaNumber;
+			var areaIsComplete = missingAreasCompleteEntries || cc.areasComplete[CommunityCentreAreaNumber];
+			Log.D($"IsCommunityCentreKitchenCompleted: (mail: {receivedMail}), (entries: {missingAreasCompleteEntries}) || (areas: {areaIsComplete})",
+				Config.DebugMode);
+			return receivedMail || missingAreasCompleteEntries || areaIsComplete;
 		}
 
 		public static bool IsAbandonedJojaMartBundleAvailable()
@@ -2010,198 +2049,238 @@ namespace LoveOfCooking
 			}
 		}
 		
-		private void ReloadBundleData()
+		internal void ReloadBundleData()
 		{
-			Log.D("CACBUNDLES Reloading custom bundle data",
+			Log.D("CACB Reloading custom bundle data",
 				Config.DebugMode);
 			SaveAndUnloadBundleData();
 			LoadBundleData();
 		}
 
-		private void LoadBundleData()
+		internal void LoadBundleData()
 		{
 			var cc = GetCommunityCentre();
 			var customBundleData = ParseBundleData();
 			BundleCount = customBundleData.Count;
 
-			Log.D(customBundleData.Aggregate("CACBUNDLES customBundleData: ", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+			Log.D(customBundleData.Aggregate("CACB customBundleData: ", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 				Config.DebugMode);
 
-			// First-time load for bundle additions
-			if (CommunityCentreBundleValues.Count == 0)
-			{
-				foreach (var bundle in customBundleData)
-				{
-					// Populate mod savedata with parsed custom bundle data from source data files
-					Log.D($"CACBUNDLES Adding first-time bundle data for {bundle.Key}",
-						Config.DebugMode);
-					var count = bundle.Value.Split('/')[2].Split(' ').Length;
-					CommunityCentreBundleValues[bundle.Key] = new bool[count];
-					CommunityCentreBundleRewards[bundle.Key] = false;
-				}
-			}
+			// Load custom bundle data from persistent world data if it exists, else default to false (bundles not yet started by player)
+			var customBundleValues = new Dictionary<int, bool[]>();
+			var customBundleRewards = new Dictionary<int, bool>();
+			var isAreaComplete = cc.modData.ContainsKey(AssetPrefix + "area_completed") && !string.IsNullOrEmpty(cc.modData[AssetPrefix + "area_completed"])
+				? bool.Parse(cc.modData[AssetPrefix + "area_completed"])
+				: false;
 
-			// Add custom bundle metadata
 			for (var i = 0; i < BundleCount; ++i)
 			{
 				var key = BundleStartIndex + i;
+				// Bundle metadata, not synced with multiplayer.broadcastWorldState()
 				Game1.netWorldState.Value.BundleData[$"{CommunityCentreAreaName}/{key}"] = customBundleData[key];
 			}
 
-			// Regular load-in for custom bundles
-			if (IsNewCommunityCentreBundleEnabledByHost() && !IsCommunityCentreComplete())
+			if (Game1.IsMasterGame)
 			{
-				// Reload custom bundle data to game savedata
-				// World state cannot be added to: it has an expected length once set
-				var bundles = new Dictionary<int, bool[]>();
-				var bundleRewards = new Dictionary<int, bool>();
-				// Fetch vanilla bundle data:
-				for (var i = 0; i < BundleStartIndex; ++i)
+				// Add GW custom bundle data
+				for (var i = 0; i < BundleCount; ++i)
 				{
-					if (Game1.netWorldState.Value.Bundles.ContainsKey(i))
-						bundles.Add(i, Game1.netWorldState.Value.Bundles[i]);
-					if (Game1.netWorldState.Value.BundleRewards.ContainsKey(i))
-						bundleRewards.Add(i, Game1.netWorldState.Value.BundleRewards[i]);
+					var key = BundleStartIndex + i;
+					// Bundle progress
+					var dataKey = AssetPrefix + "bundle_values_" + i;
+					customBundleValues.Add(key, cc.modData.ContainsKey(dataKey) && !string.IsNullOrEmpty(cc.modData[dataKey])
+						? cc.modData[dataKey].Split(',').ToList().ConvertAll(bool.Parse).ToArray()
+						: new bool[customBundleData[key].Split('/')[2].Split(' ').Length]);
+					// Bundle saved rewards
+					dataKey = AssetPrefix + "bundle_rewards_" + i;
+					customBundleRewards.Add(key, cc.modData.ContainsKey(dataKey) && !string.IsNullOrEmpty(cc.modData[dataKey])
+						? bool.Parse(cc.modData[dataKey])
+						: false);
+
+					Log.D($"CACB Added custom bundle value ({key} [{customBundleRewards[key]}]: {customBundleValues[key].Aggregate("", (str, value) => $"{str} {value}")})",
+						Config.DebugMode);
 				}
-				// Add custom bundle data:
-				// Quality control
-				for (var key = BundleStartIndex; key < BundleStartIndex + BundleCount; ++key)
+
+				// Regular load-in for custom bundles
+				if (IsCommunityCentreKitchenEnabledByHost() && !IsCommunityCentreComplete())
 				{
-					var currentLength = CommunityCentreBundleValues[key].Length;
-					var expectedLength = customBundleData[key].Split('/')[2].Split(' ').Length;
-					if (currentLength != expectedLength)
+					// Reload custom bundle data to game savedata
+					// World state cannot be added to: it has an expected length once set
+					var bundles = new Dictionary<int, bool[]>();
+					var bundleRewards = new Dictionary<int, bool>();
+
+					// Fetch vanilla GW bundle data
+					for (var i = 0; i < BundleStartIndex; ++i)
 					{
-						Log.D($"Correcting bundle {key} ({currentLength} -> {expectedLength} elems)",
-							Config.DebugMode);
-						CommunityCentreBundleValues[key] = new bool[expectedLength];
+						if (Game1.netWorldState.Value.Bundles.ContainsKey(i))
+							bundles.Add(i, Game1.netWorldState.Value.Bundles[i]);
+						if (Game1.netWorldState.Value.BundleRewards.ContainsKey(i))
+							bundleRewards.Add(i, Game1.netWorldState.Value.BundleRewards[i]);
 					}
-				}
 
-				bundles = bundles.Concat(CommunityCentreBundleValues).ToDictionary(pair => pair.Key, pair => pair.Value);
-				bundleRewards = bundleRewards.Concat(CommunityCentreBundleRewards).ToDictionary(pair => pair.Key, pair => pair.Value);
+					// Add custom bundle data
+					bundles = bundles.Concat(customBundleValues).ToDictionary(pair => pair.Key, pair => pair.Value);
+					bundleRewards = bundleRewards.Concat(customBundleRewards).ToDictionary(pair => pair.Key, pair => pair.Value);
 
-				// Apply merged bundle data to world state
-				if (CommunityCentreBundleValues.Any(bundle => !Game1.netWorldState.Value.Bundles.ContainsKey(bundle.Key)))
-				{
-					Log.D("Adding missing GW bundle entries with reset",
+					// Apply merged bundle data to world state
+					if (customBundleValues.Any(bundle => !Game1.netWorldState.Value.Bundles.ContainsKey(bundle.Key)))
+					{
+						Log.D("CACB Adding missing GW bundle entries with reset",
+							Config.DebugMode);
+						Game1.netWorldState.Value.Bundles.Clear();
+						Game1.netWorldState.Value.Bundles.Set(bundles);
+					}
+					if (customBundleData.Any(bundle => !Game1.netWorldState.Value.BundleRewards.ContainsKey(bundle.Key)))
+					{
+						Log.D("CACB Adding missing GW bundleReward entries with reset",
+							Config.DebugMode);
+						Game1.netWorldState.Value.BundleRewards.Clear();
+						Game1.netWorldState.Value.BundleRewards.Set(bundleRewards);
+					}
+
+					var multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
+					multiplayer.broadcastWorldStateDeltas();
+					multiplayer.broadcastLocationDelta(GetCommunityCentre());
+
+					Log.D($"CACB Loaded GW bundle data progress and broadcasted world state.",
 						Config.DebugMode);
-					Game1.netWorldState.Value.Bundles.Clear();
-					Game1.netWorldState.Value.Bundles.Set(bundles);
 				}
-				if (CommunityCentreBundleRewards.Any(bundleReward => !Game1.netWorldState.Value.BundleRewards.ContainsKey(bundleReward.Key)))
-				{
-					Log.D("Adding missing GW bundleReward entries with reset",
-						Config.DebugMode);
-					Game1.netWorldState.Value.BundleRewards.Clear();
-					Game1.netWorldState.Value.BundleRewards.Set(bundleRewards);
-				}
-
-				Log.D($"CACBUNDLES Loaded GW bundle progress",
-					Config.DebugMode);
 			}
 			else
 			{
-				Log.D("CACBUNDLES Did not load GW custom bundle data, peer is not host game.",
+				Log.D("CACB Did not load GW custom bundle data, peer is not host.",
 					Config.DebugMode);
 			}
 
-			// Add a new entry to areas complete game data
 			try
 			{
 				if (cc.areasComplete.Count <= CommunityCentreAreaNumber)
 				{
+					Log.D("CACB Adding new bundle data to CC areas-complete dictionary.",
+						Config.DebugMode);
+
+					// Add a new entry to areas complete game data
 					var oldAreas = cc.areasComplete;
 					var newAreas = new NetArray<bool, NetBool>(CommunityCentreAreaNumber + 1);
 					for (var i = 0; i < oldAreas.Count; ++i)
 						newAreas[i] = oldAreas[i];
-					newAreas[newAreas.Length - 1] = Game1.MasterPlayer.hasOrWillReceiveMail("68300000");
+					newAreas[newAreas.Length - 1] = Game1.MasterPlayer.hasOrWillReceiveMail(MailKitchenCompleted);
 					cc.areasComplete.Clear();
 					cc.areasComplete.Set(newAreas);
 				}
+
+				var badField = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary");
+				var bad = badField.GetValue();
+				if (customBundleData.Keys.Any(key => !bad.ContainsKey(key)))
+				{
+					Log.D("CACB Adding new data to CC bundle-area dictionary.",
+						Config.DebugMode);
+
+					// Add a reference to the new community centre kitchen area to the reference dictionary
+					for (var i = 0; i < BundleCount; ++i)
+					{
+						bad[BundleStartIndex + i] = CommunityCentreAreaNumber;
+					}
+					badField.SetValue(bad);
+				}
+
+				var abdField = Helper.Reflection.GetField<Dictionary<int, List<int>>>(cc, "areaToBundleDictionary");
+				var abd = abdField.GetValue();
+				if (customBundleData.Keys.Any(key => !abd[CommunityCentreAreaNumber].Contains(key)))
+				{
+					Log.D("CACB Adding new data to CC area-bundle dictionary.",
+						Config.DebugMode);
+
+					// Add references to the new community centre bundles to the reference dictionary
+					foreach (var bundle in customBundleData.Keys)
+					{
+						if (!abd[CommunityCentreAreaNumber].Contains(bundle))
+							abd[CommunityCentreAreaNumber].Add(bundle);
+					}
+					abdField.SetValue(abd);
+				}
+
+				Log.D($"CACB Loaded CC bundle data progress",
+					Config.DebugMode);
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error while updating CC areasComplete NetArray:"
+				Log.E($"CACB Error while updating CC areasComplete/bundleAreas/areaBundles:"
 					+ $"\nMultiplayer: {Game1.IsMultiplayer}"
 					+ $", MasterGame: {Game1.IsMasterGame}"
 					+ $", MasterPlayer: {Game1.player.UniqueMultiplayerID == Game1.MasterPlayer.UniqueMultiplayerID}"
 					+ $", FarmHands: {Game1.getAllFarmhands().Count()}"
 					+ $"\n{e}");
 			}
-
-			// Add a reference to the new community centre kitchen area to the reference dictionary
-			var badField = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary");
-			var bad = badField.GetValue();
-			for (var i = 0; i < BundleCount; ++i)
-			{
-				bad[BundleStartIndex + i] = CommunityCentreAreaNumber;
-			}
-			badField.SetValue(bad);
-
 			PrintBundleData(cc);
-
-			Log.D($"CACBUNDLES Loaded CC bundle progress",
+			Log.D("CACB End of loaded custom bundle data.",
 				Config.DebugMode);
 		}
 
-		private void SaveAndUnloadBundleData()
+		internal void SaveAndUnloadBundleData()
 		{
 			var cc = GetCommunityCentre();
-			CommunityCentreBundleValues?.Clear();
-			if (cc.areasComplete.Count > 6)
+			if (Game1.IsMasterGame)
 			{
 				for (var i = 0; i < BundleCount; ++i)
 				{
 					var key = BundleStartIndex + i;
 
-					if (Game1.IsMasterGame)
-					{
-						// Add custom bundle data to mod savedata for data persistence, because...
-						CommunityCentreBundleValues[key] = Game1.netWorldState.Value.Bundles.ContainsKey(key) ? Game1.netWorldState.Value.Bundles[key] : new bool[0];
-						CommunityCentreBundleRewards[key] = Game1.netWorldState.Value.BundleRewards.ContainsKey(key) ? Game1.netWorldState.Value.BundleRewards[key] : false;
+					// Save GW bundle data to persistent data in community centre
+					if (Game1.netWorldState.Value.Bundles.ContainsKey(key))
+						cc.modData[AssetPrefix + "bundle_values_" + i] = string.Join(",", Game1.netWorldState.Value.Bundles[key]);
+					if (Game1.netWorldState.Value.BundleRewards.ContainsKey(key))
+						cc.modData[AssetPrefix + "bundle_rewards_" + i] = Game1.netWorldState.Value.BundleRewards[key].ToString();
 
-						// We remove custom bundle data from game savedata to avoid failed save loading
-						Game1.netWorldState.Value.BundleData.Remove(key.ToString());
-						Game1.netWorldState.Value.BundleRewards.Remove(key);
+					// Remove custom bundle data from GW data to avoid failed save loading under various circumstances
+					Game1.netWorldState.Value.Bundles.Remove(key);
+					Game1.netWorldState.Value.BundleRewards.Remove(key);
+					Game1.netWorldState.Value.BundleData.Remove($"{CommunityCentreAreaName}/{key}");
 
-						// Also remove custom bundle metadata
-						Game1.netWorldState.Value.BundleData.Remove($"{CommunityCentreAreaName}/{key}");
-
-						// Now we add to persistent location data
-						cc.modData[AssetPrefix + "area_completed"] = IsCommunityCentreAreaComplete.ToString();
-						cc.modData[AssetPrefix + "bundles_completed"] = string.Join(",", CommunityCentreBundlesComplete);
-						cc.modData[AssetPrefix + "bundle_values"] = string.Join(",", CommunityCentreBundleValues);
-						cc.modData[AssetPrefix + "bundle_rewards"] = string.Join(",", CommunityCentreBundleRewards);
-					}
-
-					// Remove local community centre data
-					try
-					{
-						var areas = new bool[CommunityCentreAreaNumber];
-						for (var j = 0; j < Math.Min(cc.areasComplete.Count, areas.Length); ++j)
-						{
-							areas[j] = cc.areasComplete[j];
-						}
-						cc.areasComplete.Clear();
-						cc.areasComplete.Set(areas);
-					}
-					catch (Exception e)
-					{
-						Log.E($"Error while updating CC areasComplete NetArray:"
-							+ $"\nMultiplayer: {Game1.IsMultiplayer}"
-							+ $", MasterGame: {Game1.IsMasterGame}"
-							+ $", MasterPlayer: {Game1.player.UniqueMultiplayerID == Game1.MasterPlayer.UniqueMultiplayerID}"
-							+ $", FarmHands: {Game1.getAllFarmhands().Count()}"
-							+ $"\n{e}");
-					}
-
-					Log.D($"CACBUNDLES Saved and unloaded bundle progress for {key}",
+					Log.D($"CACB Saved and unloaded bundle progress for {key}",
 						Config.DebugMode);
+				}
+				cc.modData[AssetPrefix + "area_completed"] = IsCommunityCentreKitchenCompleted().ToString();
+			}
+			else
+			{
+				Log.D($"CACB Did not save and unload GW bundle data: Peer was not host player.",
+					Config.DebugMode);
+			}
+
+			if (cc.areasComplete.Count > CommunityCentreAreaNumber)
+			{
+				// Remove local community centre data
+				try
+				{
+					// Recalibrate area-bundle reference dictionaries
+					Helper.Reflection.GetMethod(cc, "initAreaBundleConversions").Invoke();
+
+					// Remove new areasComplete entry
+					var oldAreas = cc.areasComplete;
+					var newAreas = new NetArray<bool, NetBool>(CommunityCentreAreaNumber);
+					for (var i = 0; i < newAreas.Count; ++i)
+						newAreas[i] = oldAreas[i];
+					cc.areasComplete.Clear();
+					cc.areasComplete.Set(newAreas);
+
+					Log.D($"CACB Unloaded CC data.",
+						Config.DebugMode);
+				}
+				catch (Exception e)
+				{
+					Log.E($"CACB Error while updating CC areasComplete[{cc.areasComplete.Count()}] NetArray:"
+						+ $"\nMultiplayer: {Game1.IsMultiplayer}"
+						+ $", MasterGame: {Game1.IsMasterGame}"
+						+ $", MasterPlayer: {Game1.player.UniqueMultiplayerID == Game1.MasterPlayer.UniqueMultiplayerID}"
+						+ $", FarmHands: {Game1.getAllFarmhands().Count()}"
+						+ $"\n{e}");
 				}
 			}
 
-			// Reapply Harmony patches
-			HarmonyPatches.Patch();
+			PrintBundleData(cc);
+			Log.D("CACB End of unloaded vanilla bundle data.",
+				Config.DebugMode);
 		}
 
 		internal void PrintBundleData(CommunityCenter cc)
@@ -2210,20 +2289,22 @@ namespace LoveOfCooking
 
 			// Community centre data (LOCAL)
 			var bad = Helper.Reflection.GetField<Dictionary<int, int>>(cc, "bundleToAreaDictionary").GetValue();
+			var abd = Helper.Reflection.GetField<Dictionary<int, List<int>>>(cc, "areaToBundleDictionary").GetValue();
 
-			Log.D($"CACBUNDLES Host game: ({Game1.IsMasterGame}), Host player: ({Game1.MasterPlayer.UniqueMultiplayerID == Game1.player.UniqueMultiplayerID})");
-			Log.D($"CACBUNDLES CC IsCommunityCentreComplete: {IsCommunityCentreComplete()}"); 
-			Log.D($"CACBUNDLES CC IsNewBundleEnabledByHost:  {IsNewCommunityCentreBundleEnabledByHost()}");
-			Log.D(cc.areasComplete.Aggregate($"CACBUNDLES CC areasComplete[{cc.areasComplete.Count}]:    ", (s, b) => $"{s} ({b})"), Config.DebugMode);
-			Log.D(bad.Aggregate("CACBUNDLES CC bundleToAreaDictionary:", (s, pair) => $"{s} ({pair.Key}: {pair.Value})"), Config.DebugMode);
-			Log.D($"CACBUNDLES CC NumOfAreasComplete:        {Helper.Reflection.GetMethod(cc, "getNumberOfAreasComplete").Invoke<int>()}", Config.DebugMode);
+			Log.D($"CACB Host game: ({Game1.IsMasterGame}), Host player: ({Game1.MasterPlayer.UniqueMultiplayerID == Game1.player.UniqueMultiplayerID})");
+			Log.D($"CACB CC IsCommunityCentreComplete: {IsCommunityCentreComplete()}"); 
+			Log.D($"CACB CC IsKitchenEnabledByHost:  {IsCommunityCentreKitchenEnabledByHost()}");
+			Log.D(cc.areasComplete.Aggregate($"CACB CC areasComplete[{cc.areasComplete.Count}]:    ", (s, b) => $"{s} ({b})"), Config.DebugMode);
+			Log.D(bad.Aggregate($"CACB CC bundleToAreaDictionary[{bad.Count}]:", (s, pair) => $"{s} ({pair.Key}: {pair.Value})"), Config.DebugMode);
+			Log.D(abd.Aggregate($"CACB CC areaToBundleDictionary[{abd.Count}]:", (s, pair) => $"{s} ({pair.Key}: {pair.Value.Aggregate("", (s1, value) => s1 + " " + value)})"), Config.DebugMode);
+			Log.D($"CACB CC NumOfAreasComplete:        {Helper.Reflection.GetMethod(cc, "getNumberOfAreasComplete").Invoke<int>()}", Config.DebugMode);
 
 			// World state data (SYNCHRONISED)
-			Log.D(Game1.netWorldState.Value.BundleData.Aggregate("CACBUNDLES GW bundleData: ", (s, pair)
+			Log.D(Game1.netWorldState.Value.BundleData.Aggregate("CACB GW bundleData: ", (s, pair)
 				=> $"{s}\n{pair.Key}: {pair.Value}"), Config.DebugMode);
-			Log.D(Game1.netWorldState.Value.Bundles.Aggregate("CACBUNDLES GW bundles: ", (s, boolses)
+			Log.D(Game1.netWorldState.Value.Bundles.Aggregate("CACB GW bundles: ", (s, boolses)
 				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1}\n{pair.Key}: {pair.Value.Aggregate("", (s2, complete) => $"{s2} {complete}")}")}" : "none"), Config.DebugMode);
-			Log.D(Game1.netWorldState.Value.BundleRewards.Aggregate("CACBUNDLES GW bundleRewards: ", (s, boolses)
+			Log.D(Game1.netWorldState.Value.BundleRewards.Aggregate("CACB GW bundleRewards: ", (s, boolses)
 				=> boolses?.Count > 0 ? $"{s}\n{boolses.Aggregate("", (s1, pair) => $"{s1} ({pair.Key}: {pair.Value})")}" : "(none)"), Config.DebugMode);
 		}
 
@@ -2240,7 +2321,6 @@ namespace LoveOfCooking
 				var parsedBundle = new List<List<string>>();
 
 				var index = BundleStartIndex + i;
-				var name = $"{CommunityCentreAreaName}.bundle.{i}";
 				var displayName = i18n.Get($"world.community_centre.bundle.{i + 1}");
 				var itemsToComplete = sourceBundle[i][2];
 				var colour = sourceBundle[i][3];

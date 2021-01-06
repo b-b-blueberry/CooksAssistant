@@ -334,7 +334,7 @@ namespace LoveOfCooking.GameObjects.Menus
 			_currentSelectedInventory = -2;
 			var fridgeForFarmHouse = Game1.currentLocation is FarmHouse fh
 				&& ModEntry.Instance.GetFarmhouseKitchenLevel(fh) > 0;
-			var fridgeForCommunityCentre = ModEntry.Instance.IsNewCommunityCentreBundleEnabledByHost()
+			var fridgeForCommunityCentre = ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost()
 				&& Game1.currentLocation is CommunityCenter cc
 				&& cc.areasComplete.Count > ModEntry.CommunityCentreAreaNumber && cc.areasComplete[ModEntry.CommunityCentreAreaNumber];
 			// Check for fridge
@@ -1008,7 +1008,7 @@ namespace LoveOfCooking.GameObjects.Menus
 				// Extra sprite
 				spritePosition = new Vector2(Game1.player.Position.X, Game1.player.Position.Y - 40 * Game1.pixelZoom);
 				sprite = new TemporaryAnimatedSprite(
-						textureName: ModEntry.SpriteSheetPath,
+						textureName: ModEntry.GameContentSpriteSheetPath,
 						sourceRect: new Rectangle(0, 336, 16, 48),
 						animationInterval: ms, animationLength: 16, numberOfLoops: 0,
 						position: spritePosition,
@@ -1051,7 +1051,7 @@ namespace LoveOfCooking.GameObjects.Menus
 				// Extra sprite
 				spritePosition = new Vector2(Game1.player.Position.X, Game1.player.Position.Y - 40 * Game1.pixelZoom);
 				sprite = new TemporaryAnimatedSprite(
-						textureName: ModEntry.SpriteSheetPath,
+						textureName: ModEntry.LocalSpriteSheetPath,
 						sourceRect: new Rectangle(0, 288, 16, 48),
 						animationInterval: ms, animationLength: 16, numberOfLoops: 0,
 						position: spritePosition,

@@ -32,7 +32,7 @@ namespace LoveOfCooking
 
 		public bool CanLoad<T>(IAssetInfo asset)
 		{
-			return asset.AssetNameEquals(ModEntry.SpriteSheetPath)
+			return asset.AssetNameEquals(ModEntry.GameContentSpriteSheetPath)
 				|| asset.AssetNameEquals(ModEntry.MapTileSheetPath);
 		}
 
@@ -42,9 +42,9 @@ namespace LoveOfCooking
 		{
 			Log.D($"Loading custom asset {asset.AssetName}",
 				ModEntry.Instance.Config.DebugMode);
-			if (asset.AssetNameEquals(ModEntry.SpriteSheetPath))
+			if (asset.AssetNameEquals(ModEntry.GameContentSpriteSheetPath))
 			{
-				return (T) (object) ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.SpriteSheetPath}.png");
+				return (T) (object) ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.LocalSpriteSheetPath}.png");
 			}
 			if (asset.AssetNameEquals(ModEntry.MapTileSheetPath))
 			{
@@ -448,7 +448,7 @@ namespace LoveOfCooking
 						{"Pepper Rex", new[] {$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .02"}},
 					};
 					foreach (var monster in monsterData)
-						data[monster.Key] = ModEntry.UpdateEntry(data[monster.Key], monster.Value, true);
+						data[monster.Key] = ModEntry.UpdateEntry(data[monster.Key], monster.Value, append: true);
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
 					

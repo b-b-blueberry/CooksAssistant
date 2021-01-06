@@ -11,7 +11,7 @@ namespace LoveOfCooking.GameObjects
 	public class CookingSkill : Skills.Skill
 	{
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
-		public static readonly string Name = "Cooking";
+		public static readonly string Name = ModEntry.AssetPrefix + "CookingSkill";
 		protected static readonly string ProfessionI18nId = "menu.cooking_skill.tier{0}_path{1}{2}";
 
 		public enum ProfId
@@ -123,7 +123,7 @@ namespace LoveOfCooking.GameObjects
 
 		public override string GetName()
 		{
-			return ModEntry.AssetPrefix + "Cooking";
+			return i18n.Get("menu.cooking_recipe.buff.12");
 		}
 		
 		public override List<string> GetExtraLevelUpInfo(int level)
