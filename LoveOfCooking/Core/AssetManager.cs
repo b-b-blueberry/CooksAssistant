@@ -26,6 +26,7 @@ namespace LoveOfCooking
 			{ "Speed", 9},
 			{ "Defense", 10},
 			{ "Attack", 11},
+			{ "Cooking", 12},
 		};
 
 		public AssetManager() {}
@@ -340,10 +341,10 @@ namespace LoveOfCooking
 
 				// lol pan
 				var whoops = "Umm, hello @."
-					+ $"^There was a mix-up at the forge with your {i18n.Get("menu.cooking_equipment.name")}."
-						+ $" This is a bit embarrassing, so I'll return your materials as an apology."
-					+ "^Come back to the shop and we'll see about getting you that upgrade."
-					+ "^ - Clint, the blacksmith"
+						+ $"^There was a mix-up at the forge with your {i18n.Get("menu.cooking_equipment.name")}."
+							+ $" This is a bit embarrassing, so I'll return your materials as an apology."
+						+ "^Come back to the shop and we'll see about getting you that upgrade."
+						+ "^ - Clint, the blacksmith"
 					+ "^^^                     $ 1000g"
 					+ " %item object 334 5 %% [#] Love of Cooking Meta Menu Mix-Up";
 				data.Add(ModEntry.MailFryingPanWhoops, whoops);
@@ -466,16 +467,6 @@ namespace LoveOfCooking
 				return;
 			}
 
-			/*
-			if (asset.DataType == typeof(IDictionary<string, string>)// && !Config.AddCookingQuestline)
-				)
-			{
-				Log.D($"Did not edit {asset.AssetName}: Quest edits are disabled in config file.",
-					Config.DebugMode);
-				return;
-			}
-			*/
-			
 			if (asset.AssetNameEquals(@"LooseSprites/JunimoNote"))
 			{
 				// Add icons for a new community centre bundle
@@ -638,7 +629,7 @@ namespace LoveOfCooking
 				    || cookingRecipes[objectSplit[0]].Split('/')[1].StartsWith("what"))
 					continue;
 				var ingredients = cookingRecipes[objectSplit[0]].Split('/')[0].Split(' ');
-				var buffArray = new[] { "0","0","0","0","0","0","0","0","0","0","0","0" };
+				var buffArray = new[] { "0","0","0","0","0","0","0","0","0","0","0","0","0" };
 				var buffDuration = 0;
 
 				// Populate buff values using ingredients for this object in CookingRecipes

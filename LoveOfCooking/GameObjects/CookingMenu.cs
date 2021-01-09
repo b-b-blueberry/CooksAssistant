@@ -787,22 +787,16 @@ namespace LoveOfCooking.GameObjects.Menus
 			var requiredExperience = CookingSkill.GetExperienceRequiredForNextLevel();
 			var experience = Math.Min(remainingExperience,
 				(int) (newBonus + dailyBonus + baseExperience * stackBonus * (ModEntry.Instance.Config.DebugMode ? ModEntry.DebugExperienceRate : 1)));
-			if (!ModEntry.HasLevelledUpToday && apply)
+			Log.D($"Cooked up {item.Name} with {ingredientsCount} ingredients",
+				ModEntry.Instance.Config.DebugMode);
+			if (apply)
 			{
-				Log.D($"Cooked up {item.Name} with {ingredientsCount} ingredients"
-					+ $"\nExperience until level {CookingSkill.GetLevel() + 1}:"
+				Log.D($"\nExperience until level {CookingSkill.GetLevel() + 1}:"
 					+ $" ({requiredExperience - remainingExperience}/{requiredExperience})"
 					+ $"\nTotal experience: ({CookingSkill.GetTotalCurrentExperience()}/{CookingSkill.GetTotalExperienceRequiredForNextLevel()})"
 					+ $"\n+{experience} experience!",
 					ModEntry.Instance.Config.DebugMode);
 				CookingSkill.AddExperience(experience);
-
-				if (experience >= remainingExperience)
-				{
-					ModEntry.HasLevelledUpToday = true;
-					Log.D($"Experience reached {requiredExperience}, levelling up!",
-						ModEntry.Instance.Config.DebugMode);
-				}
 			}
 			else
 			{

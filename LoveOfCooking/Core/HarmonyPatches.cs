@@ -6,6 +6,7 @@ using StardewValley.Characters;
 using StardewValley.Locations;
 using StardewValley.TerrainFeatures;
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using xTile;
 using xTile.Tiles;
@@ -25,7 +26,8 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.D($"Error occurred while unpatching methods, may not be fatal.\n{e}", ModEntry.Instance.Config.DebugMode);
+				Log.D($"Error occurred while unpatching methods, may not be fatal.\n{e}",
+					ModEntry.Instance.Config.DebugMode);
 			}
 
 			harmony.Patch(
@@ -43,7 +45,8 @@ namespace LoveOfCooking
 
 			if (!ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
 			{
-				Log.D($"Did not patch CC methods: host player kitchen is not enabled.");
+				Log.D($"Did not patch CC methods: host player kitchen is not enabled.",
+					ModEntry.Instance.Config.DebugMode);
 				return;
 			}
 
@@ -288,7 +291,8 @@ namespace LoveOfCooking
 						}
 					}
 				}
-				Log.D("End of LoadAreaPrefix");
+				Log.D("End of LoadAreaPrefix",
+					ModEntry.Instance.Config.DebugMode);
 				return false;
 			}
 			catch (Exception e)
@@ -331,16 +335,15 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				Log.D($"ShouldNoteAppearInArea({area})",
-					ModEntry.Instance.Config.DebugMode);
-				if (ModEntry.IsCommunityCentreComplete() && ModEntry.IsAbandonedJojaMartBundleAvailable())
+				if (ModEntry.IsCommunityCentreComplete() && ModEntry.IsAbandonedJojaMartBundleAvailable()
+					&& Game1.netWorldState.Value.BundleData.Keys.Any(key => key.StartsWith(ModEntry.CommunityCentreAreaName)))
 				{
 					ModEntry.Instance.SaveAndUnloadBundleData();
 				}
 
 				if (area != ModEntry.CommunityCentreAreaNumber)
 					return true;
-				__result = ModEntry.Instance.IsCommunityCentreKitchenCompleted()
+				__result = !ModEntry.Instance.IsCommunityCentreKitchenCompleted()
 					&& __instance.numberOfCompleteBundles() > (ModEntry.Instance.Config.DebugMode ? 0 : 2);
 				return false;
 			}
