@@ -14,7 +14,7 @@ namespace LoveOfCooking
 		private static Config Config => ModEntry.Instance.Config;
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 
-		private Dictionary<string, int> BuffIndex = new Dictionary<string, int>
+		private static readonly Dictionary<string, int> BuffIndex = new Dictionary<string, int>
 		{
 			{ "Farming", 0},
 			{ "Fishing", 1},
@@ -28,12 +28,14 @@ namespace LoveOfCooking
 			{ "Attack", 11},
 			{ "Cooking", 12},
 		};
+		internal static readonly Point IconPosition = new Point(506, 372);
 
 		public AssetManager() {}
 
 		public bool CanLoad<T>(IAssetInfo asset)
 		{
 			return asset.AssetNameEquals(ModEntry.GameContentSpriteSheetPath)
+				|| asset.AssetNameEquals(ModEntry.GameContentBundleDataPath)
 				|| asset.AssetNameEquals(ModEntry.MapTileSheetPath);
 		}
 
@@ -46,6 +48,10 @@ namespace LoveOfCooking
 			if (asset.AssetNameEquals(ModEntry.GameContentSpriteSheetPath))
 			{
 				return (T) (object) ModEntry.Instance.Helper.Content.Load<Texture2D>($"{ModEntry.LocalSpriteSheetPath}.png");
+			}
+			if (asset.AssetNameEquals(ModEntry.GameContentBundleDataPath))
+			{
+				return (T) (object) ModEntry.Instance.Helper.Content.Load<Dictionary<string, List<List<string>>>>($"{ModEntry.LocalBundleDataPath}.json");
 			}
 			if (asset.AssetNameEquals(ModEntry.MapTileSheetPath))
 			{
@@ -82,21 +88,22 @@ namespace LoveOfCooking
 		public bool CanEdit<T>(IAssetInfo asset)
 		{
 			return Game1.player != null 
-			       && (asset.AssetNameEquals(@"Data/Bundles")
-			           || asset.AssetNameEquals(@"Data/BigCraftablesInformation")
-			           || asset.AssetNameEquals(@"Data/CookingRecipes")
-			           || asset.AssetNameEquals(@"Data/mail")
-					   || asset.AssetNameEquals(@"Data/ObjectInformation")
-			           || asset.AssetNameEquals(@"Data/Events/Saloon")
-			           || asset.AssetNameEquals(@"Data/Events/Mountain")
-			           || asset.AssetNameEquals(@"Data/Events/JoshHouse")
-			           || asset.AssetNameEquals(@"LooseSprites/JunimoNote")
-			           || asset.AssetNameEquals(@"Maps/Beach")
-			           || asset.AssetNameEquals(@"Maps/springobjects")
-			           || asset.AssetNameEquals(@"Maps/townInterior")
-			           || asset.AssetNameEquals(@"Strings/UI")
-			           || asset.AssetNameEquals(@"Strings/Locations")
-			           || asset.AssetNameEquals(@"TileSheets/tools"));
+			    && (asset.AssetNameEquals(@"Data/Bundles")
+			        || asset.AssetNameEquals(@"Data/BigCraftablesInformation")
+			        || asset.AssetNameEquals(@"Data/CookingRecipes")
+			        || asset.AssetNameEquals(@"Data/mail")
+					|| asset.AssetNameEquals(@"Data/ObjectInformation")
+			        || asset.AssetNameEquals(@"Data/Events/Saloon")
+			        || asset.AssetNameEquals(@"Data/Events/Mountain")
+			        || asset.AssetNameEquals(@"Data/Events/JoshHouse")
+					|| asset.AssetNameEquals(@"LooseSprites/Cursors")
+					|| asset.AssetNameEquals(@"LooseSprites/JunimoNote")
+			        || asset.AssetNameEquals(@"Maps/Beach")
+			        || asset.AssetNameEquals(@"Maps/springobjects")
+			        || asset.AssetNameEquals(@"Maps/townInterior")
+			        || asset.AssetNameEquals(@"Strings/UI")
+			        || asset.AssetNameEquals(@"Strings/Locations")
+					|| asset.AssetNameEquals(@"TileSheets/tools"));
 		}
 
 		public void Edit<T>(IAssetData asset)
@@ -467,7 +474,67 @@ namespace LoveOfCooking
 				return;
 			}
 
-			if (asset.AssetNameEquals(@"LooseSprites/JunimoNote"))
+			if (asset.AssetNameEquals(@"LooseSprites/Cursors"))
+			{
+				// Home-cook a notification icon for under the HUD money tray:
+
+				// Prime a canvas as a clipboard to hold in sequence both a copy of the vanilla icon
+				// and our custom icon to merge together into some particular open space in Cursors
+				const int iconW = 11;
+				const int iconH = 14;
+				var data = asset.AsImage().Data;
+				var canvas = new Color[iconW * iconH];
+				var texture = new Texture2D(Game1.graphics.GraphicsDevice, iconW, iconH);
+				var vanillaIconArea = new Rectangle(383, 493, iconW, iconH);
+				var targetArea = new Rectangle(IconPosition.X, IconPosition.Y, iconW, iconH);
+
+				// Patch in a copy of the vanilla quest log icon
+				data.GetData(0, vanillaIconArea, canvas, 0, canvas.Length);
+				texture.SetData(canvas);
+				asset.AsImage().PatchImage(texture, null, targetArea, PatchMode.Replace);
+
+				// Chroma-key our custom icon with colours from the vanilla icon
+				var colorSampleA = canvas[iconW * 5 + 1];
+				var colorSampleB = canvas[iconW * 11 + 1];
+
+				var colorR = new Color(255, 0, 0);
+				var colorC = new Color(255, 0, 255);
+				var colorG = new Color(0, 255, 0);
+				var colorA = new Color(0, 0, 0, 0);
+
+				ModEntry.SpriteSheet.GetData(0, new Rectangle(0, 0, iconW, iconH), canvas, 0, canvas.Length);
+
+				for (var i = 0; i < canvas.Length; ++i)
+				{
+					if (canvas[i] == colorC)
+						canvas[i] = colorA;
+					else if (canvas[i] == colorG)
+						canvas[i] = colorSampleA;
+					else if (canvas[i] == colorR)
+						canvas[i] = colorSampleB;
+				}
+
+				// Patch in the custom icon over the vanilla icon copy
+				texture.SetData(canvas);
+				asset.AsImage().PatchImage(texture, null, targetArea, PatchMode.Overlay);
+
+				// Patch in an alpha-shaded copy of the custom icon to use for the pulse animation
+				var colorShade = new Color(0, 0, 0, 0.35f);
+
+				for (var i = 0; i < canvas.Length; ++i)
+				{
+					if (canvas[i] == colorSampleB)
+						canvas[i] = colorShade;
+					else if (canvas[i] == colorSampleA)
+						canvas[i] = colorA;
+				}
+
+				// Apply changes to the Cursors sheet
+				texture.SetData(canvas);
+				targetArea.X -= targetArea.Width;
+				asset.AsImage().PatchImage(texture, null, targetArea, PatchMode.Overlay);
+			}
+			else if (asset.AssetNameEquals(@"LooseSprites/JunimoNote"))
 			{
 				// Add icons for a new community centre bundle
 				

@@ -43,13 +43,6 @@ namespace LoveOfCooking
 				original: AccessTools.Method(typeof(Bush), "shake"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_shake_Prefix)));
 
-			if (!ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
-			{
-				Log.D($"Did not patch CC methods: host player kitchen is not enabled.",
-					ModEntry.Instance.Config.DebugMode);
-				return;
-			}
-
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNameFromNumber"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNameFromNumber_Prefix)));
@@ -135,7 +128,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
-				if (name != ModEntry.CommunityCentreAreaName || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
+				if (name != ModEntry.CommunityCentreAreaName)
 					return true;
 				__result = ModEntry.CommunityCentreAreaNumber;
 				return false;
@@ -336,8 +329,10 @@ namespace LoveOfCooking
 			try
 			{
 				if (ModEntry.IsCommunityCentreComplete() && ModEntry.IsAbandonedJojaMartBundleAvailable()
-					&& Game1.netWorldState.Value.BundleData.Keys.Any(key => key.StartsWith(ModEntry.CommunityCentreAreaName)))
+					&& (Game1.netWorldState.Value.BundleData.Keys.Any(key => key.StartsWith(ModEntry.CommunityCentreAreaName))))
 				{
+					Log.D($"ShouldNoteAppearInArea removing custom bundle data.",
+						ModEntry.Instance.Config.DebugMode);
 					ModEntry.Instance.SaveAndUnloadBundleData();
 				}
 
@@ -440,7 +435,7 @@ namespace LoveOfCooking
 			{
 				var viewportTargets = ModEntry.Instance.Helper.Reflection.GetField<List<int>>(
 					__instance, "junimoNotesViewportTargets").GetValue();
-				if (viewportTargets.Count < 1 || viewportTargets[0] != ModEntry.CommunityCentreAreaNumber)
+				if (viewportTargets.Count < 1 || viewportTargets[0] != ModEntry.CommunityCentreAreaNumber || !ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
 					return true;
 
 				var reachedTarget = ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "afterViewportGetsToJunimoNotePosition");
@@ -471,6 +466,9 @@ namespace LoveOfCooking
 		{
 			try
 			{
+				if (!ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
+					return true;
+
 				var junimo = __instance.getJunimoForArea(ModEntry.CommunityCentreAreaNumber);
 				junimo.Position = new Vector2(22f, 12f) * 64f;
 				junimo.stayStill();
@@ -495,6 +493,9 @@ namespace LoveOfCooking
 		{
 			try
 			{
+				if (!ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
+					return true;
+
 				__instance.getJunimoForArea(ModEntry.CommunityCentreAreaNumber).Position = new Vector2(22f, 12f) * 64f;
 			}
 			catch (Exception e)
@@ -508,6 +509,7 @@ namespace LoveOfCooking
 		{
 			try
 			{
+				// todo: what the fuck?
 				__result = null;
 				return string.IsNullOrEmpty(__result);
 			}
@@ -528,7 +530,7 @@ namespace LoveOfCooking
 				var phaseField = ModEntry.Instance.Helper.Reflection.GetField<int>(__instance, "restoreAreaPhase");
 				var phase = phaseField.GetValue();
 
-				if (timer == 0)
+				if (timer == 0 || !ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
 				{
 					return true;
 				}

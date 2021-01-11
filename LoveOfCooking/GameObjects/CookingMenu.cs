@@ -1045,7 +1045,7 @@ namespace LoveOfCooking.GameObjects.Menus
 				// Extra sprite
 				spritePosition = new Vector2(Game1.player.Position.X, Game1.player.Position.Y - 40 * Game1.pixelZoom);
 				sprite = new TemporaryAnimatedSprite(
-						textureName: ModEntry.LocalSpriteSheetPath,
+						textureName: ModEntry.GameContentSpriteSheetPath,
 						sourceRect: new Rectangle(0, 288, 16, 48),
 						animationInterval: ms, animationLength: 16, numberOfLoops: 0,
 						position: spritePosition,
