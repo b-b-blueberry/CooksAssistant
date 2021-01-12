@@ -371,7 +371,8 @@ namespace LoveOfCooking.GameObjects
 					switch (_currentNotification)
 					{
 						case ModEntry.Notification.BundleMultiplayerWarning:
-							Log.I("Enabled custom bundle data in a possible multiplayer game.");
+							Log.I("Enabled custom bundle data in a possible multiplayer game."
+								+ "\nReload the save if you need bundles disabled again for playing with friends.");
 							ModEntry.Instance.SetCommunityCentreKitchenForThisSession(true);
 							ModEntry.Instance.LoadBundleData();
 							break;
@@ -383,7 +384,8 @@ namespace LoveOfCooking.GameObjects
 					switch (_currentNotification)
 					{
 						case ModEntry.Notification.BundleMultiplayerWarning:
-							Log.I("Declined to load bundle data in a possible multiplayer game.");
+							Log.I("Declined to load bundle data in a possible multiplayer game."
+								+ "\nReload the save if you need bundles enabled for playing singleplayer.");
 							break;
 					}
 					TrashNotification(playSound: false);

@@ -153,7 +153,7 @@ namespace LoveOfCooking.GameObjects.Menus
 		private List<IList<Item>> _minifridgeList;
 		private int _currentSelectedInventory;
 
-		private enum Filter
+		public enum Filter
 		{
 			None,
 			Alphabetical,
@@ -208,12 +208,12 @@ namespace LoveOfCooking.GameObjects.Menus
 			ModEntry.Instance.UpdateEnglishRecipeDisplayNames(ref _unlockedCookingRecipes);
 
 			// Apply default filter to the default recipe list
+			var reverseDefaultFilter = ModEntry.LastFilterReversed;
 			_unlockedCookingRecipes = FilterRecipes();
 
 			// Initialise filtered search lists
 			_filteredRecipeList = _unlockedCookingRecipes;
 			_searchRecipes = new List<CraftingRecipe>();
-			_lastFilterUsed = Filter.None;
 
 			// Cooking ingredients item drop-in slots
 			_cookingSlots = ModEntry.Instance.GetNearbyCookingStationLevel();
@@ -379,12 +379,24 @@ namespace LoveOfCooking.GameObjects.Menus
 				_stack.Push(State.Opening);
 			OpenSearchPage();
 
+			// Apply previously-used filter
+			if (ModEntry.LastFilterThisSession != Filter.None)
+			{
+				_filteredRecipeList = FilterRecipes(ModEntry.LastFilterThisSession);
+			}
+			if (reverseDefaultFilter)
+			{
+				_filteredRecipeList = ReverseRecipeList(_filteredRecipeList);
+			}
+			UpdateSearchRecipes();
+
 			// Open to a starting recipe if needed
 			if (!string.IsNullOrEmpty(initialRecipe))
 			{
 				ChangeCurrentRecipe(initialRecipe);
 				OpenRecipePage();
 			}
+
 			Game1.displayHUD = false;
 		}
 
@@ -536,7 +548,7 @@ namespace LoveOfCooking.GameObjects.Menus
 			CookQuantityUpButton.bounds.Y = yOffset - 12;
 
 			var textSize = _quantityTextBox.Font.MeasureString(
-				Game1.parseText("99", _quantityTextBox.Font, 96));
+				Game1.parseText("999", _quantityTextBox.Font, 96));
 			_quantityTextBox.Text = QuantityTextBoxDefaultText;
 			_quantityTextBox.limitWidth = false;
 			_quantityTextBox.Width = (int)textSize.X + 24;
@@ -1192,6 +1204,7 @@ namespace LoveOfCooking.GameObjects.Menus
 
 		private List<CraftingRecipe> ReverseRecipeList(List<CraftingRecipe> recipes)
 		{
+			ModEntry.LastFilterReversed = !ModEntry.LastFilterReversed;
 			recipes.Reverse();
 			_currentRecipe = _searchRecipes.Count / 2;
 			return recipes;
@@ -1200,6 +1213,7 @@ namespace LoveOfCooking.GameObjects.Menus
 		private List<CraftingRecipe> FilterRecipes(Filter which = Filter.Alphabetical,
 			string substr = null)
 		{
+			ModEntry.LastFilterReversed = false;
 			Func<CraftingRecipe, object> order = null;
 			Func<CraftingRecipe, bool> filter = null;
 			switch (which)
@@ -1301,9 +1315,9 @@ namespace LoveOfCooking.GameObjects.Menus
 		{
 			int.TryParse(sender.Text.Trim(), out var value);
 			value = value > 0 ? value : 1;
-			sender.Text = Math.Max(1, Math.Min(9,
+			sender.Text = Math.Max(1, Math.Min(99,
 				Math.Min(value, GetAmountCraftable(_recipeIngredients, _cookingSlotsDropIn)))).ToString();
-			sender.Text = sender.Text.PadLeft(2, ' ');
+			sender.Text = sender.Text.PadLeft(sender.Text.Length == 2 ? 3 : 2, ' ');
 			sender.Selected = false;
 		}
 
@@ -1963,6 +1977,7 @@ namespace LoveOfCooking.GameObjects.Menus
 									_filteredRecipeList = FilterRecipes(which, _searchBarTextBox.Text);
 								}
 								Game1.playSound("coin");
+								ModEntry.LastFilterThisSession = which;
 							}
 						}
 					
@@ -2052,7 +2067,7 @@ namespace LoveOfCooking.GameObjects.Menus
 				// Quantity text box
 				if (_quantityTextBoxBounds.Contains(x, y))
 				{
-					_quantityTextBox.Text = " ";
+					_quantityTextBox.Text = "";
 					Game1.keyboardDispatcher.Subscriber = _quantityTextBox;
 					_quantityTextBox.SelectMe();
 				}

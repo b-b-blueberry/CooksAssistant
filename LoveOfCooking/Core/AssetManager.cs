@@ -113,8 +113,9 @@ namespace LoveOfCooking
 
 		private void EditAsset(ref IAssetData asset)
 		{
-			Log.D($"Editing {asset.AssetName}",
-				ModEntry.Instance.Config.DebugMode);
+			if (ModEntry.PrintRename)
+				Log.D($"Editing {asset.AssetName}",
+					ModEntry.Instance.Config.DebugMode);
 			if (asset.AssetNameEquals(@"Data/Bundles"))
 			{
 				// Make no changes for the new community centre bundle, but set our base values from the data
@@ -329,7 +330,7 @@ namespace LoveOfCooking
 
 					if (ModEntry.PrintRename)
 						Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
-							.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+								.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 							ModEntry.Instance.Config.DebugMode);
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
@@ -412,10 +413,10 @@ namespace LoveOfCooking
 
 					asset.AsDictionary<int, string>().ReplaceWith(data);
 
-					Log.D($"Edited {asset.AssetName}:" + data.Where(
-							pair => objectData.ContainsKey(pair.Key))
-						.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
-						ModEntry.Instance.Config.DebugMode);
+					if (ModEntry.PrintRename)
+						Log.D($"Edited {asset.AssetName}:" + data.Where(pair => objectData.ContainsKey(pair.Key))
+								.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+							ModEntry.Instance.Config.DebugMode);
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
@@ -459,11 +460,11 @@ namespace LoveOfCooking
 						data[monster.Key] = ModEntry.UpdateEntry(data[monster.Key], monster.Value, append: true);
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
-					
-					Log.D($"Edited {asset.AssetName}:" + data.Where(
-							pair => monsterData.ContainsKey(pair.Key))
-						.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
-						ModEntry.Instance.Config.DebugMode);
+
+					if (ModEntry.PrintRename)
+						Log.D($"Edited {asset.AssetName}:" + data.Where(pair => monsterData.ContainsKey(pair.Key))
+								.Aggregate("", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+							ModEntry.Instance.Config.DebugMode);
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{

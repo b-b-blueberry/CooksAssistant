@@ -25,19 +25,17 @@ using Object = StardewValley.Object;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 
-// TODO: 1.5 FIX: Test Qi Seasoning
-// TODO: 1.5 FIX: Evelyn's special request board quest is uncompleteable as it requires using the kitchen
-// TODO: 1.5 FIX: New skill menu erases Golden Walnut count
+// TODO: FIX: Add mail with refund for Iridium Frying Pans
 // TODO: FIX: Duplicating items when inventory full and cooking menu closes
 // TODO: FIX: CC Kitchen star doesn't show up on board for host when CC completed; empty star shows for peers (https://i.imgur.com/UZXTopu.png)
 // TODO: FIX: Some cooking recipes (Starbrew Valley) have 6 ingredients, and the menu will need support for them
-// TODO: FIX: Iridium frying pan upgrade gives an inventory item
 
+// TODO: 1.5 FIX: Test Qi Seasoning
+// TODO: 1.5 FIX: Evelyn's special request board quest is uncompleteable as it requires using the kitchen
+// TODO: 1.5 FIX: New skill menu erases Golden Walnut count
 
 // TODO: UPDATE: Cooked food has a chance (scaling with Cooking level) of taking the quality of its ingredients,
-// Final quality is decided by random choice from list of qualities of each ingredient
-// TODO: UPDATE: Add alternate ways to get Chocolate Bar; unobtainable once JojaMart is removed
-// Purchaseable from Gus after CC completed and not Joja?
+//		Final quality is decided by random choice from list of qualities of each ingredient
 
 // TODO: ???: Ping Pathos about what Game1.IsServer does
 
@@ -100,6 +98,8 @@ namespace LoveOfCooking
 
 		// Add Cooking Menu
 		public const int CookbookMailDate = 14;
+		public static CookingMenu.Filter LastFilterThisSession = CookingMenu.Filter.None;
+		public static bool LastFilterReversed;
 
 		// Add Cooking Skill
 		public static readonly Dictionary<int, int> FoodCookedToday = new Dictionary<int, int>();
@@ -516,12 +516,15 @@ namespace LoveOfCooking
 			Helper.ConsoleCommands.Add(cmd + "book", "Flag cookbook mail as read, allowing kitchens to be used.", (s, args) =>
 			{
 				if (!Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
+				{
 					Game1.player.mailReceived.Add(MailCookbookUnlocked);
+				}
+				Log.D($"Added cookbook: {Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked)}");
 			});
 			Helper.ConsoleCommands.Add(cmd + "clearinbox", "Remove all notifications from your inbox.", (s, p) =>
 			{
 				PendingNotifications.Clear();
-				Log.D($"Cleared notifications: {(PendingNotifications.Count <= 0 ? "true" : "false")}");
+				Log.D($"Cleared notifications: {(PendingNotifications.Count <= 0)}");
 			});
 			Helper.ConsoleCommands.Add(cmd + "inbox", "Bring up the Notification Menu.", (s, p) =>
 			{
@@ -918,15 +921,14 @@ namespace LoveOfCooking
 			// Checks for purchasing a cooking tool upgrade from Clint's upgrade menu
 			var toolName = i18n.Get("menu.cooking_equipment.name");
 			if (Game1.activeClickableMenu != null && Game1.activeClickableMenu is ShopMenu menu
-				&& menu.heldItem != null
-				&& menu.heldItem is StardewValley.Tools.GenericTool tool)
+				&& menu.heldItem != null && menu.heldItem is StardewValley.Tools.GenericTool tool)
 			{
 				var nameMatches = tool.Name.EndsWith(toolName)
 					|| (LocalizedContentManager.CurrentLanguageCode.ToString() == "ru" && tool.Name.StartsWith(toolName));
-				if (nameMatches && tool.IndexOfMenuItemView - 17 < 3)
+				if (nameMatches && tool.IndexOfMenuItemView - 17 < 4)
 				{
 					Game1.player.toolBeingUpgraded.Value = tool;
-					Game1.player.daysLeftForToolUpgrade.Value = 2;
+					Game1.player.daysLeftForToolUpgrade.Value = Config.DebugMode ? 0 : 2;
 					Game1.playSound("parry");
 					Game1.exitActiveMenu();
 					Game1.drawDialogue(Game1.getCharacterFromName("Clint"),
@@ -935,12 +937,14 @@ namespace LoveOfCooking
 			}
 
 			// Checks for collecting your upgraded cooking tool from Clint after waiting the upgrade period
-			if (Game1.player.mostRecentlyGrabbedItem != null
-				&& Game1.player.mostRecentlyGrabbedItem is StardewValley.Tools.GenericTool tool1
-				&& tool1.Name.EndsWith(toolName)
-				&& tool1.IndexOfMenuItemView - 17 > CookingToolLevel - 1)
+			if (Game1.player.mostRecentlyGrabbedItem != null && Game1.player.mostRecentlyGrabbedItem is StardewValley.Tools.GenericTool tool1)
 			{
-				++CookingToolLevel;
+				var nameMatches = tool1.Name.EndsWith(toolName)
+					|| (LocalizedContentManager.CurrentLanguageCode.ToString() == "ru" && tool1.Name.StartsWith(toolName));
+				if (nameMatches && tool1.IndexOfMenuItemView - 17 > CookingToolLevel - 1)
+				{
+					++CookingToolLevel;
+				}
 			}
 
 			if (Game1.currentLocation == null || Game1.currentLocation.Name != "Blacksmith")
@@ -1255,6 +1259,12 @@ namespace LoveOfCooking
 					var o = new Object(Vector2.Zero, JsonAssets.GetObjectId(ChocolateName), int.MaxValue);
 					menu.itemPriceAndStock.Add(o, new [] {(int) (o.Price * Game1.MasterPlayer.difficultyModifier), int.MaxValue});
 					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Sugar"), o);
+				}
+				else if (menu.portraitPerson.Name == "Gus" && !Game1.currentLocation.IsOutdoors && IsCommunityCentreComplete())
+				{
+					var o = new Object(Vector2.Zero, JsonAssets.GetObjectId(ChocolateName), int.MaxValue);
+					menu.itemPriceAndStock.Add(o, new[] { (int)((o.Price - 35) * Game1.MasterPlayer.difficultyModifier), int.MaxValue });
+					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Coffee"), o);
 				}
 			}
 
@@ -2001,7 +2011,9 @@ namespace LoveOfCooking
 
 		private bool CanFarmerUpgradeCookingEquipment()
 		{
-			return Game1.player.mailReceived.Contains(MailCookbookUnlocked) && CookingToolLevel < 4;
+			var hasMail = Game1.player.mailReceived.Contains(MailCookbookUnlocked);
+			var level = CookingToolLevel < 4;
+			return hasMail && level;
 		}
 		
 		/// <summary>
