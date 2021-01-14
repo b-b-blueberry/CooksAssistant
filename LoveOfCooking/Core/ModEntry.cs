@@ -291,6 +291,7 @@ namespace LoveOfCooking
 					  + $"\nNew Cooking Tool:   {Config.AddCookingToolProgression}"
 					  + $"\nNew Crops & Stuff:  {Config.AddNewCropsAndStuff}"
 					  + $"\nNew Recipe Scaling: {Config.AddRecipeRebalancing}"
+					  + $"\nNew Buff Assigning: {Config.AddBuffReassigning}"
 					  + $"\nCooking Animation:  {Config.PlayCookingAnimation}"
 					  + $"\nHealing Takes Time: {Config.FoodHealingTakesTime}"
 					  + $"\nHide Food Buffs:    {Config.HideFoodBuffsUntilEaten}"
@@ -299,7 +300,6 @@ namespace LoveOfCooking
 					  + $"\nDebugging:      {Config.DebugMode}"
 					  + $"\nRegen tracker:  {Config.DebugRegenTracker}"
 					  + $"\nCommand prefix: {Config.ConsoleCommandPrefix}"
-					  + $"\nLanguage:       {LocalizedContentManager.CurrentLanguageCode.ToString().ToUpper()}"
 					  + $"\nResize Korean:  {Config.ResizeKoreanFonts}\n",
 					Config.DebugMode);
 			}
@@ -316,9 +316,14 @@ namespace LoveOfCooking
 				Log.D("\n== LOCAL DATA ==\n"
 					+ $"\nRecipeGridView:   {IsUsingRecipeGridView}"
 					+ $"\nCookingToolLevel: {CookingToolLevel}"
+					+ $"\nCanUpgradeTool:   {CanFarmerUpgradeCookingEquipment()}"
 					+ $"\nFoodsEaten:       {FoodsEaten.Aggregate("", (s, cur) => $"{s} ({cur})")}"
 					+ $"\nFavouriteRecipes: {FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur})")}\n"
 					+ "-- OTHERS --"
+					+ $"\nLanguage:         {LocalizedContentManager.CurrentLanguageCode.ToString().ToUpper()}"
+					+ $"\nFarmHouseLevel:   {GetFarmhouseKitchenLevel(Game1.getLocationFromName("FarmHouse") as FarmHouse)}"
+					+ $"\nNumberOfCabins:   {GetNumberOfCabinsBuilt()}"
+					+ $"\nMaxIngredients:   {GetFarmersMaxUsableIngredients()}"
 					+ $"\nCookbookUnlockedMail: {Game1.player.mailReceived.Contains(MailCookbookUnlocked)}"
 					+ $"\nBundleCompleteMail:   {Game1.player.mailReceived.Contains(MailKitchenCompleted)}"
 					+ $"\nBundleFollowupMail:   {Game1.player.mailReceived.Contains(MailKitchenCompletedFollowup)}"
@@ -530,7 +535,7 @@ namespace LoveOfCooking
 			{
 				Game1.activeClickableMenu = new NotificationMenu();
 			});
-			Helper.ConsoleCommands.Add(cmd + "unblock", "Unblock player movement if stuck in animations.", (s, args) =>
+			Helper.ConsoleCommands.Add(cmd + "unstuck", "Unlocks player movement if stuck in animations.", (s, args) =>
 			{
 				if (Game1.activeClickableMenu is CookingMenu || Game1.activeClickableMenu is NotificationMenu)
 				{
@@ -633,7 +638,9 @@ namespace LoveOfCooking
 
 		private void GameLoopOnSaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
-			Config = Helper.ReadConfig<Config>();
+			// Reset per-world config values
+			var savedConfig = Helper.ReadConfig<Config>();
+			Config.AddCookingCommunityCentreBundles = savedConfig.AddCookingCommunityCentreBundles;
 
 			HarmonyPatches.Patch();
 
@@ -1248,7 +1255,7 @@ namespace LoveOfCooking
 			}
 
 			// Add new crops and objects to shop menus
-			if (e.NewMenu is ShopMenu menu)
+			if (e.NewMenu is ShopMenu menu && menu != null)
 			{
 				if (Game1.currentLocation is SeedShop)
 				{
@@ -1260,7 +1267,7 @@ namespace LoveOfCooking
 					menu.itemPriceAndStock.Add(o, new [] {(int) (o.Price * Game1.MasterPlayer.difficultyModifier), int.MaxValue});
 					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Sugar"), o);
 				}
-				else if (menu.portraitPerson.Name == "Gus" && !Game1.currentLocation.IsOutdoors && IsCommunityCentreComplete())
+				else if (menu.portraitPerson != null && menu.portraitPerson.Name == "Gus" && !Game1.currentLocation.IsOutdoors && IsCommunityCentreComplete())
 				{
 					var o = new Object(Vector2.Zero, JsonAssets.GetObjectId(ChocolateName), int.MaxValue);
 					menu.itemPriceAndStock.Add(o, new[] { (int)((o.Price - 35) * Game1.MasterPlayer.difficultyModifier), int.MaxValue });

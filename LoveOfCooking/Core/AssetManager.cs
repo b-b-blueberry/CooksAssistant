@@ -762,7 +762,10 @@ namespace LoveOfCooking
 					newData = new string[9];
 					objectSplit.CopyTo(newData, 0);
 					newData[6] ??= "food";
-					newData[7] = newBuffs;
+					if (ModEntry.Instance.Config.AddBuffReassigning)
+					{
+						newData[7] = newBuffs;
+					}
 					newData[8] = buffDuration.ToString();
 				}
 

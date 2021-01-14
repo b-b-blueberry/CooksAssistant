@@ -9,6 +9,7 @@
 		//public bool AddCookingQuestline { get; set; } = true;
 		public bool AddNewCropsAndStuff { get; set; } = true;
 		public bool AddRecipeRebalancing { get; set; } = true;
+		public bool AddBuffReassigning { get; set; } = false;
 		public bool PlayCookingAnimation { get; set; } = true;
 		public bool HideFoodBuffsUntilEaten { get; set; } = true;
 		public bool FoodHealingTakesTime { get; set; } = false;
