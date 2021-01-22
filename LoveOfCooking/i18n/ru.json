@@ -18,7 +18,7 @@
 	"menu.cooking_station.done_improv": "Вы записали рецепт в маминой поваренной книге.",
 
 	"menu.cooking_recipe.title_unknown": "???",
-	"menu.cooking_recipe.notes_unknown": "Вы не знаете этот рецепт.",
+	"menu.cooking_recipe.notes_unknown": "Вы не ели это блюдо.",
 	"menu.cooking_recipe.ingredients_label": "Ингредиенты:",
 	"menu.cooking_recipe.notes_label": "Записи:",
 	"menu.cooking_recipe.time_label": "Время приготовления:",
@@ -154,7 +154,7 @@
 	"item.loadedpotato.name": "Печёный картофель",
 	"item.lobster.name": "Запечёный омар",
 	"item.oceanplatter.name": "Морское блюдо",
-	"item.onionsoup.name": "\"Луковый суп,",
+	"item.onionsoup.name": "Луковый суп,",
 	"item.skewers.name": "Шашлык с ананасом",
 	"item.porridge.name": "Горшок сливовой каши",
 	"item.breakfast.name": "Быстрый завтрак",

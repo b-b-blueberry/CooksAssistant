@@ -61,6 +61,7 @@ namespace LoveOfCooking.GameObjects.Menus
 			{"ko", 48},
 			{"ru", 53},
 			{"de", 40},
+			{"it", 48},
 		};
 		private const int CookTextSourceHeight = 16;
 		private const int CookTextSideWidth = 5;
@@ -337,7 +338,7 @@ namespace LoveOfCooking.GameObjects.Menus
 			var fridgeForCommunityCentre = ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost()
 				&& Game1.currentLocation is CommunityCenter cc
 				&& cc.areasComplete.Count > ModEntry.CommunityCentreAreaNumber && cc.areasComplete[ModEntry.CommunityCentreAreaNumber];
-			// Check for fridge
+			// Check for community centre fridge
 			if (fridgeForCommunityCentre)
 			{
 				if (!((CommunityCenter)Game1.currentLocation).Objects.ContainsKey(ModEntry.DummyFridgePosition))
@@ -727,7 +728,7 @@ namespace LoveOfCooking.GameObjects.Menus
 				{
 					var hasOilPerk =
 						ModEntry.Instance.Config.AddCookingSkillAndRecipes && Game1.player.HasCustomProfession(
-							CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.ImprovedOil]);
+							ModEntry.CookingSkillApi.GetSkill().Professions[(int) CookingSkill.ProfId.ImprovedOil]);
 					switch (items[i].ParentSheetIndex)
 					{
 						case 247: // Oil
@@ -748,10 +749,10 @@ namespace LoveOfCooking.GameObjects.Menus
 
 			if (ModEntry.Instance.Config.AddCookingSkillAndRecipes) {
 				if (Game1.player.HasCustomProfession(
-					CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.SaleValue]))
+					ModEntry.CookingSkillApi.GetSkill().Professions[(int) CookingSkill.ProfId.SaleValue]))
 					result.Price += result.Price / CookingSkill.SaleValue;
 				if (Game1.random.NextDouble() * 10 < CookingSkill.ExtraPortionChance && Game1.player.HasCustomProfession(
-					CookingSkill.GetSkill().Professions[(int) CookingSkill.ProfId.ExtraPortion]))
+					ModEntry.CookingSkillApi.GetSkill().Professions[(int) CookingSkill.ProfId.ExtraPortion]))
 					++result.Stack;
 			}
 			
@@ -769,53 +770,13 @@ namespace LoveOfCooking.GameObjects.Menus
 				results.Add(Math.Log(i, Math.E));
 			}
 
-			var cookingLevel = CookingSkill.GetLevel();
+			var cookingLevel = ModEntry.CookingSkillApi.GetLevel();
 			var baseRate = 0.22f;
 			var chance = Math.Max(0f, (baseRate + 0.0035f * recipe.getNumberOfIngredients())
 				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
 				- (ModEntry.Instance.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
 
 			return chance;
-		}
-
-		private int CalculateCookingExperience(Item item, int ingredientsCount, bool apply)
-		{
-			// Reward players for cooking brand new recipes
-			var newBonus
-				= Game1.player.recipesCooked.ContainsKey(item.ParentSheetIndex) ? 0 : 34;
-			// Gain more experience for the first time cooking a meal each day
-			var dailyBonus
-				= ModEntry.FoodCookedToday.ContainsKey(item.ParentSheetIndex) ? 0 : 12;
-			// Gain less experience the more is cooked in bulk
-			var stackBonus // Quantity * (Rate of decay per quantity from 1 to half * max) / Base experience rate
-				= Math.Min(item.Stack, ModEntry.MaxFoodStackPerDayForExperienceGains)
-					* Math.Max(6f, 12f - ModEntry.FoodCookedToday[item.ParentSheetIndex]) / 8f;
-			// Gain more experience for recipe complexity
-			var ingredientsBonus
-				= 1f + ingredientsCount * 0.2f;
-			var baseExperience = 5 + 4f * ingredientsBonus;
-			// Limit experience gains to 1 level per day, because let's be reasonable here
-			var remainingExperience = CookingSkill.GetExperienceRemainingUntilNextLevel();
-			var requiredExperience = CookingSkill.GetExperienceRequiredForNextLevel();
-			var experience = Math.Min(remainingExperience,
-				(int) (newBonus + dailyBonus + baseExperience * stackBonus * (ModEntry.Instance.Config.DebugMode ? ModEntry.DebugExperienceRate : 1)));
-			Log.D($"Cooked up {item.Name} with {ingredientsCount} ingredients",
-				ModEntry.Instance.Config.DebugMode);
-			if (apply)
-			{
-				Log.D($"\nExperience until level {CookingSkill.GetLevel() + 1}:"
-					+ $" ({requiredExperience - remainingExperience}/{requiredExperience})"
-					+ $"\nTotal experience: ({CookingSkill.GetTotalCurrentExperience()}/{CookingSkill.GetTotalExperienceRequiredForNextLevel()})"
-					+ $"\n+{experience} experience!",
-					ModEntry.Instance.Config.DebugMode);
-				CookingSkill.AddExperience(experience);
-			}
-			else
-			{
-				Log.D($"No experience was applied.",
-					ModEntry.Instance.Config.DebugMode);
-			}
-			return experience;
 		}
 
 		private int CookRecipe(CraftingRecipe recipe, Dictionary<int, int> requiredItems, ref List<Item> items, int quantity)
@@ -843,11 +804,11 @@ namespace LoveOfCooking.GameObjects.Menus
 					for (var i = 0; i < 20; ++i)
 					{
 						result.Stack = i;
-						xpTable.Add(CalculateCookingExperience(result, requiredItems.Count, apply: false));
+						xpTable.Add(ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(item: result, requiredItems.Count, apply: false));
 					}
 				// DEBUGGING
 
-				var experience = CalculateCookingExperience(result, requiredItems.Count, apply: true);
+				ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(item: result, requiredItems.Count, apply: true);
 				Game1.player.cookedRecipe(result.ParentSheetIndex);
 			}
 			if (result?.Stack > 0)
@@ -1386,7 +1347,7 @@ namespace LoveOfCooking.GameObjects.Menus
 				return;
 
 			// If any items couldn't be returned, toss them on the ground as debris
-			foreach (var item in _cookingSlotsDropIn.Where(item => item != null))
+			foreach (var item in _cookingSlotsDropIn.Where(item => item != null && item.Stack > 0))
 			{
 				Game1.createItemDebris(item, Game1.player.Position, -1);
 			}
@@ -1432,7 +1393,7 @@ namespace LoveOfCooking.GameObjects.Menus
 			{
 				inventory.actualInventory = Game1.currentLocation is CommunityCenter
 					? ((Chest)((CommunityCenter)Game1.currentLocation).Objects[ModEntry.DummyFridgePosition]).items
-					: ((FarmHouse)Game1.getLocationFromName("FarmHouse")).fridge.Value.items;
+					: Game1.currentLocation is FarmHouse farmHouse ? farmHouse.fridge.Value.items : null;
 				_currentSelectedInventory = -1;
 			}
 			else
@@ -1530,7 +1491,7 @@ namespace LoveOfCooking.GameObjects.Menus
 		public bool TryClickItem(int x, int y, bool moveEntireStack)
 		{
 			const string sound = "coin";
-			var clickedAnItem = true;
+			var movedItems = false;
 			var inventoryItem = inventory.getItemAt(x, y);
 			var inventoryIndex = inventory.getInventoryPositionOfClick(x, y);
 
@@ -1544,16 +1505,16 @@ namespace LoveOfCooking.GameObjects.Menus
 			var dropInIsFull = _cookingSlotsDropIn.GetRange(0, _cookingSlots).TrueForAll(i => i != null);
 
 			// Add an inventory item to the ingredients dropIn slots in the best available position
-			for (var i = 0; i < _cookingSlots && inventoryItem != null && clickedAnItem; ++i)
+			for (var i = 0; i < _cookingSlots && inventoryItem != null && !movedItems; ++i)
 			{
 				if (_cookingSlotsDropIn[i] == null || !_cookingSlotsDropIn[i].canStackWith(inventoryItem))
 					continue;
 
-				clickedAnItem = AddToIngredientsDropIn(
-					inventoryIndex, i, moveEntireStack, false, sound) == 0;
+				movedItems = AddToIngredientsDropIn(inventoryIndex, i, moveEntireStack, false, sound) > 0;
 			}
+
 			// Try add inventory item to a new slot if it couldn't be stacked with any elements in dropIn ingredients slots
-			if (inventoryItem != null && clickedAnItem)
+			if (inventoryItem != null && !movedItems)
 			{
 				// Ignore dropIn actions from inventory when ingredients slots are full
 				var index = _cookingSlotsDropIn.FindIndex(i => i == null);
@@ -1563,12 +1524,11 @@ namespace LoveOfCooking.GameObjects.Menus
 					Game1.playSound("cancel");
 					return false;
 				}
-				clickedAnItem = AddToIngredientsDropIn(
-					inventoryIndex, index, moveEntireStack, false, sound) == 0;
+				movedItems = AddToIngredientsDropIn(inventoryIndex, index, moveEntireStack, false, sound) > 0;
 			}
 
 			// Return a dropIn ingredient item to the inventory
-			for (var i = 0; i < _cookingSlotsDropIn.Count && clickedAnItem; ++i)
+			for (var i = 0; i < _cookingSlotsDropIn.Count && !movedItems; ++i)
 			{
 				if (!CookingSlots[i].containsPoint(x, y))
 					continue;
@@ -1576,11 +1536,10 @@ namespace LoveOfCooking.GameObjects.Menus
 				{
 					return false;
 				}
-				clickedAnItem = AddToIngredientsDropIn(
-					inventoryIndex, i, moveEntireStack, true, sound) == 0;
+				movedItems = AddToIngredientsDropIn(inventoryIndex, i, moveEntireStack, true, sound) > 0;
 			}
 
-			return clickedAnItem;
+			return movedItems;
 		}
 		
 		private int TryGetIndexForSearchResult(int x, int y)
@@ -1606,10 +1565,10 @@ namespace LoveOfCooking.GameObjects.Menus
 		/// <param name="reverse">If true, stack size from the ingredients dropIn is reduced, and added to the inventory.</param>
 		/// <param name="sound">Name of sound effect to play when items are moved.</param>
 		/// <returns>Quantity moved from one item stack to another. May return a negative number, affected by reverse.</returns>
-		private int AddToIngredientsDropIn(int inventoryIndex, int ingredientsIndex,
-			bool moveEntireStack, bool reverse, string sound = null)
+		private int AddToIngredientsDropIn(int inventoryIndex, int ingredientsIndex, bool moveEntireStack, bool reverse, string sound = null)
 		{
-			Log.D($"AddToIngredientsDropIn() => Inventory: {_currentSelectedInventory}",
+			Log.D($"AddToIngredientsDropIn() => Inventory: {_currentSelectedInventory}"
+				+ $"\nInventory index: {inventoryIndex}, Ingredients index: {ingredientsIndex}, Reverse: {reverse}",
 				ModEntry.Instance.Config.DebugMode);
 
 			// Add items to fill in empty slots at our indexes
@@ -1784,7 +1743,8 @@ namespace LoveOfCooking.GameObjects.Menus
 				if (playSound)
 					Game1.playSound("bigDeSelect");
 
-				Log.D("Closing cooking menu.");
+				Log.D("Closing cooking menu.",
+					ModEntry.Instance.Config.DebugMode);
 
 				exitThisMenuNoSound();
 			}
@@ -2596,15 +2556,17 @@ namespace LoveOfCooking.GameObjects.Menus
 					var dropInCount = GetIngredientsCount(id, _cookingSlotsDropIn);
 					var fridge = Game1.currentLocation is FarmHouse farmHouse
 						&& ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0
-							? farmHouse.fridge.Value
+							? farmHouse.fridge?.Value ?? null
 							: null;
 					var fridgeCount = fridge != null ? GetIngredientsCount(id, fridge.items) : 0;
 					var miniFridgeCount = _minifridgeList != null && _minifridgeList.Count > 0 ? _minifridgeList.SelectMany(
-						mf => mf?.Where(item => item != null && (item.ParentSheetIndex == id || item.Category == id || CraftingRecipe.isThereSpecialIngredientRule((Object)item, id))))
-						.Aggregate(0, (current, item) => current + item.Stack) : 0;
+							mf => mf?.Where(item => item != null
+								&& (item.ParentSheetIndex == id || item.Category == id
+								|| (CanBeCooked(item) && CraftingRecipe.isThereSpecialIngredientRule((Object)item, id)))))
+						.Aggregate(0, (current, item) => current + item?.Stack ?? 0) : 0;
 					requiredCount -= bagCount + dropInCount + fridgeCount + miniFridgeCount;
 					var ingredientNameText = _filteredRecipeList[_currentRecipe].getNameFromIndex(id);
-
+					
 					// Show category-specific information for general category ingredient rules
 					if (id < 0)
 					{

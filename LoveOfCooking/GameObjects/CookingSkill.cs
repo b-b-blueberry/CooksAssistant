@@ -4,15 +4,15 @@ using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace LoveOfCooking.GameObjects
 {
 	public class CookingSkill : Skills.Skill
 	{
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
-		public static readonly string Name = ModEntry.AssetPrefix + "CookingSkill";
+		public static readonly string InternalName = ModEntry.AssetPrefix + "CookingSkill";
 		protected static readonly string ProfessionI18nId = "menu.cooking_skill.tier{0}_path{1}{2}";
+		internal const float DebugExperienceRate = 1f;
 
 		public enum ProfId
 		{
@@ -24,18 +24,18 @@ namespace LoveOfCooking.GameObjects
 			BuffDuration
 		}
 
-		internal static readonly int GiftBoostValue = 10;
-		internal static readonly int SaleValue = 30;
-		internal static readonly int ExtraPortionChance = 4;
-		internal static readonly int RestorationValue = 35;
-		internal static readonly int RestorationAltValue = 5;
-		internal static readonly int BuffRateValue = 3;
-		internal static readonly int BuffDurationValue = 36;
+		public static readonly int GiftBoostValue = 10;
+		public static readonly int SaleValue = 30;
+		public static readonly int ExtraPortionChance = 4;
+		public static readonly int RestorationValue = 35;
+		public static readonly int RestorationAltValue = 5;
+		public static readonly int BuffRateValue = 3;
+		public static readonly int BuffDurationValue = 36;
 
-		internal static readonly float BurnChanceReduction = 0.015f;
-		internal static readonly float BurnChanceModifier = 1.5f;
+		public static readonly float BurnChanceReduction = 0.015f;
+		public static readonly float BurnChanceModifier = 1.5f;
 
-		internal int AddedLevel;
+		public int AddedLevel;
 
 		public static readonly List<string> StartingRecipes = new List<string>
 		{
@@ -67,9 +67,9 @@ namespace LoveOfCooking.GameObjects
 			public override string GetDescription() { return Description; }
 		}
 
-		public CookingSkill() : base(Name)
+		public CookingSkill() : base(InternalName)
 		{
-			Log.D($"Registering skill {Name}",
+			Log.D($"Registering skill {InternalName}",
 				ModEntry.Instance.Config.DebugMode);
 
 			// Set experience values
@@ -147,61 +147,6 @@ namespace LoveOfCooking.GameObjects
 				str += "\n" + i18n.Get("menu.cooking_skill.levelup_burn", new { Number = level * BurnChanceModifier * BurnChanceReduction });
 
 			return str;
-		}
-
-		public static List<string> GetNewCraftingRecipes(int level)
-		{
-			var list = new List<string>();
-			for (var i = 0; i <= level; ++i)
-			{
-				list = list.Concat(CookingSkillLevelUpRecipes[i].Where(
-					str => !Game1.player.cookingRecipes.ContainsKey(ModEntry.ObjectPrefix + str))).ToList();
-			}
-			for (var i = 0; i < list.Count; ++i)
-			{
-				list[i] = ModEntry.ObjectPrefix + list[i];
-			}
-			return list;
-		}
-
-		public static CookingSkill GetSkill()
-		{
-			return Skills.GetSkill(Name) as CookingSkill;
-		}
-
-		public static int GetLevel()
-		{
-			return Skills.GetSkillLevel(Game1.player, Name);
-		}
-
-		public static bool AddExperience(int experience)
-		{
-			var level = GetLevel();
-			Skills.AddExperience(Game1.player, Name, experience);
-			return level < GetLevel();
-		}
-
-		public static int GetTotalCurrentExperience()
-		{
-			return Skills.GetExperienceFor(Game1.player, Name);
-		}
-
-		public static int GetExperienceRequiredForNextLevel()
-		{
-			var level = GetLevel();
-			return level > 0
-				? GetSkill().ExperienceCurve[level] - GetSkill().ExperienceCurve[level - 1]
-				: GetSkill().ExperienceCurve[0];
-		}
-
-		public static int GetTotalExperienceRequiredForNextLevel()
-		{
-			return GetSkill().ExperienceCurve[GetLevel()];
-		}
-
-		public static int GetExperienceRemainingUntilNextLevel()
-		{
-			return GetTotalExperienceRequiredForNextLevel() - GetTotalCurrentExperience();
 		}
 	}
 }
