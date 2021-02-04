@@ -51,7 +51,7 @@ namespace LoveOfCooking
 			}
 			if (asset.AssetNameEquals(ModEntry.GameContentBundleDataPath))
 			{
-				return (T) (object) ModEntry.Instance.Helper.Content.Load<Dictionary<string, List<List<string>>>>($"{ModEntry.LocalBundleDataPath}.json");
+				return (T) (object) ModEntry.Instance.Helper.Content.Load<Dictionary<string, Dictionary<string, List<string>>>>($"{ModEntry.LocalBundleDataPath}.json");
 			}
 			if (asset.AssetNameEquals(ModEntry.MapTileSheetPath))
 			{
@@ -96,6 +96,7 @@ namespace LoveOfCooking
 			        || asset.AssetNameEquals(@"Data/Events/Saloon")
 			        || asset.AssetNameEquals(@"Data/Events/Mountain")
 			        || asset.AssetNameEquals(@"Data/Events/JoshHouse")
+			        || asset.AssetNameEquals(@"Data/Events/Town")
 					|| asset.AssetNameEquals(@"LooseSprites/Cursors")
 					|| asset.AssetNameEquals(@"LooseSprites/JunimoNote")
 			        || asset.AssetNameEquals(@"Maps/Beach")
@@ -120,12 +121,7 @@ namespace LoveOfCooking
 			{
 				// Make no changes for the new community centre bundle, but set our base values from the data
 				// Do this even with community centre changes disabled, in case we join as farmhand to a player who has it enabled
-
-				if (!Game1.hasLoadedGame)
-				{
-					return;
-				}
-
+				
 				var data = asset.AsDictionary<string, string>().Data;
 				ModEntry.BundleStartIndex = 1 + data.Keys.ToList().Max(key => int.Parse(key.Split('/')[1]));
 			}
@@ -221,89 +217,97 @@ namespace LoveOfCooking
 					foreach (var recipe in recipeData)
 						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new [] {recipe.Value});
 
-					// Substitute in the actual custom ingredients for custom recipes if custom objects are enabled
-					if (ModEntry.Instance.Config.AddNewCropsAndStuff
-						&& ModEntry.Instance.Config.AddCookingSkillAndRecipes)
+					// Substitute in the actual custom ingredients for custom recipes if custom ingredients are enabled
+					// TODO: TEST: Opening cooking menu with MoreRecipes/FruitsAndVeggies/NewMenu/NewCrops/NewRecipes
+					var enabled = Config.AddNewCropsAndStuff;
+					var overlappingMods = ModEntry.Instance.Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
+					if (enabled || overlappingMods)
 					{
+						var customCropIds = new Dictionary<string, int>
+						{
+							{ "onion", ModEntry.JsonAssets.GetObjectId(overlappingMods ? "Onion" : ModEntry.ObjectPrefix + "onion") },
+							{ "cabbage", ModEntry.JsonAssets.GetObjectId(overlappingMods ? "Cabbage" : ModEntry.ObjectPrefix + "cabbage") },
+							{ "carrot", ModEntry.JsonAssets.GetObjectId(overlappingMods ? "Carrot" : ModEntry.ObjectPrefix + "carrot") },
+							{ "chocolate", ModEntry.JsonAssets.GetObjectId(overlappingMods ? "Chocolate Bar" : ModEntry.ObjectPrefix + "chocolate") },
+						};
+
 						recipeData = new Dictionary<string, string>
 						{
 							// Beet Burger: Bread 1 Beet 1 Onion 1 Red Cabbage 1
 							{
 								ModEntry.ObjectPrefix + "burger",
 								"216 1 284 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
+								+ $" {customCropIds["onion"]} 1"
 								+ " 266 1"
 							},
 							// Cabbage Pot: Cabbage 2 Onion 2
 							{
 								ModEntry.ObjectPrefix + "cabbagepot",
-								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 2"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 2"
+								$"{customCropIds["cabbage"]} 2"
+								+ $" {customCropIds["onion"]} 2"
 							},
 							// Garden Pie: Flour 1 Cabbage 1 Onion 1 Tomato 1
 							{
 								ModEntry.ObjectPrefix + "gardenpie",
 								"246 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
+								+ $" {customCropIds["cabbage"]} 1"
+								+ $" {customCropIds["onion"]} 1"
 								+ " 256 1"
 							},
 							// Hearty Stew: Carrot 2 Potato 1
 							{
 								ModEntry.ObjectPrefix + "stew",
-								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "carrot")} 2"
+								$"{customCropIds["carrot"]} 2"
 								+ " 192 1"
 							},
 							// Hot Cocoa: Milk (Any) 1 Chocolate Bar 1
 							{
 								ModEntry.ObjectPrefix + "hotcocoa",
 								"-6 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "chocolate")} 1"
+								+ $" {customCropIds["chocolate"]} 1"
 							},
 							// Hot Pot Roast: Cranberry Sauce 1 Roots Platter 1 Stuffing 1 Onion 1
 							{
 								ModEntry.ObjectPrefix + "roast",
 								"238 1 244 1 239 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
+								+ $" {customCropIds["onion"]} 1"
 							},
 							// Hunter's Plate: Potato 1 Cabbage 1 Horseradish 1
 							{
 								ModEntry.ObjectPrefix + "hunters",
 								"192 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
+								+ $" {customCropIds["cabbage"]} 1"
 								+ " 16 1"
 							},
-							// Kebab: Tortilla 1 Tomato 1 Onion 1
+							// Kebab: Tortilla 1 Tomato 1 Cabbage 1
 							{
 								ModEntry.ObjectPrefix + "kebab",
 								"229 1 256 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
+								+ $" {customCropIds["cabbage"]} 1"
 							},
 							// Onion Soup: Onion 1 Garlic 1 Cheese 1
 							{
 								ModEntry.ObjectPrefix + "onionsoup",
-								$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
+								$"{customCropIds["onion"]} 1"
 								+ " 248 1 424 1"
 							},
 							// Pineapple Skewers: Pineapple 1 Onion 1 Eggplant 1
 							{
 								ModEntry.ObjectPrefix + "skewers",
 								"832 1"
-								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "onion")} 1"
+								+ $" {customCropIds["onion"]} 1"
 								+ " 272 1"
 							},
 							// Redberry Pie: Flour 1 Sugar 1 Redberries 3
-							{
+							/*{
 								ModEntry.ObjectPrefix + "redberrypie",
 								"246 1 245 1"
 								+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry")} 3"
-							},
-							// Tropical Salad: Pineapple 1 Apple 1 Watermelon 1
+							},*/
+							// Tropical Salad: Pineapple 1 Apple 1 Pomegranate 1
 							{
 								ModEntry.ObjectPrefix + "tropicalsalad",
-								"832 1 613 1"
-								//+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "watermelon")} 1"
-								+ " 637 1" // pomegranate
+								"832 1 613 1 637 1"
 							},
 						};
 						foreach (var recipe in recipeData)
@@ -425,6 +429,18 @@ namespace LoveOfCooking
 				}
 
 				return;
+			}
+
+			if (asset.AssetNameEquals(@"Data/Events/Town"))
+			{
+				var data = asset.AsDictionary<string, string>().Data;
+
+				var key = data.Keys.FirstOrDefault(key => key.StartsWith("191393"));
+				var value = data[key];
+				data.Remove(key);
+				data.Add("191393/n ccIsComplete/w sunny/H", value);
+				
+				asset.AsDictionary<string, string>().ReplaceWith(data);
 			}
 
 			if (asset.AssetNameEquals(@"Data/Monsters"))
@@ -635,14 +651,16 @@ namespace LoveOfCooking
 
 				var data = asset.AsDictionary<string, string>().Data;
 
-				if (data.ContainsKey("CommunityCenter_AreaName_" + ModEntry.CommunityCentreAreaName))
-					return;
+				// Add area name
+				data["CommunityCenter_AreaName_" + ModEntry.CommunityCentreAreaName] = i18n.Get("world.community_centre.kitchen");
 
-				data.Add("CommunityCenter_AreaName_" + ModEntry.CommunityCentreAreaName, i18n.Get("world.community_centre.kitchen"));
+				// Insert a new AreaCompletion line to account for our extra bundle
 				const int newJunimoLineNumber = 3;
-				for (var i = newJunimoLineNumber; i < ModEntry.CommunityCentreAreaNumber - 1; ++i)
-					data["CommunityCenter_AreaCompletion" + i] = data["CommunityCenter_AreaCompletion" + (i - 1)];
-				
+				for (var i = ModEntry.CommunityCentreAreaNumber + 1; i > newJunimoLineNumber; --i)
+				{
+					var below = data["CommunityCenter_AreaCompletion" + (i - 1)];
+					data["CommunityCenter_AreaCompletion" + i] = below;
+				}
 				data["CommunityCenter_AreaCompletion" + newJunimoLineNumber] = i18n.Get("world.community_centre.newjunimoline");
 
 				asset.AsDictionary<string, string>().ReplaceWith(data);

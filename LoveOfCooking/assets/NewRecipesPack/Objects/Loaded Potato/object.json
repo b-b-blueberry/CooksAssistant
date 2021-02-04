@@ -3,7 +3,7 @@
 	"Name": "blueberry.cac.loadedpotato",
 	"Description": "...",
 	"Category": "Cooking",
-	"Edibility": 75,
+	"Edibility": 33,
 	"EdibleIsDrink": false,
 	"EdibleBuffs": {
 		"Farming": 0,

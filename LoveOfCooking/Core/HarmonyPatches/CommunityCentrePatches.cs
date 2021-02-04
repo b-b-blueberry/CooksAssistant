@@ -1,110 +1,79 @@
-﻿using Harmony; // el diavolo
+﻿using Harmony;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
 using StardewValley.Characters;
 using StardewValley.Locations;
-using StardewValley.TerrainFeatures;
 using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using xTile;
 using xTile.Tiles;
 
-namespace LoveOfCooking
+namespace LoveOfCooking.Core.HarmonyPatches
 {
-	public static class HarmonyPatches
+	public static class CommunityCentrePatches
 	{
-		public static void Patch()
+		public static void Patch(HarmonyInstance harmony)
 		{
-			var id = ModEntry.Instance.Helper.ModRegistry.ModID;
-			var harmony = HarmonyInstance.Create(id);
-			try
-			{
-				if (harmony.HasAnyPatches(id))
-					harmony.UnpatchAll(id);
-			}
-			catch (Exception e)
-			{
-				Log.D($"Error occurred while unpatching methods, may not be fatal.\n{e}",
-					ModEntry.Instance.Config.DebugMode);
-			}
-
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Bush), nameof(Bush.inBloom)),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_inBloom_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Bush), "getEffectiveSize"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_getEffectiveSize_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Bush), nameof(Bush.isDestroyable)),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_isDestroyable_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(Bush), "shake"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Bush_shake_Prefix)));
-
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNameFromNumber"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNameFromNumber_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNumberFromName"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNumberFromName_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaNumberFromLocation"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaNumberFromLocation_Prefix)));
-			
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaEnglishDisplayNameFromNumber"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaEnglishDisplayNameFromNumber_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getAreaDisplayNameFromNumber"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AreaDisplayNameFromNumber_Prefix)));
-			
-
+			// TODO: TEST: Community centre cooking bundle completion and all bundle completion
 			// TODO: TEST: Big problem in JunimoNoteMenu.setUpMenu():
 			// >> if (!Game1.player.hasOrWillReceiveMail("hasSeenAbandonedJunimoNote") && whichArea == 6)
-
 			// TODO: POLISH: Move as many routines out of harmony as possible
 
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "loadArea"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_LoadArea_Prefix)));
-			
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "shouldNoteAppearInArea"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_ShouldNoteAppearInArea_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "isJunimoNoteAtArea"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_IsJunimoNoteAtArea_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "addJunimoNote"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_AddJunimoNote_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "UpdateWhenCurrentLocation"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_UpdateWhenCurrentLocation_Prefix)));
+			var type = (Type) null;
 
-			// these ones are probably alright
+			{
+				type = typeof(Farmer);
+				var original = "hasCompletedCommunityCenter";
+				Log.D($"Applying postfix: {type.Name}.{original}",
+					ModEntry.Instance.Config.DebugMode);
+				harmony.Patch(
+					original: AccessTools.Method(type, original),
+					postfix: new HarmonyMethod(typeof(CommunityCentrePatches), nameof(HasCompletedCommunityCentre_Postfix)));
+			}
 
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "setViewportToNextJunimoNoteTarget"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_SetViewportToNextJunimoNoteTarget_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "junimoGoodbyeDance"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_JunimoGoodbyeDance_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "startGoodbyeDance"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_StartGoodbyeDance_Prefix)));
-			harmony.Patch(
-				original: AccessTools.Method(typeof(CommunityCenter), "getMessageForAreaCompletion"),
-				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CC_MessageForAreaCompletion_Prefix)));
+			type = typeof(CommunityCenter);
+			var prefixes = new List<(string prefix, string original)>
+			{
+				(nameof(AreaNameFromNumber_Prefix), "getAreaNameFromNumber"),
+				(nameof(AreaNumberFromName_Prefix), "getAreaNumberFromName"),
+				(nameof(AreaNumberFromLocation_Prefix), "getAreaNumberFromLocation"),
+				(nameof(AreaEnglishDisplayNameFromNumber_Prefix), "getAreaEnglishDisplayNameFromNumber"),
+				(nameof(AreaDisplayNameFromNumber_Prefix), "getAreaDisplayNameFromNumber"),
+				(nameof(LoadArea_Prefix), "loadArea"),
+				(nameof(ShouldNoteAppearInArea_Prefix), "shouldNoteAppearInArea"),
+				(nameof(IsJunimoNoteAtArea_Prefix), "isJunimoNoteAtArea"),
+				(nameof(AddJunimoNote_Prefix), "addJunimoNote"),
+				(nameof(UpdateWhenCurrentLocation_Prefix), "UpdateWhenCurrentLocation"),
+				
+				// these ones are probably alright
 
-			// TODO: TEST: Community centre cooking bundle completion and all bundle completion
+				(nameof(SetViewportToNextJunimoNoteTarget_Prefix), "setViewportToNextJunimoNoteTarget"),
+				(nameof(JunimoGoodbyeDance_Prefix), "junimoGoodbyeDance"),
+				(nameof(StartGoodbyeDance_Prefix), "startGoodbyeDance"),
+				(nameof(MessageForAreaCompletion_Prefix), "getMessageForAreaCompletion"),
+			};
+
+			foreach (var (prefix, original) in prefixes)
+			{
+				Log.D($"Applying prefix: {type.Name}.{original}",
+					ModEntry.Instance.Config.DebugMode);
+				harmony.Patch(
+					original: AccessTools.Method(type, original),
+					prefix: new HarmonyMethod(typeof(CommunityCentrePatches), prefix));
+			}
+		}
+
+		public static void HasCompletedCommunityCentre_Postfix(Farmer __instance, ref bool __result)
+		{
+			__result &= __instance.mailReceived.Contains("cc" + ModEntry.CommunityCentreAreaName);
 		}
 
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool CC_AreaNameFromNumber_Prefix(ref string __result, int areaNumber)
+		public static bool AreaNameFromNumber_Prefix(ref string __result, int areaNumber)
 		{
 			try
 			{
@@ -115,7 +84,7 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_AreaNameFromNumber_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(AreaNameFromNumber_Prefix)}:\n{e}");
 			}
 
 			return true;
@@ -124,7 +93,7 @@ namespace LoveOfCooking
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool CC_AreaNumberFromName_Prefix(ref int __result, string name)
+		public static bool AreaNumberFromName_Prefix(ref int __result, string name)
 		{
 			try
 			{
@@ -135,7 +104,7 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_AreaNumberFromName_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(AreaNumberFromName_Prefix)}:\n{e}");
 			}
 
 			return true;
@@ -144,7 +113,7 @@ namespace LoveOfCooking
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool CC_AreaNumberFromLocation_Prefix(ref int __result, Vector2 tileLocation)
+		public static bool AreaNumberFromLocation_Prefix(ref int __result, Vector2 tileLocation)
 		{
 			try
 			{
@@ -156,16 +125,16 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_AreaNumberFromLocation_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(AreaNumberFromLocation_Prefix)}:\n{e}");
 			}
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool CC_AreaEnglishDisplayNameFromNumber_Prefix(ref string __result, int areaNumber)
+		public static bool AreaEnglishDisplayNameFromNumber_Prefix(ref string __result, int areaNumber)
 		{
 			try
 			{
@@ -176,7 +145,7 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_AreaEnglishDisplayNameFromNumber_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(AreaEnglishDisplayNameFromNumber_Prefix)}:\n{e}");
 			}
 
 			return true;
@@ -185,7 +154,7 @@ namespace LoveOfCooking
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool CC_AreaDisplayNameFromNumber_Prefix(ref string __result, int areaNumber)
+		public static bool AreaDisplayNameFromNumber_Prefix(ref string __result, int areaNumber)
 		{
 			try
 			{
@@ -196,7 +165,7 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_AreaDisplayNameFromNumber_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(AreaDisplayNameFromNumber_Prefix)}:\n{e}");
 			}
 
 			return true;
@@ -206,7 +175,7 @@ namespace LoveOfCooking
 		/// GetAreaBounds() throws FatalEngineExecutionError when patched.
 		/// Mimics LoadArea() using a static areaToRefurbish value in place of GetAreaBounds().
 		/// </summary>
-		public static bool CC_LoadArea_Prefix(CommunityCenter __instance, int area, bool showEffects)
+		public static bool LoadArea_Prefix(CommunityCenter __instance, int area, bool showEffects)
 		{
 			try
 			{
@@ -214,7 +183,7 @@ namespace LoveOfCooking
 				if (area != ModEntry.CommunityCentreAreaNumber || ModEntry.IsCommunityCentreComplete() || ModEntry.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
-				var areaToRefurbish = area != ModEntry.CommunityCentreAreaNumber 
+				var areaToRefurbish = area != ModEntry.CommunityCentreAreaNumber
 					? ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "getAreaBounds").Invoke<Rectangle>(area)
 					: ModEntry.CommunityCentreArea;
 				var refurbishedMap = Game1.game1.xTileContent.Load<Map>("Maps\\CommunityCenter_Refurbished");
@@ -225,7 +194,7 @@ namespace LoveOfCooking
 
 				var adjustMapLightPropertiesForLamp = ModEntry.Instance.Helper.Reflection.GetMethod(
 					__instance, "adjustMapLightPropertiesForLamp");
-				
+
 				for (var x = areaToRefurbish.X; x < areaToRefurbish.Right; x++)
 				{
 					for (var y = areaToRefurbish.Y; y < areaToRefurbish.Bottom; y++)
@@ -246,6 +215,10 @@ namespace LoveOfCooking
 							{
 								Game1.player.Position = new Vector2(2080f, 576f);
 							}
+							if (refurbishedMap.GetLayer("Buildings").Tiles[x, y].TileIndex == 634)
+							{
+								ModEntry.CommunityCentreFridgePosition = new Vector2(x, y);
+							}
 						}
 						else
 						{
@@ -264,13 +237,13 @@ namespace LoveOfCooking
 							__instance.map.GetLayer("Front").Tiles[x, y] = null;
 						}
 						if (refurbishedMap.GetLayer("Paths").Tiles[x, y] != null
-						    && refurbishedMap.GetLayer("Paths").Tiles[x, y].TileIndex == 8)
+							&& refurbishedMap.GetLayer("Paths").Tiles[x, y].TileIndex == 8)
 						{
 							Game1.currentLightSources.Add(new LightSource(
 								4, new Vector2(x * 64, y * 64), 2f));
 						}
 						if (showEffects && Game1.random.NextDouble() < 0.58
-						                && refurbishedMap.GetLayer("Buildings").Tiles[x, y] == null)
+										&& refurbishedMap.GetLayer("Buildings").Tiles[x, y] == null)
 						{
 							__instance.temporarySprites.Add(new TemporaryAnimatedSprite(
 								6, new Vector2(x * 64, y * 64), Color.White)
@@ -290,17 +263,17 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_LoadArea_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(LoadArea_Prefix)}:\n{e}");
 			}
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics IsJunimoNoteAtArea() using a static p value in place of GetNotePosition().
 		/// </summary>
-		public static bool CC_IsJunimoNoteAtArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
+		public static bool IsJunimoNoteAtArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
 		{
 			try
 			{
@@ -314,7 +287,7 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_IsJunimoNoteAtArea_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(IsJunimoNoteAtArea_Prefix)}:\n{e}");
 			}
 
 			return true;
@@ -324,7 +297,7 @@ namespace LoveOfCooking
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics ShouldNoteAppearInArea() using a static position in place of GetNotePosition().
 		/// </summary>
-		public static bool CC_ShouldNoteAppearInArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
+		public static bool ShouldNoteAppearInArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
 		{
 			try
 			{
@@ -344,23 +317,23 @@ namespace LoveOfCooking
 			}
 			catch (ArgumentOutOfRangeException e)
 			{
-				Log.D($"Error in {nameof(CC_ShouldNoteAppearInArea_Prefix)}, may be non-critical:\n{e}",
+				Log.D($"Error in {nameof(ShouldNoteAppearInArea_Prefix)}, may be non-critical:\n{e}",
 					ModEntry.Instance.Config.DebugMode);
 				return false;
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_ShouldNoteAppearInArea_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(ShouldNoteAppearInArea_Prefix)}:\n{e}");
 			}
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
-		/// Mimics AddJunimoNote() using a static p value in place of GetNotePosition().
+		/// Mimics AddJunimoNote() using a constant position value in place of GetNotePosition().
 		/// </summary>
-		public static bool CC_AddJunimoNote_Prefix(CommunityCenter __instance, int area)
+		public static bool AddJunimoNote_Prefix(CommunityCenter __instance, int area)
 		{
 			try
 			{
@@ -370,7 +343,7 @@ namespace LoveOfCooking
 					return true;
 
 				var p = ModEntry.CommunityCentreNotePosition;
-			
+
 				var tileFrames = CommunityCenter.getJunimoNoteTileFrames(area, __instance.Map);
 				const string layer = "Buildings";
 				__instance.Map.GetLayer(layer).Tiles[p.X, p.Y]
@@ -414,22 +387,22 @@ namespace LoveOfCooking
 					acceleration = new Vector2(-0.005f, 0f),
 					delayBeforeAnimationStart = 150
 				});
-		
+
 				return false;
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_AddJunimoNote_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(AddJunimoNote_Prefix)}:\n{e}");
 			}
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics SetViewportToNextJunimoNoteTarget() using a static p value in place of GetNotePosition().
 		/// </summary>
-		public static bool CC_SetViewportToNextJunimoNoteTarget_Prefix(CommunityCenter __instance)
+		public static bool SetViewportToNextJunimoNoteTarget_Prefix(CommunityCenter __instance)
 		{
 			try
 			{
@@ -447,27 +420,29 @@ namespace LoveOfCooking
 			}
 			catch (ArgumentException e)
 			{
-				Log.D($"Error in {nameof(CC_SetViewportToNextJunimoNoteTarget_Prefix)}, may be non-critical:\n{e}",
+				Log.D($"Error in {nameof(SetViewportToNextJunimoNoteTarget_Prefix)}, may be non-critical:\n{e}",
 					ModEntry.Instance.Config.DebugMode);
 				return false;
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_SetViewportToNextJunimoNoteTarget_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(SetViewportToNextJunimoNoteTarget_Prefix)}:\n{e}");
 			}
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Adds an extra Junimo to the goodbye dance, as the number of Junimos added is otherwise hardcoded.
 		/// </summary>
-		public static bool CC_StartGoodbyeDance_Prefix(CommunityCenter __instance)
+		public static bool StartGoodbyeDance_Prefix(CommunityCenter __instance)
 		{
 			try
 			{
 				if (!ModEntry.Instance.IsCommunityCentreKitchenEnabledByHost())
 					return true;
+
+				ModEntry.Instance.DrawStarInCommunityCentre(__instance);
 
 				var junimo = __instance.getJunimoForArea(ModEntry.CommunityCentreAreaNumber);
 				junimo.Position = new Vector2(22f, 12f) * 64f;
@@ -480,16 +455,16 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_StartGoodbyeDance_Prefix)}: {e}");
+				Log.E($"Error in {nameof(StartGoodbyeDance_Prefix)}: {e}");
 			}
 
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Adds an extra Junimo to the goodbye dance, as the number of Junimos added is otherwise hardcoded.
 		/// </summary>
-		public static bool CC_JunimoGoodbyeDance_Prefix(CommunityCenter __instance)
+		public static bool JunimoGoodbyeDance_Prefix(CommunityCenter __instance)
 		{
 			try
 			{
@@ -500,27 +475,29 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_JunimoGoodbyeDance_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(JunimoGoodbyeDance_Prefix)}:\n{e}");
 			}
 			return true;
 		}
 
-		public static bool CC_MessageForAreaCompletion_Prefix(CommunityCenter __instance, ref string __result)
+		public static bool MessageForAreaCompletion_Prefix(CommunityCenter __instance, ref string __result)
 		{
 			try
 			{
-				// todo: what the fuck?
-				__result = null;
+				if (!ModEntry.IsAbandonedJojaMartBundleAvailable())
+				{
+					__result = Game1.content.LoadString("Strings\\Locations:CommunityCenter_AreaCompletion" + __instance.areasComplete.Count(_ => _), Game1.player.Name);
+				}
 				return string.IsNullOrEmpty(__result);
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_MessageForAreaCompletion_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(MessageForAreaCompletion_Prefix)}:\n{e}");
 			}
 			return true;
 		}
 
-		public static bool CC_UpdateWhenCurrentLocation_Prefix(CommunityCenter __instance, GameTime time)
+		public static bool UpdateWhenCurrentLocation_Prefix(CommunityCenter __instance, GameTime time)
 		{
 			try
 			{
@@ -651,7 +628,7 @@ namespace LoveOfCooking
 							phase = 3;
 							if (Game1.IsMasterGame)
 							{
-								for (int j = __instance.characters.Count - 1; j >= 0; j--)
+								for (var j = __instance.characters.Count - 1; j >= 0; j--)
 								{
 									if (__instance.characters[j] is Junimo
 										&& (__instance.characters[j] as Junimo).temporaryJunimo.Value)
@@ -715,46 +692,15 @@ namespace LoveOfCooking
 
 				timerField.SetValue(timer);
 				phaseField.SetValue(phase);
+				messageAlphaField.SetValue(messageAlpha);
 
 				return false;
 			}
 			catch (Exception e)
 			{
-				Log.E($"Error in {nameof(CC_UpdateWhenCurrentLocation_Prefix)}:\n{e}");
+				Log.E($"Error in {nameof(UpdateWhenCurrentLocation_Prefix)}:\n{e}");
 			}
 			return true;
-		}
-
-		public static bool Bush_inBloom_Prefix(Bush __instance, ref bool __result, string season, int dayOfMonth)
-		{
-			if (!(__instance is CustomBush bush))
-				return true;
-			__result = CustomBush.InBloomBehaviour(bush, season, dayOfMonth);
-			return false;
-		}
-
-		public static bool Bush_getEffectiveSize_Prefix(Bush __instance, ref int __result)
-		{
-			if (!(__instance is CustomBush bush))
-				return true;
-			__result = CustomBush.GetEffectiveSizeBehaviour(bush);
-			return false;
-		}
-
-		public static bool Bush_isDestroyable_Prefix(Bush __instance, ref bool __result)
-		{
-			if (!(__instance is CustomBush bush))
-				return true;
-			__result = CustomBush.IsDestroyableBehaviour(bush);
-			return false;
-		}
-
-		public static bool Bush_shake_Prefix(Bush __instance, Vector2 tileLocation)
-		{
-			if (!(__instance is CustomBush bush))
-				return true;
-			CustomBush.ShakeBehaviour(bush, tileLocation);
-			return false;
 		}
 	}
 }

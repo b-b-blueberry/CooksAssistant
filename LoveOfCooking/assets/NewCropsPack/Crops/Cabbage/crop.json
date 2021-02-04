@@ -7,7 +7,7 @@
 	"Type": "Vegetable",
 	"CropType": "Normal", // Available types are: Normal, IndoorsOnly, Paddy.
 	"Seasons": [ "summer" ],
-	"Phases": [ 2, 2, 2, 2 ],
+	"Phases": [ 2, 1, 2, 2, 2 ],
 	"RegrowthPhase": -1,
 
 	// Extras

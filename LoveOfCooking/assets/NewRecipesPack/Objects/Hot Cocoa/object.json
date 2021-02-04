@@ -3,7 +3,7 @@
 	"Name": "blueberry.cac.hotcocoa",
 	"Description": "...",
 	"Category": "Cooking",
-	"Edibility": 75,
+	"Edibility": 65,
 	"EdibleIsDrink": true,
 	"EdibleBuffs": {
 		"Farming": 0,
