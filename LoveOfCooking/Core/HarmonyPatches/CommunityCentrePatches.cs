@@ -34,29 +34,31 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 
 			type = typeof(CommunityCenter);
-			var prefixes = new List<(string prefix, string original)>
+			var prefixes = new List<KeyValuePair<string, string>>
 			{
-				(nameof(AreaNameFromNumber_Prefix), "getAreaNameFromNumber"),
-				(nameof(AreaNumberFromName_Prefix), "getAreaNumberFromName"),
-				(nameof(AreaNumberFromLocation_Prefix), "getAreaNumberFromLocation"),
-				(nameof(AreaEnglishDisplayNameFromNumber_Prefix), "getAreaEnglishDisplayNameFromNumber"),
-				(nameof(AreaDisplayNameFromNumber_Prefix), "getAreaDisplayNameFromNumber"),
-				(nameof(LoadArea_Prefix), "loadArea"),
-				(nameof(ShouldNoteAppearInArea_Prefix), "shouldNoteAppearInArea"),
-				(nameof(IsJunimoNoteAtArea_Prefix), "isJunimoNoteAtArea"),
-				(nameof(AddJunimoNote_Prefix), "addJunimoNote"),
-				(nameof(UpdateWhenCurrentLocation_Prefix), "UpdateWhenCurrentLocation"),
+				new KeyValuePair<string, string>(nameof(AreaNameFromNumber_Prefix), "getAreaNameFromNumber"),
+				new KeyValuePair<string, string>(nameof(AreaNumberFromName_Prefix), "getAreaNumberFromName"),
+				new KeyValuePair<string, string>(nameof(AreaNumberFromLocation_Prefix), "getAreaNumberFromLocation"),
+				new KeyValuePair<string, string>(nameof(AreaEnglishDisplayNameFromNumber_Prefix), "getAreaEnglishDisplayNameFromNumber"),
+				new KeyValuePair<string, string>(nameof(AreaDisplayNameFromNumber_Prefix), "getAreaDisplayNameFromNumber"),
+				new KeyValuePair<string, string>(nameof(LoadArea_Prefix), "loadArea"),
+				new KeyValuePair<string, string>(nameof(ShouldNoteAppearInArea_Prefix), "shouldNoteAppearInArea"),
+				new KeyValuePair<string, string>(nameof(IsJunimoNoteAtArea_Prefix), "isJunimoNoteAtArea"),
+				new KeyValuePair<string, string>(nameof(AddJunimoNote_Prefix), "addJunimoNote"),
+				new KeyValuePair<string, string>(nameof(UpdateWhenCurrentLocation_Prefix), "UpdateWhenCurrentLocation"),
 				
 				// these ones are probably alright
 
-				(nameof(SetViewportToNextJunimoNoteTarget_Prefix), "setViewportToNextJunimoNoteTarget"),
-				(nameof(JunimoGoodbyeDance_Prefix), "junimoGoodbyeDance"),
-				(nameof(StartGoodbyeDance_Prefix), "startGoodbyeDance"),
-				(nameof(MessageForAreaCompletion_Prefix), "getMessageForAreaCompletion"),
+				new KeyValuePair<string, string>(nameof(SetViewportToNextJunimoNoteTarget_Prefix), "setViewportToNextJunimoNoteTarget"),
+				new KeyValuePair<string, string>(nameof(JunimoGoodbyeDance_Prefix), "junimoGoodbyeDance"),
+				new KeyValuePair<string, string>(nameof(StartGoodbyeDance_Prefix), "startGoodbyeDance"),
+				new KeyValuePair<string, string>(nameof(MessageForAreaCompletion_Prefix), "getMessageForAreaCompletion"),
 			};
 
-			foreach (var (prefix, original) in prefixes)
+			foreach (var pair in prefixes)
 			{
+				var prefix = pair.Key;
+				var original = pair.Value;
 				Log.D($"Applying prefix: {type.Name}.{original}",
 					ModEntry.Instance.Config.DebugMode);
 				harmony.Patch(

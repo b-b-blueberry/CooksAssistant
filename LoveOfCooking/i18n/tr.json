@@ -116,9 +116,9 @@
 	// Community Centre edits when using the Cooking bundle
 	"world.community_centre.kitchen": "Murfak",
 	"world.community_centre.reward": "Mutfak Malzemeleri",
-	"world.community_centre.bundle.1": "Piknikçiler",
-	"world.community_centre.bundle.2": "Fırıncı",
-	"world.community_centre.bundle.3": "Akşam Yemeği Yiyicisi",
+	"world.community_centre.bundle.1": "Fırıncı",
+	"world.community_centre.bundle.2": "Akşam Yemeği Yiyicisi",
+	"world.community_centre.bundle.3": "Piknikçiler",
 	"world.community_centre.newjunimoline": "Minnetarlığımızı göstermek için siz giderken toplayacağız...",
 
 	// Notifications strings

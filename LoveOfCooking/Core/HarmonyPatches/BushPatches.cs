@@ -10,16 +10,18 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		public static void Patch(HarmonyInstance harmony)
 		{
 			var type = typeof(Bush);
-			var prefixes = new List<(string prefix, string original)>
+			var prefixes = new List<KeyValuePair<string, string>>
 			{
-				(nameof(InBloom_Prefix), nameof(Bush.inBloom)),
-				(nameof(IsDestroyable_Prefix), nameof(Bush.isDestroyable)),
-				(nameof(EffectiveSize_Prefix), "getEffectiveSize"),
-				(nameof(Shake_Prefix), "shake"),
+				new KeyValuePair<string, string>(nameof(InBloom_Prefix), nameof(Bush.inBloom)),
+				new KeyValuePair<string, string>(nameof(IsDestroyable_Prefix), nameof(Bush.isDestroyable)),
+				new KeyValuePair<string, string>(nameof(EffectiveSize_Prefix), "getEffectiveSize"),
+				new KeyValuePair<string, string>(nameof(Shake_Prefix), "shake"),
 			};
 
-			foreach (var (prefix, original) in prefixes)
+			foreach (var pair in prefixes)
 			{
+				var prefix = pair.Key;
+				var original = pair.Value;
 				Log.D($"Applying prefix: {type.Name}.{original}",
 					ModEntry.Instance.Config.DebugMode);
 				harmony.Patch(

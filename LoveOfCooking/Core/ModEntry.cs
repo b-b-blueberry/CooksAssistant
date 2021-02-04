@@ -1105,7 +1105,7 @@ namespace LoveOfCooking
 				// Calculate height of the full tooltip to determine Y position
 				var healAmountToDisplay = -1;
 				var buffIconsToDisplay = Game1.objectInformation[(lastCookingHover as StardewValley.Object).ParentSheetIndex].Split('/').Length > 7
-					? Game1.objectInformation[(lastCookingHover as StardewValley.Object).parentSheetIndex].Split('/')[7].Split(' ')
+					? Game1.objectInformation[(lastCookingHover as StardewValley.Object).ParentSheetIndex].Split('/')[7].Split(' ')
 					: null;
 				var addedHeight = Math.Max(20 * 3,
 					(int)Game1.smallFont.MeasureString(displayName).Y + 32 + 8
@@ -2835,7 +2835,7 @@ namespace LoveOfCooking
 			var sourceBundles = sourceBundleList[(JsonAssets != null && Config.AddNewCropsAndStuff) ? "Custom" : "Vanilla"];
 
 			// Iterate over each custom bundle to add their data to game Bundles dictionary
-			var index = BundleStartIndex;
+			var index = 0;
 			var keys = sourceBundles.Keys.ToList();
 			keys.Sort();
 			foreach (var key in keys)
@@ -2893,7 +2893,7 @@ namespace LoveOfCooking
 				{
 					value += $"/{displayName}";
 				}
-				newData.Add(index, value);
+				newData.Add(BundleStartIndex + index, value);
 				++index;
 			}
 			return newData;

@@ -336,6 +336,9 @@ namespace LoveOfCooking
 						Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
 								.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 							ModEntry.Instance.Config.DebugMode);
+
+					Log.D(data.Aggregate("", (str, recipe) => $"{str}\n{recipe.Key}: {recipe.Value}"),
+						Config.DebugMode);
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{

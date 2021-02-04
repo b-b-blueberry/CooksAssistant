@@ -16,6 +16,7 @@ namespace LoveOfCooking.GameObjects
 	public class CookingMenu : ItemGrabMenu
 	{
 		private static Texture2D Texture => ModEntry.SpriteSheet;
+		private static Config Config => ModEntry.Instance.Config;
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 
 		// Spritesheet source areas
@@ -152,6 +153,7 @@ namespace LoveOfCooking.GameObjects
 		private string _locale;
 		private List<IList<Item>> _minifridgeList = new List<IList<Item>>();
 		private int _currentSelectedInventory;
+		private static int _lastBurntCount;
 
 		public enum Filter
 		{
@@ -189,7 +191,7 @@ namespace LoveOfCooking.GameObjects
 			{
 				_locale = "en";
 			}
-			_resizeKoreanFonts = ModEntry.Instance.Config.ResizeKoreanFonts;
+			_resizeKoreanFonts = Config.ResizeKoreanFonts;
 			initializeUpperRightCloseButton();
 			trashCan = null;
 
@@ -286,7 +288,7 @@ namespace LoveOfCooking.GameObjects
 				FilterButtons.Add(new ClickableTextureComponent(
 					$"filter{i}", new Rectangle(-1, -1, FilterIconSource.Width * Scale, FilterIconSource.Height * Scale),
 					null, i18n.Get($"menu.cooking_search.filter.{i}"
-						+ (ModEntry.Instance.Config.HideFoodBuffsUntilEaten && i == 4 ? "_alt" : "")),
+						+ (Config.HideFoodBuffsUntilEaten && i == 4 ? "_alt" : "")),
 					Texture, new Rectangle(
 						FilterIconSource.X + (i - 1) * FilterIconSource.Width, FilterIconSource.Y,
 						FilterIconSource.Width, FilterIconSource.Height),
@@ -589,7 +591,7 @@ namespace LoveOfCooking.GameObjects
 			NavLeftButton.bounds.X = _leftContent.X - 24;
 			NavRightButton.bounds.X = NavLeftButton.bounds.X + _lineWidth - 12;
 			NavRightButton.bounds.Y = NavLeftButton.bounds.Y = _leftContent.Y
-				//+ (ModEntry.Instance.Config.CookingTakesTime ? 20 : 23);
+				//+ (Config.CookingTakesTime ? 20 : 23);
 				+ 23;
 
 			// Ingredients item slots
@@ -804,7 +806,7 @@ namespace LoveOfCooking.GameObjects
 		/// <param name="inventory"></param>
 		/// <param name="quantity"></param>
 		/// <returns></returns>
-		public static (List<StardewValley.Object>, int) CraftItemAndConsumeIngredients(CraftingRecipe recipe, ref List<Item> inventory, int quantity)
+		public static List<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, ref List<Item> inventory, int quantity)
 		{
 			var itemsToConsume = ChooseItemsForCrafting(recipe, inventory);
 			var qualityStacks = new Dictionary<int, int> { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 4, 0 } };
@@ -817,8 +819,10 @@ namespace LoveOfCooking.GameObjects
 				{
 					if ((inventory[pair.Key].Stack -= pair.Value) < 1)
 						inventory[pair.Key] = null;
-					qualityStacks[0] += numPerCraft;
 				}
+
+				// Add to stack
+				qualityStacks[0] += numPerCraft;
 
 				// Apply extra portion bonuses to the amount cooked
 				if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
@@ -893,12 +897,13 @@ namespace LoveOfCooking.GameObjects
 				itemsCooked.Add(item);
 			}
 
-			return (itemsCooked, burntCount);
+			_lastBurntCount = burntCount;
+			return itemsCooked;
 		}
 
 		public static float GetBurnChance(CraftingRecipe recipe)
 		{
-			if (!ModEntry.Instance.Config.FoodCanBurn || ModEntry.JsonAssets == null)
+			if (!Config.FoodCanBurn || ModEntry.JsonAssets == null)
 				return 0f;
 
 			var results = new List<double>();
@@ -919,12 +924,12 @@ namespace LoveOfCooking.GameObjects
 		private static int CookRecipe(CraftingRecipe recipe, ref List<Item> inventory, int quantity)
 		{
 			// Craft items to be cooked from recipe
-			(var itemsCooked, var burntCount) = CraftItemAndConsumeIngredients(recipe, ref inventory, quantity);
-			var quantityCooked = (itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft) - burntCount;
+			var itemsCooked = CraftItemAndConsumeIngredients(recipe, ref inventory, quantity);
+			var quantityCooked = (itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft) - _lastBurntCount;
 			var item = recipe.createItem();
 
 			// Track experience for items cooked
-			if (ModEntry.Instance.Config.AddCookingSkillAndRecipes)
+			if (Config.AddCookingSkillAndRecipes)
 			{
 				if (!ModEntry.FoodCookedToday.ContainsKey(recipe.name))
 					ModEntry.FoodCookedToday[recipe.name] = 0;
@@ -944,13 +949,13 @@ namespace LoveOfCooking.GameObjects
 			}
 
 			// Add burnt items
-			if (burntCount > 0)
+			if (_lastBurntCount > 0)
 			{
-				var burntItem = new StardewValley.Object(ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), burntCount);
+				var burntItem = new StardewValley.Object(ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), _lastBurntCount);
 				ModEntry.AddOrDropItem(burntItem);
 			}
 
-			return burntCount;
+			return _lastBurntCount;
 		}
 
 		/// <summary>
@@ -964,7 +969,7 @@ namespace LoveOfCooking.GameObjects
 				return false;
 
 			var burntCount = CookRecipe(recipe, ref inventory, craftableCount);
-			if (ModEntry.Instance.Config.PlayCookingAnimation)
+			if (Config.PlayCookingAnimation)
 			{
 				if (Game1.activeClickableMenu is CookingMenu cookingMenu)
 				{
@@ -1322,7 +1327,7 @@ namespace LoveOfCooking.GameObjects
 					break;
 				case Filter.Buffs:
 					filter = recipe =>
-						(!ModEntry.Instance.Config.HideFoodBuffsUntilEaten
+						(!Config.HideFoodBuffsUntilEaten
 						|| (ModEntry.Instance.FoodsEaten.Contains(recipe.name)))
 						&& Game1.objectInformation[recipe.createItem().ParentSheetIndex].Split('/').Length > 6
 						&& Game1.objectInformation[recipe.createItem().ParentSheetIndex].Split('/')[7].Split(' ').Any(i => int.Parse(i) != 0);
@@ -1532,7 +1537,7 @@ namespace LoveOfCooking.GameObjects
 				_currentSelectedInventory = _minifridgeList.IndexOf(inventory.actualInventory);
 			}
 			Log.D($"New inventory: {_currentSelectedInventory}",
-				ModEntry.Instance.Config.DebugMode);
+				Config.DebugMode);
 		}
 
 		private void TryClickNavButton(int x, int y, bool playSound)
@@ -1703,7 +1708,7 @@ namespace LoveOfCooking.GameObjects
 		{
 			Log.D($"AddToIngredientsDropIn() => Inventory: {_currentSelectedInventory}"
 				+ $"\nInventory index: {inventoryIndex}, Ingredients index: {ingredientsIndex}, Reverse: {reverse}",
-				ModEntry.Instance.Config.DebugMode);
+				Config.DebugMode);
 
 			// Add items to fill in empty slots at our indexes
 			if (_cookingSlotsDropIn[ingredientsIndex] == null)
@@ -1711,14 +1716,14 @@ namespace LoveOfCooking.GameObjects
 				if (inventoryIndex == -1)
 				{
 					Log.D("No inventory index or ingredients dropIn index, aborting move",
-						ModEntry.Instance.Config.DebugMode);
+						Config.DebugMode);
 					return 0;
 				}
 
 				_cookingSlotsDropIn[ingredientsIndex] = inventory.actualInventory[inventoryIndex].getOne();
 				_cookingSlotsDropIn[ingredientsIndex].Stack = 0;
 				Log.D($"Adding {_cookingSlotsDropIn[ingredientsIndex]?.Name ?? "null" } to ingredients dropIn",
-					ModEntry.Instance.Config.DebugMode);
+					Config.DebugMode);
 			}
 			if (inventoryIndex == -1)
 			{
@@ -1727,7 +1732,7 @@ namespace LoveOfCooking.GameObjects
 				var item = inventory.actualInventory.FirstOrDefault(i => dropOut.canStackWith(i));
 				inventoryIndex = inventory.actualInventory.IndexOf(item);
 				Log.D($"Removing {dropOut.Name} from ingredients dropIn",
-					ModEntry.Instance.Config.DebugMode);
+					Config.DebugMode);
 				if (item == null)
 				{
 					if (_currentSelectedInventory > -2)
@@ -1735,7 +1740,7 @@ namespace LoveOfCooking.GameObjects
 						if (inventory.actualInventory.Count > 35)
 						{
 							Log.D($"Failed to return item {dropOut.Name}: Fridge inventory full",
-								ModEntry.Instance.Config.DebugMode);
+								Config.DebugMode);
 							Game1.playSound("cancel");
 							return 0;
 						}
@@ -1748,14 +1753,14 @@ namespace LoveOfCooking.GameObjects
 							if (inventoryIndex < 0)
 							{
 								Log.D($"Adding item {dropOut.Name} to new fridge slot",
-									ModEntry.Instance.Config.DebugMode);
+									Config.DebugMode);
 								inventoryIndex = inventory.actualInventory.Count;
 								inventory.actualInventory.Add(_cookingSlotsDropIn[ingredientsIndex]);
 							}
 							else
 							{
 								Log.D($"Returning item {dropOut.Name} to some fridge slot {inventoryIndex}",
-									ModEntry.Instance.Config.DebugMode);
+									Config.DebugMode);
 								inventory.actualInventory[inventoryIndex] = _cookingSlotsDropIn[ingredientsIndex];
 							}
 						}
@@ -1763,7 +1768,7 @@ namespace LoveOfCooking.GameObjects
 					else if (inventoryIndex >= 0)
 					{
 						Log.D($"Returning {dropOut.Name} to inventory at {inventoryIndex}",
-							ModEntry.Instance.Config.DebugMode);
+							Config.DebugMode);
 						inventory.actualInventory[inventoryIndex] = dropOut;
 					}
 					else
@@ -1776,13 +1781,13 @@ namespace LoveOfCooking.GameObjects
 						if (inventoryIndex > 0)
 						{
 							Log.D($"Returning {dropOut.Name} to inventory at {inventoryIndex} after double-check",
-								ModEntry.Instance.Config.DebugMode);
+								Config.DebugMode);
 							inventory.actualInventory[inventoryIndex] = dropOut;
 						}
 						else
 						{
 							Log.D($"Failed to return item {dropOut.Name}: No player inventory slot found",
-								ModEntry.Instance.Config.DebugMode);
+								Config.DebugMode);
 							Game1.playSound("cancel");
 							return 0;
 						}
@@ -1878,7 +1883,7 @@ namespace LoveOfCooking.GameObjects
 					Game1.playSound("bigDeSelect");
 
 				Log.D("Closing cooking menu.",
-					ModEntry.Instance.Config.DebugMode);
+					Config.DebugMode);
 
 				exitThisMenuNoSound();
 			}
@@ -2141,7 +2146,7 @@ namespace LoveOfCooking.GameObjects
 				Game1.playSound("bigSelect");
 			}
 			// Ingredients tab
-			else if (IsIngredientsPageEnabled && ModEntry.Instance.Config.AddRecipeRebalancing
+			else if (IsIngredientsPageEnabled && Config.AddRecipeRebalancing
 			         && state != State.Ingredients && IngredientsTabButton.containsPoint(x, y))
 			{
 				_stack.Pop();
@@ -2388,12 +2393,31 @@ namespace LoveOfCooking.GameObjects
 			}
 			else
 			{
-				if (key == Keys.L && ModEntry.Instance.Config.DebugMode)
+				if (Config.DebugMode)
 				{
-					var locales = CookTextSource.Keys.ToList();
-					_locale = locales[(locales.IndexOf(_locale) + 1) % locales.Count];
-					Log.D($"Changed to locale {_locale} and realigning elements");
-					RealignElements();
+					if (key == Keys.L)
+					{
+						var locales = CookTextSource.Keys.ToList();
+						_locale = locales[(locales.IndexOf(_locale) + 1) % locales.Count];
+						Log.D($"Changing to locale {_locale} and realigning elements");
+						RealignElements();
+					}
+					else if (key == Keys.K)
+					{
+						Log.D($"Adding ingredients for {_filteredRecipeList[_currentRecipe].name}");
+						var i = 0;
+						foreach (var pair in _filteredRecipeList[_currentRecipe].recipeList)
+						{
+							if (i >= Math.Min(_cookingSlotsDropIn.Count, _filteredRecipeList[_currentRecipe].recipeList.Count))
+								break;
+
+							var id = pair.Key;
+							var quantity = pair.Value;
+							var item = new StardewValley.Object(id, quantity);
+							_cookingSlotsDropIn[i] = item;
+							++i;
+						}
+					}
 				}
 
 				if (Game1.options.doesInputListContain(Game1.options.menuButton, key)
@@ -2661,7 +2685,7 @@ namespace LoveOfCooking.GameObjects
 
 			// Recipe description
 			textPosition.X = 0;
-			textPosition.Y = NavLeftButton.bounds.Y + NavLeftButton.bounds.Height //+ (ModEntry.Instance.Config.CookingTakesTime ? 20 : 25);
+			textPosition.Y = NavLeftButton.bounds.Y + NavLeftButton.bounds.Height //+ (Config.CookingTakesTime ? 20 : 25);
 				+ 25;
 			if (textHeightCheck > 60)
 				textPosition.Y += textHeightCheck - 50 * xScale;
@@ -2785,7 +2809,7 @@ namespace LoveOfCooking.GameObjects
 				DrawText(b, text, 1f, 40, textPosition.Y, textWidth, true, SubtextColour);
 			}
 
-			//if (!ModEntry.Instance.Config.CookingTakesTime)
+			//if (!Config.CookingTakesTime)
 				return;
 
 			// Recipe cooking duration and clock icon
@@ -2874,7 +2898,7 @@ namespace LoveOfCooking.GameObjects
 			{
 				textPosition.Y += 16;
 				textPosition.X = _rightContent.X + _cookbookRightRect.Width / 2 - MarginRight;
-				var frypanWidth = ModEntry.Instance.Config.AddCookingToolProgression ? 16 + 4 : 0;
+				var frypanWidth = Config.AddCookingToolProgression ? 16 + 4 : 0;
 
 				// Cook! button
 				var extraHeight = new [] { "ko", "ja", "zh", "tr" }.Contains(_locale) ? 4 : 0;
@@ -2919,7 +2943,7 @@ namespace LoveOfCooking.GameObjects
 					Color.White, 0f, Vector2.Zero, SpriteEffects.None, 1f);
 				dest.X += _cookTextMiddleWidth * Scale;
 				dest.Width = 16 * Scale;
-				if (ModEntry.Instance.Config.AddCookingToolProgression)
+				if (Config.AddCookingToolProgression)
 				{
 					b.Draw(
 						Texture,
@@ -2951,7 +2975,7 @@ namespace LoveOfCooking.GameObjects
 						Color.White, 0f, Vector2.Zero, Scale, flipped, 1f);
 				}*/
 			}
-			else if (ModEntry.Instance.Config.HideFoodBuffsUntilEaten
+			else if (Config.HideFoodBuffsUntilEaten
 				&& (!ModEntry.Instance.FoodsEaten.Contains(_recipeItem.Name)))
 			{
 				text = i18n.Get("menu.cooking_recipe.notes_unknown");

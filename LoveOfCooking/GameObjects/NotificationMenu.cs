@@ -503,7 +503,7 @@ namespace LoveOfCooking.GameObjects
 				// Notification elements
 				for (var i = 0; i < _notificationButtons.Count; i++)
 				{
-					if (_pages.Count <= 0 || _pages[_currentPage].Count <= i || _notifications[i] == null)
+					if (_pages.Count <= 0 || _pages[_currentPage].Count <= i)
 						continue;
 
 					// Button container

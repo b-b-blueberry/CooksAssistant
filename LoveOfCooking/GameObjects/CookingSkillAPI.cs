@@ -176,6 +176,8 @@ namespace LoveOfCooking.GameObjects
 
 			// Gain more experience for the first time cooking a meal each day
 			var dailyBonus = ModEntry.FoodCookedToday.ContainsKey(item.Name) ? 0 : 12;
+			if (!ModEntry.FoodCookedToday.ContainsKey(item.Name))
+				ModEntry.FoodCookedToday[item.Name] = 0;
 
 			// Gain less experience the more that the same food is cooked for this day
 			var stackBonus // (Quantity * (Rate of decay per quantity towards roughly 50%) / Some divisor for experience rate)
