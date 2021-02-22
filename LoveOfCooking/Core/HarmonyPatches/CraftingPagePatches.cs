@@ -1,7 +1,6 @@
 ﻿using Harmony;
 using StardewValley;
 using StardewValley.Menus;
-using System.Linq;
 
 namespace LoveOfCooking.Core.HarmonyPatches
 {

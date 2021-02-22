@@ -177,50 +177,10 @@ namespace LoveOfCooking
 
 				try
 				{
-					var recipeData = new Dictionary<string, string>
-					{
-						// Maki Roll: Sashimi 1 Seaweed 1 Rice 1
-						{
-							"Maki Roll",
-							"227 1 152 1 423 1"
-						},
-						// Coleslaw: Vinegar 1 Mayonnaise 1
-						{
-							"Coleslaw",
-							$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cabbage")} 1"
-							+ " 419 1 306 1"
-						},
-						// Pink Cake: Cake 1 Melon 1
-						{
-							"Pink Cake",
-							$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cake")} 1"
-							+ " 254 1"
-						},
-						// Chocolate Cake: Cake 1 Chocolate Bar 1
-						{
-							"Chocolate Cake",
-							$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cake")} 1" 
-							+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "chocolate")} 1"
-						},
-						// Cookies: Flour 1 Category:Egg 1 Chocolate Bar 1
-						{
-							"Cookies",
-							"246 1 -5 1"
-							+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "chocolate")} 1"
-						},
-						// Pizza: Flour 2 Tomato 2 Cheese 2
-						{
-							"Pizza",
-							"246 2 256 2 424 2"
-						},
-					};
-					foreach (var recipe in recipeData)
-						data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new [] {recipe.Value});
-
 					// Substitute in the actual custom ingredients for custom recipes if custom ingredients are enabled
-					// TODO: TEST: Opening cooking menu with MoreRecipes/FruitsAndVeggies/NewMenu/NewCrops/NewRecipes
 					var enabled = Config.AddNewCropsAndStuff;
 					var overlappingMods = ModEntry.Instance.Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
+					Dictionary<string, string> recipeData = null;
 					if (enabled || overlappingMods)
 					{
 						var customCropIds = new Dictionary<string, int>
@@ -230,6 +190,62 @@ namespace LoveOfCooking
 							{ "carrot", ModEntry.JsonAssets.GetObjectId(overlappingMods ? "Carrot" : ModEntry.ObjectPrefix + "carrot") },
 							{ "chocolate", ModEntry.JsonAssets.GetObjectId(overlappingMods ? "Chocolate Bar" : ModEntry.ObjectPrefix + "chocolate") },
 						};
+
+						// Update recipe data for recipes planned to use vanilla objects or best-available common custom objects
+						recipeData = new Dictionary<string, string>
+						{
+							// Maki Roll: Sashimi 1 Seaweed 1 Rice 1
+							{
+								"Maki Roll",
+								"227 1 152 1 423 1"
+							},
+							// Coleslaw: Vinegar 1 Mayonnaise 1
+							{
+								"Coleslaw",
+								$"{customCropIds["cabbage"]} 1"
+								+ " 419 1 306 1"
+							},
+							// Cookies: Flour 1 Category:Egg 1 Chocolate Bar 1
+							{
+								"Cookies",
+								"246 1 -5 1"
+								+ $" {customCropIds["chocolate"]} 1"
+							},
+							// Pizza: Flour 2 Tomato 2 Cheese 2
+							{
+								"Pizza",
+								"246 2 256 2 424 2"
+							},
+						};
+
+						// Update recipe data for recipes planned to use custom objects exclusive to this mod
+						if (enabled)
+						{
+							var exclusiveCustomData = new Dictionary<string, string>
+							{
+								// Pink Cake: Cake 1 Melon 1
+								{
+									"Pink Cake",
+									$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cake")} 1"
+									+ " 254 1"
+								}, 
+								// Chocolate Cake: Cake 1 Chocolate Bar 1
+								{
+									"Chocolate Cake",
+									$"{ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cake")} 1"
+									+ $" {ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "chocolate")} 1"
+								}
+							};
+							recipeData = recipeData.Union(exclusiveCustomData).ToDictionary(pair => pair.Key, pair => pair.Value);
+						}
+
+						foreach (var recipe in recipeData)
+							data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new[] { recipe.Value });
+
+						if (ModEntry.PrintRename && recipeData != null)
+							Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
+									.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+								ModEntry.Instance.Config.DebugMode);
 
 						recipeData = new Dictionary<string, string>
 						{
@@ -310,8 +326,9 @@ namespace LoveOfCooking
 								"832 1 613 1 637 1"
 							},
 						};
-						foreach (var recipe in recipeData)
-							data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new[] { recipe.Value });
+						if (recipeData != null)
+							foreach (var recipe in recipeData)
+								data[recipe.Key] = ModEntry.UpdateEntry(data[recipe.Key], new[] { recipe.Value });
 					}
 					
 					foreach (var recipe in data.ToDictionary(pair => pair.Key, pair => pair.Value))
@@ -332,7 +349,7 @@ namespace LoveOfCooking
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
 
-					if (ModEntry.PrintRename)
+					if (ModEntry.PrintRename && recipeData != null)
 						Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
 								.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 							ModEntry.Instance.Config.DebugMode);
@@ -408,6 +425,7 @@ namespace LoveOfCooking
 						{419, new[] {null, "220", "-300", "Basic -26"}}, // Vinegar
 						{247, new[] {null, null, "-300", "Basic -26", null, i18n.Get("item.oil.description")}}, // Oil
 						{432, new[] {null, null, "-300", null, null, i18n.Get("item.truffleoil.description")}}, // Truffle Oil
+						{917, new[] {null, null, null, null, null, data[917].Split('/')[5].Split('.')[0] + '.'}}, // Qi Seasoning
 						//{ModEntry.JsonAssets.GetObjectId(ObjectPrefix + "sugarcane"), new[] {null, null, null, "Basic"}},
 					};
 					
@@ -497,6 +515,9 @@ namespace LoveOfCooking
 			if (asset.AssetNameEquals(@"LooseSprites/Cursors"))
 			{
 				// Home-cook a notification icon for under the HUD money tray:
+
+				if (ModEntry.SpriteSheet == null)
+					return;
 
 				// Prime a canvas as a clipboard to hold in sequence both a copy of the vanilla icon
 				// and our custom icon to merge together into some particular open space in Cursors

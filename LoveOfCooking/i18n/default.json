@@ -25,6 +25,7 @@
 	"menu.cooking_recipe.favourite_label": "Favourite",
 	"menu.cooking_recipe.quantity_label": "How many?",
 	"menu.cooking_recipe.which_label": "Which would you like to make?",
+	"menu.cooking_recipe.autofill_label": "Auto-fill ingredients",
 
 	"menu.cooking_recipe.buff.0": "Farming",
 	"menu.cooking_recipe.buff.1": "Fishing",

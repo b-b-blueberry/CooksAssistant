@@ -23,6 +23,25 @@ using xTile.Dimensions;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 
+// TO DO THE MOST
+
+		// TO VERY MUCH DO
+
+				// ABSOLUTELY TO DO
+
+
+// TODO: RELEASE: Copy assets folder from E:\Dev\Projects\SDV\Projects\CooksAssistant\temp_py_output to C:\SteamSSD\steamapps\common\Stardew Valley\Mods\LoveOfCooking
+
+
+				// DO THAT
+
+		// DON'T FORGET
+
+
+// TODO: 1.0.12: Icon-based rewrite of ingredients dropIn slots
+
+// TODO: FIX: Special orders based on items cooked not increasing with new cooking menu
+
 // TODO: FIX: Add mail with refund for Iridium Frying Pans
 // TODO: FIX: Duplicating items when inventory full and cooking menu closes (ingredients brought from fridge into ingredients dropIn)
 // TODO: FIX: CC Kitchen star doesn't show up on board for host when CC completed; empty star shows for peers (https://i.imgur.com/UZXTopu.png)
@@ -31,7 +50,6 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 // TODO: FIX: Bundle is unloaded overnight, CC is completed when all other areas are finished?
 
-// TODO: 1.5 FIX: Test Qi Seasoning
 // TODO: 1.5 FIX: Evelyn's special request board quest is uncompleteable as it requires using the kitchen
 // TODO: 1.5 FIX: New skill menu erases Golden Walnut count
 
@@ -53,6 +71,7 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 // TODO: COMPATIBILITY: Tool Upgrade Delivery (https://www.nexusmods.com/stardewvalley/mods/5421)
 // TODO: COMPATIBILITY: Expanded Fridge (https://forums.stardewvalley.net/threads/unofficial-mod-updates.2096/page-6#post-20884)
 // TODO: COMPATIBILITY: Expanded Storage (https://www.nexusmods.com/stardewvalley/mods/7431)
+// TODO: COMPATIBILITY: Food Buff Stacking (https://www.nexusmods.com/stardewvalley/mods/4321)
 
 
 namespace LoveOfCooking
@@ -76,10 +95,10 @@ namespace LoveOfCooking
 		internal static readonly string NewRecipesPackPath = Path.Combine("assets", "NewRecipesPack");
 		internal static readonly string NewCropsPackPath = Path.Combine("assets", "NewCropsPack");
 		internal static readonly string NettlesPackPath = Path.Combine("assets", "NettlesPack");
-		internal static readonly string GameContentSpriteSheetPath = @"SpriteSheet";
+		internal static readonly string GameContentSpriteSheetPath = @$"{AssetPrefix}Assets/Sprites";
 		internal static readonly string LocalSpriteSheetPath = Path.Combine("assets", "sprites");
 		internal static readonly string MapTileSheetPath = Path.Combine("assets", "maptiles");
-		internal static readonly string GameContentBundleDataPath = @"Bundles";
+		internal static readonly string GameContentBundleDataPath = @$"{AssetPrefix}Assets/Bundles";
 		internal static readonly string LocalBundleDataPath = Path.Combine("assets", "bundles");
 		internal static readonly string BuffDataPath = Path.Combine("assets", "ingredientBuffChart");
 
@@ -393,7 +412,6 @@ namespace LoveOfCooking
 			var assetManager = new AssetManager();
 			Helper.Content.AssetEditors.Add(assetManager);
 			Helper.Content.AssetLoaders.Add(assetManager);
-			SpriteSheet = Game1.content.Load<Texture2D>(GameContentSpriteSheetPath);
 			
 			// Game events
 			Helper.Events.GameLoop.GameLaunched += GameLoopOnGameLaunched;
@@ -409,11 +427,6 @@ namespace LoveOfCooking
 			Helper.Events.Multiplayer.PeerContextReceived += MultiplayerOnPeerContextReceived;
 			Helper.Events.Multiplayer.PeerConnected += MultiplayerOnPeerConnected;
 
-			CookingSkillApi = new CookingSkillAPI(Helper.Reflection);
-			if (Config.AddCookingSkillAndRecipes)
-			{
-				Skills.RegisterSkill(new CookingSkill());
-			}
 			if (Config.DebugMode && Config.DebugRegenTracker)
 			{
 				Helper.Events.Display.RenderedHud += Event_DrawDebugRegenTracker;
@@ -749,6 +762,15 @@ namespace LoveOfCooking
 
 		private void GameLoopOnGameLaunched(object sender, GameLaunchedEventArgs e)
 		{
+			// Load spritesheet late to allow for patching by other mods
+			SpriteSheet = Game1.content.Load<Texture2D>(GameContentSpriteSheetPath);
+			// Load skill after spritesheet for skill/profession icons
+			CookingSkillApi = new CookingSkillAPI(Helper.Reflection);
+			if (Config.AddCookingSkillAndRecipes)
+			{
+				Skills.RegisterSkill(new CookingSkill());
+			}
+			// Load custom objects now that mod-provided APIs are available
 			LoadJsonAssetsObjects();
 		}
 
@@ -786,16 +808,19 @@ namespace LoveOfCooking
 					Game1.player.cookingRecipes.Add(recipe, 0);
 			}
 
-			// Set up vanilla campfire recipe
-			if (Config.AddCookingSkillAndRecipes && CookingSkillApi.GetLevel() < CraftCampfireLevel)
+			// Add or remove vanilla campfire recipe
+			if (CookingSkillApi.IsEnabled())
 			{
-				// Campfire is added on level-up for cooking skill users
-				Game1.player.craftingRecipes.Remove("Campfire");
-			}
-			else if (!Config.AddCookingSkillAndRecipes && !Game1.player.craftingRecipes.ContainsKey("Campfire"))
-			{
-				// Re-add campfire to the player's recipe list if it's otherwise missing
-				Game1.player.craftingRecipes["Campfire"] = 0;
+				if (CookingSkillApi.GetLevel() < CraftCampfireLevel)
+				{
+					// Campfire is added on level-up for cooking skill users
+					Game1.player.craftingRecipes.Remove("Campfire");
+				}
+				else if (!Game1.player.craftingRecipes.ContainsKey("Campfire"))
+				{
+					// Re-add campfire to the player's recipe list if it's otherwise missing
+					Game1.player.craftingRecipes["Campfire"] = 0;
+				}
 			}
 
 			// Clear daily cooking to free up Cooking experience gains
@@ -1069,16 +1094,26 @@ namespace LoveOfCooking
 			OpenNewCookingMenu();
 		}
 
+		/// <summary>
+		/// Render the correct English display name in crafting pages over the top of the incorrect display name.
+		/// Default game draw logic uses internal name for recipes in English locales, ignoring display name altogether.
+		/// 
+		/// Also applies to NewCraftingPage instances, found in spacechase0.CookingSkill:
+		/// https://github.com/spacechase0/CookingSkill/blob/master/NewCraftingPage.cs
+		/// </summary>
 		private void Event_DrawOverEnglishRecipeNames(object sender, RenderedEventArgs e)
 		{
-			if (!(Game1.activeClickableMenu is CraftingPage cm) || !Helper.Reflection.GetField<bool>(cm, "cooking").GetValue()
-				|| LocalizedContentManager.CurrentLanguageCode.ToString() != "en")
+			var isCraftingMenu = Game1.activeClickableMenu is CraftingPage || Game1.activeClickableMenu.GetType().Name == "NewCraftingPage";
+			var isCookingFlag = Helper.Reflection.GetField<bool>(Game1.activeClickableMenu, "cooking");
+			var isCookingMenu = isCookingFlag != null && isCookingFlag.GetValue();
+			var isEnglish = LocalizedContentManager.CurrentLanguageCode.ToString() == "en";
+			if (!isCraftingMenu || !isCookingMenu || !isEnglish)
 			{
 				Helper.Events.Display.Rendered -= Event_DrawOverEnglishRecipeNames;
 				return;
 			}
 
-			var craftingMenu = Game1.activeClickableMenu as CraftingPage;
+			var craftingMenu = Game1.activeClickableMenu;
 			var heldItem = Helper.Reflection.GetField<Item>(craftingMenu, "heldItem").GetValue();
 			var hoverRecipe = Helper.Reflection.GetField<CraftingRecipe>(craftingMenu, "hoverRecipe").GetValue();
 			var lastCookingHover = Helper.Reflection.GetField<Item>(craftingMenu, "lastCookingHover").GetValue();
@@ -1267,7 +1302,7 @@ namespace LoveOfCooking
 						OpenNewCookingMenu();
 						Helper.Input.Suppress(e.Button);
 					}
-					else if (IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
+					else if (!Game1.currentLocation.IsOutdoors && IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
 					{
 						if (NpcHomeLocations.Any(pair => pair.Value == Game1.currentLocation.Name
 								&& Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= NpcKitchenFriendshipRequired)
@@ -1551,29 +1586,6 @@ namespace LoveOfCooking
 					}
 				}
 			}
-		}
-
-		internal void DrawStarInCommunityCentre(CommunityCenter cc)
-		{
-			const int id = 68305742;
-			if (cc.getTemporarySpriteByID(id) != null)
-			{
-				return;
-			}
-
-			var multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
-			multiplayer.broadcastSprites(cc,
-				new TemporaryAnimatedSprite(
-					"LooseSprites\\Cursors",
-					new Rectangle(354, 401, 7, 7),
-					9999, 1, 9999,
-					new Vector2(2096f, 344f),
-					false, false, 0.8f, 0f, Color.White,
-					4f, 0f, 0f, 0f)
-				{
-					id = id,
-					holdLastFrame = true
-				});
 		}
 
 		private void PlayerOnWarped(object sender, WarpedEventArgs e)
@@ -1937,6 +1949,11 @@ namespace LoveOfCooking
 			Helper.Content.InvalidateCache(@"Data/ObjectInformation");
 			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
 			Helper.Content.InvalidateCache(@"Data/Bundles");
+			// Our custom assets
+			//Helper.Content.InvalidateCache(GameContentSpriteSheetPath);
+			//Helper.Content.InvalidateCache(GameContentBundleDataPath);
+			// Assets edited with our spritesheet
+			Helper.Content.InvalidateCache(@"LooseSprites/Cursors");
 
 			// Populate NPC home locations for cooking range usage
 			var npcData = Game1.content.Load<Dictionary<string, string>>("Data/NPCDispositions");
@@ -2246,9 +2263,9 @@ namespace LoveOfCooking
 
 		public int GetFarmersMaxUsableIngredients()
 		{
-			return Config.AddCookingToolProgression
+			return (Config.AddCookingToolProgression && CookingToolLevel < 4)
 				? 1 + CookingToolLevel
-				: 5;
+				: 6;
 		}
 
 		private bool CanFarmerUpgradeCookingEquipment()
@@ -2306,38 +2323,6 @@ namespace LoveOfCooking
 					var displayName = Game1.objectInformation[JsonAssets.GetObjectId(recipe.name)].Split('/')[4];
 					recipe.DisplayName = displayName;
 				}
-			}
-		}
-
-		/// <summary>
-		/// Update display names for all new cooking recipe objects for the active crafting menu
-		/// With English locale, recipes' display names default to the internal name, so we have to replace it
-		/// </summary>
-		internal void UpdateEnglishRecipeDisplayNames()
-		{
-			var craftingMenu = (CraftingPage) Game1.activeClickableMenu;
-			if (LocalizedContentManager.CurrentLanguageCode.ToString() == "en")
-			{
-				/*
-				for (var i = 0; i < craftingMenu.inventory.actualInventory.Count; ++i)
-				{
-					if (craftingMenu.inventory.actualInventory[i] == null)
-						continue;
-
-					var displayName = Game1.objectInformation[JsonAssets.GetObjectId(craftingMenu.inventory.actualInventory[i].Name)].Split('/')[4];
-					craftingMenu.inventory.actualInventory[i].DisplayName = displayName;
-				}
-				*/
-				/*
-				for (var i = 0; i < craftingMenu.pagesOfCraftingRecipes.Count; ++i)
-				{
-					foreach (var pair in craftingMenu.pagesOfCraftingRecipes[i].Where(pair => pair.Value.DisplayName.StartsWith(ObjectPrefix)))
-					{
-						var displayName = Game1.objectInformation[JsonAssets.GetObjectId(pair.Value.name)].Split('/')[4];
-						((CraftingPage)Game1.activeClickableMenu).pagesOfCraftingRecipes[i][pair.Key].DisplayName = displayName;
-					}
-				}
-				*/
 			}
 		}
 
@@ -2521,6 +2506,27 @@ namespace LoveOfCooking
 			Helper.Content.InvalidateCache(@"Strings/UI");
 		}
 
+		internal void DrawStarInCommunityCentre(CommunityCenter cc)
+		{
+			const int id = 68305742;
+			if (cc.getTemporarySpriteByID(id) != null)
+				return;
+
+			var multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
+			multiplayer.broadcastSprites(cc,
+				new TemporaryAnimatedSprite(
+					"LooseSprites\\Cursors",
+					new Rectangle(354, 401, 7, 7),
+					9999, 1, 9999,
+					new Vector2(2096f, 344f),
+					false, false, 0.8f, 0f, Color.White,
+					4f, 0f, 0f, 0f)
+				{
+					id = id,
+					holdLastFrame = true
+				});
+		}
+
 		private void GiveBundleItems(int whichBundle, bool print)
 		{
 			var bundle = Game1.netWorldState.Value.BundleData.FirstOrDefault(pair => pair.Key.Split('/')[1] == whichBundle.ToString());
@@ -2586,8 +2592,8 @@ namespace LoveOfCooking
 
 			for (var i = 0; i < BundleCount; ++i)
 			{
+				// Bundle metadata, not synced by multiplayer.broadcastWorldState
 				var key = BundleStartIndex + i;
-				// Bundle metadata, not synced with multiplayer.broadcastWorldState()
 				Game1.netWorldState.Value.BundleData[$"{CommunityCentreAreaName}/{key}"] = customBundleData[key];
 			}
 
@@ -2602,6 +2608,7 @@ namespace LoveOfCooking
 					customBundleValues.Add(key, cc.modData.ContainsKey(dataKey) && !string.IsNullOrEmpty(cc.modData[dataKey])
 						? cc.modData[dataKey].Split(',').ToList().ConvertAll(bool.Parse).ToArray()
 						: new bool[customBundleData[key].Split('/')[2].Split(' ').Length]);
+
 					// Bundle saved rewards
 					dataKey = AssetPrefix + "bundle_rewards_" + i;
 					customBundleRewards.Add(key, cc.modData.ContainsKey(dataKey) && !string.IsNullOrEmpty(cc.modData[dataKey])
@@ -2743,12 +2750,16 @@ namespace LoveOfCooking
 				{
 					for (var i = 0; i < Math.Max(3, BundleCount); ++i)
 					{
-						var key = Math.Max(36, BundleStartIndex) + i;
+						var key = Math.Max(37, BundleStartIndex) + i;
 
 						if (Game1.netWorldState.Value.Bundles.ContainsKey(key))
+						{
 							cc.modData[AssetPrefix + "bundle_values_" + i] = string.Join(",", Game1.netWorldState.Value.Bundles[key]);
+						}
 						if (Game1.netWorldState.Value.BundleRewards.ContainsKey(key))
+						{
 							cc.modData[AssetPrefix + "bundle_rewards_" + i] = Game1.netWorldState.Value.BundleRewards[key].ToString();
+						}
 
 						// Remove custom bundle data from GW data to avoid failed save loading under various circumstances
 						Game1.netWorldState.Value.Bundles.Remove(key);
@@ -2830,9 +2841,16 @@ namespace LoveOfCooking
 
 		internal Dictionary<int, string> ParseBundleData()
 		{
-			var newData = new Dictionary<int, string>();
 			var sourceBundleList = Game1.content.Load<Dictionary<string, Dictionary<string, List<string>>>>(GameContentBundleDataPath);
-			var sourceBundles = sourceBundleList[(JsonAssets != null && Config.AddNewCropsAndStuff) ? "Custom" : "Vanilla"];
+			var whichBundleList = JsonAssets == null
+				? "Vanilla"
+				: Instance.Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies")
+					? "PPJA"
+					: Config.AddNewCropsAndStuff
+						? "Custom"
+						: "Vanilla";
+			var sourceBundles = sourceBundleList[whichBundleList];
+			var newData = new Dictionary<int, string>();
 
 			// Iterate over each custom bundle to add their data to game Bundles dictionary
 			var index = 0;
@@ -2843,6 +2861,7 @@ namespace LoveOfCooking
 				// Bundle data
 				var parsedBundle = new List<List<string>>();
 
+				// Parse the bundle metadata
 				var displayName = i18n.Get($"world.community_centre.bundle.{index + 1}");
 				var itemsToComplete = sourceBundles[key][2];
 				var colour = sourceBundles[key][3];
@@ -2858,34 +2877,14 @@ namespace LoveOfCooking
 						? Game1.bigCraftablesInformation.FirstOrDefault(o => o.Value.Split('/')[0] == rewardName).Key
 						: Game1.objectInformation.FirstOrDefault(o => o.Value.Split('/')[0] == rewardName).Key;
 				}
-				parsedBundle.Add(new List<string> { rewardsData[0], rewardId.ToString(), rewardsData[rewardsData.Length - 1] });
 
-				// Iterate over each word in the items list, formatted as [<Name With Spaces> <Quantity> <Quality>]
-				parsedBundle.Add(new List<string>());
-				var startIndex = 0;
-				var requirementsData = sourceBundles[key][1].Split(' ');
-				for (var j = 0; j < requirementsData.Length; ++j)
-				{
-					// Group and parse each [name quantity quality] cluster
-					if (j != startIndex && int.TryParse(requirementsData[j], out var itemQuantity))
-					{
-						var itemName = SplitToString(requirementsData.Skip(startIndex).Take(j - startIndex).ToArray(), ' ');
-						var itemQuality = int.Parse(requirementsData[++j]);
-						var itemId = JsonAssets.GetObjectId(itemName);
+				// Add parsed rewards
+				var parsedRewards = new List<string> { rewardsData[0], rewardId.ToString(), rewardsData[rewardsData.Length - 1] };
+				parsedBundle.Add(parsedRewards);
 
-						// Add parsed item data to the requiredItems section of the new bundle data
-						if (itemId < 0)
-						{
-							itemId = Game1.objectInformation.FirstOrDefault(o => o.Value.Split('/')[0] == itemName).Key;
-						}
-						if (itemId > 0)
-						{
-							parsedBundle[2].AddRange(new List<int> { itemId, itemQuantity, itemQuality }.ConvertAll(o => o.ToString()));
-						}
-
-						startIndex = ++j;
-					}
-				}
+				// Parse and add item requirements for this bundle
+				var parsedItems = ParseBundleItems(sourceBundles[key][1].Split(' '));
+				parsedBundle.Add(parsedItems.ConvertAll(o => o.ToString()));
 
 				// Patch new data into the target bundle dictionary, including mininmum completion count and display name
 				var value = SplitToString(parsedBundle.Select(list => SplitToString(list, ' ')), '/') + $"/{colour}/{itemsToComplete}";
@@ -2897,6 +2896,38 @@ namespace LoveOfCooking
 				++index;
 			}
 			return newData;
+		}
+
+		internal static List<int> ParseBundleItems(string[] sourceItems)
+		{
+			var parsedItems = new List<int>();
+
+			// Iterate over each word in the items list, formatted as [<Name With Spaces> <Quantity> <Quality>]
+			var startIndex = 0;
+			for (var j = 0; j < sourceItems.Length; ++j)
+			{
+				// Group and parse each [name quantity quality] cluster
+				if (j != startIndex && int.TryParse(sourceItems[j], out var itemQuantity))
+				{
+					var itemName = SplitToString(sourceItems.Skip(startIndex).Take(j - startIndex).ToArray(), ' ');
+					var itemQuality = int.Parse(sourceItems[++j]);
+					var itemId = JsonAssets.GetObjectId(itemName);
+
+					// Add parsed item data to the requiredItems section of the new bundle data
+					if (itemId < 0)
+					{
+						itemId = Game1.objectInformation.FirstOrDefault(o => o.Value.Split('/')[0] == itemName).Key;
+					}
+					if (itemId > 0)
+					{
+						parsedItems.AddRange(new List<int> { itemId, itemQuantity, itemQuality });
+					}
+
+					startIndex = ++j;
+				}
+			}
+
+			return parsedItems;
 		}
 
 		internal static void AddNotificationButton()
