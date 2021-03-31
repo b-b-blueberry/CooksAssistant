@@ -37,9 +37,6 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 // DON'T FORGET
 
 
-// TODO: 1.0.13: Icon-based rewrite of ingredients dropIn slots
-// TODO: FIX: Duplicating items when inventory full and cooking menu closes (ingredients brought from fridge into ingredients dropIn)
-
 // TODO: FIX: CC Kitchen star doesn't show up on board for host when CC completed; empty star shows for peers (https://i.imgur.com/UZXTopu.png)
 // TODO: FIX: Left-right inventory bundle menu navigation with/without kitchen and other bundles
 // TODO: FIX: Bundle is unloaded overnight, CC is completed when all other areas are finished?
@@ -63,6 +60,7 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 // TODO: COMPATIBILITY: Expanded Fridge (https://forums.stardewvalley.net/threads/unofficial-mod-updates.2096/page-6#post-20884)
 // TODO: COMPATIBILITY: Expanded Storage (https://www.nexusmods.com/stardewvalley/mods/7431)
 // TODO: COMPATIBILITY: Food Buff Stacking (https://www.nexusmods.com/stardewvalley/mods/4321)
+// TODO: COMPATIBILITY: Regular Quality (https://www.nexusmods.com/stardewvalley/mods/5090)
 
 
 namespace LoveOfCooking
@@ -88,12 +86,12 @@ namespace LoveOfCooking
 		// Assets
 		// Game content paths: asset keys sent as requests to Game1.content.Load<T>()
 		// These can be intercepted and modified by AssetLoaders/Editors, eg. Content Patcher.
-		internal static readonly string GameContentSpriteSheetPath = AssetPrefix + "Assets\\Sprites";
-		internal static readonly string GameContentBundleDataPath = AssetPrefix + "Assets\\Bundles";
-		internal static readonly string GameContentIngredientBuffDataPath = AssetPrefix + "Assets\\IngredientBuffChart";
-		internal static readonly string GameContentDefinitionsPath = AssetPrefix + "Assets\\ItemDefinitions";
-		internal static readonly string GameContentSkillValuesPath = AssetPrefix + "Assets\\CookingSkillValues";
-		internal static readonly string GameContentSkillRecipeTablePath = AssetPrefix + "Assets\\CookingSkillLevelUpRecipes";
+		internal static readonly string GameContentSpriteSheetPath = PathUtilities.NormalizePath(AssetPrefix + "Assets\\Sprites");
+		internal static readonly string GameContentBundleDataPath = PathUtilities.NormalizePath(AssetPrefix + "Assets\\Bundles");
+		internal static readonly string GameContentIngredientBuffDataPath = PathUtilities.NormalizePath(AssetPrefix + "Assets\\IngredientBuffChart");
+		internal static readonly string GameContentDefinitionsPath = PathUtilities.NormalizePath(AssetPrefix + "Assets\\ItemDefinitions");
+		internal static readonly string GameContentSkillValuesPath = PathUtilities.NormalizePath(AssetPrefix + "Assets\\CookingSkillValues");
+		internal static readonly string GameContentSkillRecipeTablePath = PathUtilities.NormalizePath(AssetPrefix + "Assets\\CookingSkillLevelUpRecipes");
 		// Local paths: filepaths without extension passed to Helper.Content.Load<T>()
 		// These are the paths for our default data files bundled with the mod in our assets folder.
 		internal static readonly string LocalSpriteSheetPath = Path.Combine("assets", "sprites");
@@ -110,6 +108,7 @@ namespace LoveOfCooking
 		internal static readonly string NettlesPackPath = Path.Combine("assets", "NettlesPack");
 
 		// Player session state
+		public readonly PerScreen<State> States = new PerScreen<State>(createNewState: () => new State());
 		public class State
 		{
 			// Persistent player data
@@ -135,9 +134,8 @@ namespace LoveOfCooking
 			public StardewValley.Object LastFoodEaten;
 			public bool LastFoodWasDrink;
 			// debug
-			public float DebugRegenRate;
+			public float RegenTickRate;
 		}
-		public readonly PerScreen<State> States = new PerScreen<State>(createNewState: () => new State());
 
 		// Add Cooking Questline
 		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
@@ -826,16 +824,21 @@ namespace LoveOfCooking
 				return;
 			}
 
+			// Fetch all components for the rate of HP/EP regeneration
 			var cookingLevel = CookingSkillApi.GetLevel();
 			var panicMultiplier = (Game1.player.health * 3f + Game1.player.Stamina) / (Game1.player.maxHealth * 3f + Game1.player.MaxStamina);
 			var foodMultiplier = GetFoodRegenRate(States.Value.LastFoodEaten);
 			var baseRate = int.Parse(ItemDefinitions["RegenBaseRate"][0]);
-			var rate = (baseRate - baseRate * States.Value.RegenSkillModifier) * foodMultiplier * 100d;
-			rate = Math.Floor(Math.Max(36 - cookingLevel * 1.75f, rate * panicMultiplier));
+			var overallScale = float.Parse(ItemDefinitions["RegenSpeedScale"][0]);
 
-			States.Value.DebugRegenRate = (float)rate;
+			// Calculate regeneration
+			var rate = (baseRate - baseRate * States.Value.RegenSkillModifier) * foodMultiplier * 100d;
+			rate = Math.Floor(Math.Max(36 - cookingLevel * 1.75f, rate * panicMultiplier) / overallScale);
+
+			States.Value.RegenTickRate = (float)rate;
 			++States.Value.RegenTicksCurr;
 
+			// Regenerate player HP/EP when 
 			if (States.Value.RegenTicksCurr < rate)
 				return;
 
@@ -871,6 +874,9 @@ namespace LoveOfCooking
 			{
 				SpaceCore.Skills.RegisterSkill(new CookingSkill());
 			}
+
+			// Invalidate other assets waiting on our custom assets before they can be edited
+			Helper.Content.InvalidateCache(@"TileSheets/tools"); // Waits for SpriteSheet
 
 			// Load custom objects now that mod-provided APIs are available
 			LoadJsonAssetsObjects();
@@ -914,7 +920,7 @@ namespace LoveOfCooking
 				Color.White);
 			e.SpriteBatch.DrawString(
 				Game1.smallFont,
-				$"RATE {States.Value.DebugRegenRate}",
+				$"RATE {States.Value.RegenTickRate}",
 				new Vector2(Game1.graphics.GraphicsDevice.Viewport.Width - 222, Game1.graphics.GraphicsDevice.Viewport.Height - 96),
 				Color.White);
 			e.SpriteBatch.DrawString(

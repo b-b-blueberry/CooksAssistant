@@ -14,6 +14,24 @@
 	"RegenBaseRate": [
 		"128"
 	],
+	"RegenSpeedScale": [
+		"1.00"
+	],
+	"BurnChanceBase": [
+		"0.22"
+	],
+	"BurnChancePerIngredient": [
+		"0.0035"
+	],
+	"AutoConsumeOilAndSeasoning": [
+		"false"
+	],
+	"NettlesUsableLevel": [
+		"2"
+	],
+	"NettlesUsableMachines": [
+		"Keg"
+	],
 	"RegenSkillModifiers": [
 		"Combat:0.02",
 		"Foraging:0.0012",
@@ -25,12 +43,6 @@
 		"499",
 		"632",
 		"633"
-	],
-	"NettlesUsableLevel": [
-		"2"
-	],
-	"NettlesUsableMachines": [
-		"Keg"
 	],
 	"NettlesLocations": [
 		"Mountain",
