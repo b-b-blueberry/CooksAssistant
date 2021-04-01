@@ -59,7 +59,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			if (!(__instance is CustomBush bush))
 				return true;
 			CustomBush.ShakeBehaviour(bush, tileLocation);
-			return false;
+			return true;
 		}
 	}
 }
