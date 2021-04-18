@@ -3,7 +3,7 @@
 	public class Config
 	{
 		public bool AddCookingMenu { get; set; } = true;
-		public bool AddCookingCommunityCentreBundles { get; set; } = true;
+		public bool AddCookingCommunityCentreBundles { get; set; } = false;
 		public bool AddCookingSkillAndRecipes { get; set; } = true;
 		public bool AddCookingToolProgression { get; set; } = true;
 		//public bool AddCookingQuestline { get; set; } = true;

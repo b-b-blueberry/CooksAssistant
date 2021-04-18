@@ -228,6 +228,8 @@ namespace LoveOfCooking.GameObjects
 			set
 			{
 				Game1.player.modData[ModEntry.AssetPrefix + "autofill"] = value.ToString();
+				Log.D($"Autofill set to {value}",
+					Config.DebugMode);
 			}
 		}
 
@@ -266,6 +268,8 @@ namespace LoveOfCooking.GameObjects
 			{
 				IsUsingAutofill = false;
 			}
+			Log.D($"Autofill on startup: {IsUsingAutofill}",
+				Config.DebugMode);
 
 			// Apply default filter to the default recipe list
 			bool reverseDefaultFilter = ModEntry.Instance.States.Value.LastFilterReversed;
@@ -2526,10 +2530,6 @@ namespace LoveOfCooking.GameObjects
 
 			base.receiveKeyPress(key);
 
-			Log.D($"KY CSC: {(currentlySnappedComponent != null ? currentlySnappedComponent.myID : -1)}"
-				+ $" | ACC: {(allClickableComponents != null ? allClickableComponents.Count().ToString() : "null")}",
-				Config.DebugMode);
-			
 			switch (state)
 			{
 				case State.Search:

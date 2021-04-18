@@ -400,7 +400,7 @@ namespace LoveOfCooking
 					// Spawn a random number of nettles between some upper and lower bounds, reduced by the number of nettles already in this location
 					GameLocation location = Game1.getLocationFromName(l);
 					int nettlesToAdd = Game1.random.Next(int.Parse(ModEntry.ItemDefinitions["NettlesAddedRange"][0]), int.Parse(ModEntry.ItemDefinitions["NettlesAddedRange"][1]));
-					int nettlesAlreadyInLocation = location.Objects.Values.Count(o => o.Name.ToLower().EndsWith("nettles"));
+					int nettlesAlreadyInLocation = location.Objects.Values.Count(o => o.Name.ToLower().EndsWith("nettles")); // location.largeTerrainFeatures.Count(ltf => ltf is CustomBush);
 					nettlesToAdd -= nettlesAlreadyInLocation;
 					int nettlesAdded = 0;
 
