@@ -1,5 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Netcode;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.TerrainFeatures;
@@ -29,21 +30,64 @@ namespace LoveOfCooking
 		protected IReflectedField<float> AlphaField, ShakeField, MaxShakeField;
 		[XmlIgnore]
 		protected IReflectedMethod ShakeMethod;
-		
-		public int Variety;
-		public int DaysToMature;
-		public int DaysBetweenProduceWhenEmpty;
-		public int DaysBetweenAdditionalProduce;
-		public int HeldItemId = -1;
-		public int HeldItemQuantity;
-		public int EffectiveSize;
-		public bool IsMature => this.getAge() >= DaysToMature;
+
 		[XmlIgnore]
 		public static readonly Point NettleSize = new Point(24, 24);
 		[XmlIgnore]
 		public static readonly Point RedberrySize = new Point(32, 32);
 
-		// Nettles
+		public bool IsMature => this.getAge() >= DaysToMature;
+		public readonly NetInt DaysToMature = new NetInt();
+		public readonly NetInt DaysBetweenProduceWhenEmpty = new NetInt();
+		public readonly NetInt DaysBetweenAdditionalProduce = new NetInt();
+		public readonly NetInt HeldItemId = new NetInt();
+		public readonly NetInt HeldItemQuantity = new NetInt();
+		public readonly NetInt EffectiveSize = new NetInt();
+		private readonly NetInt _variety = new NetInt();
+		public object Variety
+		{
+			get => _variety;
+			set
+			{
+				int? variety = null;
+				if (value is System.Xml.XmlNode[] xml)
+				{
+					value = xml[0].Value;
+				}
+				if (value is BushVariety b)
+				{
+					variety = (int)b;
+				}
+				if (value is string s && !string.IsNullOrEmpty(s))
+				{
+					if (Enum.IsDefined(typeof(BushVariety), s))
+						variety = (int)Enum.Parse(typeof(BushVariety), s);
+					if (int.TryParse(s, out int i1))
+						value = i1;
+				}
+				if (value is int i && Enum.IsDefined(typeof(BushVariety), i))
+				{
+					variety = i;
+				}
+				if (value is NetInt ni && Enum.IsDefined(typeof(BushVariety), ni.Value))
+				{
+					variety = ni.Value;
+				}
+
+				if (variety.HasValue)
+				{
+					_variety.Value = variety.Value;
+				}
+				else
+				{
+					_variety.Value = (int)BushVariety.Nettle;
+					Log.W($"Undefined value for {nameof(Variety)}: {value.GetType()} {value.ToString()}." +
+						$" Defaulted to {_variety.GetType()} {_variety.ToString()}");
+				}
+			}
+		}
+
+		// Nettles unique values
 		public const int NettlesDamage = 4;
 		public const string NettleBuffSource = ModEntry.ObjectPrefix + "NettleBuff";
 
@@ -51,6 +95,8 @@ namespace LoveOfCooking
 			: base()
 		{
 			this.GetFields();
+			this.NetFields.AddFields(DaysToMature, DaysBetweenProduceWhenEmpty, DaysBetweenAdditionalProduce, HeldItemId, HeldItemQuantity, EffectiveSize);
+			HeldItemId.Value = -1;
 		}
 
 		public CustomBush(Vector2 tile, GameLocation location, BushVariety variety)
@@ -58,7 +104,7 @@ namespace LoveOfCooking
 		{
 			currentTileLocation = tile;
 			currentLocation = location;
-			Variety = (int)variety;
+			_variety.Value = (int)variety;
 			this.GetFields();
 			this.FirstTimeSetup();
 		}
@@ -79,25 +125,25 @@ namespace LoveOfCooking
 			if (currentLocation.IsGreenhouse)
 				greenhouseBush.Value = true;
 
-			if (Variety == (int)BushVariety.Nettle)
+			if (_variety == (int)BushVariety.Nettle)
 			{
 				health = 20;
-				EffectiveSize = 0;
-				DaysToMature = -1;
-				DaysBetweenProduceWhenEmpty = -1;
-				DaysBetweenAdditionalProduce = -1;
-				HeldItemId = ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "nettles");
-				HeldItemQuantity = 1;
+				EffectiveSize.Value = 0;
+				DaysToMature.Value = -1;
+				DaysBetweenProduceWhenEmpty.Value = -1;
+				DaysBetweenAdditionalProduce.Value = -1;
+				HeldItemId.Value = ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "nettles");
+				HeldItemQuantity.Value = 1;
 			}
-			else if (Variety == (int)BushVariety.Redberry)
+			else if (_variety == (int)BushVariety.Redberry)
 			{
 				health = 80;
-				EffectiveSize = 1;
-				DaysToMature = 17;
-				DaysBetweenProduceWhenEmpty = 4;
-				DaysBetweenAdditionalProduce = 2;
-				HeldItemId = ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry");
-				HeldItemQuantity = 0;
+				EffectiveSize.Value = 1;
+				DaysToMature.Value = 17;
+				DaysBetweenProduceWhenEmpty.Value = 4;
+				DaysBetweenAdditionalProduce.Value = 2;
+				HeldItemId.Value = ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry");
+				HeldItemQuantity.Value = 0;
 			}
 		}
 
@@ -108,7 +154,7 @@ namespace LoveOfCooking
 
 		public override void dayUpdate(GameLocation environment, Vector2 tileLocation)
 		{
-			if (Variety == (int)BushVariety.Redberry
+			if (_variety == (int)BushVariety.Redberry
 			    && tileSheetOffset == 0
 			    && Game1.random.NextDouble() < 0.2
 			    && this.inBloom(Game1.currentSeason, Game1.dayOfMonth))
@@ -123,7 +169,7 @@ namespace LoveOfCooking
 		{
 			if (!Game1.IsMultiplayer || Game1.IsServer)
 			{
-				if (Variety == (int)BushVariety.Redberry && Game1.currentSeason.Equals("summer") && Game1.random.NextDouble() < 0.5)
+				if (_variety == (int)BushVariety.Redberry && Game1.currentSeason.Equals("summer") && Game1.random.NextDouble() < 0.5)
 					tileSheetOffset.Value = 1;
 				else
 					tileSheetOffset.Value = 0;
@@ -140,12 +186,12 @@ namespace LoveOfCooking
 		public override bool performUseAction(Vector2 tileLocation, GameLocation location)
 		{
 			if (Math.Abs(0f - MaxShakeField.GetValue()) < 0.001f
-			    && (greenhouseBush || Variety == (int)BushVariety.Redberry || !Game1.currentSeason.Equals("winter")))
+			    && (greenhouseBush || _variety == (int)BushVariety.Redberry || !Game1.currentSeason.Equals("winter")))
 			{
 				location.localSound("leafrustle");
 			}
 
-			if (Variety == (int)BushVariety.Nettle)
+			if (_variety == (int)BushVariety.Nettle)
 			{
 				DelayedAction.playSoundAfterDelay("leafrustle", 100);
 				Game1.player.takeDamage(NettlesDamage + Game1.player.resilience, true, null);
@@ -178,7 +224,7 @@ namespace LoveOfCooking
 				location.playSound("leafrustle");
 				this.Shake(tileLocation, doEvenIfStillShaking: true);
 				
-				if (Variety == (int)BushVariety.Nettle)
+				if (_variety == (int)BushVariety.Nettle)
 					health = -100;
 				else
 					health -= 50;
@@ -194,7 +240,7 @@ namespace LoveOfCooking
 					{
 						Game1.createItemDebris(item: heldObject, origin: Utility.PointToVector2(this.getBoundingBox().Center), direction: Game1.random.Next(1, 4));
 					}
-					if (Variety != (int)BushVariety.Nettle)
+					if (_variety != (int)BushVariety.Nettle)
 						location.playSound("treethud");
 					DelayedAction.playSoundAfterDelay("leafrustle", 100);
 					Color leafColour = Color.Green;
@@ -216,7 +262,7 @@ namespace LoveOfCooking
 					}
 					Multiplayer multiplayer = ModEntry.Instance.Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
 					Rectangle sourceRect = new Rectangle(355, 1200 + (season.Equals("fall") ? 16 : (season.Equals("winter") ? (-16) : 0)), 16, 16);
-					int leafCount = Variety == (int)BushVariety.Nettle ? 6 : 10;
+					int leafCount = _variety == (int)BushVariety.Nettle ? 6 : 10;
 					for (int j = 0; j <= EffectiveSize; j++)
 					{
 						for (int i = 0; i < leafCount; i++)
@@ -258,13 +304,13 @@ namespace LoveOfCooking
 
 		public override Rectangle getBoundingBox(Vector2 tileLocation)
 		{
-			if (Variety == (int)BushVariety.Nettle)
+			if (_variety == (int)BushVariety.Nettle)
 				return new Rectangle(
 					(int)tileLocation.X * Game1.tileSize,
 					(int)tileLocation.Y * Game1.tileSize,
 					Game1.tileSize,
 					Game1.tileSize);
-			if (Variety == (int)BushVariety.Redberry)
+			if (_variety == (int)BushVariety.Redberry)
 				return new Rectangle(
 					(int) tileLocation.X * Game1.tileSize,
 					(int) tileLocation.Y * Game1.tileSize,
@@ -277,11 +323,11 @@ namespace LoveOfCooking
 		{
 			Random r = new Random((int)Game1.stats.DaysPlayed
 			                   + (int)Game1.uniqueIDForThisGame + (int)tilePosition.X + (int)tilePosition.Y * 777);
-			if (Variety == (int)BushVariety.Nettle && r.NextDouble() < 0.5)
+			if (_variety == (int)BushVariety.Nettle && r.NextDouble() < 0.5)
 			{
 				tileSheetOffset.Value = 1;
 			}
-			else if (Variety == (int)BushVariety.Redberry)
+			else if (_variety == (int)BushVariety.Redberry)
 			{
 				tileSheetOffset.Value = this.inBloom(Game1.currentSeason, Game1.dayOfMonth) ? 1 : 0;
 			}
@@ -290,7 +336,7 @@ namespace LoveOfCooking
 		
 		public void SetUpSourceRectangle()
 		{
-			if (Variety == (int)BushVariety.Nettle)
+			if (_variety == (int)BushVariety.Nettle)
 			{
 				SourceRectangle = new Rectangle(
 					0 + (tileSheetOffset * NettleSize.X),
@@ -298,7 +344,7 @@ namespace LoveOfCooking
 					NettleSize.X,
 					NettleSize.Y);
 			}
-			else if (Variety == (int)BushVariety.Redberry)
+			else if (_variety == (int)BushVariety.Redberry)
 			{
 				int seasonNumber = greenhouseBush.Value ? 0 : Utility.getSeasonNumber(Game1.currentSeason);
 				int age = this.getAge();
@@ -312,9 +358,9 @@ namespace LoveOfCooking
 		
 		public override Rectangle getRenderBounds(Vector2 tileLocation)
 		{
-			if (Variety == (int)BushVariety.Nettle)
+			if (_variety == (int)BushVariety.Nettle)
 				return new Rectangle((int)tileLocation.X * 64, (int)(tileLocation.Y - 1f) * 64, 64, 160);
-			if (Variety == (int)BushVariety.Redberry)
+			if (_variety == (int)BushVariety.Redberry)
 				return new Rectangle((int)tileLocation.X * 64, (int)(tileLocation.Y - 2f) * 64, 128, 256);
 			return Rectangle.Empty;
 		}
@@ -358,7 +404,7 @@ namespace LoveOfCooking
 
 		public static bool InBloomBehaviour(CustomBush bush, string season, int dayOfMonth)
 		{
-			if (bush.Variety == (int)BushVariety.Nettle)
+			if (bush._variety.Value == (int)BushVariety.Nettle)
 				return false;
 			bool inSeason = dayOfMonth >= 22 && (!season.Equals("winter") || bush.greenhouseBush.Value);
 			return bush.IsMature && inSeason;
@@ -366,7 +412,7 @@ namespace LoveOfCooking
 
 		public static int GetEffectiveSizeBehaviour(CustomBush bush)
 		{
-			return bush.EffectiveSize;
+			return bush.EffectiveSize.Value;
 		}
 
 		public static bool IsDestroyableBehaviour(CustomBush bush)
@@ -376,10 +422,10 @@ namespace LoveOfCooking
 
 		public static void ShakeBehaviour(CustomBush bush, Vector2 tileLocation)
 		{
-			if (bush.Variety == (int)BushVariety.Redberry)
+			if (bush._variety.Value == (int)BushVariety.Redberry)
 			{
-				for (int i = 0; i < bush.HeldItemQuantity; ++i)
-					Game1.createObjectDebris(bush.HeldItemId, (int)tileLocation.X, (int)tileLocation.Y);
+				for (int i = 0; i < bush.HeldItemQuantity.Value; ++i)
+					Game1.createObjectDebris(bush.HeldItemId.Value, (int)tileLocation.X, (int)tileLocation.Y);
 			}
 		}
 
@@ -450,12 +496,12 @@ namespace LoveOfCooking
 			foreach (string l in ModEntry.ItemDefinitions["NettlesLocations"])
 			{
 				GameLocation location = Game1.getLocationFromName(l);
-				Log.D($"Removing {location.largeTerrainFeatures.Count(ltf => ltf is CustomBush cb && cb.Variety == (int)BushVariety.Nettle)} nettles from {location.Name}.",
+				Log.D($"Removing {location.largeTerrainFeatures.Count(ltf => ltf is CustomBush cb && cb._variety.Value == (int)BushVariety.Nettle)} nettles from {location.Name}.",
 					ModEntry.Instance.Config.DebugMode);
 				for (int i = location.largeTerrainFeatures.Count - 1; i >= 0; --i)
 				{
 					LargeTerrainFeature ltf = location.largeTerrainFeatures[i];
-					if (ltf is CustomBush customBush && customBush.Variety == (int)BushVariety.Nettle)
+					if (ltf is CustomBush customBush && customBush._variety.Value == (int)BushVariety.Nettle)
 					{
 						Log.D($"Removing from {ltf.currentTileLocation}...",
 							ModEntry.Instance.Config.DebugMode);
