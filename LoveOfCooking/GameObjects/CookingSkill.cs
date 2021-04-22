@@ -16,7 +16,6 @@ namespace LoveOfCooking.GameObjects
 		public static double GlobalExperienceRate;
 		public static int MaxFoodStackPerDayForExperienceGains;
 		public static int CraftNettleTeaLevel;
-		public static int CraftCampfireLevel;
 
 		public static int GiftBoostValue;
 		public static float SalePriceModifier;

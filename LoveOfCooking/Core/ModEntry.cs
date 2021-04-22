@@ -43,7 +43,6 @@ using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 // TODO: UPDATE: Cooked food has a chance (scaling with Cooking level) of taking the quality of its ingredients,
 //		Final quality is decided by random choice from list of qualities of each ingredient
-// TODO: UPDATE: Finish the cookbook sprite bottom + spine and have the cookbook + inventory space outwards vertically on large resolutions
 // TODO: UPDATE: Quests, events, and scripts
 // TODO: UPDATE: Hot chocolate at the ice festival
 
@@ -158,7 +157,7 @@ namespace LoveOfCooking
 			Luck
 		}
 		// safe item names
-		internal static string ChocolateName { get { return UsingPPJACrops ? "Chocolate Bar" : ObjectPrefix + "chocolate"; } }
+		internal static string ChocolateName { get { return UsingPPJACrops ? "Chocolate" : ObjectPrefix + "chocolate"; } }
 		internal static string CabbageName { get { return UsingPPJACrops ? "Cabbage" : ObjectPrefix + "cabbage"; } }
 		internal static string OnionName { get { return UsingPPJACrops ? "Onion" : ObjectPrefix + "onion"; } }
 		internal static string CarrotName { get { return UsingPPJACrops ? "Carrot" : ObjectPrefix + "carrot"; } }
@@ -323,12 +322,13 @@ namespace LoveOfCooking
 			Helper.Events.GameLoop.SaveLoaded += GameLoop_SaveLoaded;
 			Helper.Events.GameLoop.Saving += GameLoop_Saving;
 			Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
-			helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
+			Helper.Events.GameLoop.DayEnding += GameLoop_DayEnding;
 			Helper.Events.GameLoop.ReturnedToTitle += GameLoop_ReturnedToTitle;
 			Helper.Events.GameLoop.UpdateTicked += GameLoop_UpdateTicked;
 			Helper.Events.Player.InventoryChanged += Player_InventoryChanged;
 			Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
 			Helper.Events.Display.MenuChanged += Display_MenuChanged;
+			Helper.Events.Display.Rendered += Display_Rendered;
 			Helper.Events.Multiplayer.PeerContextReceived += Multiplayer_PeerContextReceived;
 			Helper.Events.Multiplayer.PeerConnected += Multiplayer_PeerConnected;
 			Bundles.RegisterEvents();
@@ -347,7 +347,8 @@ namespace LoveOfCooking
 		private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
 		{
 			// Clear existing nettles at the start of each season
-			if (NettlesEnabled && Game1.dayOfMonth == 28)
+			if (NettlesEnabled && Game1.dayOfMonth == 28
+				|| Helper.ModRegistry.IsLoaded("Entoarox.EntoaroxFramework"))
 			{
 				CustomBush.ClearNettlesGlobally();
 			}
@@ -649,6 +650,10 @@ namespace LoveOfCooking
 			{
 				Game1.activeClickableMenu = new NotificationMenu();
 			});
+			Helper.ConsoleCommands.Add(cmd + "nettles", "Add nettle bushes to the world. No spawn limit.", (s, p) =>
+			{
+				CustomBush.SpawnNettles(force: true);
+			});
 			Helper.ConsoleCommands.Add(cmd + "unstuck", "Unlocks player movement if stuck in animations.", (s, args) =>
 			{
 				if (Game1.activeClickableMenu is CookingMenu || Game1.activeClickableMenu is NotificationMenu)
@@ -678,6 +683,20 @@ namespace LoveOfCooking
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
 			LoadSpaceCoreAPI();
+
+			// Entoarox Framework save serialiser overrides SpaceCore save serialiser and causes errors when saving
+			// with registered [XmlType] objects (eg. CustomBush) in the world.
+			const string entoSafeVersion = "2.5.4";
+			if (Helper.ModRegistry.IsLoaded("Entoarox.EntoaroxFramework")
+				&& Helper.ModRegistry.Get("Entoarox.EntoaroxFramework") is IModInfo entoInfo
+				&& entoInfo.Manifest.Version.IsOlderThan(entoSafeVersion))
+			{
+				ISemanticVersion entoCurrentVersion = entoInfo.Manifest.Version;
+				Log.W("This version of Entoarox Framework doesn't allow for persistent custom bushes."
+					+ "\nNettles will be cleared at the end of each day to prevent errors."
+					+ "\nIf you have a save with nettle bushes, you will need to remove Ento " + entoCurrentVersion + " to load the game."
+					+ "\nCheck your SMAPI console for an update notice to Ento " + entoSafeVersion + " or higher.");
+			}
 
 			// Load assets after mods and asset editors have been registered to allow for patches, correct load orders
 			Helper.Events.GameLoop.OneSecondUpdateTicked += Event_LoadAssetsLate;
@@ -1010,6 +1029,9 @@ namespace LoveOfCooking
 
 		private void Display_Rendered(object sender, RenderedEventArgs e)
 		{
+			if (Game1.currentLocation == null)
+				return;
+
 			// Draw cooking animation sprites
 			if (Config.PlayCookingAnimation)
 			{
@@ -1045,11 +1067,12 @@ namespace LoveOfCooking
 			var lastCookingHover = Helper.Reflection.GetField<Item>(craftingMenu, "lastCookingHover").GetValue();
 			if (lastCookingHover != null && hoverRecipe != null && hoverRecipe.name.StartsWith(ObjectPrefix))
 			{
-				var displayName = lastCookingHover.DisplayName + ((hoverRecipe.numberProducedPerCraft > 1)
-					? (" x" + hoverRecipe.numberProducedPerCraft)
-					: "");
+				var displayName = lastCookingHover.DisplayName
+					+ ((hoverRecipe.numberProducedPerCraft > 1)
+						? (" x" + hoverRecipe.numberProducedPerCraft)
+						: "");
 				var originalWidthHeight = Game1.dialogueFont.MeasureString(hoverRecipe.name);
-				var coverupWidth = (int)Math.Max(384f - 8f, originalWidthHeight.X + 4);
+				var coverupWidth = (int)originalWidthHeight.X + 4;
 				var x = Game1.getOldMouseX() + 44 + (heldItem != null ? 48 : 0);
 
 				// Check to show advanced crafting info
@@ -1533,19 +1556,11 @@ namespace LoveOfCooking
 				}
 			}
 
-			// Add or remove vanilla campfire recipe
-			if (CookingSkillApi.IsEnabled())
+			// Ensure vanilla campfire recipe is added
+			if (!Game1.player.craftingRecipes.ContainsKey("Campfire"))
 			{
-				if (CookingSkillApi.GetLevel() < CookingSkill.CraftCampfireLevel)
-				{
-					// Campfire is added on level-up for cooking skill users
-					Game1.player.craftingRecipes.Remove("Campfire");
-				}
-				else if (!Game1.player.craftingRecipes.ContainsKey("Campfire"))
-				{
-					// Re-add campfire to the player's recipe list if it's otherwise missing
-					Game1.player.craftingRecipes["Campfire"] = 0;
-				}
+				// Re-add campfire to the player's recipe list if it's otherwise missing
+				Game1.player.craftingRecipes["Campfire"] = 0;
 			}
 
 			if (Config.AddCookingSkillAndRecipes)
@@ -1822,15 +1837,7 @@ namespace LoveOfCooking
 
 			// Add crafting recipes
 			var craftingRecipes = new List<CraftingRecipe>();
-			if (level == CookingSkill.CraftCampfireLevel)
-			{
-				var recipe = new CraftingRecipe("Campfire", false);
-				craftingRecipes.Add(recipe);
-				if (!Game1.player.craftingRecipes.ContainsKey(recipe.name))
-				{
-					Game1.player.craftingRecipes[recipe.name] = 0;
-				}
-			}
+			// No new crafting recipes currently.
 
 			// Apply new recipes
 			var combinedRecipes = craftingRecipes.Concat(cookingRecipes).ToList();

@@ -170,7 +170,7 @@ namespace LoveOfCooking.GameObjects
 		private readonly List<CraftingRecipe> _recipesAvailable;
 		private List<CraftingRecipe> _recipesFiltered;
 		private List<CraftingRecipe> _recipeSearchResults;
-		private CraftingRecipe CurrentRecipe => _recipesFiltered[_recipeIndex];
+		private CraftingRecipe CurrentRecipe => _recipesFiltered.Count > _recipeIndex ? _recipesFiltered[_recipeIndex] : null;
 		private int _recipeIndex;
 		private Item _recipeAsItem;
 		private List<int> _recipeBuffs;
@@ -1214,6 +1214,7 @@ namespace LoveOfCooking.GameObjects
 
 			_searchTabButton.sourceRect.X = SearchTabButtonSource.X;
 			_ingredientsTabButton.sourceRect.X = IngredientsTabButtonSource.X;
+			this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
 
 			if (Game1.options.SnappyMenus)
 			{
@@ -1251,6 +1252,7 @@ namespace LoveOfCooking.GameObjects
 			
 			_searchTabButton.sourceRect.X = SearchTabButtonSource.X;
 			_ingredientsTabButton.sourceRect.X = SearchTabButtonSource.X + SearchTabButtonSource.Width;
+			this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
 		}
 
 		private void CloseIngredientsPage()
@@ -1345,7 +1347,6 @@ namespace LoveOfCooking.GameObjects
 			return recipes;
 		}
 
-		// TODO: POLISH: Find a very suitable position for UpdateSearchRecipes() call, rather than in draw()
 		private void UpdateSearchRecipes()
 		{
 			_navUpButton.bounds.Y = _showSearchFilters
@@ -1387,9 +1388,12 @@ namespace LoveOfCooking.GameObjects
 			}
 		}
 
-		private void ToggleFilterPopup(bool playSound)
+		private void ToggleFilterPopup(bool playSound, bool? forceToggleTo = null)
 		{
-			_showSearchFilters = !_showSearchFilters;
+			if (forceToggleTo.HasValue && forceToggleTo.Value == _showSearchFilters)
+				return;
+
+			_showSearchFilters = forceToggleTo ?? !_showSearchFilters;
 			if (playSound)
 				Game1.playSound(PageChangeCue);
 
@@ -1437,12 +1441,16 @@ namespace LoveOfCooking.GameObjects
 
 		private void ChangeCurrentRecipe(int index)
 		{
+			if (_recipesFiltered.Count == 0)
+				return;
 			index = Math.Max(0, Math.Min(_recipesFiltered.Count - 1, index));
 			this.ChangeCurrentRecipe(_recipesFiltered[index].name);
 		}
 
 		private void ChangeCurrentRecipe(string name)
 		{
+			if (_recipesFiltered.Count == 0)
+				return;
 			CraftingRecipe recipe = new CraftingRecipe(name, isCookingRecipe: true);
 			_recipeIndex = _recipesFiltered.FindIndex(recipe => recipe.name == name);
 			_recipeAsItem = recipe.createItem();
@@ -1463,7 +1471,7 @@ namespace LoveOfCooking.GameObjects
 		private void UpdateCraftableCounts(CraftingRecipe recipe)
 		{
 			_recipeIngredientQuantitiesHeld.Clear();
-			for (int i = 0; i < CurrentRecipe.getNumberOfIngredients(); ++i)
+			for (int i = 0; i < CurrentRecipe?.getNumberOfIngredients(); ++i)
 			{
 				int id = CurrentRecipe.recipeList.Keys.ElementAt(i);
 				int requiredQuantity = CurrentRecipe.recipeList.Values.ElementAt(i);
@@ -1680,9 +1688,10 @@ namespace LoveOfCooking.GameObjects
 			else
 			{
 				if (item != null)
+				{
 					inventory.ShakeItem(item);
-				Game1.playSound(CancelCue);
-				return false;
+					Game1.playSound(CancelCue);
+				}
 			}
 			return itemWasMoved;
 		}
@@ -1908,9 +1917,9 @@ namespace LoveOfCooking.GameObjects
 			hoverText = null;
 			hoveredItem = null;
 			Item obj = inventory.getItemAt(x, y);
+			inventory.hover(x, y, heldItem);
 			if (CookingManager.CanBeCooked(item: obj))
 			{
-				inventory.hover(x, y, heldItem);
 				hoveredItem = obj;
 			}
 
@@ -2084,7 +2093,7 @@ namespace LoveOfCooking.GameObjects
 								ModEntry.Instance.States.Value.LastFilterThisSession = which;
 							}
 						}
-					
+						
 						// Search filter toggles
 						if (_toggleFilterButton.containsPoint(x, y))
 						{
@@ -2147,11 +2156,12 @@ namespace LoveOfCooking.GameObjects
 			{
 				Game1.playSound(ClickCue);
 				IsUsingAutofill = !IsUsingAutofill;
-				_autofillButton.sourceRect.X = IsUsingAutofill
+				_autofillButton.sourceRect.X = IsUsingAutofill // Update toggled button appearance
 					? AutofillButtonSource.X + AutofillButtonSource.Width
 					: AutofillButtonSource.X;
-				_cookingManager.ClearCurrentIngredients();
-				this.TryAutoFillIngredients();
+				_cookingManager.ClearCurrentIngredients(); // Remove current ingredients from slots
+				this.TryAutoFillIngredients(); // Actually auto-add ingredients to cooking slots
+				this.ChangeCurrentRecipe(_recipeIndex); // Refresh check for ready-to-cook recipe
 			}
 			// Search tab
 			else if (state != State.Search && _searchTabButton.containsPoint(x, y))
@@ -2787,6 +2797,7 @@ namespace LoveOfCooking.GameObjects
 
 		private void DrawRecipePage(SpriteBatch b)
 		{
+			bool knowsRecipe = CurrentRecipe != null && Game1.player.knowsRecipe(CurrentRecipe.name);
 			float xScale = _locale == "ko" && _resizeKoreanFonts ? KoWidthScale : 1f;
 			float yScale = _locale == "ko" && _resizeKoreanFonts ? KoHeightScale : 1f;
 			float textHeightCheck = 0f;
@@ -2817,7 +2828,7 @@ namespace LoveOfCooking.GameObjects
 			}
 			float titleScale = 1f;
 			textWidth = (int)(162 * xScale);
-			text = Game1.player.knowsRecipe(CurrentRecipe.name)
+			text = knowsRecipe
 				? CurrentRecipe.DisplayName
 				: i18n.Get("menu.cooking_recipe.title_unknown");
 			textPosition.X = _navLeftButton.bounds.Width + 56;
@@ -2845,7 +2856,7 @@ namespace LoveOfCooking.GameObjects
 			if (textHeightCheck > 60)
 				textPosition.Y += textHeightCheck - 50 * xScale;
 			textWidth = (int)(_textWidth * xScale);
-			text = Game1.player.knowsRecipe(CurrentRecipe.name)
+			text = knowsRecipe
 				? CurrentRecipe.description
 				: i18n.Get("menu.cooking_recipe.title_unknown");
 			this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, isLeftSide);
@@ -2857,7 +2868,7 @@ namespace LoveOfCooking.GameObjects
 			textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale;
 			if (textHeightCheck > 120) 
 				textPosition.Y += 6 * Scale;
-			if (textHeightCheck > 100 && CurrentRecipe.getNumberOfIngredients() < 6)
+			if (textHeightCheck > 100 && CurrentRecipe?.getNumberOfIngredients() < 6)
 				textPosition.Y += 6 * Scale;
 			textPosition.Y += TextDividerGap + Game1.smallFont.MeasureString(
 				Game1.parseText(yScale < 1 ? "Hoplite!\nHoplite!" : "Hoplite!\nHoplite!\nHoplite!", Game1.smallFont, textWidth)).Y * yScale;
@@ -2870,7 +2881,7 @@ namespace LoveOfCooking.GameObjects
 			this.DrawHorizontalDivider(b, 0, textPosition.Y, _lineWidth, isLeftSide);
 			textPosition.Y += TextDividerGap - 64 / 2 + 4;
 
-			if (Game1.player.knowsRecipe(CurrentRecipe.name))
+			if (knowsRecipe)
 			{
 				for (int i = 0; i < CurrentRecipe.getNumberOfIngredients(); ++i)
 				{
@@ -2996,7 +3007,7 @@ namespace LoveOfCooking.GameObjects
 
 				// Contextual cooking popup
 				Game1.DrawBox(x: _cookIconBounds.X, y: _cookIconBounds.Y, width: _cookIconBounds.Width, height: _cookIconBounds.Height);
-				CurrentRecipe.drawMenuView(b, x: _cookIconBounds.X + 14, y: _cookIconBounds.Y + 14);
+				CurrentRecipe?.drawMenuView(b, x: _cookIconBounds.X + 14, y: _cookIconBounds.Y + 14);
 
 				_cookQuantityUpButton.draw(b);
 				_quantityTextBox.Draw(b);
