@@ -168,6 +168,7 @@ namespace LoveOfCooking
 		{
 			498, 499, 631, 632, 633
 		};
+		internal static readonly List<int> IndoorsTileIndexesOfFridges = new List<int>{ 173, 258, 500, 634 };
 		// kebab
 		private const string KebabBuffSource = AssetPrefix + "kebab";
 		private const int KebabBonusDuration = 220;
@@ -862,6 +863,9 @@ namespace LoveOfCooking
 
 		private void Event_ReplaceCraftingMenu(object sender, UpdateTickedEventArgs e)
 		{
+			// We replace the menu on the next tick to give the game a chance to close the existing menu
+			// This does, however, cause a 1-frame flash of the original menu before it closes
+			// Solvable with harmony by blocking the draw call, but not a safe option?
 			Helper.Events.GameLoop.UpdateTicked -= Event_ReplaceCraftingMenu;
 			OpenNewCookingMenu();
 		}
@@ -957,32 +961,38 @@ namespace LoveOfCooking
 			if (e.Button.IsActionButton())
 			{
 				// Tile actions
-				var tile = Game1.currentLocation.Map.GetLayer("Buildings")
-					.Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
+				var openFridge = false;
+				var tile = Game1.currentLocation.Map.GetLayer("Buildings").Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
+				var action = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
 				if (tile != null)
 				{
-					// Try to open a cooking menu when nearby to cooking stations (ie. kitchen, range)
-					if (tile.Properties.Any(p => p.Key == "Action") && tile.Properties.FirstOrDefault(p => p.Key == "Action").Value == "kitchen")
+					var isCookingStationTile = IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex);
+					var isFridgeTile = IndoorsTileIndexesOfFridges.Contains(tile.TileIndex);
+					if (Game1.currentLocation is FarmHouse || Game1.currentLocation is IslandFarmHouse)
 					{
-						OpenNewCookingMenu();
-						Helper.Input.Suppress(e.Button);
+						// Try to open a cooking menu when nearby to cooking stations (ie. kitchen, range)
+						if (!isFridgeTile)
+						{
+							if (action == "kitchen" || action == "drawer")
+							{
+								openFridge = true;
+							}
+						}
 					}
-					else if (!Game1.currentLocation.IsOutdoors && IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex))
+					else if (!Game1.currentLocation.IsOutdoors && isCookingStationTile)
 					{
+						// Try to open a new cooking menu when in NPC homes
 						if (NpcHomeLocations.Any(pair => pair.Value == Game1.currentLocation.Name
 								&& Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= int.Parse(ItemDefinitions["NpcKitchenFriendshipRequired"][0]))
 							|| NpcHomeLocations.All(pair => pair.Value != Game1.currentLocation.Name))
 						{
-							Log.D($"Clicked the kitchen at {Game1.currentLocation.Name}",
-								Config.DebugMode);
 							if (Game1.player.team.specialOrders.Any(order => order != null && order.objectives.Any(
 								obj => obj is DonateObjective dobj && dobj.dropBox.Value.EndsWith("Kitchen"))))
 							{
 								// Avoid blocking the player from submitting items to special order dropboxes
 								return;
 							}
-							OpenNewCookingMenu();
-							Helper.Input.Suppress(e.Button);
+							openFridge = true;
 						}
 						else
 						{
@@ -997,8 +1007,14 @@ namespace LoveOfCooking
 					&& Game1.currentLocation.Objects[e.Cursor.GrabTile].Name == CookingCraftableName)
 				{
 					Game1.playSound("bigSelect");
+					openFridge = true;
+				}
+
+				if (openFridge)
+				{
 					OpenNewCookingMenu();
 					Helper.Input.Suppress(e.Button);
+					return;
 				}
 
 				// Use tile actions in maps
@@ -1749,7 +1765,9 @@ namespace LoveOfCooking
 
 				fridge.Set(Game1.currentLocation is FarmHouse farmHouse && GetFarmhouseKitchenLevel(farmHouse) > 0
 					? farmHouse.fridge
-					: ccFridge != null ? new NetRef<Chest>(ccFridge) : null);
+					: Game1.currentLocation is IslandFarmHouse islandFarmHouse
+						? islandFarmHouse.fridge
+						: ccFridge != null ? new NetRef<Chest>(ccFridge) : null);
 
 				foreach (var item in Game1.currentLocation.Objects.Values.Where(
 					i => i != null && i.bigCraftable.Value && i is Chest && i.ParentSheetIndex == 216))

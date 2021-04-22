@@ -413,23 +413,26 @@ namespace LoveOfCooking.GameObjects
 					_allInventories.Add(((Chest)(cc.Objects[Bundles.FridgeChestPosition])).items);
 				}
 			}
-			if (Game1.currentLocation is FarmHouse farmHouse)
+			if (Game1.currentLocation is FarmHouse farmHouse && ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0)
 			{
 				// Recognise farmhouse fridge
-				if (ModEntry.Instance.GetFarmhouseKitchenLevel(farmHouse) > 0)
+				_allInventories.Add(farmHouse.fridge.Value.items);
+			}
+			if (Game1.currentLocation is IslandFarmHouse islandFarmHouse)
+			{
+				// Recognise island farmhouse fridge
+				_allInventories.Add(islandFarmHouse.fridge.Value.items);
+			}
+			if (_allInventories.Count > 0)
+			{
+				// Check for minifridges
+				_allInventories.AddRange(Game1.currentLocation.Objects.Values.Where(o => o != null && o.bigCraftable.Value && o is Chest && o.ParentSheetIndex == 216)
+					.Select(o => ((Chest)o).items).Take(MaximumMiniFridges).Cast<IList<Item>>().ToList());
+				for (int i = 0; i < _allInventories.Count - InventoryIdsBeforeMinifridges; ++i)
 				{
-					// Add fridge inventory
-					_allInventories.Add(farmHouse.fridge.Value.items);
-
-					// Check for minifridges
-					_allInventories.AddRange(farmHouse.Objects.Values.Where(o => o != null && o.bigCraftable.Value && o is Chest && o.ParentSheetIndex == 216)
-						.Select(o => ((Chest)o).items).Take(MaximumMiniFridges).Cast<IList<Item>>().ToList());
-					for (int i = 0; i < _allInventories.Count - InventoryIdsBeforeMinifridges; ++i)
-					{
-						_inventorySelectButtons.Add(new ClickableTextureComponent($"minifridgeSelect{i}",
-							new Rectangle(-1, -1, 16 * Scale, 16 * Scale), null, null,
-							ModEntry.SpriteSheet, new Rectangle(243, 114, 11, 14), Scale, false));
-					}
+					_inventorySelectButtons.Add(new ClickableTextureComponent($"minifridgeSelect{i}",
+						new Rectangle(-1, -1, 16 * Scale, 16 * Scale), null, null,
+						ModEntry.SpriteSheet, new Rectangle(243, 114, 11, 14), Scale, false));
 				}
 			}
 			// Populate list of inventories
@@ -3317,10 +3320,11 @@ namespace LoveOfCooking.GameObjects
 				if (inventory.actualInventory.Count <= i || inventory.actualInventory.ElementAt(i) == null)
 					continue;
 
-				Color colour = (CookingManager.CanBeCooked(item: inventory.actualInventory[i])
-					&& !_cookingManager.IsInventoryItemInCurrentIngredients(inventoryIndex: _inventoryId, itemIndex: i))
-					? Color.White
-					: Color.Gray * 0.25f;
+				Color colour = !_cookingManager.IsInventoryItemInCurrentIngredients(inventoryIndex: _inventoryId, itemIndex: i)
+					? CookingManager.CanBeCooked(item: inventory.actualInventory[i])
+						? Color.White
+						: Color.Gray * 0.25f
+					: Color.White * 0.35f;
 				bool drawShadow = inventory.highlightMethod(inventory.actualInventory[i]);
 				if (iconShakeTimer.ContainsKey(i))
 					location += 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2));
