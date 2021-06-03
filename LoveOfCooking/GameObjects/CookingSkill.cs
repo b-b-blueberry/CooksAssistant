@@ -115,7 +115,7 @@ namespace LoveOfCooking.GameObjects
 					Name = i18n.Get($"{id}{extra}.name"),
 					Description = i18n.Get($"{id}{extra}.description",
 					new { // v-- Skill profession description values are tokenised here
-						SaleValue = SalePriceModifier,
+						SaleValue = (SalePriceModifier - 1) * 100,
 						RestorationAltValue = RestorationAltValue,
 					})
 				};

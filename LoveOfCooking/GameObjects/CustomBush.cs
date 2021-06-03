@@ -194,14 +194,23 @@ namespace LoveOfCooking
 			if (_variety == (int)BushVariety.Nettle)
 			{
 				DelayedAction.playSoundAfterDelay("leafrustle", 100);
-				Game1.player.takeDamage(NettlesDamage + Game1.player.resilience, true, null);
+				Game1.player.takeDamage(damage: NettlesDamage + Game1.player.resilience, overrideParry: true, damager: null);
 				if (Game1.player.health < 1)
 					Game1.player.health = 1;
-				Game1.buffsDisplay.otherBuffs.RemoveAll(b => b.source == NettleBuffSource);
-				Game1.buffsDisplay.addOtherBuff(new Buff(
-					0, 0, 0, 0, 0, 0, 0,
-					0, 0, -1, 0, 0, 10,
-					NettleBuffSource, ModEntry.Instance.Helper.Translation.Get("buff.nettles.inspect")));
+				Buff existingBuff = Game1.buffsDisplay.otherBuffs.FirstOrDefault(b => b.source == NettleBuffSource);
+				if (existingBuff == null)
+				{
+					Game1.buffsDisplay.addOtherBuff(new Buff(
+						0, 0, 0, 0, 0, 0, 0,
+						0, 0, speed: -1, 0, 0,
+						minutesDuration: 10,
+						source: NettleBuffSource,
+						displaySource: ModEntry.Instance.Helper.Translation.Get("buff.nettles.inspect")));
+				}
+				else
+				{
+					existingBuff.millisecondsDuration = 6000;
+				}
 			}
 
 			this.Shake(tileLocation: tileLocation, doEvenIfStillShaking: true);

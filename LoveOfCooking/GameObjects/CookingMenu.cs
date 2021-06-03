@@ -2063,6 +2063,7 @@ namespace LoveOfCooking.GameObjects
 						Game1.keyboardDispatcher.Subscriber = _searchBarTextBox;
 						_searchBarTextBox.SelectMe();
 						_showSearchFilters = false;
+						this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
 					}
 					else if (_searchBarTextBox.Selected)
 					{
@@ -2894,29 +2895,50 @@ namespace LoveOfCooking.GameObjects
 					string ingredientNameText = CurrentRecipe.getNameFromIndex(id);
 					
 					// Show category-specific information for general category ingredient rules
+					// Icons are furnished with some recognisable stereotypes of items from each category
 					if (id < 0)
 					{
 						switch (id)
 						{
 							case -81:
 								ingredientNameText = i18n.Get("item.forage.label");
-								id = 22;
+								id = 22; // Dandelion
 								break;
 							case -80:
 								ingredientNameText = i18n.Get("item.flower.label");
-								id = 591;
+								id = 591; // Tulip
 								break;
 							case -79:
 								ingredientNameText = i18n.Get("item.fruit.label");
-								id = 406;
+								id = 406; // Wild Plum
 								break;
 							case -75:
 								ingredientNameText = i18n.Get("item.vegetable.label");
-								id = 278;
+								id = 278; // Bok Choy
 								break;
 							case -14:
 								ingredientNameText = i18n.Get("item.meat.label");
-								id = 640;
+								id = 640; // Unused meat (white steak, raw)
+								break;
+							case -7:
+								ingredientNameText = i18n.Get("item.cooking.label");
+								id = 662; // Unused cooking (nice bowl of red sauce)
+								break;
+							case -2:
+								ingredientNameText = i18n.Get("item.gem.label");
+								id = 60; // Emerald
+								break;
+							case -12:
+								ingredientNameText = i18n.Get("item.mineral.label");
+								id = 546; // Geminite
+								break;
+							case -15:
+								ingredientNameText = i18n.Get("item.metal.label");
+								id = 380; // Iron Ore (variant A)
+								break;
+							case -74:
+								ingredientNameText = i18n.Get("item.seed.label");
+								id = 770; // Mixed Seeds
 								break;
 						}
 					}

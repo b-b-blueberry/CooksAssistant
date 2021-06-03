@@ -177,7 +177,7 @@ namespace LoveOfCooking
 		private const int KebabNonCombatBonus = 2;
 
 		// Mail titles
-		internal static readonly string MailKitchenCompleted = $"cc{Bundles.CommunityCentreAreaName}";
+		internal static readonly string MailKitchenCompleted = "cc" + Bundles.CommunityCentreAreaName;
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked";
 		internal static readonly string MailKitchenCompletedFollowup = MailPrefix + "kitchen_completed_followup";
 		internal static readonly string MailKitchenLastBundleCompleteRewardDelivery = MailPrefix + "kitchen_reward_guarantee";
@@ -388,7 +388,6 @@ namespace LoveOfCooking
 			if (!Config.AddNewCropsAndStuff)
 			{
 				Log.W("Did not add new objects: New stuff is disabled in config file.");
-				return;
 			}
 			else if (UsingPPJACrops)
 			{
@@ -400,7 +399,7 @@ namespace LoveOfCooking
 					Log.W("Loading New Crops Pack.");
 				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, NewCropsPackPath));
 			}
-
+			
 			if (Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops"))
 			{
 				Log.I("Did not add nettles: Winter Crops is enabled.");
@@ -746,7 +745,7 @@ namespace LoveOfCooking
 				var reachedMailDate = (Game1.year == year && gameMonth == month && Game1.dayOfMonth >= day);
 				if (reachedNextYear || reachedNextMonth || reachedMailDate)
 				{
-					Game1.player.mailbox.Add(MailCookbookUnlocked);
+					Game1.addMail(MailCookbookUnlocked);
 				}
 			}
 		}
@@ -918,12 +917,12 @@ namespace LoveOfCooking
 			{
 				switch (e.Button)
 				{
-					case SButton.G:
+					case SButton.F3:
 						Game1.player.warpFarmer(Game1.currentLocation is CommunityCenter
 							? new Warp(0, 0, "FarmHouse", 0, 0, false)
 							: new Warp(0, 0, "CommunityCenter", 7, 7, false));
 						return;
-					case SButton.H:
+					case SButton.F4:
 						if (Game1.activeClickableMenu is CookingMenu cookingMenu)
 							cookingMenu.exitThisMenu();
 						else
@@ -940,6 +939,10 @@ namespace LoveOfCooking
 					case SButton.F7:
 						Game1.currentLocation.largeTerrainFeatures.Add(
 							new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, CustomBush.BushVariety.Redberry));
+						return;
+					case SButton.F8:
+						Log.D(CookingSkillApi.GetCurrentProfessions().Aggregate("Current professions:", (str, pair) 
+							=> $"{str}\n{pair.Key}: {pair.Value}"));
 						return;
 				}
 			}
@@ -1589,6 +1592,7 @@ namespace LoveOfCooking
 				var recipes = CookingSkillApi.GetAllLevelUpRecipes();
 				var missingRecipes = recipes.TakeWhile(pair => pair.Key < level) // Take all recipe lists up to the current level
 					.SelectMany(pair => pair.Value) // Flatten recipe lists into their recipes
+					.Select(r => ObjectPrefix + r) // Add item prefixes
 					.Where(r => !Game1.player.cookingRecipes.ContainsKey(r)); // Take recipes not known by the player
 				foreach (var recipe in missingRecipes)
 				{
@@ -1736,7 +1740,7 @@ namespace LoveOfCooking
 
 				var topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(
 					800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2);
-
+				
 				var craftingMenu = new CraftingPage(
 					(int)topLeftPositionForCenteringOnScreen.X, (int)topLeftPositionForCenteringOnScreen.Y,
 					800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2,
@@ -1756,7 +1760,7 @@ namespace LoveOfCooking
 				}
 			}
 
-			if (Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
+			if (CanUseKitchens())
 			{
 				var ccFridge = Game1.currentLocation is CommunityCenter ? Bundles.GetCommunityCentreFridge() : null;
 				var fridge = new NetRef<Chest>();
@@ -1883,6 +1887,15 @@ namespace LoveOfCooking
 				return recipePages.SelectMany(page => page.Values).ToList();
 			}
 			return null;
+		}
+
+		/// <summary>
+		/// Checks for if the player meets conditions to open the new cooking menu.
+		/// Always true if using the default cooking menu.
+		/// </summary>
+		public bool CanUseKitchens()
+		{
+			return !Config.AddCookingMenu || Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked);
 		}
 
 		/// <summary>

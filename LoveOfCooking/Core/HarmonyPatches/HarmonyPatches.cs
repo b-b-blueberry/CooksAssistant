@@ -46,7 +46,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				// Handle sale price bonus profession for Cooking skill by affecting object sale multipliers
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Object), "getPriceAfterMultipliers"),
-					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
+					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
 			}
 			catch (Exception ex)
 			{
@@ -64,7 +64,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 		}
 
-		public static void Object_GetPriceAfterMultipliers_Postfix(StardewValley.Object __instance, ref float __result,
+		public static void Object_GetPriceAfterMultipliers_Postfix(StardewValley.Object __instance, ref float __result, 
 			float startPrice, long specificPlayerID = -1L)
 		{
 			if (ModEntry.CookingSkillApi.IsEnabled())
@@ -92,13 +92,13 @@ namespace LoveOfCooking.Core.HarmonyPatches
 					}
 
 					// Add bonus price for having the sale value Cooking skill profession
-					if (ModEntry.CookingSkillApi.HasProfession(GameObjects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID)
-						&& __instance.Category == ModEntry.CookingCategory)
+					bool hasSaleProfession = ModEntry.CookingSkillApi.HasProfession(GameObjects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID);
+					if (hasSaleProfession && __instance.Category == ModEntry.CookingCategory)
 					{
 						multiplier *= GameObjects.CookingSkill.SalePriceModifier;
 					}
 				}
-				__result += startPrice * multiplier;
+				__result *= multiplier;
 			}
 		}
 	}

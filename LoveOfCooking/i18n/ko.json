@@ -97,6 +97,11 @@
 	"item.vegetable.label": "채소 (아무거나)",
 	"item.meat.label": "고기 (아무거나)",
 	"item.forage.label": "채집물 (아무거나)",
+	"item.cooking.label": "요리 (아무거나)",
+	"item.mineral.label": "광물 (아무거나)",
+	"item.seed.label": "씨앗 (아무거나)",
+	"item.metal.label": "금속이 (아무거나)",
+	"item.gem.label": "보석 (아무거나)",
 
 	// Kebab item interactions
 	"buff.kebab.quality_worst": "썩은 ",

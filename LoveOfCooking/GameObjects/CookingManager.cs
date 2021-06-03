@@ -226,7 +226,10 @@ namespace LoveOfCooking.GameObjects
 				{
 					Item item = this.GetItemForIngredient(index: i, sourceItems: sourceItems);
 					if (item == null)
+					{
+						CurrentIngredients[i] = null; // No items were found for this ingredient, prevent it being checked later
 						return null;
+					}
 					if (IsMatchingIngredient(id: itemAndQuantity.Key, item: item))
 					{
 						// Mark ingredient for consumption and check remaining count before consuming other ingredients
@@ -291,6 +294,7 @@ namespace LoveOfCooking.GameObjects
 					qualityStacks[0] += numPerCraft;
 				}
 
+				// Choose new ingredients until none are found
 				ingredientsToConsume = this.ChooseIngredientsForCrafting(recipe: recipe, sourceItems: sourceItems);
 			}
 
