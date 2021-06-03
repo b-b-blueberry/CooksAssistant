@@ -337,8 +337,17 @@ namespace LoveOfCooking
 							&& ingredients.Any(i => i == "-1" || i == "0" || (ingredients.IndexOf(i) % 2 == 0 && ingredients.Count(x => x == i) > 1)));
 					if (badRecipes.Count() > 0)
 					{
-						Log.W(badRecipes.Aggregate($"Removing {badRecipes.Count()} malformed recipes:",
-							(str, cur) => $"{str}\n{cur.Key}: {cur.Value.Split('/')[0]}"));
+						string str = badRecipes.Aggregate($"Removing {badRecipes.Count()} malformed recipes:",
+							(str, cur) => $"{str}\n{cur.Key}: {cur.Value.Split('/')[0]}");
+						if (Game1.activeClickableMenu is StardewValley.Menus.TitleMenu)
+						{
+							Log.D("At TitleMenu: " + str,
+								Config.DebugMode);
+						}
+						else
+						{
+							Log.W(str);
+						}
 						foreach (var recipe in badRecipes.ToList())
 						{
 							data.Remove(recipe);
@@ -347,13 +356,17 @@ namespace LoveOfCooking
 
 					asset.AsDictionary<string, string>().ReplaceWith(data);
 
-					if (ModEntry.PrintRename && recipeData != null)
-						Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
-								.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
-							ModEntry.Instance.Config.DebugMode);
-
-					Log.D(data.Aggregate("", (str, recipe) => $"{str}\n{recipe.Key}: {recipe.Value}"),
-						Config.DebugMode);
+					if (ModEntry.PrintRename)
+					{
+						if (recipeData != null)
+						{
+							Log.D(data.Where(pair => recipeData.ContainsKey(pair.Key))
+									.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
+								ModEntry.Instance.Config.DebugMode);
+						}
+						Log.D(data.Aggregate("", (str, recipe) => $"{str}\n{recipe.Key}: {recipe.Value}"),
+							Config.DebugMode);
+					}
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
