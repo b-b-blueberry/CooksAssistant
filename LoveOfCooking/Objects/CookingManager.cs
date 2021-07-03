@@ -5,7 +5,7 @@ using StardewValley;
 using StardewModdingAPI;
 using StardewValley.Objects;
 
-namespace LoveOfCooking.GameObjects
+namespace LoveOfCooking.Objects
 {
 	public class CookingManager
 	{

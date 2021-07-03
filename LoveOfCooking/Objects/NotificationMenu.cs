@@ -8,7 +8,7 @@ using StardewValley.Menus;
 using System;
 using System.Collections.Generic;
 
-namespace LoveOfCooking.GameObjects
+namespace LoveOfCooking.Objects
 {
 	public class NotificationMenu : IClickableMenu
 	{

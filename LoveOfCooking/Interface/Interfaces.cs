@@ -242,7 +242,7 @@ namespace LoveOfCooking.Interface
 							optionDesc: i18n.Get(i18nKey + "description"),
 							optionGet: () => (string)property.GetValue(ModEntry.Config),
 							optionSet: (string value) => property.SetValue(ModEntry.Config, value),
-							choices: Enum.GetNames(typeof(GameObjects.CookingMenu.Filter)));
+							choices: Enum.GetNames(typeof(Objects.CookingMenu.Filter)));
 				}
 				else
 				{
@@ -281,9 +281,9 @@ namespace LoveOfCooking.Interface
 		private static void RegisterSkillsWithLevelExtender()
 		{
 			LevelExtender.initializeSkill(
-				name: GameObjects.CookingSkill.InternalName,
+				name: Objects.CookingSkill.InternalName,
 				xp: ModEntry.CookingSkillApi.GetTotalCurrentExperience(),
-				xp_mod: GameObjects.CookingSkill.GlobalExperienceRate,
+				xp_mod: Objects.CookingSkill.GlobalExperienceRate,
 				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(), cats: null);
 		}
 

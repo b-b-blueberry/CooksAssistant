@@ -92,10 +92,10 @@ namespace LoveOfCooking.Core.HarmonyPatches
 					}
 
 					// Add bonus price for having the sale value Cooking skill profession
-					bool hasSaleProfession = ModEntry.CookingSkillApi.HasProfession(GameObjects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID);
+					bool hasSaleProfession = ModEntry.CookingSkillApi.HasProfession(Objects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID);
 					if (hasSaleProfession && __instance.Category == ModEntry.CookingCategory)
 					{
-						multiplier *= GameObjects.CookingSkill.SalePriceModifier;
+						multiplier *= Objects.CookingSkill.SalePriceModifier;
 					}
 				}
 				__result *= multiplier;

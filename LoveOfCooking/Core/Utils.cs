@@ -1,4 +1,4 @@
-﻿using LoveOfCooking.GameObjects;
+﻿using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Netcode;
 using SpaceCore;

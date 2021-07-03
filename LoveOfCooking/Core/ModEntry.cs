@@ -1,4 +1,4 @@
-﻿using LoveOfCooking.GameObjects;
+﻿using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using PyTK.Extensions;
@@ -15,9 +15,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
-
-// TODO: 1.0.17+: Move HarmonyPatches namespace outside of Core namespace.
-// TODO: 1.0.17+: Rename GameObjects namespace to Objects.
 
 // TODO: FIX: CC Kitchen star doesn't show up on board for host when CC completed; empty star shows for peers (https://i.imgur.com/UZXTopu.png)
 // TODO: FIX: Left-right inventory bundle menu navigation with/without kitchen and other bundles

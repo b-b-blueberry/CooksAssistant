@@ -4,7 +4,7 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 
-namespace LoveOfCooking.GameObjects
+namespace LoveOfCooking.Objects
 {
 	public interface ICookingSkillAPI
 	{

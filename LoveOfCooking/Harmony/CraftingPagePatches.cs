@@ -65,7 +65,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				// TODO: SYSTEM: Finish integrating cooking skill profession bonuses into cooking minus new menu
 
 				// Apply extra portion bonuses to the amount cooked
-				if (ModEntry.CookingSkillApi.HasProfession(GameObjects.ICookingSkillAPI.Profession.ExtraPortion) && ModEntry.CookingSkillApi.RollForExtraPortion())
+				if (ModEntry.CookingSkillApi.HasProfession(Objects.ICookingSkillAPI.Profession.ExtraPortion) && ModEntry.CookingSkillApi.RollForExtraPortion())
 				{
 					//qualityStacks[0] += numPerCraft;
 				}

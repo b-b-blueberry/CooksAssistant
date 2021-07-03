@@ -5,7 +5,7 @@ using StardewValley.Menus;
 using System;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
-namespace LoveOfCooking.GameObjects
+namespace LoveOfCooking.Objects
 {
 	/// <summary>
 	/// This is a big stupid class copied from blueberry.SecretBase.

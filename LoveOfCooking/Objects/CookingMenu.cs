@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace LoveOfCooking.GameObjects
+namespace LoveOfCooking.Objects
 {
 	public class CookingMenu : ItemGrabMenu
 	{

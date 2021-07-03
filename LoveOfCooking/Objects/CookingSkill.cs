@@ -5,7 +5,7 @@ using StardewValley;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace LoveOfCooking.GameObjects
+namespace LoveOfCooking.Objects
 {
 	public class CookingSkill : SpaceCore.Skills.Skill
 	{
