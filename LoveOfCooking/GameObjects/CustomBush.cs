@@ -4,9 +4,7 @@ using Netcode;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.TerrainFeatures;
-using StardewValley.Tools;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
@@ -132,7 +130,7 @@ namespace LoveOfCooking
 				DaysToMature.Value = -1;
 				DaysBetweenProduceWhenEmpty.Value = -1;
 				DaysBetweenAdditionalProduce.Value = -1;
-				HeldItemId.Value = ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "nettles");
+				HeldItemId.Value = Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.NettleName);
 				HeldItemQuantity.Value = 1;
 			}
 			else if (_variety == (int)BushVariety.Redberry)
@@ -142,7 +140,7 @@ namespace LoveOfCooking
 				DaysToMature.Value = 17;
 				DaysBetweenProduceWhenEmpty.Value = 4;
 				DaysBetweenAdditionalProduce.Value = 2;
-				HeldItemId.Value = ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry");
+				HeldItemId.Value = Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry");
 				HeldItemQuantity.Value = 0;
 			}
 		}
@@ -442,11 +440,19 @@ namespace LoveOfCooking
 		{
 			foreach (string l in ModEntry.ItemDefinitions["NettlesLocations"])
 			{
+				// TODO: 1.0.18: Remove Forest Nettle bush spawn check if problem resolved
+				if (false && l == "Forest" && Bundles.IsMultiplayer())
+				{
+					Log.D($"Did not add nettles to {l}: multiplayer message safety catch.",
+						ModEntry.Config.DebugMode);
+					continue;
+				}
+
 				if (!force && Game1.random.NextDouble() > float.Parse(ModEntry.ItemDefinitions["NettlesDailyChancePerLocation"][0]))
 				{
 					// Skip the location if we didn't succeed the roll to add nettles
 					Log.D($"Did not add nettles to {l}.",
-						ModEntry.Instance.Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					continue;
 				}
 
@@ -478,11 +484,11 @@ namespace LoveOfCooking
 					location.largeTerrainFeatures.Add(nettleBush);
 					++nettlesAdded;
 					Log.D($"Adding to {nearbyTile}...",
-						force || ModEntry.Instance.Config.DebugMode);
+						force || ModEntry.Config.DebugMode);
 				}
 
 				Log.D($"Added {nettlesAdded} nettles to {l}.",
-					force || ModEntry.Instance.Config.DebugMode);
+					force || ModEntry.Config.DebugMode);
 			}
 		}
 
@@ -500,21 +506,32 @@ namespace LoveOfCooking
 			}
 		}
 
-		internal static void ClearNettlesGlobally()
+		internal static void FindNettlesGlobally(bool remove)
 		{
 			foreach (string l in ModEntry.ItemDefinitions["NettlesLocations"])
 			{
 				GameLocation location = Game1.getLocationFromName(l);
-				Log.D($"Removing {location.largeTerrainFeatures.Count(ltf => ltf is CustomBush cb && cb._variety.Value == (int)BushVariety.Nettle)} nettles from {location.Name}.",
-					ModEntry.Instance.Config.DebugMode);
-				for (int i = location.largeTerrainFeatures.Count - 1; i >= 0; --i)
+				List<CustomBush> nettles = location.largeTerrainFeatures
+					.OfType<CustomBush>()
+					.Where(cb => cb._variety.Value == (int)BushVariety.Nettle)
+					.ToList();
+				Log.D($"Found {nettles.Count} nettles in {location.Name}"
+					+ (nettles.Count > 0
+						? nettles.Aggregate("\n=> ",
+							(str, nb) => $"{str} ({nb.currentTileLocation.X},{nb.currentTileLocation.Y})")
+						: ""),
+					ModEntry.Config.DebugMode);
+				if (remove)
 				{
-					LargeTerrainFeature ltf = location.largeTerrainFeatures[i];
-					if (ltf is CustomBush customBush && customBush._variety.Value == (int)BushVariety.Nettle)
+					for (int i = location.largeTerrainFeatures.Count - 1; i >= 0; --i)
 					{
-						Log.D($"Removing from {ltf.currentTileLocation}...",
-							ModEntry.Instance.Config.DebugMode);
-						location.largeTerrainFeatures.RemoveAt(i);
+						LargeTerrainFeature ltf = location.largeTerrainFeatures[i];
+						if (ltf is CustomBush customBush && customBush._variety.Value == (int)BushVariety.Nettle)
+						{
+							Log.D($"Removing from {ltf.currentTileLocation}...",
+								ModEntry.Config.DebugMode);
+							location.largeTerrainFeatures.RemoveAt(i);
+						}
 					}
 				}
 			}

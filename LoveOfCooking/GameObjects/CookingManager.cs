@@ -4,8 +4,6 @@ using System.Linq;
 using StardewValley;
 using StardewModdingAPI;
 using StardewValley.Objects;
-using StardewValley.Menus;
-using Microsoft.Xna.Framework;
 
 namespace LoveOfCooking.GameObjects
 {
@@ -53,7 +51,8 @@ namespace LoveOfCooking.GameObjects
 		}
 
 		private static IModHelper Helper => ModEntry.Instance.Helper;
-		private static Config Config => ModEntry.Instance.Config;
+		private static Config Config => ModEntry.Config;
+
 
 		public CookingManager(CookingMenu cookingMenu)
 		{
@@ -66,18 +65,8 @@ namespace LoveOfCooking.GameObjects
 		/// </summary>
 		public static float GetBurnChance(CraftingRecipe recipe)
 		{
-			if (!Config.FoodCanBurn || ModEntry.JsonAssets == null)
+			if (!Config.FoodCanBurn || Interface.Interfaces.JsonAssets == null)
 				return 0f;
-
-			/*if (Config.DebugMode)
-			{
-				// test values
-				List<double> results = new List<double>();
-				for (double i = 0d; i < 5d; ++i)
-				{
-					results.Add(Math.Log(i, Math.E));
-				}
-			}*/
 
 			int cookingLevel = ModEntry.CookingSkillApi.GetLevel();
 			float baseRate = float.Parse(ModEntry.ItemDefinitions["BurnChanceBase"][0]);
@@ -413,7 +402,11 @@ namespace LoveOfCooking.GameObjects
 					ModEntry.Instance.States.Value.FoodCookedToday[recipe.name] = 0;
 				ModEntry.Instance.States.Value.FoodCookedToday[recipe.name] += quantity;
 
-				ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(item: item, recipe.getNumberOfIngredients(), quantityCooked, applyExperience: true);
+				ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
+					item: item,
+					recipe.getNumberOfIngredients(),
+					quantityCooked,
+					applyExperience: true);
 				Game1.player.cookedRecipe(item.ParentSheetIndex);
 
 				// Update game stats
@@ -425,14 +418,16 @@ namespace LoveOfCooking.GameObjects
 			// Add cooked items to inventory if possible
 			foreach (StardewValley.Object cookedItem in itemsCooked)
 			{
-				ModEntry.AddOrDropItem(cookedItem);
+				Utils.AddOrDropItem(cookedItem);
 			}
 
 			// Add burnt items
 			if (CookingMenu.LastBurntCount > 0)
 			{
-				Item burntItem = new StardewValley.Object(ModEntry.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), CookingMenu.LastBurntCount);
-				ModEntry.AddOrDropItem(burntItem);
+				Item burntItem = new StardewValley.Object(
+					Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"),
+					CookingMenu.LastBurntCount);
+				Utils.AddOrDropItem(burntItem);
 			}
 
 			return CookingMenu.LastBurntCount;

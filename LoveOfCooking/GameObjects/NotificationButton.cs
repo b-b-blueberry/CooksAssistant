@@ -1,10 +1,8 @@
-﻿using System;
-
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
-
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using System;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace LoveOfCooking.GameObjects

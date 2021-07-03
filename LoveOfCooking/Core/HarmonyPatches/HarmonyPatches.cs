@@ -10,7 +10,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 
 		public static void Patch()
 		{
-			var harmony = HarmonyInstance.Create(Id);
+			HarmonyInstance harmony = HarmonyInstance.Create(Id);
 			try
 			{
 				BushPatches.Patch(harmony);
@@ -59,7 +59,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			if (Tools.IsThisCookingTool(__instance))
 			{
 				Log.D($"Collected {__instance?.Name ?? "null cooking tool"} (index {__instance.IndexOfMenuItemView})",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				++ModEntry.Instance.States.Value.CookingToolLevel;
 			}
 		}
@@ -69,7 +69,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		{
 			if (ModEntry.CookingSkillApi.IsEnabled())
 			{
-				var multiplier = 1f;
+				float multiplier = 1f;
 				foreach (Farmer player in Game1.getAllFarmers())
 				{
 					if (Game1.player.useSeparateWallets)

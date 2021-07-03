@@ -9,7 +9,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 	{
 		public static void Patch(HarmonyInstance harmony)
 		{
-			var type = typeof(Bush);
+			System.Type type = typeof(Bush);
 			var prefixes = new List<KeyValuePair<string, string>>
 			{
 				new KeyValuePair<string, string>(nameof(InBloom_Prefix), nameof(Bush.inBloom)),
@@ -18,12 +18,12 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				new KeyValuePair<string, string>(nameof(Shake_Prefix), "shake"),
 			};
 
-			foreach (var pair in prefixes)
+			foreach (KeyValuePair<string, string> pair in prefixes)
 			{
-				var prefix = pair.Key;
-				var original = pair.Value;
+				string prefix = pair.Key;
+				string original = pair.Value;
 				Log.D($"Applying prefix: {type.Name}.{original}",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				harmony.Patch(
 					original: AccessTools.Method(type, original),
 					prefix: new HarmonyMethod(typeof(BushPatches), prefix));

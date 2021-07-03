@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-
 using StardewModdingAPI;
-
 using StardewValley;
 using StardewValley.BellsAndWhistles;
 using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
 
 namespace LoveOfCooking.GameObjects
 {
@@ -186,7 +182,7 @@ namespace LoveOfCooking.GameObjects
 
 			_currentPage = Math.Min(Math.Max(_currentPage, 0), _pages.Count - 1);
 			Log.D($"Pagination - notifications: {_notifications.Count}, pages: {_pages.Count}, currentPage: {_currentPage}",
-				ModEntry.Instance.Config.DebugMode);
+				ModEntry.Config.DebugMode);
 		}
 
 		private void ChangeButtonFormatting()
@@ -322,7 +318,7 @@ namespace LoveOfCooking.GameObjects
 				return;
 
 			Log.D($"Trashed notification {_currentNotification}",
-				ModEntry.Instance.Config.DebugMode);
+				ModEntry.Config.DebugMode);
 
 			if (playSound)
 				Game1.playSound("throwDownITem"); // [sic]
@@ -421,7 +417,7 @@ namespace LoveOfCooking.GameObjects
 							continue;
 
 						Log.D($"Opened notification ({_notifications[actualIndex]}) at i: {i} actual i: {actualIndex}",
-							ModEntry.Instance.Config.DebugMode);
+							ModEntry.Config.DebugMode);
 						OpenNotification(playSound: true, notification: _notifications[actualIndex]);
 						return;
 					}
@@ -633,7 +629,7 @@ namespace LoveOfCooking.GameObjects
 				return;
 
 			Log.D("Adding NotificationButton to HUD",
-				ModEntry.Instance.Config.DebugMode);
+				ModEntry.Config.DebugMode);
 			Game1.onScreenMenus.Add(NotificationButton);
 		}
 
@@ -643,7 +639,7 @@ namespace LoveOfCooking.GameObjects
 				return;
 
 			Log.D("Removing NotificationButton from HUD",
-				ModEntry.Instance.Config.DebugMode);
+				ModEntry.Config.DebugMode);
 			Game1.onScreenMenus.Remove(NotificationButton);
 		}
 
@@ -654,7 +650,7 @@ namespace LoveOfCooking.GameObjects
 				return;
 
 			Log.D($"Sending {notification.ToString()} notification",
-				ModEntry.Instance.Config.DebugMode);
+				ModEntry.Config.DebugMode);
 
 			Game1.playSound("give_gift");
 			Game1.showGlobalMessage("Love of Cooking: " + ModEntry.Instance.i18n.Get($"notification.{notification.ToString().ToLower()}.inspect"));

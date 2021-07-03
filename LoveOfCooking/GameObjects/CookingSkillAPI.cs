@@ -15,8 +15,7 @@ namespace LoveOfCooking.GameObjects
 			GiftBoost,
 			SalePrice,
 			ExtraPortion,
-			BuffDuration,
-			COUNT
+			BuffDuration
 		}
 
 		bool IsEnabled();
@@ -48,26 +47,27 @@ namespace LoveOfCooking.GameObjects
 		/// <returns>Whether the Cooking skill is enabled in the mod config.</returns>
 		public bool IsEnabled()
 		{
-			return ModEntry.Instance.Config.AddCookingSkillAndRecipes;
+			return ModEntry.Config.AddCookingSkillAndRecipes;
 		}
 
 		/// <returns>Instance of the Cooking skill.</returns>
 		public CookingSkill GetSkill()
 		{
-			return Skills.GetSkill(CookingSkill.InternalName) as CookingSkill;
+			return SpaceCore.Skills.GetSkill(CookingSkill.InternalName) as CookingSkill;
 		}
 
 		/// <returns>Current base level.</returns>
 		public int GetLevel()
 		{
-			return Skills.GetSkillLevel(Game1.player, CookingSkill.InternalName);
+			return SpaceCore.Skills.GetSkillLevel(Game1.player, CookingSkill.InternalName);
 		}
 
 		/// <returns>A dictionary of all possible Cooking professions and whether each is active.</returns>
 		public Dictionary<ICookingSkillAPI.Profession, bool> GetCurrentProfessions(long playerID = -1L)
 		{
 			var dict = new Dictionary<ICookingSkillAPI.Profession, bool>();
-			for (int i = 0; i < (int)ICookingSkillAPI.Profession.COUNT; ++i)
+			int count = Enum.GetNames(typeof(ICookingSkillAPI.Profession)).Length;
+			for (int i = 0; i < count; ++i)
 			{
 				var profession = (ICookingSkillAPI.Profession)i;
 				dict.Add(profession, this.HasProfession(profession: profession, playerID: playerID));
@@ -105,14 +105,14 @@ namespace LoveOfCooking.GameObjects
 			Events.InvokeOnCookingExperienceGained(experienceGained: experience);
 
 			int level = this.GetLevel();
-			Skills.AddExperience(Game1.player, CookingSkill.InternalName, experience);
+			SpaceCore.Skills.AddExperience(Game1.player, CookingSkill.InternalName, experience);
 			return level < this.GetLevel();
 		}
 
 		/// <returns>Total accumulated experience.</returns>
 		public int GetTotalCurrentExperience()
 		{
-			return Skills.GetExperienceFor(Game1.player, CookingSkill.InternalName);
+			return SpaceCore.Skills.GetExperienceFor(Game1.player, CookingSkill.InternalName);
 		}
 
 		/// <returns>Experience required to reach this level from the previous level.</returns>
@@ -207,23 +207,23 @@ namespace LoveOfCooking.GameObjects
 			if (currentLevel >= maxLevel)
 			{
 				Log.D($"No experience was applied: Skill is at max level.",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 			}
 			else
 			{
 				int remainingExperience = this.GetExperienceRemainingUntilLevel(nextLevel);
 				int requiredExperience = this.GetExperienceRequiredForLevel(nextLevel);
-				int summedExperience = (int)(newBonus + dailyBonus + experienceFromIngredients * stackBonus * (ModEntry.Instance.Config.DebugMode ? CookingSkill.GlobalExperienceRate : 1));
+				int summedExperience = (int)(newBonus + dailyBonus + experienceFromIngredients * stackBonus * (ModEntry.Config.DebugMode ? CookingSkill.GlobalExperienceRate : 1));
 				finalExperience = maxLevel - currentLevel == 1
 					? Math.Min(remainingExperience, summedExperience)
 					: summedExperience;
 				Log.D($"Cooked up {item.Name} with {ingredientsCount} ingredients.",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 
 				if (finalExperience < 1)
 				{
 					Log.D($"No experience was applied: None gained.",
-						ModEntry.Instance.Config.DebugMode);
+						ModEntry.Config.DebugMode);
 				}
 				else if (apply)
 				{
@@ -231,13 +231,13 @@ namespace LoveOfCooking.GameObjects
 						+ $" ({requiredExperience - remainingExperience}/{requiredExperience})"
 						+ $"\nTotal experience: ({this.GetTotalCurrentExperience()}/{this.GetTotalExperienceRequiredForLevel(nextLevel)})"
 						+ $"\n+{finalExperience} experience!",
-						ModEntry.Instance.Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					this.AddExperienceDirectly(finalExperience);
 				}
 				else
 				{
 					Log.D($"No experience was applied: Probe.",
-						ModEntry.Instance.Config.DebugMode);
+						ModEntry.Config.DebugMode);
 				}
 			}
 

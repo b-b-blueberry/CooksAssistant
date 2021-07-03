@@ -1,6 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
 using System.Collections.Generic;
@@ -8,7 +7,7 @@ using System.Linq;
 
 namespace LoveOfCooking.GameObjects
 {
-	public class CookingSkill : Skills.Skill
+	public class CookingSkill : SpaceCore.Skills.Skill
 	{
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 		public static readonly string InternalName = ModEntry.AssetPrefix + "CookingSkill";
@@ -32,9 +31,9 @@ namespace LoveOfCooking.GameObjects
 		public static readonly Dictionary<int, List<string>> CookingSkillLevelUpRecipes = new Dictionary<int, List<string>>();
 		public static readonly Dictionary<string, int> FoodsThatBuffCookingSkill = new Dictionary<string, int>();
 
-		public class SkillProfession : Profession
+		public class SkillProfession : SpaceCore.Skills.Skill.Profession
 		{
-			public SkillProfession(Skills.Skill skill, string theId) : base(skill, theId) {}
+			public SkillProfession(SpaceCore.Skills.Skill skill, string theId) : base(skill, theId) {}
 	            
 			internal string Name { get; set; }
 			internal string Description { get; set; }
@@ -45,11 +44,16 @@ namespace LoveOfCooking.GameObjects
 		public CookingSkill() : base(InternalName)
 		{
 			Log.D($"Registering skill {InternalName}",
-				ModEntry.Instance.Config.DebugMode);
+				ModEntry.Config.DebugMode);
 
 			// Read class values from definitions data file
-			var cookingSkillValues = Game1.content.Load<Dictionary<string, string>>(ModEntry.GameContentSkillValuesPath);
-			foreach (var field in this.GetType().GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static))
+			var cookingSkillValues = Game1.content.Load
+				<Dictionary<string, string>>
+				(AssetManager.GameContentSkillValuesPath);
+			System.Reflection.FieldInfo[] fields = this
+				.GetType()
+				.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
+			foreach (System.Reflection.FieldInfo field in fields)
 			{
 				System.Type type = field.GetValue(this).GetType();
 				if (type == typeof(int))
@@ -61,27 +65,35 @@ namespace LoveOfCooking.GameObjects
 			}
 
 			// Read cooking skill level up recipes from data file
-			var cookingSkillLevelUpTable = Game1.content.Load<Dictionary<string, List<string>>>(ModEntry.GameContentSkillRecipeTablePath);
-			foreach (var pair in cookingSkillLevelUpTable)
+			var cookingSkillLevelUpTable = Game1.content.Load
+				<Dictionary<string, List<string>>>
+				(AssetManager.GameContentSkillRecipeTablePath);
+			foreach (KeyValuePair<string, List<string>> pair in cookingSkillLevelUpTable)
 			{
 				CookingSkillLevelUpRecipes.Add(int.Parse(pair.Key), pair.Value);
 			}
 
 			// Read starting recipes from general data file
-			foreach (var entry in ModEntry.ItemDefinitions["StartingRecipes"])
+			foreach (string entry in ModEntry.ItemDefinitions["StartingRecipes"])
 			{
 				StartingRecipes.Add(entry);
 			}
 
 			// Set experience values
-			var experienceBarColourSplit = cookingSkillValues["ExperienceBarColor"].Split(' ').ToList().ConvertAll(int.Parse);
+			List<int> experienceBarColourSplit = cookingSkillValues["ExperienceBarColor"]
+				.Split(' ')
+				.ToList()
+				.ConvertAll(int.Parse);
 			ExperienceBarColor = new Color(experienceBarColourSplit[0], experienceBarColourSplit[1], experienceBarColourSplit[2]);
-			ExperienceCurve = new[] { 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 }; // default
+			ExperienceCurve = new[] { 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 }; // values same as for base game skills
+
+			int size;
+
 			// Set the skills page icon (cookpot)
-			var size = 10;
-			var texture = new Texture2D(Game1.graphics.GraphicsDevice, size, size);
-			var pixels = new Color[size * size];
-			ModEntry.SpriteSheet.GetData(0, new Rectangle(69, 220, size, size), pixels, 0, pixels.Length);
+			size = 10;
+			Texture2D texture = new Texture2D(Game1.graphics.GraphicsDevice, size, size);
+			Color[] pixels = new Color[size * size];
+			ModEntry.SpriteSheet.GetData(0, new Rectangle(31, 4, size, size), pixels, 0, pixels.Length);
 			texture.SetData(pixels);
 			SkillsPageIcon = texture;
 
@@ -95,21 +107,21 @@ namespace LoveOfCooking.GameObjects
 
 			// Populate skill professions
 			const string professionIdTemplate = "menu.cooking_skill.tier{0}_path{1}{2}";
-			var textures = new Texture2D[6];
-			for (var i = 0; i < textures.Length; ++i)
+			Texture2D[] textures = new Texture2D[6];
+			for (int i = 0; i < textures.Length; ++i)
 			{
-				var x = 16 + (i * 16); // <-- Which profession icon to use is decided here
+				int x = 16 + (i * 16); // <-- Which profession icon to use is decided here
 				ModEntry.SpriteSheet.GetData(0, new Rectangle(x, 272, size, size), pixels, 0, pixels.Length); // Pixel data copied from spritesheet
 				textures[i] = new Texture2D(Game1.graphics.GraphicsDevice, size, size); // Unique texture created, no shared references
 				textures[i].SetData(pixels); // Texture has pixel data applied
 
 				// Set metadata for this profession
-				var id = string.Format(professionIdTemplate,
+				string id = string.Format(professionIdTemplate,
 					i < 2 ? 1 : 2, // Tier
 					i / 2 == 0 ? i + 1 : i / 2, // Path
 					i < 2 ? "" : i % 2 == 0 ? "a" : "b"); // Choice
-				var extra = i == 1 && !ModEntry.Instance.Config.FoodHealingTakesTime ? "_alt" : "";
-				var profession = new SkillProfession(this, id)
+				string extra = i == 1 && !ModEntry.Config.FoodHealingTakesTime ? "_alt" : "";
+				SkillProfession profession = new SkillProfession(this, id)
 				{
 					Icon = textures[i], // <-- Skill profession icon is applied here
 					Name = i18n.Get($"{id}{extra}.name"),
@@ -135,22 +147,32 @@ namespace LoveOfCooking.GameObjects
 		public override List<string> GetExtraLevelUpInfo(int level)
 		{
 			var list = new List<string>();
-			if (ModEntry.Instance.Config.FoodCanBurn)
-				list.Add(i18n.Get("menu.cooking_skill.levelup_burn", new { Number = level * BurnChanceModifier * BurnChanceReduction }));
+			if (ModEntry.Config.FoodCanBurn)
+			{
+				list.Add(i18n.Get("menu.cooking_skill.levelup_burn", new
+					{
+						Number = level * BurnChanceModifier * BurnChanceReduction
+					}));
+			}
 
-			var extra = i18n.Get($"menu.cooking_skill.levelupbonus.{level}");
-			if (extra.HasValue() && (level != CraftNettleTeaLevel || ModEntry.NettlesEnabled))
+			Translation extra = i18n.Get($"menu.cooking_skill.levelupbonus.{level}");
+			if (extra.HasValue() && (level != CraftNettleTeaLevel || Utils.AreNettlesActive()))
+			{
 				list.Add(extra);
+			}
 
 			return list;
 		}
 
 		public override string GetSkillPageHoverText(int level)
 		{
-			var str = "";
+			string str = "";
 
-			if (ModEntry.Instance.Config.FoodCanBurn)
-				str += "\n" + i18n.Get("menu.cooking_skill.levelup_burn", new { Number = level * BurnChanceModifier * BurnChanceReduction });
+			if (ModEntry.Config.FoodCanBurn)
+				str += "\n" + i18n.Get("menu.cooking_skill.levelup_burn", new
+					{
+						Number = level * BurnChanceModifier * BurnChanceReduction
+					});
 
 			return str;
 		}

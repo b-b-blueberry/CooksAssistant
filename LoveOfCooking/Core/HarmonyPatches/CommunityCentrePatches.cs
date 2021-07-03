@@ -21,13 +21,13 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			// >> if (!Game1.player.hasOrWillReceiveMail("hasSeenAbandonedJunimoNote") && whichArea == 6)
 			// TODO: POLISH: Move as many routines out of harmony as possible
 
-			var type = (Type) null;
+			Type type = (Type) null;
 
 			{
 				type = typeof(Farmer);
-				var original = "hasCompletedCommunityCenter";
+				string original = "hasCompletedCommunityCenter";
 				Log.D($"Applying postfix: {type.Name}.{original}",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				harmony.Patch(
 					original: AccessTools.Method(type, original),
 					postfix: new HarmonyMethod(typeof(CommunityCentrePatches), nameof(HasCompletedCommunityCentre_Postfix)));
@@ -55,12 +55,12 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				new KeyValuePair<string, string>(nameof(MessageForAreaCompletion_Prefix), "getMessageForAreaCompletion"),
 			};
 
-			foreach (var pair in prefixes)
+			foreach (KeyValuePair<string, string> pair in prefixes)
 			{
-				var prefix = pair.Key;
-				var original = pair.Value;
+				string prefix = pair.Key;
+				string original = pair.Value;
 				Log.D($"Applying prefix: {type.Name}.{original}",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				harmony.Patch(
 					original: AccessTools.Method(type, original),
 					prefix: new HarmonyMethod(typeof(CommunityCentrePatches), prefix));
@@ -185,21 +185,21 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				if (area != Bundles.CommunityCentreAreaNumber || Bundles.IsCommunityCentreComplete() || Bundles.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
-				var areaToRefurbish = area != Bundles.CommunityCentreAreaNumber
+				Rectangle areaToRefurbish = area != Bundles.CommunityCentreAreaNumber
 					? ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "getAreaBounds").Invoke<Rectangle>(area)
 					: Bundles.CommunityCentreArea;
-				var refurbishedMap = Game1.game1.xTileContent.Load<Map>("Maps\\CommunityCenter_Refurbished");
+				Map refurbishedMap = Game1.game1.xTileContent.Load<Map>("Maps\\CommunityCenter_Refurbished");
 
 				//PyTK.Extensions.PyMaps.mergeInto(__instance.Map, refurbishedMap, Vector2.Zero, ModEntry.CommunityCentreArea);
 				//__instance.addLightGlows();
 				//return false;
 
-				var adjustMapLightPropertiesForLamp = ModEntry.Instance.Helper.Reflection.GetMethod(
-					__instance, "adjustMapLightPropertiesForLamp");
+				StardewModdingAPI.IReflectedMethod adjustMapLightPropertiesForLamp = ModEntry.Instance.Helper.Reflection
+					.GetMethod(__instance, "adjustMapLightPropertiesForLamp");
 
-				for (var x = areaToRefurbish.X; x < areaToRefurbish.Right; x++)
+				for (int x = areaToRefurbish.X; x < areaToRefurbish.Right; ++x)
 				{
-					for (var y = areaToRefurbish.Y; y < areaToRefurbish.Bottom; y++)
+					for (int y = areaToRefurbish.Y; y < areaToRefurbish.Bottom; ++y)
 					{
 						if (refurbishedMap.GetLayer("Back").Tiles[x, y] != null)
 						{
@@ -260,7 +260,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 					}
 				}
 				Log.D("End of LoadAreaPrefix",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				return false;
 			}
 			catch (Exception e)
@@ -280,10 +280,12 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			try
 			{
 				Log.T($"CC_IsJunimoNoteAtArea_Prefix(area={area})");
-				if (area != Bundles.CommunityCentreAreaNumber || Bundles.IsCommunityCentreComplete() || Bundles.IsAbandonedJojaMartBundleAvailable())
+				if (area != Bundles.CommunityCentreAreaNumber
+					|| Bundles.IsCommunityCentreComplete()
+					|| Bundles.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
-				var p = Bundles.CommunityCentreNotePosition;
+				Point p = Bundles.CommunityCentreNotePosition;
 				__result = __instance.map.GetLayer("Buildings").Tiles[p.X, p.Y] != null;
 				return false;
 			}
@@ -303,24 +305,25 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		{
 			try
 			{
-				if (Bundles.IsCommunityCentreComplete() && Bundles.IsAbandonedJojaMartBundleAvailable()
+				if (Bundles.IsCommunityCentreComplete()
+					&& Bundles.IsAbandonedJojaMartBundleAvailable()
 					&& (Game1.netWorldState.Value.BundleData.Keys.Any(key => key.StartsWith(Bundles.CommunityCentreAreaName))))
 				{
 					Log.D($"ShouldNoteAppearInArea removing custom bundle data.",
-						ModEntry.Instance.Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					Bundles.SaveAndUnloadBundleData();
 				}
 
 				if (area != Bundles.CommunityCentreAreaNumber)
 					return true;
 				__result = !Bundles.IsCommunityCentreKitchenComplete()
-					&& __instance.numberOfCompleteBundles() > (ModEntry.Instance.Config.DebugMode ? 0 : 2);
+					&& __instance.numberOfCompleteBundles() > (ModEntry.Config.DebugMode ? 0 : 2);
 				return false;
 			}
 			catch (ArgumentOutOfRangeException e)
 			{
 				Log.D($"Error in {nameof(ShouldNoteAppearInArea_Prefix)}, may be non-critical:\n{e}",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				return false;
 			}
 			catch (Exception e)
@@ -341,12 +344,14 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			{
 				Log.T($"CC_AddJunimoNote_Prefix(area={area})");
 
-				if (area != Bundles.CommunityCentreAreaNumber || Bundles.IsCommunityCentreComplete() || Bundles.IsAbandonedJojaMartBundleAvailable())
+				if (area != Bundles.CommunityCentreAreaNumber
+					|| Bundles.IsCommunityCentreComplete()
+					|| Bundles.IsAbandonedJojaMartBundleAvailable())
 					return true;
 
-				var p = Bundles.CommunityCentreNotePosition;
+				Point p = Bundles.CommunityCentreNotePosition;
 
-				var tileFrames = CommunityCenter.getJunimoNoteTileFrames(area, __instance.Map);
+				StaticTile[] tileFrames = CommunityCenter.getJunimoNoteTileFrames(area, __instance.Map);
 				const string layer = "Buildings";
 				__instance.Map.GetLayer(layer).Tiles[p.X, p.Y]
 					= new AnimatedTile(__instance.Map.GetLayer(layer), tileFrames, 70L);
@@ -408,22 +413,28 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		{
 			try
 			{
-				var viewportTargets = ModEntry.Instance.Helper.Reflection.GetField<List<int>>(
-					__instance, "junimoNotesViewportTargets").GetValue();
-				if (viewportTargets.Count < 1 || viewportTargets[0] != Bundles.CommunityCentreAreaNumber || !Bundles.IsCommunityCentreKitchenEnabledByHost())
+				List<int> viewportTargets = ModEntry.Instance.Helper.Reflection.GetField
+					<List<int>>
+					(__instance, "junimoNotesViewportTargets")
+					.GetValue();
+				if (viewportTargets.Count < 1
+					|| viewportTargets[0] != Bundles.CommunityCentreAreaNumber
+					|| !Bundles.IsCommunityCentreKitchenEnabledByHost())
 					return true;
 
-				var reachedTarget = ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "afterViewportGetsToJunimoNotePosition");
-				var endFunction = ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "setViewportToNextJunimoNoteTarget");
+				StardewModdingAPI.IReflectedMethod reachedTarget = ModEntry.Instance.Helper.Reflection
+					.GetMethod(__instance, "afterViewportGetsToJunimoNotePosition");
+				StardewModdingAPI.IReflectedMethod endFunction = ModEntry.Instance.Helper.Reflection
+					.GetMethod(__instance, "setViewportToNextJunimoNoteTarget");
 
-				var p = Bundles.CommunityCentreNotePosition;
-				Game1.moveViewportTo(new Vector2(p.X, p.Y) * 64f, 5f, 2000, () => reachedTarget.Invoke(), () => endFunction.Invoke());
+				Point p = Bundles.CommunityCentreNotePosition;
+				Game1.moveViewportTo(new Vector2(p.X, p.Y) * Game1.tileSize, 5f, 2000, () => reachedTarget.Invoke(), () => endFunction.Invoke());
 				return false;
 			}
 			catch (ArgumentException e)
 			{
 				Log.D($"Error in {nameof(SetViewportToNextJunimoNoteTarget_Prefix)}, may be non-critical:\n{e}",
-					ModEntry.Instance.Config.DebugMode);
+					ModEntry.Config.DebugMode);
 				return false;
 			}
 			catch (Exception e)
@@ -446,8 +457,8 @@ namespace LoveOfCooking.Core.HarmonyPatches
 
 				Bundles.DrawStarInCommunityCentre(__instance);
 
-				var junimo = __instance.getJunimoForArea(Bundles.CommunityCentreAreaNumber);
-				junimo.Position = new Vector2(22f, 12f) * 64f;
+				Junimo junimo = __instance.getJunimoForArea(Bundles.CommunityCentreAreaNumber);
+				junimo.Position = new Vector2(22f, 12f) * Game1.tileSize;
 				junimo.stayStill();
 				junimo.faceDirection(1);
 				junimo.fadeBack();
@@ -473,7 +484,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				if (!Bundles.IsCommunityCentreKitchenEnabledByHost())
 					return true;
 
-				__instance.getJunimoForArea(Bundles.CommunityCentreAreaNumber).Position = new Vector2(22f, 12f) * 64f;
+				__instance.getJunimoForArea(Bundles.CommunityCentreAreaNumber).Position = new Vector2(22f, 12f) * Game1.tileSize;
 			}
 			catch (Exception e)
 			{
@@ -503,11 +514,11 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		{
 			try
 			{
-				var index = ModEntry.Instance.Helper.Reflection.GetField<int>(__instance, "restoreAreaIndex").GetValue();
 				var timerField = ModEntry.Instance.Helper.Reflection.GetField<int>(__instance, "restoreAreaTimer");
-				var timer = timerField.GetValue();
 				var phaseField = ModEntry.Instance.Helper.Reflection.GetField<int>(__instance, "restoreAreaPhase");
-				var phase = phaseField.GetValue();
+				int timer = timerField.GetValue();
+				int phase = phaseField.GetValue();
+				int index = ModEntry.Instance.Helper.Reflection.GetField<int>(__instance, "restoreAreaIndex").GetValue();
 
 				if (timer == 0 || !Bundles.IsCommunityCentreKitchenEnabledByHost())
 				{
@@ -528,9 +539,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				}
 
 				var messageAlphaField = ModEntry.Instance.Helper.Reflection.GetField<float>(__instance, "messageAlpha");
-				var messageAlpha = messageAlphaField.GetValue();
-				var buildUpSound = ModEntry.Instance.Helper.Reflection.GetField<ICue>(__instance, "buildUpSound").GetValue();
-				var junimoNotesViewportTargets = ModEntry.Instance.Helper.Reflection.GetField<List<int>>(__instance, "junimoNotesViewportTargets").GetValue();
+				float messageAlpha = messageAlphaField.GetValue();
+				ICue buildUpSound = ModEntry.Instance.Helper.Reflection.GetField<ICue>(__instance, "buildUpSound").GetValue();
+				List<int> junimoNotesViewportTargets = ModEntry.Instance.Helper.Reflection.GetField<List<int>>(__instance, "junimoNotesViewportTargets").GetValue();
 
 				__instance.missedRewardsChest.Value.updateWhenCurrentLocation(time, __instance);
 
@@ -555,7 +566,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 									// THIS IS AN IMPORTANT BIT:
 									// Add some mail to flag this bundle as having been completed
 									Log.D($"Sending mail for Cooking bundle completion ({ModEntry.MailKitchenCompleted})",
-										ModEntry.Instance.Config.DebugMode);
+										ModEntry.Config.DebugMode);
 									Game1.player.mailForTomorrow.Add(ModEntry.MailKitchenCompleted + "%&NL&%");
 								}
 							}
@@ -563,17 +574,17 @@ namespace LoveOfCooking.Core.HarmonyPatches
 						case 1:
 							if (Game1.IsMasterGame && Game1.random.NextDouble() < 0.4)
 							{
-								var area = new Rectangle(Bundles.CommunityCentreArea.X, Bundles.CommunityCentreArea.Y,
+								Rectangle area = new Rectangle(Bundles.CommunityCentreArea.X, Bundles.CommunityCentreArea.Y,
 									Bundles.CommunityCentreArea.Width + 12, Bundles.CommunityCentreArea.Height + 6);
-								var v = Utility.getRandomPositionInThisRectangle(area, Game1.random);
-								var i = new Junimo(v * 64f, index, temporary: true);
+								Vector2 v = Utility.getRandomPositionInThisRectangle(area, Game1.random);
+								Junimo i = new Junimo(v * Game1.tileSize, index, temporary: true);
 								if (!__instance.isCollidingPosition(i.GetBoundingBox(), Game1.viewport, i))
 								{
 									__instance.characters.Add(i);
 									ModEntry.Instance.Helper.Reflection.GetField<Multiplayer>(
 										typeof(Game1), "multiplayer").GetValue().broadcastSprites(__instance,
 										new TemporaryAnimatedSprite((Game1.random.NextDouble() < 0.5) ? 5 : 46,
-										v * 64f + new Vector2(16f, 16f), Color.White)
+										v * Game1.tileSize + new Vector2(16f, 16f), Color.White)
 										{
 											layerDepth = 1f
 										});
@@ -658,7 +669,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 						case 3:
 							if (old > 1000 && timer <= 1000)
 							{
-								var junimo = __instance.getJunimoForArea(index);
+								Junimo junimo = __instance.getJunimoForArea(index);
 								if (junimo != null && Game1.IsMasterGame)
 								{
 									if (!junimo.holdingBundle.Value)
@@ -667,7 +678,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 										var iter = 0;
 										while (__instance.isCollidingPosition(junimo.GetBoundingBox(), Game1.viewport, junimo) && iter < 20)
 										{
-											junimo.Position = Utility.getRandomPositionInThisRectangle(Bundles.CommunityCentreArea, Game1.random) * 64f;
+											junimo.Position = Utility.getRandomPositionInThisRectangle(Bundles.CommunityCentreArea, Game1.random) * Game1.tileSize;
 											iter++;
 										}
 										if (iter < 20)
@@ -686,8 +697,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 							break;
 					}
 				}
-				else if (Game1.activeClickableMenu == null && junimoNotesViewportTargets != null
-					&& junimoNotesViewportTargets.Count > 0 && !Game1.isViewportOnCustomPath())
+				else if (Game1.activeClickableMenu == null
+					&& junimoNotesViewportTargets?.Count > 0
+					&& !Game1.isViewportOnCustomPath())
 				{
 					ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "setViewportToNextJunimoNoteTarget").Invoke();
 				}
