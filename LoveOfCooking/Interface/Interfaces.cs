@@ -46,10 +46,10 @@ namespace LoveOfCooking.Interface
 
 		private static void GetLoadedMods()
 		{
-			UsingSVE= Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
+			UsingSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
 			UsingPPJACrops = Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
 			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
-			UsingLevelExtender =Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
+			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
 			UsingFarmhouseKitchenStart = new string[]
 			{
@@ -223,8 +223,8 @@ namespace LoveOfCooking.Interface
 			};
 			foreach (string entry in entries)
 			{
-				var flags = BindingFlags.Public | BindingFlags.Instance;
-				var property = typeof(Config).GetProperty(entry, flags);
+				BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
+				PropertyInfo property = typeof(Config).GetProperty(entry, flags);
 				if (property != null)
 				{
 					string i18nKey = $"config.option.{entry.ToLower()}_";

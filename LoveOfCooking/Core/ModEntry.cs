@@ -141,7 +141,7 @@ namespace LoveOfCooking
 		internal const bool RedberriesEnabled = false;
 		internal const bool PFMEnabled = false;
 		internal const bool SendBundleFollowupMail = false;
-		internal const bool PrintRename = false;
+		internal static bool PrintRename => false;
 
 
 		public override void Entry(IModHelper helper)
@@ -434,8 +434,17 @@ namespace LoveOfCooking
 			Utils.CalculateFoodRegenModifiers();
 			if (Utils.AreNettlesActive())
 			{
-				CustomBush.TrySpawnNettles();
-				CustomBush.FindNettlesGlobally(remove: false);
+				// TODO: 1.0.18: Remove Nettle bush spawn block if problem resolved
+				if (Bundles.IsMultiplayer())
+				{
+					Log.D($"Did not add nettles: multiplayer safety catch.",
+						ModEntry.Config.DebugMode);
+				}
+				else
+				{
+					CustomBush.TrySpawnNettles();
+					CustomBush.FindNettlesGlobally(remove: false);
+				}
 			}
 
 			// Add the cookbook for the player once they've reached the unlock date

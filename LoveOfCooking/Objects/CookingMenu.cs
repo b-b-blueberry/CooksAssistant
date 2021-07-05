@@ -265,7 +265,8 @@ namespace LoveOfCooking.Objects
 		}
 
 
-		public CookingMenu(List<CraftingRecipe> recipes, bool addDummyState = false, string initialRecipe = null) : base(inventory: null, context: null)
+		public CookingMenu(List<CraftingRecipe> recipes, bool addDummyState = false, string initialRecipe = null)
+			: base(inventory: null, context: null)
 		{
 			this.width = CookbookSource.Width * Scale;
 			this.height = 720;
@@ -404,7 +405,7 @@ namespace LoveOfCooking.Objects
 			};
 
 			_quantityTextBox.OnEnterPressed += this.ValidateNumericalTextBox;
-			_searchBarTextBox.OnEnterPressed += sender => { this.CloseTextBox(sender); };
+			_searchBarTextBox.OnEnterPressed += sender => { this.CloseTextBox(sender, reapplyFilters: true); };
 
 			// 'Cook!' button localisations
 			int xOffset = 0;
@@ -802,7 +803,6 @@ namespace LoveOfCooking.Objects
 			_searchBarTextBox.X = _leftContent.X;
 			_searchBarTextBox.Y = _leftContent.Y + yOffset + (1 * Scale);
 			_searchBarTextBox.Selected = false;
-			_searchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
 			_searchBarTextBox.Update();
 			_searchBarTextBoxBounds = new Rectangle(
 				_searchBarTextBox.X, _searchBarTextBox.Y, -1, _searchBarTextBox.Height);
@@ -1377,9 +1377,7 @@ namespace LoveOfCooking.Objects
 
 			_searchTabButton.sourceRect.X = SearchTabButtonSource.X + SearchTabButtonSource.Width;
 			_ingredientsTabButton.sourceRect.X = IngredientsTabButtonSource.X;
-			_recipesFiltered = this.FilterRecipes();
 			_showSearchFilters = false;
-			_searchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
 
 			if (Game1.options.SnappyMenus)
 			{
@@ -1460,12 +1458,12 @@ namespace LoveOfCooking.Objects
 			}
 		}
 
-		private void CloseTextBox(TextBox textBox)
+		private void CloseTextBox(TextBox textBox, bool reapplyFilters)
 		{
 			textBox.Selected = false;
 			Game1.keyboardDispatcher.Subscriber = null;
 
-			if (textBox.Text == _searchBarTextBox.Text)
+			if (reapplyFilters && textBox.Text == _searchBarTextBox.Text)
 			{
 				_recipesFiltered = this.FilterRecipes(_lastFilterUsed, substr: _searchBarTextBox.Text);
 				this.UpdateSearchRecipes();
@@ -1888,9 +1886,13 @@ namespace LoveOfCooking.Objects
 				this.UpdateCraftableCounts(recipe: CurrentRecipe);
 			}
 
-			// Snap to the Cook! button if desirable
-			if (itemWasMoved && Game1.options.SnappyMenus && ReadyToCook && currentlySnappedComponent != null
-				&& currentlySnappedComponent.myID != _navLeftButton.myID && currentlySnappedComponent.myID != _navRightButton.myID)
+			// Snap to the Cook! button if appropriate
+			if (Game1.options.SnappyMenus
+				&& itemWasMoved
+				&& ReadyToCook
+				&& currentlySnappedComponent != null
+				&& currentlySnappedComponent.myID != _navLeftButton.myID
+				&& currentlySnappedComponent.myID != _navRightButton.myID)
 			{
 				this.setCurrentlySnappedComponentTo(_cookButton.myID);
 			}
@@ -2003,7 +2005,7 @@ namespace LoveOfCooking.Objects
 				}
 				if (_searchBarTextBox.Selected)
 				{
-					this.CloseTextBox(_searchBarTextBox);
+					this.CloseTextBox(_searchBarTextBox, reapplyFilters: true);
 					if (!tryToQuit)
 						return false;
 				}
@@ -2288,11 +2290,15 @@ namespace LoveOfCooking.Objects
 				case State.Search:
 					// Search result clicks
 					int index = this.TryGetIndexForSearchResult(x, y);
-					if (index >= 0 && index < _recipeSearchResults.Count && _recipeSearchResults[index] != null && _recipeSearchResults[index].name != "Torch")
+					bool clickedSearchResult = index >= 0
+						&& index < _recipeSearchResults.Count
+						&& _recipeSearchResults[index] != null
+						&& _recipeSearchResults[index].name != "Torch";
+					if (clickedSearchResult)
 					{
 						Game1.playSound(PageChangeCue);
-						this.OpenRecipePage();
 						this.ChangeCurrentRecipe(_recipeSearchResults[index].name);
+						this.OpenRecipePage();
 					}
 
 					// Search text box
@@ -2312,7 +2318,7 @@ namespace LoveOfCooking.Objects
 						}
 						if (string.IsNullOrEmpty(_searchBarTextBox.Text))
 							_searchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
-						this.CloseTextBox(_searchBarTextBox);
+						this.CloseTextBox(_searchBarTextBox, reapplyFilters: !clickedSearchResult);
 					}
 					else
 					{
@@ -2413,7 +2419,7 @@ namespace LoveOfCooking.Objects
 						else if (_quantityTextBox.Selected)
 						{
 							this.ValidateNumericalTextBox(_quantityTextBox);
-							this.CloseTextBox(_quantityTextBox);
+							this.CloseTextBox(_quantityTextBox, reapplyFilters: true);
 						}
 
 						// Cook OK/Cancel buttons
@@ -2542,7 +2548,7 @@ namespace LoveOfCooking.Objects
 				if (_searchBarTextBox.Selected)
 				{
 					_searchBarTextBox.Text = i18n.Get("menu.cooking_recipe.search_label");
-					this.CloseTextBox(_searchBarTextBox);
+					this.CloseTextBox(_searchBarTextBox, reapplyFilters: true);
 				}
 				else if (state == State.Search)
 				{
@@ -2667,7 +2673,7 @@ namespace LoveOfCooking.Objects
 				if (b == Buttons.A)
 					Game1.showTextEntry(_searchBarTextBox);
 				if (isExitButton)
-					this.CloseTextBox(_searchBarTextBox);
+					this.CloseTextBox(_searchBarTextBox, reapplyFilters: true);
 			}
 			else if (b == Buttons.RightTrigger)
 				return;
@@ -2935,7 +2941,7 @@ namespace LoveOfCooking.Objects
 					case Keys.Enter:
 						break;
 					case Keys.Escape:
-						this.CloseTextBox(_searchBarTextBox);
+						this.CloseTextBox(_searchBarTextBox, reapplyFilters: true);
 						break;
 					default:
 						_recipesFiltered = this.FilterRecipes(_lastFilterUsed, substr: _searchBarTextBox.Text);
@@ -3200,12 +3206,14 @@ namespace LoveOfCooking.Objects
 			
 			if (ModEntry.Instance.States.Value.FavouriteRecipes.Contains(_recipeAsItem.Name))
 			{
-				b.Draw(Texture,
-					new Rectangle(
+				b.Draw(
+					texture: Texture,
+					destinationRectangle: new Rectangle(
 						_recipeIconButton.bounds.X + _recipeIconButton.bounds.Width / 3 * 2,
 						_recipeIconButton.bounds.Y + _recipeIconButton.bounds.Height / 3 * 2,
 						FavouriteIconSource.Width * 3, FavouriteIconSource.Height * 3),
-					FavouriteIconSource, Color.White);
+					sourceRectangle: FavouriteIconSource,
+					color: Color.White);
 			}
 			float titleScale = 1f;
 			textWidth = (int)(40.5f * Scale * xScale);
@@ -3344,32 +3352,32 @@ namespace LoveOfCooking.Objects
 						toDraw: CurrentRecipe.recipeList.Values.ElementAt(i),
 						b,
 						position: new Vector2(
-							_leftContent.X + 32 - Game1.tinyFont.MeasureString(string.Concat(CurrentRecipe.recipeList.Values.ElementAt(i))).X,
-							textPosition.Y + 21 - 2f),
+							_leftContent.X + (8 * Scale) - Game1.tinyFont.MeasureString(string.Concat(CurrentRecipe.recipeList.Values.ElementAt(i))).X,
+							textPosition.Y + (4.5f * Scale)),
 						scale: 2f,
 						layerDepth: 0.87f,
 						c: Color.AntiqueWhite);
 					// Ingredient name
-					this.DrawText(b, ingredientNameText, 1f, 48, textPosition.Y, null, isLeftSide, false, drawColour);
+					this.DrawText(b, ingredientNameText, 1f, (12 * Scale), textPosition.Y, null, isLeftSide, false, drawColour);
 
 					// Ingredient stock
 					if (Game1.options.showAdvancedCraftingInformation)
 					{
-						Point position = new Point((int)(_lineWidth - 64 * xScale), (int)(textPosition.Y + 2));
+						Point position = new Point((int)(_lineWidth - (16 * Scale * xScale)), (int)(textPosition.Y + (0.5f * Scale)));
 						b.Draw(
-							Game1.mouseCursors,
-							new Rectangle(_leftContent.X + position.X, position.Y, 22, 26),
-							new Rectangle(268, 1436, 11, 13),
-							Color.White);
+							texture: Game1.mouseCursors,
+							destinationRectangle: new Rectangle(_leftContent.X + position.X, position.Y, 22, 26),
+							sourceRectangle: new Rectangle(268, 1436, 11, 13),
+							color: Color.White);
 						this.DrawText(b, _recipeIngredientQuantitiesHeld[i].ToString(), 1f, position.X + 32, position.Y, 72, isLeftSide, false, drawColour);
 					}
 				}
 			}
 			else
 			{
-				textPosition.Y += 64 / 2 + 4;
+				textPosition.Y += (16 * Scale / 2) + (1 * Scale);
 				text = i18n.Get("menu.cooking_recipe.title_unknown");
-				this.DrawText(b, text, 1f, 40, textPosition.Y, textWidth, isLeftSide, false, SubtextColour);
+				this.DrawText(b, text, 1f, 10 * Scale, textPosition.Y, textWidth, isLeftSide, false, SubtextColour);
 			}
 		}
 

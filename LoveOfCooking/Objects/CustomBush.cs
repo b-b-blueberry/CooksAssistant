@@ -440,14 +440,6 @@ namespace LoveOfCooking
 		{
 			foreach (string l in ModEntry.ItemDefinitions["NettlesLocations"])
 			{
-				// TODO: 1.0.18: Remove Forest Nettle bush spawn check if problem resolved
-				if (false && l == "Forest" && Bundles.IsMultiplayer())
-				{
-					Log.D($"Did not add nettles to {l}: multiplayer message safety catch.",
-						ModEntry.Config.DebugMode);
-					continue;
-				}
-
 				if (!force && Game1.random.NextDouble() > float.Parse(ModEntry.ItemDefinitions["NettlesDailyChancePerLocation"][0]))
 				{
 					// Skip the location if we didn't succeed the roll to add nettles

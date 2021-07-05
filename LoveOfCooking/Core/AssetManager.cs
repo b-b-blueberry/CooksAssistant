@@ -13,7 +13,6 @@ namespace LoveOfCooking
 {
 	public class AssetManager : IAssetEditor, IAssetLoader
 	{
-		private static Config Config => ModEntry.Config;
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 
 		private readonly Dictionary<string, int> _buffIndex = new Dictionary<string, int>
@@ -201,39 +200,22 @@ namespace LoveOfCooking
 				}
 				asset.AsDictionary<string, string>().ReplaceWith(data);
 
-				if (!Config.AddRecipeRebalancing)
-				{
-					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
-						Config.DebugMode);
-					return;
-				}
-
 				try
 				{
 					// Substitute in the actual custom ingredients for custom recipes if custom ingredients are enabled
-					bool enabled = Config.AddNewCropsAndStuff;
 					Dictionary<string, string> recipeData = null;
-					if (enabled || Interface.Interfaces.UsingPPJACrops)
+
+					// Update recipe data for recipes planned to use vanilla objects or best-available common custom objects
+
+					// BASE GAME RECIPES
+					if (ModEntry.Config.AddRecipeRebalancing)
 					{
-						// Update recipe data for recipes planned to use vanilla objects or best-available common custom objects
 						recipeData = new Dictionary<string, string>
 						{
 							// Maki Roll: Sashimi 1 Seaweed 1 Rice 1
 							{
 								"Maki Roll",
 								"227 1 152 1 423 1"
-							},
-							// Coleslaw: Vinegar 1 Mayonnaise 1
-							{
-								"Coleslaw",
-								$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.CabbageName)} 1"
-								+ " 419 1 306 1"
-							},
-							// Cookies: Flour 1 Category:Egg 1 Chocolate Bar 1
-							{
-								"Cookies",
-								"246 1 -5 1"
-								+ $" {Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.ChocolateName)} 1"
 							},
 							// Pizza: Flour 2 Tomato 2 Cheese 2
 							{
@@ -242,10 +224,30 @@ namespace LoveOfCooking
 							},
 						};
 
-						// Update recipe data for recipes planned to use custom objects exclusive to this mod
-						if (enabled)
+						// New Crops ingredients:
+						if (ModEntry.Config.AddNewCropsAndStuff || Interface.Interfaces.UsingPPJACrops)
 						{
-							var exclusiveCustomData = new Dictionary<string, string>
+							recipeData = recipeData.Concat(new Dictionary<string, string>
+							{
+								// Coleslaw: Vinegar 1 Mayonnaise 1
+								{
+									"Coleslaw",
+									$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.CabbageName)} 1"
+									+ " 419 1 306 1"
+								},
+								// Cookies: Flour 1 Category:Egg 1 Chocolate Bar 1
+								{
+									"Cookies",
+									"246 1 -5 1"
+									+ $" {Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.ChocolateName)} 1"
+								},
+							}).ToDictionary(pair => pair.Key, pair => pair.Value);
+						}
+
+						// Cooking Skill ingredients:
+						if (ModEntry.Config.AddCookingSkillAndRecipes)
+						{
+							recipeData = recipeData.Concat(new Dictionary<string, string>
 							{
 								// Pink Cake: Cake 1 Melon 1
 								{
@@ -258,9 +260,8 @@ namespace LoveOfCooking
 									"Chocolate Cake",
 									$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "cake")} 1"
 									+ $" {Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.ChocolateName)} 1"
-								}
-							};
-							recipeData = recipeData.Union(exclusiveCustomData).ToDictionary(pair => pair.Key, pair => pair.Value);
+								},
+							}).ToDictionary(pair => pair.Key, pair => pair.Value);
 						}
 
 						foreach (KeyValuePair<string, string> recipe in recipeData)
@@ -271,7 +272,23 @@ namespace LoveOfCooking
 									.Aggregate($"Edited {asset.AssetName}:", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 								ModEntry.Config.DebugMode);
 
-						recipeData = new Dictionary<string, string>
+					}
+
+					// LOVE OF COOKING RECIPES
+					// Basic Objects recipes:
+					recipeData = new Dictionary<string, string>
+					{
+						// Hot Cocoa: Milk (Any) 1 Chocolate Bar 1
+						{
+							ModEntry.ObjectPrefix + "hotcocoa",
+							"-6 1"
+							+ $" {Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.ChocolateName)} 1"
+						},
+					};
+					// New Crops recipes:
+					if (ModEntry.Config.AddNewCropsAndStuff || Interface.Interfaces.UsingPPJACrops) 
+					{
+						recipeData = recipeData.Concat(new Dictionary<string, string>
 						{
 							// Beet Burger: Bread 1 Beet 1 Onion 1 Red Cabbage 1
 							{
@@ -299,12 +316,6 @@ namespace LoveOfCooking
 								ModEntry.ObjectPrefix + "stew",
 								$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.CarrotName)} 2"
 								+ " 192 1"
-							},
-							// Hot Cocoa: Milk (Any) 1 Chocolate Bar 1
-							{
-								ModEntry.ObjectPrefix + "hotcocoa",
-								"-6 1"
-								+ $" {Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.ChocolateName)} 1"
 							},
 							// Hot Pot Roast: Cranberry Sauce 1 Roots Platter 1 Stuffing 1 Onion 1
 							{
@@ -349,12 +360,13 @@ namespace LoveOfCooking
 								ModEntry.ObjectPrefix + "tropicalsalad",
 								"832 1 613 1 637 1"
 							},
-						};
-						if (recipeData != null)
-							foreach (KeyValuePair<string, string> recipe in recipeData.Where(r => data.ContainsKey(r.Key)))
-								data[recipe.Key] = Utils.UpdateEntry(data[recipe.Key], new[] { recipe.Value });
+						}).ToDictionary(pair => pair.Key, pair => pair.Value);
 					}
-					
+
+					if (recipeData != null)
+						foreach (KeyValuePair<string, string> recipe in recipeData.Where(r => data.ContainsKey(r.Key)))
+							data[recipe.Key] = Utils.UpdateEntry(data[recipe.Key], new[] { recipe.Value });
+
 					foreach (KeyValuePair<string, string> recipe in data.ToDictionary(pair => pair.Key, pair => pair.Value))
 					{
 						string[] recipeSplit = data[recipe.Key].Split('/');
@@ -374,16 +386,24 @@ namespace LoveOfCooking
 					// Strip recipes with invalid, missing, or duplicate ingredients from the recipe data list
 					Dictionary<string, string> badRecipes = data.Where(
 						pair => pair.Value.Split('/')[0].Split(' ').ToList() is List<string> ingredients
-							&& ingredients.Any(i => i == "-1" || i == "0" || (ingredients.IndexOf(i) % 2 == 0 && ingredients.Count(x => x == i) > 1)))
+							&& ingredients.Any(s =>
+								(ingredients.IndexOf(s) % 2 == 0) is bool isItemId
+								&& 
+									// Missing ingredients 
+									((isItemId && (s == "0" || s == "-1"))
+									// Duplicate ingredients
+									|| (isItemId && ingredients.Count(x => x == s) > 1)
+									// Bad ingredient quantities
+									|| (!isItemId && (!int.TryParse(s, out int i) || (i < 1 || i > 999))))))
 						.ToDictionary(pair => pair.Key, pair => pair.Value);
 					if (badRecipes.Count() > 0)
 					{
-						string str = badRecipes.Aggregate($"Removing {badRecipes.Count()} malformed recipes:",
+						string str = badRecipes.Aggregate($"Removing {badRecipes.Count()} malformed recipes.\nThese recipes may use items from mods that aren't installed:",
 							(str, cur) => $"{str}\n{cur.Key}: {cur.Value.Split('/')[0]}");
 						if (Game1.activeClickableMenu is StardewValley.Menus.TitleMenu)
 						{
 							Log.D("At TitleMenu: " + str,
-								Config.DebugMode);
+								ModEntry.Config.DebugMode);
 						}
 						else
 						{
@@ -406,12 +426,12 @@ namespace LoveOfCooking
 								ModEntry.Config.DebugMode);
 						}
 						Log.D(data.Aggregate("", (str, recipe) => $"{str}\n{recipe.Key}: {recipe.Value}"),
-							Config.DebugMode);
+							ModEntry.Config.DebugMode);
 					}
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
-					Log.E($"Did not patch {asset.AssetName}: {(!Config.DebugMode ? e.Message : e.ToString())}");
+					Log.E($"Did not patch {asset.AssetName}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
 				}
 
 				return;
@@ -472,10 +492,10 @@ namespace LoveOfCooking
 				}
 				asset.AsDictionary<int, string>().ReplaceWith(data);
 
-				if (!Config.AddRecipeRebalancing)
+				if (!ModEntry.Config.AddRecipeRebalancing)
 				{
 					Log.D($"Did not edit {asset.AssetName}: New recipe scaling is disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 
@@ -497,7 +517,7 @@ namespace LoveOfCooking
 					foreach (KeyValuePair<int, string[]> obj in objectData.Where(o => !ModEntry.ItemDefinitions["FoodsThatGiveLeftovers"].Contains(data[o.Key].Split('/')[0])))
 						data[obj.Key] = Utils.UpdateEntry(data[obj.Key], obj.Value);
 
-					if (Config.AddRecipeRebalancing)
+					if (ModEntry.Config.AddRecipeRebalancing)
 						this.RebuildBuffs(ref data);
 
 					asset.AsDictionary<int, string>().ReplaceWith(data);
@@ -509,8 +529,8 @@ namespace LoveOfCooking
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
-					Log.D($"Did not patch {asset.AssetName}: {(!Config.DebugMode ? e.Message : e.ToString())}",
-						Config.DebugMode);
+					Log.D($"Did not patch {asset.AssetName}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}",
+						ModEntry.Config.DebugMode);
 				}
 
 				return;
@@ -535,13 +555,13 @@ namespace LoveOfCooking
 				if (!ModEntry.Config.AddNewCropsAndStuff)
 				{
 					Log.D($"Did not edit {asset.AssetName}: New crops are disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 				if (!ModEntry.RedberriesEnabled)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Redberries not yet enabled in code.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 
@@ -568,8 +588,8 @@ namespace LoveOfCooking
 				}
 				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
 				{
-					Log.D($"Did not patch {asset.AssetName}: {(!Config.DebugMode ? e.Message : e.ToString())}",
-						Config.DebugMode);
+					Log.D($"Did not patch {asset.AssetName}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}",
+						ModEntry.Config.DebugMode);
 				}
 
 				return;
@@ -643,7 +663,7 @@ namespace LoveOfCooking
 				if (!ModEntry.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 
@@ -675,7 +695,7 @@ namespace LoveOfCooking
 				if (!ModEntry.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 				}
 				else
 				{
@@ -693,7 +713,7 @@ namespace LoveOfCooking
 				if (!ModEntry.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 
@@ -720,7 +740,7 @@ namespace LoveOfCooking
 				if (!ModEntry.Config.AddCookingCommunityCentreBundles)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Community centre edits are disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 
@@ -738,7 +758,7 @@ namespace LoveOfCooking
 				if (!ModEntry.Config.AddCookingToolProgression)
 				{
 					Log.D($"Did not edit {asset.AssetName}: Cooking equipment is disabled in config file.",
-						Config.DebugMode);
+						ModEntry.Config.DebugMode);
 					return;
 				}
 
