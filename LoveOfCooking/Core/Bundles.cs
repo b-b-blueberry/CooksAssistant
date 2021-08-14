@@ -45,33 +45,33 @@ namespace LoveOfCooking
 
 		internal static void RegisterEvents()
 		{
-			Helper.Events.GameLoop.Saving += GameLoop_Saving;
-			Helper.Events.GameLoop.DayStarted += GameLoop_DayStarted;
-			Helper.Events.Input.ButtonPressed += Input_ButtonPressed;
-			Helper.Events.Player.Warped += Player_Warped;
-			Helper.Events.Display.MenuChanged += Display_MenuChanged;
+			Helper.Events.GameLoop.Saving += Bundles.GameLoop_Saving;
+			Helper.Events.GameLoop.DayStarted += Bundles.GameLoop_DayStarted;
+			Helper.Events.Input.ButtonPressed += Bundles.Input_ButtonPressed;
+			Helper.Events.Player.Warped += Bundles.Player_Warped;
+			Helper.Events.Display.MenuChanged += Bundles.Display_MenuChanged;
 		}
 
 		public static void AddConsoleCommands(string cmd)
 		{
 			Helper.ConsoleCommands.Add(cmd + "printcc", "Print Community Centre bundle states.", (s, args) =>
 			{
-				CommunityCenter cc = GetCommunityCentre();
-				PrintBundleData(cc);
+				CommunityCenter cc = Bundles.GetCommunityCentre();
+				Bundles.PrintBundleData(cc);
 			});
 			Helper.ConsoleCommands.Add(cmd + "loadcc", "Load custom bundle data into the game.", (s, args) =>
 			{
-				LoadBundleData();
+				Bundles.LoadBundleData();
 			});
 			Helper.ConsoleCommands.Add(cmd + "unloadcc", "Clear all bundle data from the game.", (s, args) =>
 			{
-				SaveAndUnloadBundleData();
+				Bundles.SaveAndUnloadBundleData();
 			});
 			Helper.ConsoleCommands.Add(cmd + "listcc", "List all bundle IDs currently loaded.", (s, args) =>
 			{
 				var bad = Helper.Reflection.GetField
 					<Dictionary<int, int>>
-					(GetCommunityCentre(), "bundleToAreaDictionary").GetValue();
+					(Bundles.GetCommunityCentre(), "bundleToAreaDictionary").GetValue();
 				string msg = Game1.netWorldState.Value.BundleData.Aggregate("", (str, pair)
 					=> $"{str}\n[Area {bad[int.Parse(pair.Key.Split('/')[1])]}] {pair.Key}: {pair.Value.Split('/')[0]} bundle");
 				Log.D(msg);
@@ -90,7 +90,7 @@ namespace LoveOfCooking
 			{
 				var abd = Helper.Reflection.GetField
 					<Dictionary<int, List<int>>>
-					(GetCommunityCentre(), "areaToBundleDictionary").GetValue();
+					(Bundles.GetCommunityCentre(), "areaToBundleDictionary").GetValue();
 				if (args.Length == 0 || !int.TryParse(args[0], out int area) || !abd.ContainsKey(area))
 				{
 					Log.D("No area found.");
@@ -101,14 +101,14 @@ namespace LoveOfCooking
 				{
 					if (area == CommunityCentreAreaNumber)
 					{
-						if (IsAbandonedJojaMartBundleAvailable() && bundle >= BundleStartIndex)
+						if (Bundles.IsAbandonedJojaMartBundleAvailable() && bundle >= BundleStartIndex)
 							continue;
-						else if (!IsAbandonedJojaMartBundleAvailable() && bundle < BundleStartIndex)
+						else if (!Bundles.IsAbandonedJojaMartBundleAvailable() && bundle < BundleStartIndex)
 							continue;
 					}
-					if (GetCommunityCentre().isBundleComplete(bundle))
+					if (Bundles.GetCommunityCentre().isBundleComplete(bundle))
 						continue;
-					GiveBundleItems(bundle, print: true);
+					Bundles.GiveBundleItems(bundle, print: true);
 				}
 			});
 			Helper.ConsoleCommands.Add(cmd + "bundlereset", "Reset a bundle's saved progress to entirely incomplete.", (s, args) =>
@@ -119,25 +119,25 @@ namespace LoveOfCooking
 					Log.D("No bundle found.");
 					return;
 				}
-				if (IsCommunityCentreComplete())
+				if (Bundles.IsCommunityCentreComplete())
 				{
 					Log.D("Too late.");
 					return;
 				}
 
-				ResetBundleProgress(bundle, print: true);
+				Bundles.ResetBundleProgress(bundle, print: true);
 			});
 			Helper.ConsoleCommands.Add(cmd + "areareset", "Reset all bundle progress for an area to entirely incomplete.", (s, args) =>
 			{
 				var abd = Helper.Reflection.GetField
 					<Dictionary<int, List<int>>>
-					(GetCommunityCentre(), "areaToBundleDictionary").GetValue();
+					(Bundles.GetCommunityCentre(), "areaToBundleDictionary").GetValue();
 				if (args.Length == 0 || !int.TryParse(args[0], out int area) || !abd.ContainsKey(area))
 				{
 					Log.D("No area found.");
 					return;
 				}
-				if (IsCommunityCentreComplete())
+				if (Bundles.IsCommunityCentreComplete())
 				{
 					Log.D("Too late.");
 					return;
@@ -145,7 +145,7 @@ namespace LoveOfCooking
 
 				foreach (int bundle in abd[area])
 				{
-					ResetBundleProgress(bundle, print: true);
+					Bundles.ResetBundleProgress(bundle, print: true);
 				}
 			});
 		}
@@ -165,36 +165,36 @@ namespace LoveOfCooking
 				Log.E("" + e);
 			}
 
-			CommunityCenter cc = GetCommunityCentre();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 
 			// Check for sending warnings re: multiplayer and bundles
-			_debugLastCabinsCount = GetNumberOfCabinsBuilt();
+			_debugLastCabinsCount = Bundles.GetNumberOfCabinsBuilt();
 
 			// Handle custom bundle data unloading and loading
-			Dictionary<int, string> customBundleData = ParseBundleData();
+			Dictionary<int, string> customBundleData = Bundles.ParseBundleData();
 			BundleCount = customBundleData.Count;
 			Log.D($"Bundles identified: [{BundleCount}]: {string.Join(", ", customBundleData.Keys)}",
 				Config.DebugMode);
 			
 			// Fetch tile position for opening/closing fridge visually
-			FridgeTilePosition = FindCommunityCentreFridge();
+			FridgeTilePosition = Bundles.FindCommunityCentreFridge();
 			// Add community centre kitchen fridge container to the map for later
 			if (!cc.Objects.ContainsKey(FridgeChestPosition))
 			{
 				cc.Objects.Add(FridgeChestPosition, new Chest(true, FridgeChestPosition));
 			}
-			
-			PrintBundleData(GetCommunityCentre());
+
+			Bundles.PrintBundleData(GetCommunityCentre());
 			Log.D("End of default world bundle data. Now unloading custom bundles.",
 				Config.DebugMode);
-			SaveAndUnloadBundleData();
+			Bundles.SaveAndUnloadBundleData();
 
-			if (!IsCommunityCentreKitchenEnabledByHost())
+			if (!Bundles.IsCommunityCentreKitchenEnabledByHost())
 			{
 				Log.D("Did not load bundle data: Community Centre bundles not enabled by host.",
 					Config.DebugMode);
 			}
-			else if (IsCommunityCentreComplete())
+			else if (Bundles.IsCommunityCentreComplete())
 			{
 				Log.D("Did not load bundle data: Community Centre already completed.",
 					Config.DebugMode);
@@ -208,7 +208,7 @@ namespace LoveOfCooking
 					{
 						Log.D("Sending notification re: multiplayer world bundle data opt-in.",
 							Config.DebugMode);
-						SetCommunityCentreKitchenForThisSession(false);
+						Bundles.SetCommunityCentreKitchenForThisSession(false);
 						NotificationMenu.AddNewPendingNotification(NotificationMenu.Notification.BundleMultiplayerWarning);
 					}
 				}
@@ -216,7 +216,7 @@ namespace LoveOfCooking
 				{
 					Log.D("Loading first-time world bundle data for multiplayer peer.",
 						Config.DebugMode);
-					LoadBundleData();
+					Bundles.LoadBundleData();
 				}
 			}
 		}
@@ -226,7 +226,7 @@ namespace LoveOfCooking
 			// Save local (and/or persistent) community centre data
 			Log.D("Unloading world bundle data at end of day.",
 				Config.DebugMode);
-			SaveAndUnloadBundleData();
+			Bundles.SaveAndUnloadBundleData();
 		}
 
 		private static void Display_MenuChanged(object sender, MenuChangedEventArgs e)
@@ -234,7 +234,7 @@ namespace LoveOfCooking
 			if (e.OldMenu is TitleMenu || e.NewMenu is TitleMenu || Game1.currentLocation == null || Game1.player == null)
 				return;
 
-			if (e.OldMenu is JunimoNoteMenu junimoNoteMenu && e.NewMenu == null && !IsCommunityCentreComplete())
+			if (e.OldMenu is JunimoNoteMenu junimoNoteMenu && e.NewMenu == null && !Bundles.IsCommunityCentreComplete())
 			{
 				// Counteract the silly check for (whichArea == 6) in JunimoNoteMenu.setUpMenu(whichArea, bundlesComplete)
 				foreach (Farmer player in Game1.getAllFarmers())
@@ -273,9 +273,9 @@ namespace LoveOfCooking
 			}
 
 			// Check to send multiplayer bundle warning mail when building new cabins
-			if (IsCommunityCentreKitchenEnabledByHost())
+			if (Bundles.IsCommunityCentreKitchenEnabledByHost())
 			{
-				int currentCabinsCount = GetNumberOfCabinsBuilt();
+				int currentCabinsCount = Bundles.GetNumberOfCabinsBuilt();
 				if (e.OldMenu is CarpenterMenu && currentCabinsCount > _debugLastCabinsCount)
 				{
 					_debugLastCabinsCount = currentCabinsCount;
@@ -286,7 +286,7 @@ namespace LoveOfCooking
 			// Close Community Centre fridge door after use in the renovated kitchen
 			if (e.OldMenu is ItemGrabMenu && e.NewMenu == null
 				&& Game1.currentLocation is CommunityCenter cc1
-				&& (IsCommunityCentreComplete() || (cc1.areasComplete.Count > CommunityCentreAreaNumber && cc1.areasComplete[CommunityCentreAreaNumber]))
+				&& (Bundles.IsCommunityCentreComplete() || (cc1.areasComplete.Count > CommunityCentreAreaNumber && cc1.areasComplete[CommunityCentreAreaNumber]))
 				&& FridgeTilePosition != Vector2.Zero
 				&& cc1.Map.GetLayer("Front").Tiles[(int)FridgeTilePosition.X, (int)FridgeTilePosition.Y - 1] is Tile tileA
 				&& cc1.Map.GetLayer("Buildings").Tiles[(int)FridgeTilePosition.X, (int)FridgeTilePosition.Y] is Tile tileB
@@ -314,17 +314,17 @@ namespace LoveOfCooking
 			{
 				if (IsCommunityCentreKitchenEnabledByHost())
 				{
-					Helper.Events.GameLoop.UpdateTicked += Event_MoveJunimo; // fgs fds
-					Log.D($"Warped to CC: areasComplete count: {cc.areasComplete.Count}, complete: {IsCommunityCentreComplete()}",
+					Helper.Events.GameLoop.UpdateTicked += Bundles.Event_MoveJunimo; // fgs fds
+					Log.D($"Warped to CC: areasComplete count: {cc.areasComplete.Count}, complete: {Bundles.IsCommunityCentreComplete()}",
 						Config.DebugMode);
 
-					if (GetCommunityCentre().areAllAreasComplete())
+					if (cc.areAllAreasComplete())
 					{
-						DrawStarInCommunityCentre(cc);
+						Bundles.DrawStarInCommunityCentre(cc);
 					}
 					else
 					{
-						CheckAndTryToUnrenovateKitchen();
+						Bundles.CheckAndTryToUnrenovateKitchen();
 					}
 				}
 			}
@@ -342,9 +342,9 @@ namespace LoveOfCooking
 			{
 				// Navigate community centre bundles inventory menu
 				if (Game1.activeClickableMenu is JunimoNoteMenu menu && menu != null
-					&& IsCommunityCentreKitchenEnabledByHost()
-					&& !IsCommunityCentreKitchenComplete()
-					&& GetCommunityCentre() is CommunityCenter cc
+					&& Bundles.IsCommunityCentreKitchenEnabledByHost()
+					&& !Bundles.IsCommunityCentreKitchenComplete()
+					&& Bundles.GetCommunityCentre() is CommunityCenter cc
 					&& cc.shouldNoteAppearInArea(CommunityCentreAreaNumber))
 				{
 					if (!Game1.player.hasOrWillReceiveMail("canReadJunimoText"))
@@ -354,7 +354,7 @@ namespace LoveOfCooking
 					}
 
 					Point cursor = Utility.Vector2ToPoint(e.Cursor.ScreenPixels);
-					NavigateJunimoNoteMenuAroundKitchen(cc, menu, cursor.X, cursor.Y);
+					Bundles.NavigateJunimoNoteMenuAroundKitchen(cc, menu, cursor.X, cursor.Y);
 				}
 			}
 
@@ -373,7 +373,7 @@ namespace LoveOfCooking
 					.Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
 
 				// Open Community Centre fridge door
-				if (Game1.currentLocation is CommunityCenter cc && IsCommunityCentreKitchenComplete()
+				if (Game1.currentLocation is CommunityCenter cc && Bundles.IsCommunityCentreKitchenComplete()
 					&& tile != null && tile.TileIndex == FridgeTileIndexes[FridgeTilesToUse][1])
 				{
 					// Change tile to use custom open-fridge sprite
@@ -396,26 +396,26 @@ namespace LoveOfCooking
 		private static void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
 		{
 			// TODO: UPDATE: Send followup mail when the kitchen bundle is completed
-			if (ModEntry.SendBundleFollowupMail && IsCommunityCentreKitchenComplete() && Game1.MasterPlayer.hasOrWillReceiveMail(ModEntry.MailKitchenCompleted))
+			if (ModEntry.SendBundleFollowupMail && Bundles.IsCommunityCentreKitchenComplete() && Game1.MasterPlayer.hasOrWillReceiveMail(ModEntry.MailKitchenCompleted))
 			{
 				Game1.addMailForTomorrow(ModEntry.MailKitchenCompletedFollowup);
 			}
 
 			// Load in new community centre bundle data
 			// Hosts must have the Community Centre changes enabled, and hosts/farmhands must be joining a world with custom bundles apparently enabled
-			if (IsCommunityCentreComplete())
+			if (Bundles.IsCommunityCentreComplete())
 			{
 				Log.D("Community centre complete, unloading any bundle data.",
 					Config.DebugMode);
-				SaveAndUnloadBundleData();
-				SetCommunityCentreKitchenForThisSession(false);
+				Bundles.SaveAndUnloadBundleData();
+				Bundles.SetCommunityCentreKitchenForThisSession(false);
 
 			}
-			else if (IsCommunityCentreKitchenEnabledByHost())
+			else if (Bundles.IsCommunityCentreKitchenEnabledByHost())
 			{
 				Log.D("Community centre incomplete, loading bundle data.",
 					Config.DebugMode);
-				LoadBundleData();
+				Bundles.LoadBundleData();
 			}
 		}
 
@@ -426,18 +426,19 @@ namespace LoveOfCooking
 
 		public static bool IsCommunityCentreComplete()
 		{
-			CommunityCenter cc = GetCommunityCentre();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			if (cc == null)
 				return false;
 
 			bool masterPlayerComplete = Game1.MasterPlayer.hasCompletedCommunityCenter();
-			bool cutsceneSeen = Utility.HasAnyPlayerSeenEvent(191393);
+			bool cutsceneSeen = Game1.MasterPlayer.eventsSeen.Contains(191393) // CC complete
+				|| Game1.MasterPlayer.eventsSeen.Contains(502261); // Joja complete
 			return masterPlayerComplete || cutsceneSeen;
 		}
 
 		public static bool IsCommunityCentreKitchenEnabledByHost()
 		{
-			CommunityCenter cc = GetCommunityCentre();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			if (cc == null)
 				return false;
 
@@ -450,14 +451,14 @@ namespace LoveOfCooking
 
 		public static bool IsCommunityCentreKitchenComplete()
 		{
-			CommunityCenter cc = GetCommunityCentre();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			if (cc == null)
 				return false;
 
 			bool receivedMail = Game1.MasterPlayer != null && Game1.MasterPlayer.hasOrWillReceiveMail(ModEntry.MailKitchenCompleted);
 			bool missingAreasCompleteEntries = cc.areasComplete.Count <= CommunityCentreAreaNumber;
 			bool areaIsComplete = missingAreasCompleteEntries || cc.areasComplete[CommunityCentreAreaNumber];
-			bool ccIsComplete = IsCommunityCentreComplete();
+			bool ccIsComplete = Bundles.IsCommunityCentreComplete();
 			Log.T($"IsCommunityCentreKitchenCompleted: (mail: {receivedMail}), (entries: {missingAreasCompleteEntries}) || (areas: {areaIsComplete})");
 			return receivedMail || missingAreasCompleteEntries || areaIsComplete || ccIsComplete;
 		}
@@ -477,7 +478,7 @@ namespace LoveOfCooking
 			Log.D($"Checking to unrenovate area for kitchen",
 				Config.DebugMode);
 
-			CommunityCenter cc = GetCommunityCentre();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			if (cc.areasComplete.Count <= CommunityCentreAreaNumber || cc.areasComplete[CommunityCentreAreaNumber])
 				return;
 
@@ -485,6 +486,7 @@ namespace LoveOfCooking
 				Config.DebugMode);
 
 			// Replace tiles
+			// TODO: 1.0.20: Unpatch tiles for CC kitchen from pantry changes
 			cc.Map = Game1.content.Load<Map>(@"Maps/CommunityCenter_Ruins").mergeInto(cc.Map, Vector2.Zero, CommunityCentreArea);
 
 			// Replace lighting
@@ -515,8 +517,8 @@ namespace LoveOfCooking
 
 		public static Chest GetCommunityCentreFridge()
 		{
-			CommunityCenter cc = GetCommunityCentre();
-			Chest fridge = IsCommunityCentreKitchenComplete()
+			CommunityCenter cc = Bundles.GetCommunityCentre();
+			Chest fridge = Bundles.IsCommunityCentreKitchenComplete()
 					? cc.Objects.ContainsKey(FridgeChestPosition)
 						? (Chest)cc.Objects[FridgeChestPosition]
 						: null
@@ -526,7 +528,7 @@ namespace LoveOfCooking
 
 		private static Vector2 FindCommunityCentreFridge()
 		{
-			CommunityCenter cc = GetCommunityCentre();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			int w = cc.Map.GetLayer("Buildings").LayerWidth;
 			int h = cc.Map.GetLayer("Buildings").LayerHeight;
 			for (int x = 0; x < w; ++x)
@@ -608,7 +610,7 @@ namespace LoveOfCooking
 			if (_menuTab > -1)
 			{
 				// Change the menu tab on the next tick to avoid errors
-				Helper.Events.GameLoop.UpdateTicked += Event_ChangeJunimoMenuTab;
+				Helper.Events.GameLoop.UpdateTicked += Bundles.Event_ChangeJunimoMenuTab;
 			}
 		}
 
@@ -635,11 +637,11 @@ namespace LoveOfCooking
 
 		private static void ResetBundleProgress(int whichBundle, bool print)
 		{
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			Dictionary<int, int> bad = Reflection.GetField
 				<Dictionary<int, int>>
-				(GetCommunityCentre(), "bundleToAreaDictionary")
+				(cc, "bundleToAreaDictionary")
 				.GetValue();
-			CommunityCenter cc = GetCommunityCentre();
 
 			cc.bundleRewards[whichBundle] = false;
 			cc.bundles[whichBundle] = new bool[cc.bundles[whichBundle].Length];
@@ -662,14 +664,14 @@ namespace LoveOfCooking
 		{
 			Log.D("CACB Reloading custom bundle data",
 				Config.DebugMode);
-			SaveAndUnloadBundleData();
-			LoadBundleData();
+			Bundles.SaveAndUnloadBundleData();
+			Bundles.LoadBundleData();
 		}
 
 		internal static void LoadBundleData()
 		{
-			CommunityCenter cc = GetCommunityCentre();
-			Dictionary<int, string> customBundleData = ParseBundleData();
+			CommunityCenter cc = Bundles.GetCommunityCentre();
+			Dictionary<int, string> customBundleData = Bundles.ParseBundleData();
 
 			Log.D(customBundleData.Aggregate("CACB customBundleData: ", (s, pair) => $"{s}\n{pair.Key}: {pair.Value}"),
 				Config.DebugMode);
@@ -837,7 +839,7 @@ namespace LoveOfCooking
 					+ $", FarmHands: {Game1.getAllFarmhands().Count()}"
 					+ $"\n{e}");
 			}
-			PrintBundleData(cc);
+			Bundles.PrintBundleData(cc);
 			Log.D("CACB End of loaded custom bundle data.",
 				Config.DebugMode);
 		}
@@ -876,7 +878,7 @@ namespace LoveOfCooking
 							Config.DebugMode);
 					}
 				}
-				cc.modData[ModEntry.AssetPrefix + "area_completed"] = IsCommunityCentreKitchenComplete().ToString();
+				cc.modData[ModEntry.AssetPrefix + "area_completed"] = Bundles.IsCommunityCentreKitchenComplete().ToString();
 			}
 			else
 			{
@@ -906,7 +908,7 @@ namespace LoveOfCooking
 				catch (Exception e)
 				{
 					Log.E($"CACB Error while updating CC areasComplete[{cc.areasComplete.Count()}] NetArray:"
-						+ $"\nMultiplayer: {Game1.IsMultiplayer}-{IsMultiplayer()}"
+						+ $"\nMultiplayer: {Game1.IsMultiplayer}-{Bundles.IsMultiplayer()}"
 						+ $", MasterGame: {Game1.IsMasterGame}"
 						+ $", MasterPlayer: {Game1.player.UniqueMultiplayerID == Game1.MasterPlayer.UniqueMultiplayerID}"
 						+ $", FarmHands: {Game1.getAllFarmhands().Count()}"
@@ -999,7 +1001,7 @@ namespace LoveOfCooking
 				parsedBundle.Add(parsedRewards);
 
 				// Parse and add item requirements for this bundle
-				List<int> parsedItems = ParseBundleItems(sourceBundles[key][1].Split(' '));
+				List<int> parsedItems = Bundles.ParseBundleItems(sourceBundles[key][1].Split(' '));
 				parsedBundle.Add(parsedItems.ConvertAll(o => o.ToString()));
 
 				// Patch new data into the target bundle dictionary, including mininmum completion count and display name
@@ -1028,7 +1030,11 @@ namespace LoveOfCooking
 				// Group and parse each [name quantity quality] cluster
 				if (j != startIndex && int.TryParse(sourceItems[j], out int itemQuantity))
 				{
-					string itemName = string.Join(" ", sourceItems.Skip(startIndex).Take(j - startIndex).ToArray());
+					string itemName = string.Join(" ", 
+						sourceItems
+							.Skip(startIndex)
+							.Take(j - startIndex)
+							.ToArray());
 					int itemQuality = int.Parse(sourceItems[++j]);
 					int itemId = Interface.Interfaces.JsonAssets.GetObjectId(itemName);
 
@@ -1051,7 +1057,7 @@ namespace LoveOfCooking
 
 		public static bool IsMultiplayer()
 		{
-			return Game1.IsMultiplayer || GetNumberOfCabinsBuilt() > 0;
+			return Game1.IsMultiplayer || Bundles.GetNumberOfCabinsBuilt() > 0;
 		}
 
 		public static int GetNumberOfCabinsBuilt()
@@ -1062,8 +1068,8 @@ namespace LoveOfCooking
 
 		private static void Event_MoveJunimo(object sender, UpdateTickedEventArgs e)
 		{
-			Helper.Events.GameLoop.UpdateTicked -= Event_MoveJunimo;
-			CommunityCenter cc = GetCommunityCentre();
+			Helper.Events.GameLoop.UpdateTicked -= Bundles.Event_MoveJunimo;
+			CommunityCenter cc = Bundles.GetCommunityCentre();
 			Point p = CommunityCentreNotePosition;
 			if (cc.characters.FirstOrDefault(c => c is Junimo j && j.whichArea.Value == CommunityCentreAreaNumber) == null)
 			{
@@ -1073,7 +1079,7 @@ namespace LoveOfCooking
 			else
 			{
 				cc.characters.FirstOrDefault(c => c is Junimo j && j.whichArea.Value == CommunityCentreAreaNumber)
-					.Position = new Vector2(p.X, p.Y + 2) * 64f;
+					.Position = new Vector2(p.X, p.Y + 2) * Game1.tileSize;
 				Log.D("Moving junimo",
 					Config.DebugMode);
 			}
@@ -1081,12 +1087,12 @@ namespace LoveOfCooking
 
 		private static void Event_ChangeJunimoMenuTab(object sender, UpdateTickedEventArgs e)
 		{
-			Helper.Events.GameLoop.UpdateTicked -= Event_ChangeJunimoMenuTab;
+			Helper.Events.GameLoop.UpdateTicked -= Bundles.Event_ChangeJunimoMenuTab;
 			Reflection.GetField<int>((JunimoNoteMenu)Game1.activeClickableMenu, "whichArea").SetValue(_menuTab);
 			if (_menuTab == CommunityCentreAreaNumber)
 			{
 				((JunimoNoteMenu)Game1.activeClickableMenu).bundles.Clear();
-				((JunimoNoteMenu)Game1.activeClickableMenu).setUpMenu(CommunityCentreAreaNumber, GetCommunityCentre().bundlesDict());
+				((JunimoNoteMenu)Game1.activeClickableMenu).setUpMenu(CommunityCentreAreaNumber, Bundles.GetCommunityCentre().bundlesDict());
 			}
 		}
 	}

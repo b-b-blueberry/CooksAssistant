@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using StardewValley.TerrainFeatures;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 {
 	public static class BushPatches
 	{
-		public static void Patch(HarmonyInstance harmony)
+		public static void Patch(Harmony harmony)
 		{
 			System.Type type = typeof(Bush);
 			var prefixes = new List<KeyValuePair<string, string>>

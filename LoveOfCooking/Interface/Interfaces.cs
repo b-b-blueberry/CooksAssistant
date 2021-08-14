@@ -26,6 +26,7 @@ namespace LoveOfCooking.Interface
 		internal static bool UsingNettlesCrops;
 		internal static bool UsingLevelExtender;
 		internal static bool UsingBigBackpack;
+		internal static bool UsingProducerFramework;
 		internal static bool UsingFarmhouseKitchenStart;
 
 
@@ -51,6 +52,7 @@ namespace LoveOfCooking.Interface
 			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
+			UsingProducerFramework = Helper.ModRegistry.IsLoaded("Digus.ProducerFrameworkMod");
 			UsingFarmhouseKitchenStart = new string[]
 			{
 				"Allayna.Kitchen",

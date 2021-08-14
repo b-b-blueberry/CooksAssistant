@@ -1,7 +1,6 @@
 ﻿using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using PyTK.Extensions;
 using SpaceCore.Events;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
@@ -105,13 +104,13 @@ namespace LoveOfCooking
 			Luck
 		}
 		// safe item names
-		internal const string CookingCraftableName = ObjectPrefix + "cookingcraftable";
-		internal string ChocolateName { get { return Interface.Interfaces.UsingPPJACrops ? "Chocolate" : ObjectPrefix + "chocolate"; } }
-		internal string CabbageName { get { return Interface.Interfaces.UsingPPJACrops ? "Cabbage" : ObjectPrefix + "cabbage"; } }
-		internal string OnionName { get { return Interface.Interfaces.UsingPPJACrops ? "Onion" : ObjectPrefix + "onion"; } }
-		internal string CarrotName { get { return Interface.Interfaces.UsingPPJACrops ? "Carrot" : ObjectPrefix + "carrot"; } }
-		internal string NettleName { get { return Interface.Interfaces.UsingNettlesCrops ? "Nettles" : ObjectPrefix + "nettles"; } }
-		internal string NettleTeaName { get { return Interface.Interfaces.UsingNettlesCrops ? "Nettle Tea" : ObjectPrefix + "nettletea"; } }
+		internal const string CookingCraftableName = "Cookout Kit";
+		internal string ChocolateName { get { return Interface.Interfaces.UsingPPJACrops ? "Chocolate" : $"{ObjectPrefix}chocolate"; } }
+		internal string CabbageName { get { return Interface.Interfaces.UsingPPJACrops ? "Cabbage" : $"{ObjectPrefix}cabbage"; } }
+		internal string OnionName { get { return Interface.Interfaces.UsingPPJACrops ? "Onion" : $"{ObjectPrefix}onion"; } }
+		internal string CarrotName { get { return Interface.Interfaces.UsingPPJACrops ? "Carrot" : $"{ObjectPrefix}carrot"; } }
+		internal string NettleName { get { return Interface.Interfaces.UsingNettlesCrops ? "Nettles" : $"{ObjectPrefix}nettles"; } }
+		internal string NettleTeaName { get { return Interface.Interfaces.UsingNettlesCrops ? "Nettle Tea" : $"{ObjectPrefix}nettletea"; } }
 		// cook at kitchens
 		internal static Dictionary<string, string> NpcHomeLocations;
 		internal static readonly List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
@@ -134,9 +133,6 @@ namespace LoveOfCooking
 		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan";
 
 		// Mod features
-		internal const bool CiderEnabled = true;
-		internal const bool PerryEnabled = false;
-		internal const bool MarmaladeEnabled = false;
 		internal const bool NettlesEnabled = true;
 		internal const bool RedberriesEnabled = false;
 		internal const bool PFMEnabled = false;
@@ -174,7 +170,6 @@ namespace LoveOfCooking
 			Helper.Events.GameLoop.DayEnding += this.GameLoop_DayEnding;
 			Helper.Events.GameLoop.ReturnedToTitle += this.GameLoop_ReturnedToTitle;
 			Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
-			Helper.Events.Player.InventoryChanged += this.Player_InventoryChanged;
 			Helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
 			Helper.Events.Display.MenuChanged += this.Display_MenuChanged;
 			Helper.Events.Display.Rendered += this.Display_Rendered;
@@ -187,6 +182,12 @@ namespace LoveOfCooking
 			Interface.Interfaces.RegisterEvents();
 			Bundles.RegisterEvents();
 			Tools.RegisterEvents();
+
+			if (!Interface.Interfaces.UsingProducerFramework)
+			{
+				Helper.Events.Input.ButtonPressed += this.Event_TryDropInItem;
+				Helper.Events.Player.InventoryChanged += this.Event_CheckForDroppedInItem;
+			}
 
 			if (Config.DebugMode && Config.DebugRegenTracker)
 			{
@@ -449,6 +450,7 @@ namespace LoveOfCooking
 
 			// Add the cookbook for the player once they've reached the unlock date
 			// Internally day and month are zero-indexed, but are one-indexed in data file for consistency with year
+			// Alternatively if the player somehow upgrades their house early, add the cookbook mail
 			if (Config.AddCookingMenu && !Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
 			{
 				int day = int.Parse(ItemDefinitions["CookbookMailDate"][0]) - 1;
@@ -458,7 +460,8 @@ namespace LoveOfCooking
 				bool reachedNextYear = (Game1.year > year);
 				bool reachedNextMonth = (Game1.year == year && gameMonth > month);
 				bool reachedMailDate = (Game1.year == year && gameMonth == month && Game1.dayOfMonth >= day);
-				if (reachedNextYear || reachedNextMonth || reachedMailDate)
+				bool unlockedFarmhouseKitchen = Game1.player.HouseUpgradeLevel > 0;
+				if (reachedNextYear || reachedNextMonth || reachedMailDate || unlockedFarmhouseKitchen)
 				{
 					Game1.addMail(MailCookbookUnlocked);
 				}
@@ -612,6 +615,108 @@ namespace LoveOfCooking
 				extraAlpha: 1f);
 		}
 
+		private void Event_TryDropInItem(object sender, ButtonPressedEventArgs e)
+		{
+			if (e.Button.IsUseToolButton())
+			{
+				if (Utils.AreNettlesActive()
+					&& Game1.currentLocation.Objects.ContainsKey(e.Cursor.GrabTile)
+					&& Game1.currentLocation.Objects[e.Cursor.GrabTile] is StardewValley.Object o
+					&& o != null
+					&& ItemDefinitions["NettlesUsableMachines"].Contains(o.Name)
+					&& o.heldObject?.Value == null
+					&& Game1.player.ActiveObject != null
+					&& Game1.player.ActiveObject.Name.ToLower().EndsWith("nettles"))
+				{
+					if (CookingSkillApi.IsEnabled()
+						&& CookingSkillApi.GetLevel() < int.Parse(ItemDefinitions["NettlesUsableLevel"][0]))
+					{
+						// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
+						Game1.playSound("cancel");
+					}
+					else
+					{
+						// Since kegs don't accept forage items, we trigger the dropIn behaviours through our inventory changed handler 
+						if (--Game1.player.ActiveObject.Stack < 1)
+							Game1.player.ActiveObject = null;
+						Helper.Input.Suppress(e.Button);
+					}
+				}
+			}
+		}
+
+		private void Event_CheckForDroppedInItem(object sender, InventoryChangedEventArgs e)
+		{
+			// Handle unique craftable input/output
+			if (Game1.activeClickableMenu == null
+				&& Config.AddNewCropsAndStuff
+				&& Interface.Interfaces.JsonAssets != null
+				&& Game1.currentLocation != null
+				&& ((Utility.PointToVector2(Game1.graphics.GraphicsDevice.Viewport.Bounds.Location)
+					+ new Vector2(Game1.getOldMouseX(), Game1.getOldMouseY())) / Game1.tileSize) is Vector2 tile
+				&& Game1.currentLocation.Objects.ContainsKey(tile)
+				&& Game1.currentLocation.Objects[tile] is StardewValley.Object craftable
+				&& craftable != null && craftable.bigCraftable.Value)
+			{
+				if (Utils.AreNettlesActive()
+					&& ItemDefinitions["NettlesUsableMachines"].Contains(craftable.Name)
+					&& Game1.player.mostRecentlyGrabbedItem != null
+					&& Game1.player.mostRecentlyGrabbedItem.Name.ToLower().EndsWith("nettles")
+					&& craftable.heldObject.Value == null) // Keg must be empty
+				{
+					string name = NettleTeaName;
+					craftable.heldObject.Value = new StardewValley.Object(
+						Vector2.Zero,
+						Interface.Interfaces.JsonAssets.GetObjectId(name),
+						Givenname: name,
+						canBeSetDown: false,
+						canBeGrabbed: true,
+						isHoedirt: false,
+						isSpawnedObject: false);
+					craftable.MinutesUntilReady = 180;
+
+					// Since kegs don't accept forage items, we perform the dropIn behaviours ourselves
+					Game1.currentLocation.playSound("Ship");
+					Game1.currentLocation.playSound("bubbles");
+					Multiplayer multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
+					multiplayer.broadcastSprites(
+						Game1.currentLocation,
+						new TemporaryAnimatedSprite(
+							textureName: "TileSheets\\animations",
+							sourceRect: new Rectangle(256, 1856, 64, 128),
+							animationInterval: 80f,
+							animationLength: 6,
+							numberOfLoops: 999999,
+							position: craftable.TileLocation * 64f + new Vector2(0f, -128f),
+							flicker: false,
+							flipped: false,
+							layerDepth: (craftable.TileLocation.Y + 1f) * 64f / 10000f + 0.0001f,
+							alphaFade: 0f,
+							color: Color.Lime * 0.75f,
+							scale: 1f, scaleChange: 0f, rotation: 0f, rotationChange: 0f)
+						{
+							alphaFade = 0.005f
+						});
+				}
+				else if (Game1.player.mostRecentlyGrabbedItem != null
+					&& Game1.player.mostRecentlyGrabbedItem.Name.EndsWith("Apple")
+					&& craftable.heldObject.Value != null // Keg will not be empty, but we override base behaviour
+					&& !(craftable.heldObject.Value.Name.EndsWith("cider")))
+				{
+					var name = ObjectPrefix + "cider";
+					craftable.heldObject.Value = new StardewValley.Object(
+						Vector2.Zero,
+						Interface.Interfaces.JsonAssets.GetObjectId(name),
+						Givenname: name,
+						canBeSetDown: false,
+						canBeGrabbed: true,
+						isHoedirt: false,
+						isSpawnedObject: false);
+					craftable.MinutesUntilReady = 1900;
+				}
+			}
+		}
+
 		private void Event_DrawDebugRegenTracker(object sender, RenderedHudEventArgs e)
 		{
 			for (int i = 0; i < States.Value.RegenTicksDiff.Count; ++i)
@@ -695,19 +800,10 @@ namespace LoveOfCooking
 			    || !Game1.player.CanMove) // Player agency enabled
 				return;
 
-			if (Game1.currentLocation != null && !Game1.currentLocation.IsOutdoors && Game1.player.ActiveObject?.Name == CookingCraftableName
-				&& (e.Button.IsActionButton() || e.Button.IsUseToolButton()))
-			{
-				// Block the portable grill from being placed indoors
-				Game1.playSound("cancel");
-				Game1.showRedMessage(i18n.Get("world.cooking_craftable.rejected_indoors"));
-				Helper.Input.Suppress(e.Button);
-			}
-
 			if (e.Button.IsActionButton())
 			{
 				// Tile actions
-				bool openFridge = false;
+				bool overrideBaseBehaviour = false;
 				xTile.Tiles.Tile tile = Game1.currentLocation.Map.GetLayer("Buildings").Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
 				string action = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
 				if (tile != null)
@@ -721,7 +817,7 @@ namespace LoveOfCooking
 						{
 							if (action == "kitchen" || action == "drawer")
 							{
-								openFridge = true;
+								overrideBaseBehaviour = true;
 							}
 						}
 					}
@@ -738,7 +834,7 @@ namespace LoveOfCooking
 								// Avoid blocking the player from submitting items to special order dropboxes
 								return;
 							}
-							openFridge = true;
+							overrideBaseBehaviour = true;
 						}
 						else
 						{
@@ -753,10 +849,10 @@ namespace LoveOfCooking
 					&& Game1.currentLocation.Objects[e.Cursor.GrabTile].Name == CookingCraftableName)
 				{
 					Game1.playSound("bigSelect");
-					openFridge = true;
+					overrideBaseBehaviour = true;
 				}
 
-				if (openFridge)
+				if (overrideBaseBehaviour)
 				{
 					Utils.OpenNewCookingMenu();
 					Helper.Input.Suppress(e.Button);
@@ -765,32 +861,6 @@ namespace LoveOfCooking
 
 				// Use tile actions in maps
 				Utils.CheckTileAction(e.Cursor.GrabTile, Game1.currentLocation);
-			}
-			else if (e.Button.IsUseToolButton())
-			{
-				if (Utils.AreNettlesActive()
-					&& Game1.currentLocation.Objects.ContainsKey(e.Cursor.GrabTile)
-					&& Game1.currentLocation.Objects[e.Cursor.GrabTile] is StardewValley.Object o
-					&& o != null
-					&& ItemDefinitions["NettlesUsableMachines"].Contains(o.Name)
-					&& o.heldObject?.Value == null
-					&& Game1.player.ActiveObject != null
-					&& Game1.player.ActiveObject.Name.ToLower().EndsWith("nettles"))
-				{
-					if (CookingSkillApi.IsEnabled()
-						&& CookingSkillApi.GetLevel() < int.Parse(ItemDefinitions["NettlesUsableLevel"][0]))
-					{
-						// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
-						Game1.playSound("cancel");
-					}
-					else
-					{
-						// Since kegs don't accept forage items, we trigger the dropIn behaviours through our inventory changed handler 
-						if (--Game1.player.ActiveObject.Stack < 1)
-							Game1.player.ActiveObject = null;
-						Helper.Input.Suppress(e.Button);
-					}
-				}
 			}
 		}
 
@@ -1013,116 +1083,6 @@ namespace LoveOfCooking
 				}
 
 				return;
-			}
-		}
-
-		private void Player_InventoryChanged(object sender, InventoryChangedEventArgs e)
-		{
-			// Handle unique craftable input/output
-			if (Game1.activeClickableMenu == null
-				&& Config.AddNewCropsAndStuff
-				&& Interface.Interfaces.JsonAssets != null
-				&& Game1.currentLocation.Objects.ContainsKey(Game1.currentLocation.getTileAtMousePosition())
-				&& Game1.currentLocation.Objects[Game1.currentLocation.getTileAtMousePosition()] is StardewValley.Object craftable
-				&& craftable != null && craftable.bigCraftable.Value)
-			{
-				if (craftable.Name == "Keg")
-				{
-					if (Utils.AreNettlesActive()
-						&& Game1.player.mostRecentlyGrabbedItem != null
-						&& Game1.player.mostRecentlyGrabbedItem.Name.ToLower().EndsWith("nettles")
-						&& craftable.heldObject?.Value == null)
-					{
-						string name = NettleTeaName;
-						craftable.heldObject.Value = new StardewValley.Object(
-							Vector2.Zero,
-							Interface.Interfaces.JsonAssets.GetObjectId(name),
-							Givenname: name,
-							canBeSetDown: false,
-							canBeGrabbed: true,
-							isHoedirt: false,
-							isSpawnedObject: false);
-						craftable.MinutesUntilReady = 180;
-
-						// Since kegs don't accept forage items, we perform the dropIn behaviours ourselves
-						Game1.currentLocation.playSound("Ship");
-						Game1.currentLocation.playSound("bubbles");
-						Multiplayer multiplayer = Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
-						multiplayer.broadcastSprites(
-							Game1.currentLocation,
-							new TemporaryAnimatedSprite(
-								textureName: "TileSheets\\animations",
-								sourceRect: new Rectangle(256, 1856, 64, 128),
-								animationInterval: 80f,
-								animationLength: 6,
-								numberOfLoops: 999999,
-								position: craftable.TileLocation * 64f + new Vector2(0f, -128f),
-								flicker: false,
-								flipped: false,
-								layerDepth: (craftable.TileLocation.Y + 1f) * 64f / 10000f + 0.0001f,
-								alphaFade: 0f,
-								color: Color.Lime * 0.75f,
-								scale: 1f, scaleChange: 0f, rotation: 0f, rotationChange: 0f)
-							{
-								alphaFade = 0.005f
-							});
-					}
-					else if (CiderEnabled
-						&& Game1.player.mostRecentlyGrabbedItem != null
-						&& Game1.player.mostRecentlyGrabbedItem.Name.EndsWith("Apple")
-						&& craftable.heldObject.Value.Name != ObjectPrefix + "cider")
-					{
-						var name = ObjectPrefix + "cider";
-						craftable.heldObject.Value = new StardewValley.Object(
-							Vector2.Zero, 
-							Interface.Interfaces.JsonAssets.GetObjectId(name),
-							Givenname: name,
-							canBeSetDown: false,
-							canBeGrabbed: true,
-							isHoedirt: false,
-							isSpawnedObject: false);
-						craftable.MinutesUntilReady = 1900;
-					}
-					else if (PerryEnabled
-						&& Game1.player.mostRecentlyGrabbedItem != null
-						&& Game1.player.mostRecentlyGrabbedItem.Name.EndsWith("Pear"))
-					{
-						var name = ObjectPrefix + "perry";
-						craftable.heldObject.Value = new StardewValley.Object(
-							Vector2.Zero, 
-							Interface.Interfaces.JsonAssets.GetObjectId(name),
-							Givenname: name,
-							canBeSetDown: false,
-							canBeGrabbed: true,
-							isHoedirt: false,
-							isSpawnedObject: false);
-						craftable.MinutesUntilReady = 1900;
-					}
-				}
-				else if (craftable.Name == "Preserves Jar")
-				{
-					if (MarmaladeEnabled
-						&& craftable.heldObject.Value != null
-						&& !(craftable.heldObject.Value.Name.EndsWith("Marmalade"))
-						&& e.Removed.FirstOrDefault(o => ItemDefinitions["MarmaladeFoods"].Any(i => o.Name.EndsWith(i)))
-							is StardewValley.Object dropIn
-						&& dropIn != null)
-					{
-						craftable.heldObject.Value = new StardewValley.Object(
-							Vector2.Zero, 
-							Interface.Interfaces.JsonAssets.GetObjectId(ObjectPrefix + "marmalade"),
-							Givenname: dropIn.Name + " Marmalade",
-							canBeSetDown: false,
-							canBeGrabbed: true,
-							isHoedirt: false,
-							isSpawnedObject: false)
-						{
-							Price = 65 + dropIn.Price * 2,
-							name = dropIn.Name + " Marmalade"
-						};
-						craftable.MinutesUntilReady = 4600;
-					}
-				}
 			}
 		}
 

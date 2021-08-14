@@ -550,10 +550,10 @@ namespace LoveOfCooking.Objects
 				_inventorySelectButtons.Insert(0, new ClickableTextureComponent("inventorySelectFridge",
 					new Rectangle(-1, -1, 14 * Scale, 14 * Scale), null, null,
 					ModEntry.SpriteSheet, InventoryFridgeIconSource, Scale, false));
-				_inventorySelectButtons.Insert(0, new ClickableTextureComponent("inventorySelectBackpack",
-					new Rectangle(-1, -1, 14 * Scale, 14 * Scale), null, null,
-					ModEntry.SpriteSheet, InventoryBackpackIconSource, Scale, false));
 			}
+			_inventorySelectButtons.Insert(0, new ClickableTextureComponent("inventorySelectBackpack",
+				new Rectangle(-1, -1, 14 * Scale, 14 * Scale), null, null,
+				ModEntry.SpriteSheet, InventoryBackpackIconSource, Scale, false));
 
 			// Setup menu elements layout
 			this.RealignElements();

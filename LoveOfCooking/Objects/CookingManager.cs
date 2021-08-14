@@ -12,7 +12,10 @@ namespace LoveOfCooking.Objects
 		private readonly CookingMenu _cookingMenu;
 		private const int DefaultIngredientsSlots = 5;
 		internal int FirstEmptySlot => CurrentIngredients.FindIndex(i => i == null);
-		internal bool AreAllIngredientSlotsFilled => CurrentIngredients.GetRange(0, MaxIngredients).TrueForAll(i => i != null);
+		internal bool AreAllIngredientSlotsFilled => 
+			CurrentIngredients
+				.GetRange(0, MaxIngredients)
+				.TrueForAll(i => i != null);
 		private int _maxIngredients;
 		internal int MaxIngredients
 		{
@@ -213,13 +216,16 @@ namespace LoveOfCooking.Objects
 				int remainingRequired = itemAndQuantity.Value;
 				for (int i = 0; i < CurrentIngredients.Count && remainingRequired > 0; ++i)
 				{
+					if (CurrentIngredients[i] == null)
+						continue;
+
 					Item item = this.GetItemForIngredient(index: i, sourceItems: sourceItems);
 					if (item == null)
 					{
 						CurrentIngredients[i] = null; // No items were found for this ingredient, prevent it being checked later
 						return null;
 					}
-					if (IsMatchingIngredient(id: itemAndQuantity.Key, item: item))
+					if (CookingManager.IsMatchingIngredient(id: itemAndQuantity.Key, item: item))
 					{
 						// Mark ingredient for consumption and check remaining count before consuming other ingredients
 						int quantityToConsume = Math.Min(remainingRequired, item.Stack);
@@ -239,9 +245,28 @@ namespace LoveOfCooking.Objects
 
 		internal List<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity)
 		{
+			{
+				string msg1 = $"Cooking {recipe.name} x{quantity}";
+				string msg2 = recipe.recipeList.Aggregate("Requires: ", (str, pair) => $"{str} ({pair.Key} x{pair.Value})");
+				string msg3 = sourceItems.Aggregate("Sources: ", (str, list) => $"{str} ({sourceItems.IndexOf(list)} x{list.Count})");
+				string msg4 = CurrentIngredients.Aggregate("Current: ", (str, i) => $"{str} [{(i.HasValue ? i.Value.InventoryId + ", " + i.Value.ItemIndex : "null")}]");
+				Log.D($"{msg1}\n{msg2}\n{msg3}",
+					Config.DebugMode);
+			}
+
+			// Identify items to be consumed from inventory to fulfil ingredients requirements
 			Dictionary<int, int> ingredientsToConsume = this.ChooseIngredientsForCrafting(recipe: recipe, sourceItems: sourceItems);
+			// Set up dictionary for populating with quantities of different quality levels
 			Dictionary<int, int> qualityStacks = new Dictionary<int, int> { { 0, 0 }, { 1, 0 }, { 2, 0 }, { 4, 0 } };
 			int numPerCraft = recipe.numberProducedPerCraft;
+
+			{
+				string msg1 = "Indices: " + (ingredientsToConsume != null
+					? ingredientsToConsume.Aggregate("", (str, pair) => $"{str} ({pair.Key} {pair.Value})")
+					: "null");
+				Log.D($"{msg1}",
+					Config.DebugMode);
+			}
 
 			for (int i = 0; i < quantity && ingredientsToConsume != null; ++i)
 			{
@@ -267,7 +292,9 @@ namespace LoveOfCooking.Objects
 									&& CurrentIngredients[j].Value.InventoryId == ingredient.InventoryId
 									&& CurrentIngredients[j].Value.ItemIndex > ingredient.ItemIndex)
 								{
-									CurrentIngredients[j] = new Ingredient(CurrentIngredients[j].Value.InventoryId, CurrentIngredients[j].Value.ItemIndex - 1);
+									CurrentIngredients[j] = new Ingredient(
+										inventory: CurrentIngredients[j].Value.InventoryId,
+										index: CurrentIngredients[j].Value.ItemIndex - 1);
 								}
 							}
 						}
@@ -278,7 +305,8 @@ namespace LoveOfCooking.Objects
 				qualityStacks[0] += numPerCraft;
 
 				// Apply extra portion bonuses to the amount cooked
-				if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion) && ModEntry.CookingSkillApi.RollForExtraPortion())
+				if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
+					&& ModEntry.CookingSkillApi.RollForExtraPortion())
 				{
 					qualityStacks[0] += numPerCraft;
 				}
@@ -291,29 +319,34 @@ namespace LoveOfCooking.Objects
 			bool hasOilPerk = ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ImprovedOil);
 
 			// Gather seasonings as ingredients to use for improving cooked item qualities
-			bool limitToCurrentIngredients = !bool.Parse(ModEntry.ItemDefinitions["AutoConsumeOilAndSeasoning"][0]);
+			bool consumeSeasoningsFromInventory = bool.Parse(ModEntry.ItemDefinitions["AutoConsumeOilAndSeasoning"][0]);
 			List<Ingredient> ingredientsForSeasonings = new List<Ingredient>();
-			if (limitToCurrentIngredients)
-			{
-				ingredientsForSeasonings = CurrentIngredients.Where(i => i.HasValue).Select(i => i.Value)
-					.Where(i => IsSeasoning(item: sourceItems[i.InventoryId][i.ItemIndex])).ToList();
-			}
-			else
+			if (consumeSeasoningsFromInventory)
 			{
 				for (int i = 0; i < sourceItems.Count; ++i)
 				{
 					for (int j = 0; j < sourceItems[i].Count; ++j)
 					{
-						if (!IsSeasoning(item: sourceItems[i][j]))
+						if (!CookingManager.IsSeasoning(item: sourceItems[i][j]))
 							continue;
 						Ingredient ingredient = new Ingredient(inventory: i, index: j);
 						ingredientsForSeasonings.Add(ingredient);
 					}
 				}
 			}
+			else
+			{
+				ingredientsForSeasonings = CurrentIngredients
+					.Where(i => i.HasValue)
+					.Select(i => i.Value)
+					.Where(i => CookingManager.IsSeasoning(item: sourceItems[i.InventoryId][i.ItemIndex]))
+					.ToList();
+			}
 
 			// Consume best seasonings first, assuming seasonings follow the trend of higher-index = higher-quality
-			ingredientsForSeasonings = ingredientsForSeasonings.OrderByDescending(i => sourceItems[i.InventoryId][i.ItemIndex].ParentSheetIndex).ToList();
+			ingredientsForSeasonings = ingredientsForSeasonings
+				.OrderByDescending(i => sourceItems[i.InventoryId][i.ItemIndex].ParentSheetIndex)
+				.ToList();
 
 			// Consume seasoning items from ingredients to improve the recipe output item qualities, rebalancing the stack numbers per quality item
 			foreach (Ingredient ingredient in ingredientsForSeasonings)
@@ -366,7 +399,7 @@ namespace LoveOfCooking.Objects
 			{
 				for (int i = qualityStacks[quality] - 1; i >= 0; i -= numPerCraft)
 				{
-					if (GetBurnChance(recipe) > Game1.random.NextDouble())
+					if (CookingManager.GetBurnChance(recipe) > Game1.random.NextDouble())
 					{
 						qualityStacks[quality] -= numPerCraft;
 						++burntCount;
@@ -471,11 +504,16 @@ namespace LoveOfCooking.Objects
 				return;
 
 			// Fill slots with ingredients
-			List<Ingredient> ingredients = recipe.recipeList.SelectMany(itemAndQuantity => GetMatchingIngredients(
-					id: itemAndQuantity.Key, sourceItems: sourceItems, required: itemAndQuantity.Value)).ToList();
+			List<Ingredient> ingredients = recipe.recipeList
+				.SelectMany(itemAndQuantity => CookingManager.GetMatchingIngredients(
+					id: itemAndQuantity.Key, sourceItems: sourceItems, required: itemAndQuantity.Value))
+				.ToList();
 			if (ingredients == null || ingredients.Count == 0)
 				return;
-			ingredients = ingredients.OrderByDescending(i => i.InventoryId).ThenByDescending(i => i.ItemIndex).ToList();
+			ingredients = ingredients
+				.OrderByDescending(i => i.InventoryId)
+				.ThenByDescending(i => i.ItemIndex)
+				.ToList();
 			foreach (Ingredient ingredient in ingredients)
 			{
 				this.AddToIngredients(ingredient);

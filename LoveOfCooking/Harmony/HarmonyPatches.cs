@@ -1,4 +1,4 @@
-﻿using Harmony; // el diavolo
+﻿using HarmonyLib; // el diavolo nuevo
 using StardewValley;
 using System;
 
@@ -10,7 +10,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 
 		public static void Patch()
 		{
-			HarmonyInstance harmony = HarmonyInstance.Create(Id);
+			Harmony harmony = new Harmony(Id);
 			try
 			{
 				BushPatches.Patch(harmony);
@@ -39,10 +39,10 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			{
 				// Perform other miscellaneous patches
 
-				// Upgrade cooking tool in any instance it's claimed by the player, including through interactions with Clint's shop and mail delivery
+				// Upgrade cooking tool in any instance it's claimed by the player, including interactions with Clint's shop and mail delivery mods
 				harmony.Patch(
-					original: AccessTools.Method(typeof(StardewValley.Tools.GenericTool), "actionWhenClaimed"),
-					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(GenericTool_ActionWhenClaimed_Prefix)));
+					original: AccessTools.Method(typeof(StardewValley.Tool), "actionWhenClaimed"),
+					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Tool_ActionWhenClaimed_Prefix)));
 				// Handle sale price bonus profession for Cooking skill by affecting object sale multipliers
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Object), "getPriceAfterMultipliers"),
@@ -54,7 +54,8 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 		}
 
-		public static void GenericTool_ActionWhenClaimed_Prefix(ref StardewValley.Tools.GenericTool __instance)
+		public static void Tool_ActionWhenClaimed_Prefix(
+			ref StardewValley.Tool __instance)
 		{
 			if (Tools.IsThisCookingTool(__instance))
 			{
@@ -64,8 +65,11 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 		}
 
-		public static void Object_GetPriceAfterMultipliers_Postfix(StardewValley.Object __instance, ref float __result, 
-			float startPrice, long specificPlayerID = -1L)
+		public static void Object_GetPriceAfterMultipliers_Postfix(
+			StardewValley.Object __instance,
+			ref float __result, 
+			float startPrice,
+			long specificPlayerID = -1L)
 		{
 			if (ModEntry.CookingSkillApi.IsEnabled())
 			{

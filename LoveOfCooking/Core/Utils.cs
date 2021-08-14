@@ -154,7 +154,7 @@ namespace LoveOfCooking
 
 		internal static void OpenNewCookingMenu(List<CraftingRecipe> recipes = null)
 		{
-			void CreateCookingMenu(NetRef<Chest> fridge, List<Chest> miniFridges)
+			void createCookingMenu(NetRef<Chest> fridge, List<Chest> miniFridges)
 			{
 				var list = new List<Chest>();
 				if (fridge.Value != null)
@@ -176,7 +176,7 @@ namespace LoveOfCooking
 					if (!(Game1.activeClickableMenu is CookingMenu)
 						|| (Game1.activeClickableMenu is CookingMenu menu && menu.PopMenuStack(true, true)))
 					{
-						Game1.activeClickableMenu = new CookingMenu(recipes ?? TakeRecipesFromCraftingPage(craftingMenu));
+						Game1.activeClickableMenu = new CookingMenu(recipes ?? Utils.TakeRecipesFromCraftingPage(craftingMenu));
 					}
 				}
 				else
@@ -210,7 +210,7 @@ namespace LoveOfCooking
 				}
 				else if (fridge.Value == null)
 				{
-					CreateCookingMenu(fridge, miniFridges);
+					createCookingMenu(fridge, miniFridges);
 				}
 				else
 				{
@@ -219,7 +219,7 @@ namespace LoveOfCooking
 					{
 						fridge.Value.mutex.RequestLock(delegate
 						{
-							CreateCookingMenu(fridge, miniFridges);
+							createCookingMenu(fridge, miniFridges);
 							Game1.activeClickableMenu.exitFunction = delegate
 							{
 								fridge.Value.mutex.ReleaseLock();
@@ -239,7 +239,7 @@ namespace LoveOfCooking
 			else
 			{
 				Game1.activeClickableMenu?.exitThisMenuNoSound();
-				CreateInspectDialogue(ModEntry.Instance.i18n.Get("menu.cooking_station.no_cookbook"));
+				Utils.CreateInspectDialogue(ModEntry.Instance.i18n.Get("menu.cooking_station.no_cookbook"));
 			}
 		}
 
@@ -314,12 +314,8 @@ namespace LoveOfCooking
 			bool cooking = ModEntry.Instance.Helper.Reflection.GetField<bool>(cm, "cooking").GetValue();
 			if (cooking || !cookingOnly)
 			{
-				var recipePages = ModEntry.Instance.Helper.Reflection.GetField
-					<List<Dictionary<ClickableTextureComponent, CraftingRecipe>>>
-					(cm, "pagesOfCraftingRecipes")
-					.GetValue();
 				cm.exitThisMenuNoSound();
-				return recipePages.SelectMany(page => page.Values).ToList();
+				return cm.pagesOfCraftingRecipes.SelectMany(page => page.Values).ToList();
 			}
 			return null;
 		}
@@ -372,11 +368,11 @@ namespace LoveOfCooking
 						{
 							case FarmHouse farmHouse:
 								// FarmHouses use their upgrade level as a baseline after Robin installs a kitchen
-								cookingStationLevel = GetFarmhouseKitchenLevel(farmHouse);
+								cookingStationLevel = Utils.GetFarmhouseKitchenLevel(farmHouse);
 								break;
 							default:
 								// NPC kitchens (other than the Saloon) use the Farmer's ingredients limits only
-								cookingStationLevel = GetFarmersMaxUsableIngredients();
+								cookingStationLevel = Utils.GetFarmersMaxUsableIngredients();
 								break;
 						}
 
@@ -389,15 +385,17 @@ namespace LoveOfCooking
 				int xLimit = Game1.player.getTileX() + radius;
 				int yLimit = Game1.player.getTileY() + radius;
 				for (int x = Game1.player.getTileX() - radius; x < xLimit && cookingStationLevel == 0; ++x)
+				{
 					for (int y = Game1.player.getTileY() - radius; y < yLimit && cookingStationLevel == 0; ++y)
 					{
 						Game1.currentLocation.Objects.TryGetValue(new Vector2(x, y), out var o);
 						if (o == null || (o.Name != "Campfire" && o.Name != ModEntry.CookingCraftableName))
 							continue;
-						cookingStationLevel = GetFarmersMaxUsableIngredients();
+						cookingStationLevel = Utils.GetFarmersMaxUsableIngredients();
 						Log.D($"Cooking station: {cookingStationLevel}",
 							ModEntry.Config.DebugMode);
 					}
+				}
 			}
 			Log.D("Cooking station search finished",
 				ModEntry.Config.DebugMode);
@@ -412,7 +410,7 @@ namespace LoveOfCooking
 		{
 			// A basic (modded) farmhouse has a maximum of 1 slot,
 			// and a farmhouse with a kitchen has a minimum of 2+ slots
-			int level = Math.Max(farmHouse.upgradeLevel, GetFarmersMaxUsableIngredients());
+			int level = Math.Max(farmHouse.upgradeLevel, Utils.GetFarmersMaxUsableIngredients());
 			if (farmHouse.upgradeLevel == 0 && Interface.Interfaces.UsingFarmhouseKitchenStart)
 			{
 				level = 1;

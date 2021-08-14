@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using StardewValley;
@@ -14,7 +14,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 {
 	public static class CommunityCentrePatches
 	{
-		public static void Patch(HarmonyInstance harmony)
+		public static void Patch(Harmony harmony)
 		{
 			// TODO: TEST: Community centre cooking bundle completion and all bundle completion
 			// TODO: TEST: Big problem in JunimoNoteMenu.setUpMenu():
@@ -67,7 +67,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 		}
 
-		public static void HasCompletedCommunityCentre_Postfix(Farmer __instance, ref bool __result)
+		public static void HasCompletedCommunityCentre_Postfix(
+			Farmer __instance,
+			ref bool __result)
 		{
 			__result &= __instance.mailReceived.Contains("cc" + Bundles.CommunityCentreAreaName);
 		}
@@ -75,7 +77,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool AreaNameFromNumber_Prefix(ref string __result, int areaNumber)
+		public static bool AreaNameFromNumber_Prefix(
+			ref string __result,
+			int areaNumber)
 		{
 			try
 			{
@@ -95,7 +99,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool AreaNumberFromName_Prefix(ref int __result, string name)
+		public static bool AreaNumberFromName_Prefix(
+			ref int __result,
+			string name)
 		{
 			try
 			{
@@ -115,7 +121,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool AreaNumberFromLocation_Prefix(ref int __result, Vector2 tileLocation)
+		public static bool AreaNumberFromLocation_Prefix(
+			ref int __result,
+			Vector2 tileLocation)
 		{
 			try
 			{
@@ -136,7 +144,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool AreaEnglishDisplayNameFromNumber_Prefix(ref string __result, int areaNumber)
+		public static bool AreaEnglishDisplayNameFromNumber_Prefix(
+			ref string __result,
+			int areaNumber)
 		{
 			try
 			{
@@ -156,7 +166,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Basic implementation of new CommunityCenter area.
 		/// </summary>
-		public static bool AreaDisplayNameFromNumber_Prefix(ref string __result, int areaNumber)
+		public static bool AreaDisplayNameFromNumber_Prefix(
+			ref string __result,
+			int areaNumber)
 		{
 			try
 			{
@@ -177,7 +189,10 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// GetAreaBounds() throws FatalEngineExecutionError when patched.
 		/// Mimics LoadArea() using a static areaToRefurbish value in place of GetAreaBounds().
 		/// </summary>
-		public static bool LoadArea_Prefix(CommunityCenter __instance, int area, bool showEffects)
+		public static bool LoadArea_Prefix(
+			CommunityCenter __instance,
+			int area,
+			bool showEffects)
 		{
 			try
 			{
@@ -189,10 +204,6 @@ namespace LoveOfCooking.Core.HarmonyPatches
 					? ModEntry.Instance.Helper.Reflection.GetMethod(__instance, "getAreaBounds").Invoke<Rectangle>(area)
 					: Bundles.CommunityCentreArea;
 				Map refurbishedMap = Game1.game1.xTileContent.Load<Map>("Maps\\CommunityCenter_Refurbished");
-
-				//PyTK.Extensions.PyMaps.mergeInto(__instance.Map, refurbishedMap, Vector2.Zero, ModEntry.CommunityCentreArea);
-				//__instance.addLightGlows();
-				//return false;
 
 				StardewModdingAPI.IReflectedMethod adjustMapLightPropertiesForLamp = ModEntry.Instance.Helper.Reflection
 					.GetMethod(__instance, "adjustMapLightPropertiesForLamp");
@@ -275,7 +286,10 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics IsJunimoNoteAtArea() using a static p value in place of GetNotePosition().
 		/// </summary>
-		public static bool IsJunimoNoteAtArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
+		public static bool IsJunimoNoteAtArea_Prefix(
+			CommunityCenter __instance,
+			ref bool __result,
+			int area)
 		{
 			try
 			{
@@ -301,7 +315,10 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics ShouldNoteAppearInArea() using a static position in place of GetNotePosition().
 		/// </summary>
-		public static bool ShouldNoteAppearInArea_Prefix(CommunityCenter __instance, ref bool __result, int area)
+		public static bool ShouldNoteAppearInArea_Prefix(
+			CommunityCenter __instance,
+			ref bool __result,
+			int area)
 		{
 			try
 			{
@@ -338,7 +355,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics AddJunimoNote() using a constant position value in place of GetNotePosition().
 		/// </summary>
-		public static bool AddJunimoNote_Prefix(CommunityCenter __instance, int area)
+		public static bool AddJunimoNote_Prefix(
+			CommunityCenter __instance,
+			int area)
 		{
 			try
 			{
@@ -409,7 +428,8 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// GetNotePosition() throws FatalEngineExecutionError when patched.
 		/// Mimics SetViewportToNextJunimoNoteTarget() using a static p value in place of GetNotePosition().
 		/// </summary>
-		public static bool SetViewportToNextJunimoNoteTarget_Prefix(CommunityCenter __instance)
+		public static bool SetViewportToNextJunimoNoteTarget_Prefix(
+			CommunityCenter __instance)
 		{
 			try
 			{
@@ -448,7 +468,8 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Adds an extra Junimo to the goodbye dance, as the number of Junimos added is otherwise hardcoded.
 		/// </summary>
-		public static bool StartGoodbyeDance_Prefix(CommunityCenter __instance)
+		public static bool StartGoodbyeDance_Prefix(
+			CommunityCenter __instance)
 		{
 			try
 			{
@@ -477,7 +498,8 @@ namespace LoveOfCooking.Core.HarmonyPatches
 		/// <summary>
 		/// Adds an extra Junimo to the goodbye dance, as the number of Junimos added is otherwise hardcoded.
 		/// </summary>
-		public static bool JunimoGoodbyeDance_Prefix(CommunityCenter __instance)
+		public static bool JunimoGoodbyeDance_Prefix(
+			CommunityCenter __instance)
 		{
 			try
 			{
@@ -493,7 +515,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			return true;
 		}
 
-		public static bool MessageForAreaCompletion_Prefix(CommunityCenter __instance, ref string __result)
+		public static bool MessageForAreaCompletion_Prefix(
+			CommunityCenter __instance,
+			ref string __result)
 		{
 			try
 			{
@@ -510,7 +534,9 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			return true;
 		}
 
-		public static bool UpdateWhenCurrentLocation_Prefix(CommunityCenter __instance, GameTime time)
+		public static bool UpdateWhenCurrentLocation_Prefix(
+			CommunityCenter __instance,
+			GameTime time)
 		{
 			try
 			{
