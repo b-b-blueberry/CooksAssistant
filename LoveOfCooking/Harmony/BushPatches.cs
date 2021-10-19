@@ -30,11 +30,11 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 		}
 		
-		public static bool InBloom_Prefix(Bush __instance, ref bool __result, string season, int dayOfMonth)
+		public static bool InBloom_Prefix(Bush __instance, ref bool __result)
 		{
 			if (!(__instance is CustomBush bush))
 				return true;
-			__result = CustomBush.InBloomBehaviour(bush, season, dayOfMonth);
+			__result = CustomBush.InBloomBehaviour(bush);
 			return false;
 		}
 

@@ -63,17 +63,17 @@ namespace LoveOfCooking.Objects
 		private static readonly Point CookTextSourceOrigin = new Point(0, 240);
 		private static readonly Dictionary<string, int> CookTextSourceWidths = new Dictionary<string, int>
 		{
-			{"en", 32},
-			{"fr", 45},
-			{"es", 42},
-			{"pt", 48},
-			{"ja", 50},
-			{"zh", 36},
-			{"ko", 48},
-			{"ru", 53},
-			{"de", 40},
-			{"it", 48},
-			{"tr", 27 }
+			{ "en", 32 },
+			{ "fr", 45 },
+			{ "es", 42 },
+			{ "pt", 48 },
+			{ "ja", 50 },
+			{ "zh", 36 },
+			{ "ko", 48 },
+			{ "ru", 53 },
+			{ "de", 40 },
+			{ "it", 48 },
+			{ "tr", 27 }
 		};
 		private const int CookTextSourceHeight = 16;
 		private const int CookTextSideSourceWidth = 5;
@@ -450,14 +450,10 @@ namespace LoveOfCooking.Objects
 			if (Game1.currentLocation is CommunityCenter cc)
 			{
 				// Check to recognise community centre fridge
-				if (!cc.Objects.ContainsKey(Bundles.FridgeChestPosition))
-				{
-					cc.Objects.Add(Bundles.FridgeChestPosition, new Chest(true, Bundles.FridgeChestPosition));
-				}
-				if (Bundles.IsCommunityCentreKitchenComplete())
+				if (Interface.Interfaces.GetCommunityCentreFridge(cc) is Chest fridge && fridge != null)
 				{
 					// Add fridge inventory
-					_allInventories.Add(((Chest)(cc.Objects[Bundles.FridgeChestPosition])).items);
+					_allInventories.Add(fridge.items);
 				}
 			}
 			if (Game1.currentLocation is FarmHouse farmHouse && Utils.GetFarmhouseKitchenLevel(farmHouse) > 0)
@@ -1398,6 +1394,7 @@ namespace LoveOfCooking.Objects
 			_searchTabButton.sourceRect.X = SearchTabButtonSource.X;
 			_ingredientsTabButton.sourceRect.X = IngredientsTabButtonSource.X;
 			this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
+			this.TryAutoFillIngredients();
 
 			if (Game1.options.SnappyMenus)
 			{
@@ -1911,7 +1908,7 @@ namespace LoveOfCooking.Objects
 			if (!itemWasMoved && CookingManager.CanBeCooked(item: item) && !_cookingManager.AreAllIngredientSlotsFilled)
 			{
 				// Try add inventory item to an empty ingredient slot
-				itemWasMoved = _cookingManager.AddToIngredients(inventoryId: _inventoryId, itemIndex: itemIndex);
+				itemWasMoved = _cookingManager.AddToIngredients(whichInventory: _inventoryId, whichItem: itemIndex, itemId: item.ParentSheetIndex);
 			}
 			if (itemWasMoved)
 			{

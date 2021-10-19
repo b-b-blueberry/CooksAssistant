@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework;
 using Netcode;
 using SpaceCore;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
@@ -21,7 +22,8 @@ namespace LoveOfCooking
 		public static bool PlayerAgencyLostCheck()
 		{
 			// HOUSE RULES
-			return Game1.game1 == null || Game1.currentLocation == null || Game1.player == null // No unplayable games
+			return !Context.IsWorldReady || !Context.CanPlayerMove
+					|| Game1.game1 == null || Game1.currentLocation == null || Game1.player == null // No unplayable games
 					|| !Game1.game1.IsActive // No alt-tabbed game state
 					|| (Game1.eventUp && Game1.currentLocation.currentEvent != null && !Game1.currentLocation.currentEvent.playerControlSequence) // No event cutscenes
 					|| Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp
@@ -39,17 +41,6 @@ namespace LoveOfCooking
 			string[] action = property.Split(' ');
 			switch (action[0])
 			{
-				case ModEntry.ActionRange:
-					// A new cooking range in the Saloon acts as a cooking station
-					//if (Config.AddCookingQuestline && Game1.player.getFriendshipHeartLevelForNPC("Gus") < 2)
-					if (false)
-					{
-						CreateInspectDialogue(ModEntry.Instance.i18n.Get("world.range_gus.inspect"));
-						break;
-					}
-					OpenNewCookingMenu(null);
-					break;
-
 				case ModEntry.ActionDockCrate:
 					// Interact with the new crates at the secret beach pier to loot items for quests
 					if (Interface.Interfaces.JsonAssets != null)
@@ -98,8 +89,9 @@ namespace LoveOfCooking
 				// Add any missing recipes from the level-up recipe table
 				int level = ModEntry.CookingSkillApi.GetLevel();
 				Dictionary<int, List<string>> recipes = ModEntry.CookingSkillApi.GetAllLevelUpRecipes();
-				IEnumerable<string> missingRecipes = recipes.TakeWhile(pair => pair.Key < level)
-						// Take all recipe lists up to the current level
+				IEnumerable<string> missingRecipes = recipes
+					// Take all recipe lists up to the current level
+					.TakeWhile(pair => pair.Key < level)
 					.SelectMany(pair => pair.Value) // Flatten recipe lists into their recipes
 					.Select(r => ModEntry.ObjectPrefix + r) // Add item prefixes
 					.Where(r => !Game1.player.cookingRecipes.ContainsKey(r)); // Take recipes not known by the player
@@ -185,9 +177,11 @@ namespace LoveOfCooking
 				}
 			}
 
-			if (CanUseKitchens())
+			if (Utils.CanUseKitchens())
 			{
-				Chest ccFridge = Game1.currentLocation is CommunityCenter ? Bundles.GetCommunityCentreFridge() : null;
+				Chest ccFridge = Game1.currentLocation is CommunityCenter cc
+					? Interface.Interfaces.GetCommunityCentreFridge(cc)
+					: null;
 				var fridge = new NetRef<Chest>();
 				var muticies = new List<NetMutex>();
 				var miniFridges = new List<Chest>();
@@ -270,12 +264,16 @@ namespace LoveOfCooking
 		public static void AddAndDisplayNewRecipesOnLevelUp(SpaceCore.Interface.SkillLevelUpMenu menu)
 		{
 			// Add cooking recipes
-			string skill = ModEntry.Instance.Helper.Reflection.GetField<string>(menu, "currentSkill").GetValue();
+			string skill = ModEntry.Instance.Helper.Reflection
+				.GetField<string>(menu, "currentSkill")
+				.GetValue();
 			if (skill != CookingSkill.InternalName)
 			{
 				return;
 			}
-			int level = ModEntry.Instance.Helper.Reflection.GetField<int>(menu, "currentLevel").GetValue();
+			int level = ModEntry.Instance.Helper.Reflection
+				.GetField<int>(menu, "currentLevel")
+				.GetValue();
 			List<CraftingRecipe> cookingRecipes = ModEntry.CookingSkillApi
 				.GetCookingRecipesForLevel(level)
 				.ConvertAll(name => new CraftingRecipe(ModEntry.ObjectPrefix + name, true))
@@ -295,8 +293,12 @@ namespace LoveOfCooking
 			// No new crafting recipes currently.
 
 			// Apply new recipes
-			List<CraftingRecipe> combinedRecipes = craftingRecipes.Concat(cookingRecipes).ToList();
-			ModEntry.Instance.Helper.Reflection.GetField<List<CraftingRecipe>>(menu, "newCraftingRecipes").SetValue(combinedRecipes);
+			List<CraftingRecipe> combinedRecipes = craftingRecipes
+				.Concat(cookingRecipes)
+				.ToList();
+			ModEntry.Instance.Helper.Reflection
+				.GetField<List<CraftingRecipe>>(menu, "newCraftingRecipes")
+				.SetValue(combinedRecipes);
 			Log.D(combinedRecipes.Aggregate($"New recipes for level {level}:", (total, cur) => $"{total}\n{cur.name} ({cur.createItem().ParentSheetIndex})"),
 				ModEntry.Config.DebugMode);
 
@@ -311,11 +313,15 @@ namespace LoveOfCooking
 
 		public static List<CraftingRecipe> TakeRecipesFromCraftingPage(CraftingPage cm, bool cookingOnly = true)
 		{
-			bool cooking = ModEntry.Instance.Helper.Reflection.GetField<bool>(cm, "cooking").GetValue();
+			bool cooking = ModEntry.Instance.Helper.Reflection
+				.GetField<bool>(cm, "cooking")
+				.GetValue();
 			if (cooking || !cookingOnly)
 			{
 				cm.exitThisMenuNoSound();
-				return cm.pagesOfCraftingRecipes.SelectMany(page => page.Values).ToList();
+				return cm.pagesOfCraftingRecipes
+					.SelectMany(page => page.Values)
+					.ToList();
 			}
 			return null;
 		}
@@ -325,9 +331,116 @@ namespace LoveOfCooking
 			return o != null && o.bigCraftable.Value && o is Chest && o.ParentSheetIndex == 216;
 		}
 
+		public static bool IsItemFoodAndNotYetEaten(StardewValley.Item item)
+		{
+			return item is StardewValley.Object o && o != null
+				&& !o.bigCraftable.Value && o.Category == ModEntry.CookingCategory
+				&& !ModEntry.Instance.States.Value.FoodsEaten.Contains(o.Name);
+		}
+
 		public static bool AreNettlesActive()
 		{
 			return ModEntry.NettlesEnabled && !Interface.Interfaces.UsingNettlesCrops;
+		}
+
+		public static void TrySpawnNettles()
+		{
+			// Only master player should make changes to the world
+			if (Game1.MasterPlayer.UniqueMultiplayerID != Game1.player.UniqueMultiplayerID)
+				return;
+
+			// Attempt to place a wild nettle as forage around other weeds
+			bool spawnNettlesToday = (Game1.dayOfMonth % 3 == 1 && (Game1.currentSeason == "spring" || Game1.currentSeason == "fall"))
+				|| Game1.currentSeason == "summer";
+			if (ModEntry.NettlesEnabled && spawnNettlesToday)
+			{
+				Utils.SpawnNettles();
+			}
+		}
+
+		public static void SpawnNettles(bool force = false)
+		{
+			foreach (string l in ModEntry.ItemDefinitions["NettlesLocations"])
+			{
+				if (!force && Game1.random.NextDouble() > float.Parse(ModEntry.ItemDefinitions["NettlesDailyChancePerLocation"][0]))
+				{
+					// Skip the location if we didn't succeed the roll to add nettles
+					Log.D($"Did not add nettles to {l}.",
+						ModEntry.Config.DebugMode);
+					continue;
+				}
+
+				// Spawn a random number of nettles between some upper and lower bounds, reduced by the number of nettles already in this location
+				GameLocation location = Game1.getLocationFromName(l);
+				int nettlesToAdd = Game1.random.Next(int.Parse(ModEntry.ItemDefinitions["NettlesAddedRange"][0]), int.Parse(ModEntry.ItemDefinitions["NettlesAddedRange"][1]));
+				int nettlesAlreadyInLocation = force 
+					? 0
+					: location.largeTerrainFeatures.Count(
+						ltf => ltf is CustomBush cb && (string)cb.Variety == ModEntry.BushNameNettle);
+				nettlesToAdd -= nettlesAlreadyInLocation;
+				int nettlesAdded = 0;
+
+				List<Vector2> shuffledWeedsTiles = location.Objects.Keys
+					.Where(tile => location.Objects.TryGetValue(tile, out StardewValley.Object o) && o.Name == "Weeds")
+					.ToList();
+				Utility.Shuffle(Game1.random, shuffledWeedsTiles);
+				foreach (Vector2 tile in shuffledWeedsTiles)
+				{
+					if (nettlesAdded >= nettlesToAdd)
+					{
+						// Move to the next location if this location's quota is met
+						break;
+					}
+					Vector2 nearbyTile = Utility.getRandomAdjacentOpenTile(tile, location);
+					if (nearbyTile == Vector2.Zero)
+					{
+						// Skip weeds without any free spaces to spawn nettles upon
+						continue;
+					}
+					// Spawn nettles around other weeds
+					CustomBush nettleBush = new CustomBush(
+						tile: nearbyTile,
+						location: location,
+						variety: ModEntry.BushNameNettle);
+					location.largeTerrainFeatures.Add(nettleBush);
+					++nettlesAdded;
+					Log.D($"Adding to {nearbyTile}...",
+						force || ModEntry.Config.DebugMode);
+				}
+
+				Log.D($"Added {nettlesAdded} nettles to {l}.",
+					force || ModEntry.Config.DebugMode);
+			}
+		}
+
+		public static void ShakeNettles(CustomBush bush)
+		{
+			string variety = (string)bush.Variety;
+			if (variety == ModEntry.BushNameNettle)
+			{
+				DelayedAction.playSoundAfterDelay("leafrustle", 100);
+				Game1.player.takeDamage(
+					damage: Math.Max(1, int.Parse(ModEntry.ItemDefinitions["NettlesDamage"][0]) - Game1.player.resilience),
+					overrideParry: true,
+					damager: null);
+				if (Game1.player.health < 1)
+					Game1.player.health = 1;
+				Buff existingBuff = Game1.buffsDisplay.otherBuffs
+					.FirstOrDefault(b => b.source == variety);
+				if (existingBuff == null)
+				{
+					Game1.buffsDisplay.addOtherBuff(new Buff(
+						0, 0, 0, 0, 0, 0, 0,
+						0, 0, speed: -1, 0, 0,
+						minutesDuration: 10,
+						source: variety,
+						displaySource: ModEntry.Instance.Helper.Translation.Get("buff.nettles.inspect")));
+				}
+				else
+				{
+					existingBuff.millisecondsDuration = 6000;
+				}
+			}
 		}
 
 		/// <summary>
@@ -397,8 +510,6 @@ namespace LoveOfCooking
 					}
 				}
 			}
-			Log.D("Cooking station search finished",
-				ModEntry.Config.DebugMode);
 			return cookingStationLevel;
 		}
 
@@ -435,11 +546,12 @@ namespace LoveOfCooking
 			List<ISalable> itemList = menu.forSale;
 			var suffixes = new Dictionary<string, string>
 				{{"seeds", null}, {"bulb", null}, {"starter", null}, {"shoot", null}, {"sapling", null}};
-			int debugCount = 0;
+
 			for (int i = 0; i < itemList.Count; ++i)
 			{
 				// Ignore items without one of our group suffixes
-				string suffix = suffixes.Keys.FirstOrDefault(s => itemList[i].Name.ToLower().EndsWith(s));
+				string suffix = suffixes.Keys
+					.FirstOrDefault(s => itemList[i].Name.ToLower().EndsWith(s));
 				if (suffix == null)
 					continue;
 				// Set the move-to-this-item name to be the first-found item in the group
@@ -448,11 +560,11 @@ namespace LoveOfCooking
 					continue;
 				// Move newly-found items of a group up to the first item in the group, and change the move-to name to this item
 				ISalable item = itemList[i];
-				int index = 1 + itemList.FindIndex(i => i.Name == suffixes[suffix]);
+				int index = 1 + itemList
+					.FindIndex(i => i.Name == suffixes[suffix]);
 				itemList.RemoveAt(i);
 				itemList.Insert(index, item);
 				suffixes[suffix] = itemList[index].Name;
-				++debugCount;
 			}
 			menu.forSale = itemList;
 		}
@@ -463,7 +575,7 @@ namespace LoveOfCooking
 		/// </summary>
 		internal static void UpdateEnglishRecipeDisplayNames(ref List<CraftingRecipe> recipes)
 		{
-			if (LocalizedContentManager.CurrentLanguageCode.ToString() == "en")
+			if (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.en)
 			{
 				foreach (CraftingRecipe recipe in recipes.Where(r => r.DisplayName.StartsWith(ModEntry.ObjectPrefix)))
 				{

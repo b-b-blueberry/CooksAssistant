@@ -1,6 +1,9 @@
 ﻿using HarmonyLib; // el diavolo nuevo
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using System;
+using System.Collections.Generic;
 
 namespace LoveOfCooking.Core.HarmonyPatches
 {
@@ -8,20 +11,13 @@ namespace LoveOfCooking.Core.HarmonyPatches
 	{
 		public static string Id => ModEntry.Instance.Helper.ModRegistry.ModID;
 
+
 		public static void Patch()
 		{
 			Harmony harmony = new Harmony(Id);
 			try
 			{
 				BushPatches.Patch(harmony);
-			}
-			catch (Exception ex)
-			{
-				Log.E("" + ex);
-			}
-			try
-			{
-				CommunityCentrePatches.Patch(harmony);
 			}
 			catch (Exception ex)
 			{
@@ -38,20 +34,55 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			try
 			{
 				// Perform other miscellaneous patches
+				Type[] types;
 
 				// Upgrade cooking tool in any instance it's claimed by the player, including interactions with Clint's shop and mail delivery mods
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Tool), "actionWhenClaimed"),
 					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Tool_ActionWhenClaimed_Prefix)));
+
 				// Handle sale price bonus profession for Cooking skill by affecting object sale multipliers
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Object), "getPriceAfterMultipliers"),
 					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
+
+				// Hide buffs in cooked foods not yet eaten
+				if (ModEntry.HideBuffIconsOnItems)
+				{
+					types = new Type[]
+					{
+						typeof(SpriteBatch), typeof(System.Text.StringBuilder),
+						typeof(SpriteFont), typeof(int), typeof(int), typeof(int),
+						typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int),
+						typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe),
+						typeof(IList<Item>)
+					};
+					harmony.Patch(
+						original: AccessTools.Method(typeof(StardewValley.Menus.IClickableMenu), "drawHoverText", parameters: types),
+						prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(IClickableMenu_DrawHoverText_Prefix)));
+				}
 			}
 			catch (Exception ex)
 			{
 				Log.E("" + ex);
 			}
+		}
+
+		public static void IClickableMenu_DrawHoverText_Prefix(
+			ref string[] buffIconsToDisplay,
+			StardewValley.Item hoveredItem)
+		{
+			if (!Utils.IsItemFoodAndNotYetEaten(hoveredItem))
+				return;
+
+			string[] dummyBuffIcons = new string[AssetManager.DummyIndexForHidingBuffs + 1];
+			for (int i = 0; i < dummyBuffIcons.Length; ++i)
+			{
+				dummyBuffIcons[i] = "0";
+			}
+			dummyBuffIcons[AssetManager.DummyIndexForHidingBuffs] = "1";
+			buffIconsToDisplay = dummyBuffIcons;
+			AssetManager.IsCurrentHoveredItemHidingBuffs = true;
 		}
 
 		public static void Tool_ActionWhenClaimed_Prefix(

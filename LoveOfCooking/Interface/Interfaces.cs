@@ -19,11 +19,13 @@ namespace LoveOfCooking.Interface
 		// Loaded APIs
 		internal static IJsonAssetsApi JsonAssets;
 		internal static ILevelExtenderAPI LevelExtender;
+		internal static IManaBarAPI ManaBar;
 
 		// Loaded mods
 		internal static bool UsingSVE;
 		internal static bool UsingPPJACrops;
 		internal static bool UsingNettlesCrops;
+		internal static bool UsingManaBar;
 		internal static bool UsingLevelExtender;
 		internal static bool UsingBigBackpack;
 		internal static bool UsingProducerFramework;
@@ -34,11 +36,12 @@ namespace LoveOfCooking.Interface
 		{
 			Helper = helper;
 			ModManifest = manifest;
-			GetLoadedMods();
 		}
 
 		internal static void LoadInterfaces()
 		{
+			GetLoadedMods();
+
 			LoadJsonAssetsObjects();
 			LoadProducerFrameworkRules();
 			LoadModConfigMenuElements();
@@ -47,6 +50,9 @@ namespace LoveOfCooking.Interface
 
 		private static void GetLoadedMods()
 		{
+			ManaBar = Helper.ModRegistry.GetApi<IManaBarAPI>("spacechase0.ManaBar");
+			UsingManaBar = ManaBar != null;
+
 			UsingSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
 			UsingPPJACrops = Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
 			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
@@ -110,8 +116,10 @@ namespace LoveOfCooking.Interface
 
 		private static void LoadSpaceCoreAPI()
 		{
-			ISpaceCoreAPI spaceCore = Helper.ModRegistry.GetApi<ISpaceCoreAPI>("spacechase0.SpaceCore");
-			spaceCore.RegisterSerializerType(typeof(CustomBush));
+			ISpaceCoreAPI spaceCore = Helper.ModRegistry
+				.GetApi<ISpaceCoreAPI>
+				("spacechase0.SpaceCore");
+			spaceCore.RegisterSerializerType(type: typeof(CustomBush));
 		}
 
 		private static void LoadJsonAssetsObjects()
@@ -125,7 +133,7 @@ namespace LoveOfCooking.Interface
 
 			if (ModEntry.Config.DebugMode)
 				Log.W("Loading Basic Objects Pack.");
-			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, AssetManager.BasicObjectsPack));
+			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, AssetManager.BasicObjectsPackPath));
 
 			if (!ModEntry.Config.AddCookingSkillAndRecipes)
 			{
@@ -196,13 +204,18 @@ namespace LoveOfCooking.Interface
 			}
 
 			gmcm.RegisterModConfig(ModEntry.Instance.ModManifest, () => ModEntry.Config = new Config(), () => Helper.WriteConfig(ModEntry.Config));
+			gmcm.SubscribeToChange(ModManifest,
+				changeHandler: (string key, bool value) =>
+				{
+					Log.D($"Config check: {key} => {value}",
+						ModEntry.Config.DebugMode);
+				});
 
 			string[] entries = new[]
 			{
 				"features",
 
 				"AddCookingMenu",
-				"AddCookingCommunityCentreBundles",
 				"AddCookingSkillAndRecipes",
 				"AddCookingToolProgression",
 				//"AddCookingQuestline",
@@ -219,6 +232,7 @@ namespace LoveOfCooking.Interface
 
 				"others",
 
+				"ShowFoodRegenBar",
 				"RememberLastSearchFilter",
 				"DefaultSearchFilter",
 				"ResizeKoreanFonts",
@@ -231,13 +245,21 @@ namespace LoveOfCooking.Interface
 				{
 					string i18nKey = $"config.option.{entry.ToLower()}_";
 					if (property.PropertyType == typeof(bool))
+					{
 						gmcm.RegisterSimpleOption(
 							ModManifest,
 							optionName: i18n.Get(i18nKey + "name"),
 							optionDesc: i18n.Get(i18nKey + "description"),
 							optionGet: () => (bool)property.GetValue(ModEntry.Config),
-							optionSet: (bool value) => property.SetValue(ModEntry.Config, value));
+							optionSet: (bool value) =>
+							{
+								Log.D($"Config edit: {property.Name} - {property.GetValue(ModEntry.Config)} => {value}",
+									ModEntry.Config.DebugMode);
+								property.SetValue(ModEntry.Config, value);
+							});
+					}
 					else if (property.Name == "DefaultSearchFilter")
+					{
 						gmcm.RegisterChoiceOption(
 							ModManifest,
 							optionName: i18n.Get(i18nKey + "name"),
@@ -245,6 +267,7 @@ namespace LoveOfCooking.Interface
 							optionGet: () => (string)property.GetValue(ModEntry.Config),
 							optionSet: (string value) => property.SetValue(ModEntry.Config, value),
 							choices: Enum.GetNames(typeof(Objects.CookingMenu.Filter)));
+					}
 				}
 				else
 				{
@@ -288,6 +311,30 @@ namespace LoveOfCooking.Interface
 				xp_mod: Objects.CookingSkill.GlobalExperienceRate,
 				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(), cats: null);
 		}
+
+		internal static bool IsManaBarReadyToDraw(Farmer who)
+		{
+			int mana = ManaBar.GetMana(farmer: who);
+			int maxMana = ManaBar.GetMaxMana(farmer: who);
+			bool gameFlags = Context.IsWorldReady && Game1.activeClickableMenu == null && !Game1.eventUp;
+			bool manaFlags = mana > 0 && maxMana > 0 && mana < maxMana;
+			return gameFlags && manaFlags;
+		}
+
+		internal static StardewValley.Objects.Chest GetCommunityCentreFridge(StardewValley.Locations.CommunityCenter cc)
+        {
+			StardewValley.Objects.Chest chest = null;
+
+			Type kitchen = Type.GetType("CommunityKitchen.Kitchen, CommunityKitchen");
+			if (kitchen != null)
+            {
+				chest = Helper.Reflection
+					.GetMethod(type: kitchen, name: "GetKitchenFridge")
+					.Invoke<StardewValley.Objects.Chest>(cc);
+            }
+
+			return chest;
+        }
 
 		internal static Type GetMod_RemoteFridgeStorage()
 		{
