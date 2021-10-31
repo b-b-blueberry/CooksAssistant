@@ -52,7 +52,12 @@ namespace LoveOfCooking
 			public string[] ToolsToHarvest;
 
 			// Textures
-			public string SourceTexture;
+			private string _sourceTexture;
+			public string SourceTexture
+			{
+				get => _sourceTexture;
+				set => _sourceTexture = StardewModdingAPI.Utilities.PathUtilities.NormalizeAssetName(value);
+			}
 			public Dictionary<string, Rectangle> SourceAreas = new Dictionary<string, Rectangle>();
 		}
 
@@ -106,7 +111,7 @@ namespace LoveOfCooking
 		public const int HealthRemovedOnHit = 50;
 		private const int DummyConditionEventId = 87008;
 
-		// Huge mistakes
+		// Huge issues
 		public object Variety
 		{
 			// we've all made mistakes in life
@@ -138,7 +143,7 @@ namespace LoveOfCooking
 				Log.D($"Set {nameof(CustomBush)}.{nameof(this.Variety)} to {variety.GetType().Name} {variety}",
 					ModEntry.Config.DebugMode);
 
-				this.SetForVariety(variety: variety);
+				this.SetForVariety(variety: variety, setNetField: true);
 			}
 		}
 
@@ -154,7 +159,7 @@ namespace LoveOfCooking
 			this.Init();
 			this.currentTileLocation = tile;
 			this.currentLocation = location;
-			this.SetForVariety(variety);
+			this.SetForVariety(variety: variety, setNetField: true);
 		}
 
 		private void Init()
@@ -165,10 +170,15 @@ namespace LoveOfCooking
 
 		private void AddNetFields()
 		{
+            this._variety.fieldChangeEvent += (NetString field, string oldValue, string newValue) =>
+			{
+				this.SetForVariety(variety: newValue, setNetField: false);
+			};
+
 			this.NetFields.AddFields(this._variety, this.HeldProduce);
 		}
-		
-		private void GetReflectedMembers()
+
+        private void GetReflectedMembers()
 		{
 			// Fields
 			this.AlphaField = ModEntry.Instance.Helper.Reflection.GetField<float>(this, "alpha");
@@ -238,9 +248,13 @@ namespace LoveOfCooking
 			return isGrowthAreaClear;
 		}
 
-		private void SetForVariety(string variety)
+		private void SetForVariety(string variety, bool setNetField)
 		{
-			this._variety.Set(variety);
+			if (setNetField)
+			{
+				this._variety.Set(variety);
+			}
+
 			this.Definition = CustomBush.BushDefinitions[variety];
 			this.Definition.SourceTexture = StardewModdingAPI.Utilities.PathUtilities.NormalizePath(this.Definition.SourceTexture);
 

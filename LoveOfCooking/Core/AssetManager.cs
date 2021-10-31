@@ -68,10 +68,11 @@ namespace LoveOfCooking
 		public static string NewRecipesPackPath { get; private set; } = "NewRecipesPack";
 		public static string NewCropsPackPath { get; private set; } = "NewCropsPack";
 		public static string NettlesPackPath { get; private set; } = "NettlesPack";
-		public static string ProducerFrameworkPackPath { get; private set; } = "ProducerFrameworkPack";
+		public static string ProducerFrameworkPackPath { get; private set; } = "[PFM] ProducerFrameworkPack";
+		public static string CommunityCentreContentPackPath { get; private set; } = "[CCC] KitchenContentPack";
 
 		// Assets to edit: asset keys passed to CanEdit<T>()
-		private static readonly string[] AssetsToEdit = new string[]
+		private static readonly List<string> AssetsToEdit = new List<string>
 		{
 			@"Data/BigCraftablesInformation",
 			@"Data/CookingRecipes",
@@ -135,8 +136,6 @@ namespace LoveOfCooking
 
 		private T LoadAsset<T>(IAssetInfo asset)
 		{
-			Log.D($"Loading custom asset {asset.AssetName}",
-				ModEntry.Config.DebugMode);
 			if (asset.AssetNameEquals(GameContentSpriteSheetPath))
 			{
 				return (T)(object)ModEntry.Instance.Helper.Content.Load<Texture2D>($"{LocalSpriteSheetPath}.png");

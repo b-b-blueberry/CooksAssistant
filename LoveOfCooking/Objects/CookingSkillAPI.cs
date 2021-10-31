@@ -8,7 +8,7 @@ namespace LoveOfCooking.Objects
 {
 	public interface ICookingSkillAPI
 	{
-		public enum Profession
+		public enum Profession // DO NOT EDIT
 		{
 			ImprovedOil,
 			Restoration,
@@ -219,11 +219,12 @@ namespace LoveOfCooking.Objects
 			{
 				int remainingExperience = this.GetExperienceRemainingUntilLevel(nextLevel);
 				int requiredExperience = this.GetExperienceRequiredForLevel(nextLevel);
-				int summedExperience = (int)(newBonus + dailyBonus + experienceFromIngredients * stackBonus
-					* (ModEntry.Config.DebugMode
-						? CookingSkill.GlobalExperienceRate
-						: float.Parse(ModEntry.ItemDefinitions["CookingSkillExperienceGlobalScaling"][0]))
-					);
+				int summedExperience = (int)(newBonus + dailyBonus + (experienceFromIngredients * stackBonus));
+				summedExperience = (int)(summedExperience * float.Parse((ModEntry.ItemDefinitions)["CookingSkillExperienceGlobalScaling"][0]));
+				if (ModEntry.Config.DebugMode)
+                {
+					summedExperience = (int)(summedExperience * ModEntry.DebugGlobalExperienceRate);
+				}
 				finalExperience = maxLevel - currentLevel == 1
 					? Math.Min(remainingExperience, summedExperience)
 					: summedExperience;

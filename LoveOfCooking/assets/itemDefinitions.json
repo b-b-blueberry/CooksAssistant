@@ -42,6 +42,9 @@
 	"NettlesDamage": [
 		"5"
 	],
+	"ShopDiscounts": [
+		"Saloon:35"
+	],
 	"RegenSkillModifiers": [
 		"Combat:0.025",
 		"Foraging:0.0025",

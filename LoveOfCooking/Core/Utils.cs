@@ -1,12 +1,10 @@
 ﻿using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
-using Netcode;
 using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
-using StardewValley.Network;
 using StardewValley.Objects;
 using System;
 using System.Collections.Generic;
@@ -144,91 +142,22 @@ namespace LoveOfCooking
 				Game1.createItemDebris(item, Game1.player.Position, -1);
 		}
 
-		internal static void OpenNewCookingMenu(List<CraftingRecipe> recipes = null)
+		internal static void ReplaceCraftingMenu(IClickableMenu lastMenu)
 		{
-			void createCookingMenu(NetRef<Chest> fridge, List<Chest> miniFridges)
+			lastMenu.exitThisMenuNoSound();
+			Game1.delayedActions.Add(new DelayedAction(timeUntilAction: 0, behavior: delegate
 			{
-				var list = new List<Chest>();
-				if (fridge.Value != null)
-				{
-					list.Add(fridge);
-				}
-				list.AddRange(miniFridges);
+				Utils.OpenNewCookingMenu(lastMenu: lastMenu);
+			}));
+		}
 
-				Vector2 topLeftPositionForCenteringOnScreen = Utility.getTopLeftPositionForCenteringOnScreen(
-					800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2);
-
-				CraftingPage craftingMenu = new CraftingPage(
-					(int)topLeftPositionForCenteringOnScreen.X, (int)topLeftPositionForCenteringOnScreen.Y,
-					800 + IClickableMenu.borderWidth * 2, 600 + IClickableMenu.borderWidth * 2,
-					cooking: true, standalone_menu: true, material_containers: list);
-
-				if (ModEntry.Config.AddCookingMenu)
-				{
-					if (!(Game1.activeClickableMenu is CookingMenu)
-						|| (Game1.activeClickableMenu is CookingMenu menu && menu.PopMenuStack(true, true)))
-					{
-						Game1.activeClickableMenu = new CookingMenu(recipes ?? Utils.TakeRecipesFromCraftingPage(craftingMenu));
-					}
-				}
-				else
-				{
-					Game1.activeClickableMenu = craftingMenu;
-				}
-			}
-
-			if (Utils.CanUseKitchens())
+		internal static void OpenNewCookingMenu(IClickableMenu lastMenu = null)
+		{
+			if (ModEntry.Config.AddCookingMenu)
 			{
-				Chest ccFridge = Game1.currentLocation is CommunityCenter cc
-					? Interface.Interfaces.GetCommunityCentreFridge(cc)
-					: null;
-				var fridge = new NetRef<Chest>();
-				var muticies = new List<NetMutex>();
-				var miniFridges = new List<Chest>();
-
-				fridge.Set(Game1.currentLocation is FarmHouse farmHouse && GetFarmhouseKitchenLevel(farmHouse) > 0
-					? farmHouse.fridge
-					: Game1.currentLocation is IslandFarmHouse islandFarmHouse
-						? islandFarmHouse.fridge
-						: ccFridge != null ? new NetRef<Chest>(ccFridge) : null);
-
-				foreach (StardewValley.Object obj in Game1.currentLocation.Objects.Values.Where(
-					o => o != null && o.bigCraftable.Value && o is Chest && o.ParentSheetIndex == 216))
-				{
-					miniFridges.Add(obj as Chest);
-					muticies.Add((obj as Chest).mutex);
-				}
-				if (fridge.Value != null && fridge.Value.mutex.IsLocked())
-				{
-					Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
-				}
-				else if (fridge.Value == null)
-				{
-					createCookingMenu(fridge, miniFridges);
-				}
-				else
-				{
-					MultipleMutexRequest multiple_mutex_request = null;
-					multiple_mutex_request = new MultipleMutexRequest(muticies, delegate
-					{
-						fridge.Value.mutex.RequestLock(delegate
-						{
-							createCookingMenu(fridge, miniFridges);
-							Game1.activeClickableMenu.exitFunction = delegate
-							{
-								fridge.Value.mutex.ReleaseLock();
-								multiple_mutex_request.ReleaseLocks();
-							};
-						}, delegate
-						{
-							Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
-							multiple_mutex_request.ReleaseLocks();
-						});
-					}, delegate
-					{
-						Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
-					});
-				}
+				Game1.activeClickableMenu = lastMenu != null && lastMenu is CraftingPage craftingPage
+					? new CookingMenu(craftingPage: craftingPage)
+					: new CookingMenu();
 			}
 			else
 			{
@@ -326,9 +255,14 @@ namespace LoveOfCooking
 			return null;
 		}
 
+		public static bool IsFridgeOrMinifridge(StardewValley.Object o)
+		{
+			return o != null && o.bigCraftable.Value && o is Chest c && c.fridge.Value;
+		}
+
 		public static bool IsMinifridge(StardewValley.Object o)
 		{
-			return o != null && o.bigCraftable.Value && o is Chest && o.ParentSheetIndex == 216;
+			return Utils.IsFridgeOrMinifridge(o) && o.ParentSheetIndex != 130;
 		}
 
 		public static bool IsItemFoodAndNotYetEaten(StardewValley.Item item)
@@ -462,9 +396,16 @@ namespace LoveOfCooking
 			int radius = int.Parse(ModEntry.ItemDefinitions["CookingUseRange"][0]);
 			int cookingStationLevel = 0;
 
-			// If indoors, use the farmhouse or cabin level as a base for cooking levels
-			if (!Game1.currentLocation.IsOutdoors)
+			if (Game1.currentLocation.IsOutdoors)
 			{
+				// If outdoors, use the player's tool level for ingredients slots
+				cookingStationLevel = Utils.GetFarmersMaxUsableIngredients();
+				Log.D($"Cooking station: {Game1.currentLocation.Name}: Outdoors (level {cookingStationLevel})",
+					ModEntry.Config.DebugMode);
+			}
+			else
+			{
+				// If indoors, use the farmhouse or cabin level as a base for ingredients slots
 				xTile.Layers.Layer layer = Game1.currentLocation.Map.GetLayer("Buildings");
 				int xLimit = Game1.player.getTileX() + radius;
 				int yLimit = Game1.player.getTileY() + radius;
@@ -493,23 +434,6 @@ namespace LoveOfCooking
 							ModEntry.Config.DebugMode);
 					}
 			}
-			else
-			{
-				int xLimit = Game1.player.getTileX() + radius;
-				int yLimit = Game1.player.getTileY() + radius;
-				for (int x = Game1.player.getTileX() - radius; x < xLimit && cookingStationLevel == 0; ++x)
-				{
-					for (int y = Game1.player.getTileY() - radius; y < yLimit && cookingStationLevel == 0; ++y)
-					{
-						Game1.currentLocation.Objects.TryGetValue(new Vector2(x, y), out var o);
-						if (o == null || (o.Name != "Campfire" && o.Name != ModEntry.CookingCraftableName))
-							continue;
-						cookingStationLevel = Utils.GetFarmersMaxUsableIngredients();
-						Log.D($"Cooking station: {cookingStationLevel}",
-							ModEntry.Config.DebugMode);
-					}
-				}
-			}
 			return cookingStationLevel;
 		}
 
@@ -534,6 +458,25 @@ namespace LoveOfCooking
 			return (ModEntry.Config.AddCookingToolProgression && ModEntry.Instance.States.Value.CookingToolLevel < 4)
 				? 1 + ModEntry.Instance.States.Value.CookingToolLevel
 				: 6;
+		}
+
+		public static void AddToShopAtItemIndex(ShopMenu menu, StardewValley.Object o, string targetItemName = "", int price = -1, int stock = -1)
+		{
+			if (stock < 1)
+				stock = int.MaxValue;
+			if (price < 0)
+				price = o.salePrice();
+			price = (int)(price * Game1.MasterPlayer.difficultyModifier);
+
+			// Add sale info
+			menu.itemPriceAndStock.Add(o, new[] { price, stock });
+
+			// Add shop entry
+			int index = menu.forSale.FindIndex(i => i.Name == targetItemName);
+			if (index >= 0 && index < menu.forSale.Count)
+				menu.forSale.Insert(index, o);
+			else
+				menu.forSale.Add(o);
 		}
 
 		/// <summary>

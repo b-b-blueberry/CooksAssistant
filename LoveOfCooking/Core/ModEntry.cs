@@ -15,20 +15,13 @@ using System.Linq;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 // TODO: UPDATE: Ingredients bounce when added to cooking slots, puff when removed, unless using autofill
-// TODO: UPDATE: Cooked food has a chance (scaling with Cooking level) of taking the quality of its ingredients,
-//		Final quality is decided by random choice from list of qualities of each ingredient
 // TODO: UPDATE: Quests, events, and scripts
 // TODO: UPDATE: Hot chocolate at the ice festival
 
-// TODO: COMPATIBILITY: Limited Campfire Cooking (https://www.nexusmods.com/stardewvalley/mods/4971)
-//		In DisplayMenuChanged intercept for CraftingPage, OpenCookingMenu is delayed a tick for mutex request on fridges
-//		Campfires have their menu intercepted correctly, but no longer have the limited crafting recipe list passed on
 // TODO: COMPATIBILITY: Skill Prestige (https://www.nexusmods.com/stardewvalley/mods/569)
 // TODO: COMPATIBILITY: Level Extender (https://www.nexusmods.com/stardewvalley/mods/1471)
 //		No current errors or issues, but doesn't interact, either
 // TODO: COMPATIBILITY: Tool Upgrade Delivery (https://www.nexusmods.com/stardewvalley/mods/5421)
-// TODO: COMPATIBILITY: Food Buff Stacking (https://www.nexusmods.com/stardewvalley/mods/4321)
-// TODO: COMPATIBILITY: Regular Quality (https://www.nexusmods.com/stardewvalley/mods/5090)
 
 
 namespace LoveOfCooking
@@ -42,10 +35,9 @@ namespace LoveOfCooking
 
 		internal ITranslationHelper i18n => Helper.Translation;
 
-		internal const string SaveDataKey = "SaveData";
-		internal const string AssetPrefix = "blueberry.LoveOfCooking.";
-		internal const string ObjectPrefix = "blueberry.cac.";
-		internal const string MailPrefix = "blueberry.cac.mail.";
+		internal const string AssetPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
+		internal const string ObjectPrefix = "blueberry.cac."; // DO NOT EDIT
+		internal const string MailPrefix = "blueberry.cac.mail."; // DO NOT EDIT
 		internal static int NexusId { get; private set; }
 
 		// Player session state
@@ -101,7 +93,6 @@ namespace LoveOfCooking
 			Luck
 		}
 		// safe item names
-		internal const string CookingCraftableName = "Cookout Kit";
 		internal string ChocolateName { get { return Interface.Interfaces.UsingPPJACrops ? "Chocolate" : $"{ObjectPrefix}chocolate"; } }
 		internal string CabbageName { get { return Interface.Interfaces.UsingPPJACrops ? "Cabbage" : $"{ObjectPrefix}cabbage"; } }
 		internal string OnionName { get { return Interface.Interfaces.UsingPPJACrops ? "Onion" : $"{ObjectPrefix}onion"; } }
@@ -126,10 +117,11 @@ namespace LoveOfCooking
 		internal const string BushNameRedberry = "Redberry";
 
 		// Mail titles
-		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked";
-		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan";
+		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
+		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan"; // DO NOT EDIT
 
 		// Mod features
+		internal static float DebugGlobalExperienceRate = 1f;
 		internal const bool NettlesEnabled = true;
 		internal const bool RedberriesEnabled = false;
 		internal const bool PFMEnabled = false;
@@ -156,7 +148,7 @@ namespace LoveOfCooking
 			}
 			catch (Exception e)
 			{
-				Log.E("Error in applying Harmony patches:\n" + e);
+				Log.E($"Error in applying Harmony patches:{Environment.NewLine}{e}");
 			}
 
 			// Asset editors
@@ -199,7 +191,7 @@ namespace LoveOfCooking
 			Helper.ConsoleCommands.Add(cmd + "menu", "Open cooking menu.", (s, args) =>
 			{
 				if (!Utils.PlayerAgencyLostCheck())
-					Utils.OpenNewCookingMenu(null);
+					Utils.OpenNewCookingMenu();
 			});
 			Helper.ConsoleCommands.Add(cmd + "lvl", "Set cooking level.", (s, args) =>
 			{
@@ -576,16 +568,6 @@ namespace LoveOfCooking
 		}
 
 		[EventPriority(EventPriority.Low)]
-		private void Event_ReplaceCraftingMenu(object sender, UpdateTickedEventArgs e)
-		{
-			// We replace the menu on the next tick to give the game a chance to close the existing menu
-			// This does, however, cause a 1-frame flash of the original menu before it closes
-			// Solvable with harmony by blocking the draw call, but not a safe option?
-			Helper.Events.GameLoop.UpdateTicked -= this.Event_ReplaceCraftingMenu;
-			Utils.OpenNewCookingMenu();
-		}
-
-		[EventPriority(EventPriority.Low)]
 		private void Event_DrawCookingAnimation(object sender, RenderedWorldEventArgs e)
 		{
 			if (!Context.IsWorldReady || Game1.currentLocation == null)
@@ -853,7 +835,7 @@ namespace LoveOfCooking
 						if (Game1.activeClickableMenu is CookingMenu cookingMenu)
 							cookingMenu.exitThisMenu();
 						else
-							Utils.OpenNewCookingMenu(null);
+							Utils.OpenNewCookingMenu();
 						return;
 					case SButton.F5:
 						Game1.currentLocation.largeTerrainFeatures.Add(
@@ -869,7 +851,7 @@ namespace LoveOfCooking
 						return;
 					case SButton.F8:
 						Log.D(CookingSkillApi.GetCurrentProfessions().Aggregate("Current professions:", (str, pair) 
-							=> $"{str}\n{pair.Key}: {pair.Value}"));
+							=> $"{str}{Environment.NewLine}{pair.Key}: {pair.Value}"));
 						return;
 				}
 			}
@@ -882,56 +864,40 @@ namespace LoveOfCooking
 			if (e.Button.IsActionButton())
 			{
 				// Tile actions
-				bool overrideBaseBehaviour = false;
+				bool shouldOpenCookingMenu = false;
 				xTile.Tiles.Tile tile = Game1.currentLocation.Map.GetLayer("Buildings").Tiles[(int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y];
 				string action = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
 				if (tile != null)
 				{
 					bool isCookingStationTile = IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex);
 					bool isFridgeTile = IndoorsTileIndexesOfFridges.Contains(tile.TileIndex);
-					if (Game1.currentLocation is FarmHouse || Game1.currentLocation is IslandFarmHouse)
-					{
-						// Try to open a cooking menu when nearby to cooking stations (ie. kitchen, range)
-						if (!isFridgeTile)
-						{
-							if (action == "kitchen" || action == "drawer")
-							{
-								overrideBaseBehaviour = true;
-							}
-						}
-					}
-					else if (!Game1.currentLocation.IsOutdoors && isCookingStationTile)
+					if (!Game1.currentLocation.IsOutdoors && isCookingStationTile)
 					{
 						// Try to open a new cooking menu when in NPC homes
-						if (NpcHomeLocations.Any(pair => pair.Value == Game1.currentLocation.Name
-								&& Game1.player.getFriendshipHeartLevelForNPC(pair.Key) >= int.Parse(ItemDefinitions["NpcKitchenFriendshipRequired"][0]))
-							|| NpcHomeLocations.All(pair => pair.Value != Game1.currentLocation.Name))
+						string npc = NpcHomeLocations.FirstOrDefault(pair => pair.Value == Game1.currentLocation.Name).Key;
+						if (!string.IsNullOrEmpty(npc))
 						{
-							if (Game1.player.team.specialOrders.Any(order => order != null && order.objectives.Any(
-								obj => obj is DonateObjective dobj && dobj.dropBox.Value.EndsWith("Kitchen"))))
+							if (Game1.player.getFriendshipHeartLevelForNPC(npc) >= int.Parse(ItemDefinitions["NpcKitchenFriendshipRequired"][0]))
 							{
-								// Avoid blocking the player from submitting items to special order dropboxes
-								return;
+								if (Game1.player.team.specialOrders.Any(order => order != null && order.objectives.Any(
+									obj => obj is DonateObjective dobj && dobj.dropBox.Value.EndsWith("Kitchen"))))
+								{
+									// Avoid blocking the player from submitting items to special order dropboxes
+									return;
+								}
+								shouldOpenCookingMenu = true;
 							}
-							overrideBaseBehaviour = true;
-						}
-						else
-						{
-							string name = NpcHomeLocations.FirstOrDefault(pair => pair.Value == Game1.currentLocation.Name).Key;
-							Game1.showRedMessage(i18n.Get("world.range_npc.rejected",
-								new { name = Game1.getCharacterFromName(name).displayName }));
+							else
+							{
+								string name = NpcHomeLocations.FirstOrDefault(pair => pair.Value == Game1.currentLocation.Name).Key;
+								Game1.showRedMessage(i18n.Get("world.range_npc.rejected",
+									new { name = Game1.getCharacterFromName(name).displayName }));
+							}
 						}
 					}
 				}
 
-				if (Game1.currentLocation.Objects.ContainsKey(e.Cursor.GrabTile)
-					&& Game1.currentLocation.Objects[e.Cursor.GrabTile].Name == CookingCraftableName)
-				{
-					Game1.playSound("bigSelect");
-					overrideBaseBehaviour = true;
-				}
-
-				if (overrideBaseBehaviour)
+				if (shouldOpenCookingMenu && Utils.CanUseKitchens())
 				{
 					Utils.OpenNewCookingMenu();
 					Helper.Input.Suppress(e.Button);
@@ -1074,6 +1040,7 @@ namespace LoveOfCooking
 			}
 		}
 
+		[EventPriority(EventPriority.Low)]
 		private void Display_MenuChanged(object sender, MenuChangedEventArgs e)
 		{
 			if (e.OldMenu is TitleMenu || e.NewMenu is TitleMenu || !Context.IsWorldReady || Game1.currentLocation == null || Game1.player == null)
@@ -1121,47 +1088,45 @@ namespace LoveOfCooking
 			// Add new objects to shop menus and edit shop stock
 			if (e.NewMenu is ShopMenu menu && menu != null && Interface.Interfaces.JsonAssets != null)
 			{
-				if (Game1.currentLocation is SeedShop)
+				int discount = int.Parse(ModEntry.ItemDefinitions["ShopDiscounts"]
+					.Select(s => s.Split(':'))
+					.FirstOrDefault(split => split.First() == menu.storeContext)
+					?.LastOrDefault() ?? "0");
+				if (menu.storeContext == "SeedShop")
 				{
 					// Sort Pierre's shop to bring new crops alongside base game crops
 					Utils.SortSeedShopStock(ref menu);
 				}
-				else if (Game1.currentLocation is JojaMart && Config.AddNewCropsAndStuff)
+				if (Config.AddNewCropsAndStuff)
 				{
-					// Add chocolate to Joja Mart
+					// Add chocolate to shops
 					StardewValley.Object o = new StardewValley.Object(
-						Vector2.Zero,
-						Interface.Interfaces.JsonAssets.GetObjectId(ChocolateName),
-						int.MaxValue);
-					menu.itemPriceAndStock.Add(o, new [] {(int) (o.Price * Game1.MasterPlayer.difficultyModifier), int.MaxValue});
-					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Sugar"), o);
-				}
-				else if (menu.portraitPerson != null && menu.portraitPerson.Name == "Gus" && !Game1.currentLocation.IsOutdoors
-					&& Game1.MasterPlayer.hasCompletedCommunityCenter())
-				{
-					// Add chocolate to Gus' shop
-					StardewValley.Object o = new StardewValley.Object(
-						Vector2.Zero,
-						Interface.Interfaces.JsonAssets.GetObjectId(ChocolateName),
-						int.MaxValue);
-					menu.itemPriceAndStock.Add(o, new[] { (int)((o.Price - 35) * Game1.MasterPlayer.difficultyModifier), int.MaxValue });
-					menu.forSale.Insert(menu.forSale.FindIndex(i => i.Name == "Coffee"), o);
+						tileLocation: Vector2.Zero,
+						parentSheetIndex: Interface.Interfaces.JsonAssets.GetObjectId(name: ChocolateName),
+						initialStack: int.MaxValue);
+					int price = o.Price - discount;
+					if (menu.storeContext == "JojaMart")
+					{
+						Utils.AddToShopAtItemIndex(menu: menu, o: o, targetItemName: "Sugar", price: price);
+					}
+					if (menu.storeContext == "Saloon" && Game1.MasterPlayer.hasCompletedCommunityCenter())
+					{
+						Utils.AddToShopAtItemIndex(menu: menu, o: o, targetItemName: "Coffee", price: price);
+					}
 				}
 
 				return;
 			}
 
 			if (e.NewMenu != null
-				&& (e.NewMenu is CraftingPage || e.NewMenu.GetType().Name == "NewCraftingPage")
-				&& Helper.Reflection.GetField<bool>(e.NewMenu, "cooking").GetValue())
+				&& (e.NewMenu is CraftingPage || nameof(e.NewMenu).EndsWith("CraftingPage", StringComparison.InvariantCultureIgnoreCase))
+				&& Helper.Reflection.GetField<bool>(e.NewMenu, "cooking") is IReflectedField<bool> field
+				&& field != null && field.GetValue())
 			{
 				// Open the new Cooking Menu as a substitute when a cooking CraftingPage is opened
 				if (Config.AddCookingMenu)
 				{
-					e.NewMenu.exitThisMenuNoSound();
-					Game1.activeClickableMenu = null;
-
-					Helper.Events.GameLoop.UpdateTicked += this.Event_ReplaceCraftingMenu;
+                    Utils.ReplaceCraftingMenu(lastMenu: e.NewMenu);
 				}
 
 				return;

@@ -72,14 +72,14 @@
 		"IsPassable": false,
 		"ItemsDroppedWhenDestroyed": [
 			{
-				"Object": 771, // Fibre
+				"Object": "Fiber",
 				"BaseQuantity": [
 					1,
 					3
 				]
 			},
 			{
-				"Object": 380, // Wood
+				"Object": "Wood",
 				"BaseQuantity": [
 					3,
 					5
@@ -108,7 +108,7 @@
 			"spring",
 			"summer"
 		],
-		"SoundWhenDestroyed": "treeThud",
+		"SoundWhenDestroyed": "treethud",
 		"SoundWhenShaken": "leafrustle",
 		"SourceTexture": "Mods/blueberry.LoveOfCooking.Assets/BushSprites",
 		"SourceAreas": {

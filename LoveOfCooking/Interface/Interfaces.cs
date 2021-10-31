@@ -87,20 +87,7 @@ namespace LoveOfCooking.Interface
 		private static void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
 			LoadSpaceCoreAPI();
-
-			// Entoarox Framework save serialiser overrides SpaceCore save serialiser and causes errors when saving
-			// with registered [XmlType] objects (eg. CustomBush) in the world.
-			const string entoSafeVersion = "2.5.4";
-			if (Helper.ModRegistry.IsLoaded("Entoarox.EntoaroxFramework")
-				&& Helper.ModRegistry.Get("Entoarox.EntoaroxFramework") is IModInfo entoInfo
-				&& entoInfo.Manifest.Version.IsOlderThan(entoSafeVersion))
-			{
-				ISemanticVersion entoCurrentVersion = entoInfo.Manifest.Version;
-				Log.W("This version of Entoarox Framework doesn't allow for persistent custom bushes."
-					+ "\nNettles will be cleared at the end of each day to prevent errors."
-					+ "\nIf you have a save with nettle bushes, you will need to remove Ento " + entoCurrentVersion + " to load the game."
-					+ "\nCheck your SMAPI console for an update notice to Ento " + entoSafeVersion + " or higher.");
-			}
+			LoadCustomCommunityCentreContent();
 		}
 
 		private static void Event_RegisterLevelExtenderLate(object sender, OneSecondUpdateTickedEventArgs e)
@@ -122,6 +109,22 @@ namespace LoveOfCooking.Interface
 			spaceCore.RegisterSerializerType(type: typeof(CustomBush));
 		}
 
+		private static void LoadCustomCommunityCentreContent()
+		{
+			ICustomCommunityCentreAPI ccc = Helper.ModRegistry
+				.GetApi<ICustomCommunityCentreAPI>
+				("blueberry.CustomCommunityCentre");
+			if (ccc != null)
+			{
+				Log.D("Registering CustomCommunityCentre content.");
+				ccc.LoadContentPack(absoluteDirectoryPath: Path.Combine(Helper.DirectoryPath, AssetManager.CommunityCentreContentPackPath));
+			}
+			else
+            {
+				Log.D("Did not register CustomCommunityCentre content.");
+			}
+		}
+
 		private static void LoadJsonAssetsObjects()
 		{
 			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
@@ -133,7 +136,7 @@ namespace LoveOfCooking.Interface
 
 			if (ModEntry.Config.DebugMode)
 				Log.W("Loading Basic Objects Pack.");
-			JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, AssetManager.BasicObjectsPackPath));
+			JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.BasicObjectsPackPath));
 
 			if (!ModEntry.Config.AddCookingSkillAndRecipes)
 			{
@@ -143,7 +146,7 @@ namespace LoveOfCooking.Interface
 			{
 				if (ModEntry.Config.DebugMode)
 					Log.W("Loading New Recipes Pack.");
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, AssetManager.NewRecipesPackPath));
+				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NewRecipesPackPath));
 			}
 
 			if (!ModEntry.Config.AddNewCropsAndStuff)
@@ -158,7 +161,7 @@ namespace LoveOfCooking.Interface
 			{
 				if (ModEntry.Config.DebugMode)
 					Log.W("Loading New Crops Pack.");
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, AssetManager.NewCropsPackPath));
+				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NewCropsPackPath));
 			}
 
 			if (UsingNettlesCrops)
@@ -173,7 +176,7 @@ namespace LoveOfCooking.Interface
 			{
 				if (ModEntry.Config.DebugMode)
 					Log.W("Loading Nettles Pack.");
-				JsonAssets.LoadAssets(Path.Combine(Helper.DirectoryPath, AssetManager.NettlesPackPath));
+				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NettlesPackPath));
 			}
 		}
 
@@ -192,7 +195,7 @@ namespace LoveOfCooking.Interface
 			if (ModEntry.Config.DebugMode)
 				Log.W("Loading Producer Framework Pack.");
 
-			producerFramework.AddContentPack(Path.Combine(Helper.DirectoryPath, AssetManager.ProducerFrameworkPackPath));
+			producerFramework.AddContentPack(directory: Path.Combine(Helper.DirectoryPath, AssetManager.ProducerFrameworkPackPath));
 		}
 
 		private static void LoadModConfigMenuElements()
@@ -308,8 +311,9 @@ namespace LoveOfCooking.Interface
 			LevelExtender.initializeSkill(
 				name: Objects.CookingSkill.InternalName,
 				xp: ModEntry.CookingSkillApi.GetTotalCurrentExperience(),
-				xp_mod: Objects.CookingSkill.GlobalExperienceRate,
-				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(), cats: null);
+				xp_mod: float.Parse((ModEntry.ItemDefinitions)["CookingSkillExperienceGlobalScaling"][0]),
+				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(),
+				cats: null);
 		}
 
 		internal static bool IsManaBarReadyToDraw(Farmer who)
