@@ -894,6 +894,10 @@ namespace LoveOfCooking
 									new { name = Game1.getCharacterFromName(name).displayName }));
 							}
 						}
+						else if (Game1.currentLocation is CommunityCenter)
+						{
+							shouldOpenCookingMenu = true;
+						}
 					}
 				}
 

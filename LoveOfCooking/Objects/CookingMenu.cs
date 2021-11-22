@@ -475,7 +475,6 @@ namespace LoveOfCooking.Objects
 						this.exitFunction = delegate
 						{
 							multipleMutexRequest.ReleaseLocks();
-							Log.D("Freeing mutexes.");
 						};
 					},
 					failure_callback: delegate
