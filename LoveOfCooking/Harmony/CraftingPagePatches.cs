@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using StardewValley;
 using StardewValley.Menus;
 
@@ -8,7 +8,7 @@ namespace LoveOfCooking.Core.HarmonyPatches
 	{
 		private static uint ItemsCooked;
 
-		public static void Patch(HarmonyInstance harmony)
+		public static void Patch(Harmony harmony)
 		{
 			Log.D($"Applying patches to CraftingPage.clickCraftingRecipe",
 				ModEntry.Config.DebugMode);
@@ -19,8 +19,8 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				original: AccessTools.Method(typeof(CraftingPage), "clickCraftingRecipe"),
 				postfix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Postfix)));
 		}
-		
-		public static void CraftItem_Prefix()
+
+        public static void CraftItem_Prefix()
 		{
 			ItemsCooked = Game1.stats.ItemsCooked;
 		}
