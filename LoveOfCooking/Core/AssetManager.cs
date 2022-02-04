@@ -561,17 +561,6 @@ namespace LoveOfCooking
 
 				return;
 			}
-			if (asset.AssetNameEquals(@"Data/Events/Town"))
-			{
-				var data = asset.AsDictionary<string, string>().Data;
-
-				string key = data.Keys.FirstOrDefault(key => key.StartsWith("191393"));
-				string value = data[key];
-				data.Remove(key);
-				data.Add("191393/n ccIsComplete/w sunny/H", value);
-				
-				asset.AsDictionary<string, string>().ReplaceWith(data);
-			}
 			if (asset.AssetNameEquals(@"Data/Monsters"))
 			{
 				if (Interface.Interfaces.JsonAssets == null || Game1.currentLocation == null)
