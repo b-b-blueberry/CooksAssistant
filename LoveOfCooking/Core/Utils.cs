@@ -460,9 +460,7 @@ namespace LoveOfCooking
 
 		public static int GetFarmersMaxUsableIngredients()
 		{
-			return (ModEntry.Config.AddCookingToolProgression && ModEntry.Instance.States.Value.CookingToolLevel < 4)
-				? 1 + ModEntry.Instance.States.Value.CookingToolLevel
-				: 6;
+			return Objects.CookingTool.GetEffectiveGlobalToolUpgradeLevel();
 		}
 
 		public static void AddToShopAtItemIndex(ShopMenu menu, StardewValley.Object o, string targetItemName = "", int price = -1, int stock = -1)

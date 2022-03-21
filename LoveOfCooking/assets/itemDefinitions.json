@@ -8,6 +8,9 @@
 		"1",
 		"1"
 	],
+	"ShowWalletItems": [
+		"true"
+	],
 	"CookingUseRange": [
 		"3"
 	],

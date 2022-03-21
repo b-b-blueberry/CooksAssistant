@@ -38,8 +38,9 @@
 
 	<ItemGroup>
 		<Reference Include="SpaceCore">
-			<HintPath>SpaceCore-1-5-11.dll</HintPath>
+			<HintPath>$(GamePath)\Mods\SpaceCore\SpaceCore.dll</HintPath>
 			<Private>false</Private>
 		</Reference>
 	</ItemGroup>
+
 </Project>

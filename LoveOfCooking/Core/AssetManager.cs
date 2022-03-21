@@ -30,6 +30,7 @@ namespace LoveOfCooking
 		};
 		internal static readonly Rectangle RegenBarArea = new Rectangle(117, 0, 10, 38);
 		internal static readonly Rectangle CookingSkillIconArea = new Rectangle(31, 4, 10, 10);
+		internal static readonly Rectangle CookingToolIconArea = new Rectangle(176, 272, 16, 16);
 		internal static readonly Rectangle NotificationIconArea = new Rectangle(101, 11, 11, 14);
 		internal static bool IsCurrentHoveredItemHidingBuffs;
 		internal const int DummyIndexForHidingBuffs = 49;
@@ -463,25 +464,6 @@ namespace LoveOfCooking
 
 				return;
 			}
-			if (asset.AssetNameEquals(@"Data/mail"))
-			{
-				var data = asset.AsDictionary<string, string>().Data;
-				data.Add(ModEntry.MailCookbookUnlocked, i18n.Get("mail.cookbook_unlocked"));
-
-				// lol pan
-				string whoops = "Umm, hello @."
-						+ $"^There was a mix-up at the forge with your {i18n.Get("menu.cooking_equipment.name")}."
-							+ $" This is a bit embarrassing, so I'll return your materials as an apology."
-						+ "^Come back to the shop and we'll see about getting you that upgrade."
-						+ "^ - Clint, the blacksmith"
-					+ "^^^                     $ 1000g"
-					+ " %item object 334 5 %% [#] Love of Cooking Meta Menu Mix-Up";
-				data.Add(ModEntry.MailFryingPanWhoops, whoops);
-
-				asset.ReplaceWith(data);
-
-				return;
-			}
 			if (asset.AssetNameEquals(@"Data/ObjectContextTags"))
 			{
 				var dict = Game1.content.Load
@@ -725,27 +707,6 @@ namespace LoveOfCooking
 					texture.SetData(canvas);
 					customSpriteSheet.AsImage().PatchImage(source: texture, sourceArea: null, targetArea: targetArea, patchMode: PatchMode.Overlay);
 				}
-				return;
-			}
-			if (asset.AssetNameEquals(@"TileSheets/tools"))
-			{
-				// Patch in tool sprites for cooking equipment
-
-				if (ModEntry.SpriteSheet == null)
-					return;
-				
-				if (!ModEntry.Config.AddCookingToolProgression)
-				{
-					Log.D($"Did not edit {asset.AssetName}: Cooking equipment is disabled in config file.",
-						ModEntry.Config.DebugMode);
-					return;
-				}
-
-				var destImage = asset.AsImage();
-				Rectangle sourceArea = new Rectangle(192, 272, 16 * 4, 16);
-				Rectangle destArea = new Rectangle(272, 0, sourceArea.Width, sourceArea.Height);
-				destImage.PatchImage(ModEntry.SpriteSheet, sourceArea, destArea, PatchMode.Replace);
-				asset.ReplaceWith(destImage.Data);
 				return;
 			}
 		}

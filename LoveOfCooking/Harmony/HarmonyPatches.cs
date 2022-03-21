@@ -33,10 +33,10 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 			try
 			{
-				// Perform other miscellaneous patches
+				// Perform miscellaneous patches
 				Type[] types;
 
-				// Upgrade cooking tool in any instance it's claimed by the player, including interactions with Clint's shop and mail delivery mods
+				// Legacy: Upgrade cooking tool in any instance it's claimed by the player, including interactions with Clint's shop and mail delivery mods
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Tool), "actionWhenClaimed"),
 					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Tool_ActionWhenClaimed_Prefix)));
@@ -46,6 +46,15 @@ namespace LoveOfCooking.Core.HarmonyPatches
 					original: AccessTools.Method(typeof(StardewValley.Object), "getPriceAfterMultipliers"),
 					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
 
+				// Replace hold-up-item draw behaviour for Frying Pan cooking tool
+				harmony.Patch(
+					original: AccessTools.Method(typeof(StardewValley.Farmer), nameof(StardewValley.Farmer.showHoldingItem)),
+					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Utility_ShowHoldingItem_Prefix)));
+
+				// Add Frying Pan cooking tool upgrades to Clint Upgrade stock
+				harmony.Patch(
+					original: AccessTools.Method(typeof(StardewValley.Utility), nameof(StardewValley.Utility.getBlacksmithUpgradeStock)),
+					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Utility_GetBlacksmithUpgradeStock_Postfix)));
 				// Hide buffs in cooked foods not yet eaten
 				if (ModEntry.HideBuffIconsOnItems)
 				{
@@ -68,6 +77,49 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			}
 		}
 
+		private static bool Utility_ShowHoldingItem_Prefix(
+			Farmer who)
+		{
+			try
+			{
+				if (Objects.CookingTool.IsItemCookingTool(item: who.mostRecentlyGrabbedItem))
+				{
+					TemporaryAnimatedSprite sprite = new TemporaryAnimatedSprite(
+						textureName: AssetManager.GameContentSpriteSheetPath,
+						sourceRect: Objects.CookingTool.CookingToolSourceRectangle(upgradeLevel: (who.mostRecentlyGrabbedItem as Tool).UpgradeLevel),
+						animationInterval: 2500f,
+						animationLength: 1,
+						numberOfLoops: 0,
+						position: who.Position + (new Vector2(0, Game1.player.Sprite.SpriteHeight - 1) * -Game1.pixelZoom),
+						flicker: false,
+						flipped: false,
+						layerDepth: 1f,
+						alphaFade: 0f,
+						color: Color.White,
+						scale: Game1.pixelZoom,
+						scaleChange: 0f,
+						rotation: 0f,
+						rotationChange: 0f)
+					{
+						motion = new Vector2(0f, -0.1f)
+					};
+					Game1.currentLocation.temporarySprites.Add(sprite);
+				}
+				return false;
+			}
+			catch (Exception ex)
+			{
+				Log.E("" + ex);
+				return true;
+			}
+		}
+
+		public static void Utility_GetBlacksmithUpgradeStock_Postfix(
+			Dictionary<ISalable, int[]> __result,
+			Farmer who)
+		{
+			Objects.CookingTool.AddToShopStock(itemPriceAndStock: __result, who: who);
+		}
 		public static void IClickableMenu_DrawHoverText_Prefix(
 			ref string[] buffIconsToDisplay,
 			StardewValley.Item hoveredItem)
@@ -85,13 +137,14 @@ namespace LoveOfCooking.Core.HarmonyPatches
 			AssetManager.IsCurrentHoveredItemHidingBuffs = true;
 		}
 
+		/// <summary>
+		/// Legacy behaviour for non-specific GenericTool instances.
+		/// </summary>
 		public static void Tool_ActionWhenClaimed_Prefix(
 			ref StardewValley.Tool __instance)
 		{
-			if (Tools.IsThisCookingTool(__instance))
+			if (__instance is not Objects.CookingTool && Objects.CookingTool.IsItemCookingTool(item: __instance))
 			{
-				Log.D($"Collected {__instance?.Name ?? "null cooking tool"} (index {__instance.IndexOfMenuItemView})",
-					ModEntry.Config.DebugMode);
 				++ModEntry.Instance.States.Value.CookingToolLevel;
 			}
 		}

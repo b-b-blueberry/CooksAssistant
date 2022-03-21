@@ -118,7 +118,7 @@ namespace LoveOfCooking
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
-		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan"; // DO NOT EDIT
+		internal static readonly string MailFryingPanWhoops = MailPrefix + "im_sorry_lol_pan"; // Legacy
 
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
@@ -172,12 +172,12 @@ namespace LoveOfCooking
 
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
 			SpaceEvents.BeforeGiftGiven += this.SpaceEvents_BeforeGiftGiven;
+			SpaceEvents.AddWalletItems += this.SpaceEvents_AddWalletItems;
 
 			Events.BushShaken += this.Events_BushShaken;
 			Events.BushToolUsed += this.Events_BushToolUsed;
 
 			Interface.Interfaces.RegisterEvents();
-			Tools.RegisterEvents();
 
 			this.AddConsoleCommands();
 		}
@@ -1073,12 +1073,6 @@ namespace LoveOfCooking
 					Game1.player.canMove = false;
 				}
 
-				// Cooking tool whoops mail
-				if (letterClosed.mailTitle == MailFryingPanWhoops)
-				{
-					Game1.player.addUnearnedMoney(1000);
-				}
-
 				return;
 			}
 
@@ -1357,6 +1351,51 @@ namespace LoveOfCooking
 			}
 		}
 
+		/// <summary>
+		/// Add our custom wallet items to the SpaceCore wallet UI.
+		/// Invoked when instantiating <see cref="SpaceCore.Interface.NewSkillsPage"/>.
+		/// </summary>
+		/// <param name="sender">New <see cref="SpaceCore.Interface.NewSkillsPage"/>.</param>
+		/// <param name="e">No arguments expected.</param>
+		private void SpaceEvents_AddWalletItems(object sender, EventArgs e)
+		{
+			SpaceCore.Interface.NewSkillsPage menu = sender as SpaceCore.Interface.NewSkillsPage;
+
+			if (Game1.player.hasOrWillReceiveMail(ModEntry.MailCookbookUnlocked))
+			{
+				// Cookbook
+				StardewValley.Object o = new StardewValley.Object(
+					parentSheetIndex: Interface.Interfaces.JsonAssets.GetObjectId(name: ModEntry.ObjectPrefix + "cookbook"),
+					initialStack: 1);
+				Rectangle sourceRect = GameLocation.getSourceRectForObject(tileIndex: o.ParentSheetIndex);
+				menu.specialItems.Add(new ClickableTextureComponent(
+					name: string.Empty,
+					bounds: new Rectangle(-1, -1, sourceRect.Width * Game1.pixelZoom, sourceRect.Height * Game1.pixelZoom),
+					label: null,
+					hoverText: o.DisplayName,
+					texture: Game1.objectSpriteSheet,
+					sourceRect: sourceRect,
+					scale: Game1.pixelZoom,
+					drawShadow: true));
+
+				// Frying Pan
+				if (ModEntry.Config.AddCookingToolProgression)
+				{
+					int cookingToolLevel = this.States.Value.CookingToolLevel;
+					sourceRect = Objects.CookingTool.CookingToolSourceRectangle(upgradeLevel: cookingToolLevel);
+					menu.specialItems.Add(new ClickableTextureComponent(
+						name: string.Empty,
+						bounds: new Rectangle(-1, -1, sourceRect.Width * Game1.pixelZoom, sourceRect.Height * Game1.pixelZoom),
+						label: null,
+						hoverText: Objects.CookingTool.CookingToolQualityDisplayName(upgradeLevel: cookingToolLevel),
+						texture: ModEntry.SpriteSheet,
+						sourceRect: sourceRect,
+						scale: Game1.pixelZoom,
+						drawShadow: true));
+				}
+			}
+		}
+
 		private void Events_BushToolUsed(object sender, EventArgs e)
 		{
 			
@@ -1416,7 +1455,6 @@ namespace LoveOfCooking
 
 			try
 			{
-				Tools.SaveLoadedBehaviours();
 				Interface.Interfaces.SaveLoadedBehaviours();
 			}
 			catch (Exception e)
@@ -1479,7 +1517,6 @@ namespace LoveOfCooking
 
 			// Invalidate other known assets that we edit using our own
 			Helper.Content.InvalidateCache(@"LooseSprites/Cursors");
-			Helper.Content.InvalidateCache(@"TileSheets/tools");
 		}
 
 		private void PrintConfig()
@@ -1520,16 +1557,15 @@ namespace LoveOfCooking
 				Log.D("\n== LOCAL DATA ==\n"
 					+ $"\nRecipeGridView:   {States.Value.IsUsingRecipeGridView}"
 					+ $"\nCookingToolLevel: {States.Value.CookingToolLevel}"
-					+ $"\nCanUpgradeTool:   {Tools.CanFarmerUpgradeCookingEquipment()}"
+					+ $"\nCanUpgradeTool:   {Objects.CookingTool.CanBeUpgraded()}"
 					+ $"\nFoodsEaten:       {States.Value.FoodsEaten.Aggregate("", (s, cur) => $"{s} ({cur})")}"
 					+ $"\nFavouriteRecipes: {States.Value.FavouriteRecipes.Aggregate("", (s, cur) => $"{s} ({cur})")}\n"
 					+ "-- OTHERS --"
-					+ $"\nLanguage:         {LocalizedContentManager.CurrentLanguageCode.ToString().ToUpper()}"
 					+ $"\nFarmHouseLevel:   {Utils.GetFarmhouseKitchenLevel(Game1.getLocationFromName("FarmHouse") as FarmHouse)}"
 					+ $"\nMaxIngredients:   {Utils.GetFarmersMaxUsableIngredients()}"
 					+ $"\nCookbookUnlockedMail: {Game1.player.mailReceived.Contains(MailCookbookUnlocked)}"
-					+ $"\nFryingPanWhoopsMail:  {Game1.player.mailReceived.Contains(MailFryingPanWhoops)}\n",
 					Config.DebugMode);
+					+ $"\nLanguage:         {LocalizedContentManager.CurrentLanguageCode.ToString().ToUpper()}\n",
 			}
 			catch (Exception e)
 			{
