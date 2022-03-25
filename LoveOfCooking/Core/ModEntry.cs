@@ -15,14 +15,11 @@ using System.Linq;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 // TODO: UPDATE: Ingredients bounce when added to cooking slots, puff when removed, unless using autofill
-// TODO: UPDATE: Quests, events, and scripts
-// TODO: UPDATE: Hot chocolate at the ice festival
 
 // TODO: COMPATIBILITY: Skill Prestige (https://www.nexusmods.com/stardewvalley/mods/569)
 // TODO: COMPATIBILITY: Level Extender (https://www.nexusmods.com/stardewvalley/mods/1471)
 //		No current errors or issues, but doesn't interact, either
 // TODO: COMPATIBILITY: Tool Upgrade Delivery (https://www.nexusmods.com/stardewvalley/mods/5421)
-
 
 namespace LoveOfCooking
 {
@@ -72,9 +69,6 @@ namespace LoveOfCooking
 			// debug
 			public float RegenTickRate;
 		}
-
-		// Add Cooking Questline
-		internal const string ActionDockCrate = AssetPrefix + "DockCrate";
 
 		// Object definitions
 		internal static Dictionary<string, string> IngredientBuffChart;
@@ -907,9 +901,6 @@ namespace LoveOfCooking
 					Helper.Input.Suppress(e.Button);
 					return;
 				}
-
-				// Use tile actions in maps
-				Utils.CheckTileAction(e.Cursor.GrabTile, Game1.currentLocation);
 			}
 		}
 

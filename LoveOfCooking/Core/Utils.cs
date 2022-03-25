@@ -30,33 +30,7 @@ namespace LoveOfCooking
 					|| Game1.fadeToBlack; // None of that
 		}
 
-		public static void CheckTileAction(Vector2 position, GameLocation location)
 		{
-			string property = location.doesTileHaveProperty(
-				(int)position.X, (int)position.Y, "Action", "Buildings");
-			if (property == null)
-				return;
-			string[] action = property.Split(' ');
-			switch (action[0])
-			{
-				case ModEntry.ActionDockCrate:
-					// Interact with the new crates at the secret beach pier to loot items for quests
-					if (Interface.Interfaces.JsonAssets != null)
-					{
-						Game1.currentLocation.playSoundAt("ship", position);
-						double roll = Game1.random.NextDouble();
-						StardewValley.Object o = null;
-						if (roll < 0.2f && Game1.player.eventsSeen.Contains(0))
-						{
-							o = new StardewValley.Object(832, 1); // Pineapple
-							if (roll < 0.05f && Game1.player.eventsSeen.Contains(1))
-								o = new StardewValley.Object(Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.ChocolateName), 1);
-						}
-						if (o != null)
-							Game1.player.addItemByMenuIfNecessary(o.getOne());
-					}
-					break;
-			}
 		}
 
 		internal static void PopulateMissingRecipes()
