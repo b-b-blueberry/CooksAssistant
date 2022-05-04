@@ -4,17 +4,15 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
-namespace LoveOfCooking.Core.HarmonyPatches
+namespace LoveOfCooking.HarmonyPatches
 {
 	public static class HarmonyPatches
-	{
-		public static string Id => ModEntry.Instance.Helper.ModRegistry.ModID;
-
-
-		public static void Patch()
+	{// TODO: harmony patch error messages
+		public static void Patch(string id)
 		{
-			Harmony harmony = new Harmony(Id);
+			Harmony harmony = new Harmony(id);
 			try
 			{
 				BushPatches.Patch(harmony);

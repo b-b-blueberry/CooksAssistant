@@ -56,7 +56,7 @@ namespace LoveOfCooking.Objects
 			return SpaceCore.Skills.GetSkill(CookingSkill.InternalName) as CookingSkill;
 		}
 
-		/// <returns>Current base level.</returns>
+		/// <returns>Current base skill level.</returns>
 		public int GetLevel()
 		{
 			return SpaceCore.Skills.GetSkillLevel(Game1.player, CookingSkill.InternalName);
@@ -238,10 +238,10 @@ namespace LoveOfCooking.Objects
 				}
 				else if (apply)
 				{
-					Log.D($"\nExperience until level {nextLevel}:"
+					Log.D($"{Environment.NewLine}Experience until level {nextLevel}:"
 						+ $" ({requiredExperience - remainingExperience}/{requiredExperience})"
-						+ $"\nTotal experience: ({this.GetTotalCurrentExperience()}/{this.GetTotalExperienceRequiredForLevel(nextLevel)})"
-						+ $"\n+{finalExperience} experience!",
+						+ $"{Environment.NewLine}Total experience: ({this.GetTotalCurrentExperience()}/{this.GetTotalExperienceRequiredForLevel(nextLevel)})"
+						+ $"{Environment.NewLine}+{finalExperience} experience!",
 						ModEntry.Config.DebugMode);
 					this.AddExperienceDirectly(finalExperience);
 				}

@@ -95,7 +95,7 @@ namespace LoveOfCooking
 		{
 		}
 
-		internal static void Init()
+		internal static bool Init()
 		{
 			List<System.Reflection.PropertyInfo> properties = typeof(AssetManager)
 				.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static)
@@ -118,11 +118,13 @@ namespace LoveOfCooking
 			}
 
 			// Populate all custom asset paths from GameContentPath values
-			List<string> listy_list = properties
+			List<string> listyList = properties
 				.Where(property => property.Name.StartsWith("GameContent"))
 				.Select(property => (string)property.GetValue(null))
 				.ToList();
-			_gameContentAssetPaths.AddRange(listy_list);
+			_gameContentAssetPaths.AddRange(listyList);
+
+			return true;
 		}
 
 		public bool CanLoad<T>(IAssetInfo asset)
@@ -411,35 +413,30 @@ namespace LoveOfCooking
 						data[recipe.Key] = Utils.UpdateEntry(data[recipe.Key], recipeSplit, false, true);
 					}
 
-					// Strip recipes with invalid, missing, or duplicate ingredients from the recipe data list
-					Dictionary<string, string> badRecipes = data.Where(
-						pair => pair.Value.Split('/')[0].Split(' ').ToList() is List<string> ingredients
-							&& ingredients.Any(s =>
-								(ingredients.IndexOf(s) % 2 == 0) is bool isItemId
-								&& 
-									// Missing ingredients 
-									((isItemId && (s == "0" || s == "-1"))
-									// Duplicate ingredients
-									|| (isItemId && ingredients.Count(x => x == s) > 1)
-									// Bad ingredient quantities
-									|| (!isItemId && (!int.TryParse(s, out int i) || (i < 1 || i > 999))))))
-						.ToDictionary(pair => pair.Key, pair => pair.Value);
-					if (badRecipes.Count() > 0)
+					if (Game1.activeClickableMenu is not StardewValley.Menus.TitleMenu)
 					{
-						string str = badRecipes.Aggregate($"Removing {badRecipes.Count()} malformed recipes.\nThese recipes may use items from mods that aren't installed:",
-							(str, cur) => $"{str}\n{cur.Key}: {cur.Value.Split('/')[0]}");
-						if (Game1.activeClickableMenu is StardewValley.Menus.TitleMenu)
+						// Strip recipes with invalid, missing, or duplicate ingredients from the recipe data list
+						Dictionary<string, string> badRecipes = data.Where(
+							pair => pair.Value.Split('/')[0].Split(' ').ToList() is List<string> ingredients
+								&& ingredients.Any(s =>
+									(ingredients.IndexOf(s) % 2 == 0) is bool isItemId
+									&&
+										// Missing ingredients 
+										((isItemId && (s == "0" || s == "-1"))
+										// Duplicate ingredients
+										|| (isItemId && ingredients.Count(x => x == s) > 1)
+										// Bad ingredient quantities
+										|| (!isItemId && (!int.TryParse(s, out int i) || (i < 1 || i > 999))))))
+							.ToDictionary(pair => pair.Key, pair => pair.Value);
+						if (badRecipes.Count() > 0)
 						{
-							Log.D("At TitleMenu: " + str,
-								ModEntry.Config.DebugMode);
-						}
-						else
-						{
+							string str = badRecipes.Aggregate($"Removing {badRecipes.Count()} malformed recipes.\nThese recipes may use items from mods that aren't installed:",
+								(str, cur) => $"{str}\n{cur.Key}: {cur.Value.Split('/')[0]}");
 							Log.W(str);
-						}
-						foreach (string recipe in badRecipes.Keys)
-						{
-							data.Remove(recipe);
+							foreach (string recipe in badRecipes.Keys)
+							{
+								data.Remove(recipe);
+							}
 						}
 					}
 
@@ -457,7 +454,7 @@ namespace LoveOfCooking
 							ModEntry.Config.DebugMode);
 					}
 				}
-				catch (Exception e) when (e is ArgumentException || e is NullReferenceException || e is KeyNotFoundException)
+				catch (Exception e) when (e is ArgumentException or NullReferenceException or KeyNotFoundException)
 				{
 					Log.E($"Did not patch {asset.AssetName}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
 				}

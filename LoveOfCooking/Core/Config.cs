@@ -17,6 +17,5 @@
 		public string DefaultSearchFilter { get; set; } = "None";
 		public bool DebugMode { get; set; } = false;
 		public bool ResizeKoreanFonts { get; set; } = true;
-		public string ConsoleCommandPrefix { get; set; } = "cac";
 	}
 }

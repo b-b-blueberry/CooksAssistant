@@ -2,12 +2,10 @@
 using StardewValley;
 using StardewValley.Menus;
 
-namespace LoveOfCooking.Core.HarmonyPatches
+namespace LoveOfCooking.HarmonyPatches
 {
 	public static class CraftingPagePatches
 	{
-		private static uint ItemsCooked;
-
 		public static void Patch(Harmony harmony)
 		{
 			Log.D($"Applying patches to CraftingPage.clickCraftingRecipe",
@@ -20,20 +18,23 @@ namespace LoveOfCooking.Core.HarmonyPatches
 				postfix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Postfix)));
 		}
 
-        public static void CraftItem_Prefix()
+        public static void CraftItem_Prefix(uint __state)
 		{
-			ItemsCooked = Game1.stats.ItemsCooked;
+			__state = Game1.stats.ItemsCooked;
 		}
 
-		public static void CraftItem_Postfix(CraftingPage __instance, ClickableTextureComponent c)
+		public static void CraftItem_Postfix(CraftingPage __instance,
+			uint __state,
+			Item ___lastCookingHover,
+			ClickableTextureComponent c)
 		{
-			if (Game1.stats.ItemsCooked <= ItemsCooked)
+			if (Game1.stats.ItemsCooked <= __state)
 			{
 				return;
 			}
 
-			var item = ModEntry.Instance.Helper.Reflection.GetField<Item>(__instance, "lastCookingHover").GetValue();
-			var recipe = new CraftingRecipe(item.Name, isCookingRecipe: true);
+			Item item = ___lastCookingHover;
+			CraftingRecipe recipe = new CraftingRecipe(item.Name, isCookingRecipe: true);
 
 			// Apply burn chance to destroy cooked food at random
 			/*

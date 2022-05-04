@@ -86,7 +86,7 @@ namespace LoveOfCooking
 		[XmlIgnore]
 		public Rectangle? SourceRectangle;
 		public bool HasProduce => this.HeldProduce.Keys.Any(p => this.HeldProduce[p] > 0);
-		public bool IsMature => this.Definition.GrowthStages != null
+		public bool IsMature => this.Definition.GrowthStages is not null
 			&& (this.GrowthStage > this.Definition.GrowthStages.Length
 				|| this.GrowthDays.Value >= this.Definition.GrowthStages.Sum());
 		public int GrowthStage
@@ -95,7 +95,7 @@ namespace LoveOfCooking
 			{
 				if (this.HasProduce)
 					return this.Definition.GrowthStages.Length;
-				if (this.Definition.GrowthStages == null)
+				if (this.Definition.GrowthStages is null)
 					return 0;
 				
 				int i, days = 0;
@@ -192,7 +192,7 @@ namespace LoveOfCooking
 
 		public bool IsInSeason(string season)
 		{
-			return this.Definition.SeasonsToProduce != null
+			return this.Definition.SeasonsToProduce is not null
 				&& this.Definition.SeasonsToProduce.Any(s => s.Equals(season, StringComparison.InvariantCultureIgnoreCase));
 		}
 
@@ -338,7 +338,7 @@ namespace LoveOfCooking
 
 					if ((!this.HasProduce && this.DaysSinceLastProduce.Value < produceRule.DaysToProduce)
 						|| (this.HasProduce && this.DaysSinceLastProduce.Value < produceRule.DaysToAccumulateProduce
-							&& produceRule.AccumulatedQuantity != null))
+							&& produceRule.AccumulatedQuantity is not null))
 						continue;
 
 					// Add to held stacks of each produce if valid
@@ -389,8 +389,8 @@ namespace LoveOfCooking
 
 		public override bool performUseAction(Vector2 tileLocation, GameLocation location)
 		{
-			bool canShake = !this.HasProduce || this.Definition.ToolsToHarvest == null
-				|| (Game1.player.CurrentTool != null && this.Definition.ToolsToHarvest.Any(
+			bool canShake = !this.HasProduce || this.Definition.ToolsToHarvest is null
+				|| (Game1.player.CurrentTool is not null && this.Definition.ToolsToHarvest.Any(
 					tool => Game1.player.CurrentTool.GetType().Name.Equals(tool, StringComparison.InvariantCultureIgnoreCase)));
 			if (canShake)
 			{
@@ -415,7 +415,7 @@ namespace LoveOfCooking
 
 			Events.InvokeOnBushToolUsed(bush: this, tool: t, explosion: explosion, tileLocation: tileLocation, location: location);
 
-			if (t != null
+			if (t is not null
 				&& this.Definition.ToolsToDestroy.Any(n => n.Equals(t.GetType().Name, StringComparison.InvariantCultureIgnoreCase))
 				&& this.isDestroyable(location, tileLocation))
 			{
@@ -523,7 +523,7 @@ namespace LoveOfCooking
 		public void SetUpSourceRectangle()
 		{
 			string season = this.GetSeason(this.currentLocation);
-			if (this.Definition != null && this.Definition.SourceAreas.ContainsKey(season))
+			if (this.Definition is not null && this.Definition.SourceAreas.ContainsKey(season))
 			{
 				Rectangle sourceRectangle = this.Definition.SourceAreas[this.GetSeason(this.currentLocation)];
 				sourceRectangle.X += (sourceRectangle.Width * this.GrowthStage);
@@ -616,7 +616,7 @@ namespace LoveOfCooking
 					.ToList();
 				Log.D($"Found {bushes.Count} bushes in {location.Name} ({variety})"
 					+ (bushes.Any()
-						? bushes.Aggregate("\n=> ",
+						? bushes.Aggregate("{Environment.NewLine}=> ",
 							(str, nb) => $"{str} ({nb.tilePosition.Value.X},{nb.tilePosition.Value.Y})")
 						: string.Empty),
 					ModEntry.Config.DebugMode);

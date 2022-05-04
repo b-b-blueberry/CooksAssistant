@@ -151,7 +151,7 @@ namespace LoveOfCooking.Objects
 		{
 			bool isCookingTool = item is CookingTool;
 			bool isLegacyTool = !isCookingTool
-				&& item != null
+				&& item is not null
 				&& item is StardewValley.Tools.GenericTool tool
 				&& tool.IndexOfMenuItemView - CookingTool.LegacyCookingToolSheetIndex is >= 0 and < CookingTool.MaxUpgradeLevel;
 			return isCookingTool || isLegacyTool;

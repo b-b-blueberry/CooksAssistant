@@ -2,6 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -165,15 +166,19 @@ namespace LoveOfCooking.Objects
 
 		public override string GetSkillPageHoverText(int level)
 		{
-			string str = "";
+			string hoverText = string.Empty;
 
 			if (ModEntry.Config.FoodCanBurn)
-				str += "\n" + i18n.Get("menu.cooking_skill.levelup_burn", new
+			{
+				hoverText += Environment.NewLine + i18n.Get(
+					key: "menu.cooking_skill.levelup_burn",
+					tokens: new
 					{
 						Number = level * BurnChanceModifier * BurnChanceReduction
 					});
+			}
 
-			return str;
+			return hoverText;
 		}
 	}
 }

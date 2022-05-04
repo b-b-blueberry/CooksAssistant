@@ -21,16 +21,24 @@ namespace LoveOfCooking
 		{
 			// HOUSE RULES
 			return !Context.IsWorldReady || !Context.CanPlayerMove
-					|| Game1.game1 == null || Game1.currentLocation == null || Game1.player == null // No unplayable games
+					|| Game1.game1 is null || Game1.currentLocation is null || Game1.player is null // No unplayable games
 					|| !Game1.game1.IsActive // No alt-tabbed game state
-					|| (Game1.eventUp && Game1.currentLocation.currentEvent != null && !Game1.currentLocation.currentEvent.playerControlSequence) // No event cutscenes
+					|| (Game1.eventUp && Game1.currentLocation.currentEvent is not null && !Game1.currentLocation.currentEvent.playerControlSequence) // No event cutscenes
 					|| Game1.nameSelectUp || Game1.IsChatting || Game1.dialogueTyping || Game1.dialogueUp
-					|| (Game1.keyboardDispatcher != null && Game1.keyboardDispatcher.Subscriber != null) // No text inputs
+					|| (Game1.keyboardDispatcher is not null && Game1.keyboardDispatcher.Subscriber is not null) // No text inputs
 					|| Game1.player.UsingTool || Game1.pickingTool || Game1.numberOfSelectedItems != -1 // No tools in use
 					|| Game1.fadeToBlack; // None of that
 		}
 
+		public static void CleanUpSaveFiles()
 		{
+			Utils.CleanUpMail();
+			Utils.PopulateMissingRecipes();
+		}
+
+		internal static void CleanUpMail()
+		{
+			Game1.player.mailReceived.Remove(ModEntry.MailFryingPanWhoops);
 		}
 
 		internal static void PopulateMissingRecipes()
@@ -88,7 +96,7 @@ namespace LoveOfCooking
 				bool isDefined = Enum.TryParse(name, out ModEntry.SkillIndex skillIndex);
 				int level = isDefined
 					? Game1.player.GetSkillLevel((int)Enum.Parse(typeof(ModEntry.SkillIndex), name))
-					: SpaceCore.Skills.GetSkill(name) != null
+					: SpaceCore.Skills.GetSkill(name) is not null
 						? Game1.player.GetCustomSkillLevel(name)
 						: -1;
 				float value = float.Parse(split[1]);
@@ -125,11 +133,11 @@ namespace LoveOfCooking
 			}));
 		}
 
-		internal static void OpenNewCookingMenu(IClickableMenu lastMenu = null)
+		internal static void OpenNewCookingMenu(IClickableMenu lastMenu = null, bool forceOpen = false)
 		{
-			if (ModEntry.Config.AddCookingMenu)
+			if (ModEntry.Config.AddCookingMenu || forceOpen)
 			{
-				Game1.activeClickableMenu = lastMenu != null && lastMenu is CraftingPage craftingPage
+				Game1.activeClickableMenu = lastMenu is not null && lastMenu is CraftingPage craftingPage
 					? new CookingMenu(craftingPage: craftingPage)
 					: new CookingMenu();
 			}
@@ -171,9 +179,8 @@ namespace LoveOfCooking
 				.GetField<string>(menu, "currentSkill")
 				.GetValue();
 			if (skill != CookingSkill.InternalName)
-			{
 				return;
-			}
+			
 			int level = ModEntry.Instance.Helper.Reflection
 				.GetField<int>(menu, "currentLevel")
 				.GetValue();
@@ -182,7 +189,7 @@ namespace LoveOfCooking
 				.ConvertAll(name => new CraftingRecipe(ModEntry.ObjectPrefix + name, true))
 				.Where(recipe => !Game1.player.knowsRecipe(recipe.name))
 				.ToList();
-			if (cookingRecipes != null && cookingRecipes.Count > 0)
+			if (cookingRecipes is not null && cookingRecipes.Count > 0)
 			{
 				UpdateEnglishRecipeDisplayNames(ref cookingRecipes);
 				foreach (CraftingRecipe recipe in cookingRecipes.Where(r => !Game1.player.cookingRecipes.ContainsKey(r.name)))
@@ -202,7 +209,7 @@ namespace LoveOfCooking
 			ModEntry.Instance.Helper.Reflection
 				.GetField<List<CraftingRecipe>>(menu, "newCraftingRecipes")
 				.SetValue(combinedRecipes);
-			Log.D(combinedRecipes.Aggregate($"New recipes for level {level}:", (total, cur) => $"{total}\n{cur.name} ({cur.createItem().ParentSheetIndex})"),
+			Log.D(combinedRecipes.Aggregate($"New recipes for level {level}:", (total, cur) => $"{total}{Environment.NewLine}{cur.name} ({cur.createItem().ParentSheetIndex})"),
 				ModEntry.Config.DebugMode);
 
 			// Adjust menu to fit if necessary
@@ -210,7 +217,7 @@ namespace LoveOfCooking
 			int menuHeightInRecipes = combinedRecipes.Count + combinedRecipes.Count(recipe => recipe.bigCraftable);
 			if (menuHeightInRecipes >= defaultMenuHeightInRecipes)
 			{
-				menu.height += (menuHeightInRecipes - defaultMenuHeightInRecipes) * 64;
+				menu.height += (menuHeightInRecipes - defaultMenuHeightInRecipes) * StardewValley.Object.spriteSheetTileSize * Game1.pixelZoom;
 			}
 		}
 
@@ -231,7 +238,7 @@ namespace LoveOfCooking
 
 		public static bool IsFridgeOrMinifridge(StardewValley.Object o)
 		{
-			return o != null && o.bigCraftable.Value && o is Chest c && c.fridge.Value;
+			return o is not null && o.bigCraftable.Value && o is Chest c && c.fridge.Value;
 		}
 
 		public static bool IsMinifridge(StardewValley.Object o)
@@ -241,7 +248,7 @@ namespace LoveOfCooking
 
 		public static bool IsItemFoodAndNotYetEaten(StardewValley.Item item)
 		{
-			return item is StardewValley.Object o && o != null
+			return item is StardewValley.Object o && o is not null
 				&& !o.bigCraftable.Value && o.Category == ModEntry.CookingCategory
 				&& !ModEntry.Instance.States.Value.FoodsEaten.Contains(o.Name);
 		}
@@ -265,7 +272,7 @@ namespace LoveOfCooking
 			// Attempt to place a wild nettle as forage around other weeds
 			bool spawnNettlesToday = (Game1.dayOfMonth % 3 == 1 && (Game1.currentSeason == "spring" || Game1.currentSeason == "fall"))
 				|| Game1.currentSeason == "summer";
-			if (ModEntry.NettlesEnabled && spawnNettlesToday)
+			if (Utils.AreNettlesActive() && spawnNettlesToday)
 			{
 				Utils.SpawnNettles();
 			}
@@ -340,7 +347,7 @@ namespace LoveOfCooking
 					Game1.player.health = 1;
 				Buff existingBuff = Game1.buffsDisplay.otherBuffs
 					.FirstOrDefault(b => b.source == variety);
-				if (existingBuff == null)
+				if (existingBuff is null)
 				{
 					Game1.buffsDisplay.addOtherBuff(new Buff(
 						0, 0, 0, 0, 0, 0, 0,
@@ -392,7 +399,7 @@ namespace LoveOfCooking
 					for (int y = Game1.player.getTileY() - radius; y < yLimit && cookingStationLevel == 0; ++y)
 					{
 						xTile.Tiles.Tile tile = layer.Tiles[x, y];
-						if (tile == null
+						if (tile is null
 							|| (Game1.currentLocation.doesTileHaveProperty(x, y, "Action", "Buildings") != "kitchen"
 								&& !ModEntry.IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex)))
 							continue;
@@ -472,7 +479,7 @@ namespace LoveOfCooking
 				// Ignore items without one of our group suffixes
 				string suffix = suffixes.Keys
 					.FirstOrDefault(s => itemList[i].Name.ToLower().EndsWith(s));
-				if (suffix == null)
+				if (suffix is null)
 					continue;
 				// Set the move-to-this-item name to be the first-found item in the group
 				suffixes[suffix] ??= itemList[i].Name;
@@ -516,8 +523,8 @@ namespace LoveOfCooking
 			if (replace)
 				fields = newEntry;
 			else for (int i = 0; i < newEntry.Length; ++i)
-					if (newEntry[i] != null)
-						fields[startIndex + i] = append ? $"{fields[startIndex + i]} {newEntry[i]}" : newEntry[i];
+				if (newEntry[i] is not null)
+					fields[startIndex + i] = append ? $"{fields[startIndex + i]} {newEntry[i]}" : newEntry[i];
 			return string.Join(delimiter.ToString(), fields);
 		}
 	}

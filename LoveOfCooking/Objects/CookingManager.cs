@@ -12,10 +12,10 @@ namespace LoveOfCooking.Objects
 		private readonly CookingMenu _cookingMenu;
 		private const int DefaultIngredientsSlots = 5;
 		internal int FirstEmptySlot => this.CurrentIngredients
-			.FindIndex(i => i == null);
+			.FindIndex(i => i is null);
 		internal bool AreAllIngredientSlotsFilled => this.CurrentIngredients
 			.GetRange(0, this.MaxIngredients)
-			.TrueForAll(i => i != null);
+			.TrueForAll(i => i is not null);
 		private int _maxIngredients;
 		internal int MaxIngredients
 		{
@@ -68,9 +68,6 @@ namespace LoveOfCooking.Objects
 			}
 		}
 
-		private static IModHelper Helper => ModEntry.Instance.Helper;
-		private static Config Config => ModEntry.Config;
-
 
 		public CookingManager(CookingMenu cookingMenu)
 		{
@@ -83,13 +80,14 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		public static float GetBurnChance(CraftingRecipe recipe)
 		{
-			if (!Config.FoodCanBurn || Interface.Interfaces.JsonAssets == null)
-				return 0f;
+			float minimumChance = 0f;
+			if (!ModEntry.Config.FoodCanBurn || Interface.Interfaces.JsonAssets is null)
+				return minimumChance;
 
 			int cookingLevel = ModEntry.CookingSkillApi.GetLevel();
 			float baseRate = float.Parse(ModEntry.ItemDefinitions["BurnChanceBase"][0]);
 			float addedRate = float.Parse(ModEntry.ItemDefinitions["BurnChancePerIngredient"][0]);
-			float chance = Math.Max(0f, (baseRate + (addedRate * recipe.getNumberOfIngredients()))
+			float chance = Math.Max(minimumChance, (baseRate + (addedRate * recipe.getNumberOfIngredients()))
 				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
 				- (ModEntry.Instance.States.Value.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
 
@@ -102,7 +100,7 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		public static bool CanBeCooked(Item item)
 		{
-			return !(item == null || item is Tool || item is Furniture || item is Ring || item is Clothing || item is Boots || item is Hat || item is Wallpaper
+			return !(item is null or Tool or Furniture or Ring or Clothing or Boots or Hat or Wallpaper
 				|| item.Category < -90 || item.isLostItem || !item.canBeTrashed()
 				|| (item is StardewValley.Object o && (o.bigCraftable.Value || o.specialItem)));
 		}
@@ -112,7 +110,7 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		public static bool IsSeasoning(Item item)
 		{
-			return item != null && (item.ParentSheetIndex == 917 || item.Name.EndsWith("Oil"));
+			return item is not null && (item.ParentSheetIndex == 917 || item.Name.EndsWith("Oil"));
 		}
 
 		/// <summary>
@@ -177,7 +175,7 @@ namespace LoveOfCooking.Objects
 		public int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, bool limitToCurrentIngredients)
 		{
 			int count = -1;
-			if (recipe == null)
+			if (recipe is null)
 				return 0;
 			foreach (KeyValuePair<int, int> itemAndQuantity in recipe.recipeList)
 			{
@@ -190,8 +188,8 @@ namespace LoveOfCooking.Objects
 					{
 						bool hasValue = this.CurrentIngredients[i].HasValue;
 						Item item = hasValue ? this.GetItemForIngredient(index: i, sourceItems: sourceItems) : null;
-						bool isMatch = item != null && CookingManager.IsMatchingIngredient(id: itemAndQuantity.Key, item: item);
-						if (hasValue && item != null && isMatch)
+						bool isMatch = item is not null && CookingManager.IsMatchingIngredient(id: itemAndQuantity.Key, item: item);
+						if (hasValue && item is not null && isMatch)
 						{
 							countForThisIngredient += item.Stack / requiredToCook;
 						}
@@ -206,7 +204,7 @@ namespace LoveOfCooking.Objects
 					// Check amount craftable regardless of current ingredients
 					if (CookingManager.GetMatchingIngredients(id: itemAndQuantity.Key, sourceItems: sourceItems, required: itemAndQuantity.Value)
 							is List<Ingredient> ingredients
-						&& ingredients != null && ingredients.Count > 0)
+						&& ingredients is not null && ingredients.Count > 0)
 					{
 						countForThisIngredient = ingredients.Sum(
 							i => this.GetItemForIngredient(ingredient: i, sourceItems: sourceItems).Stack) / requiredToCook;
@@ -240,11 +238,11 @@ namespace LoveOfCooking.Objects
 				int remainingRequired = itemAndQuantity.Value;
 				for (int i = 0; i < this.CurrentIngredients.Count && remainingRequired > 0; ++i)
 				{
-					if (this.CurrentIngredients[i] == null)
+					if (this.CurrentIngredients[i] is null)
 						continue;
 
 					Item item = this.GetItemForIngredient(index: i, sourceItems: sourceItems);
-					if (item == null)
+					if (item is null)
 					{
 						this.CurrentIngredients[i] = null; // No items were found for this ingredient, prevent it being checked later
 						continue;
@@ -274,8 +272,8 @@ namespace LoveOfCooking.Objects
 				string msg2 = recipe.recipeList.Aggregate("Requires: ", (str, pair) => $"{str} ({pair.Key} x{pair.Value})");
 				string msg3 = sourceItems.Aggregate("Sources: ", (str, list) => $"{str} ({sourceItems.IndexOf(list)} x{list.Count})");
 				string msg4 = this.CurrentIngredients.Aggregate("Current: ", (str, i) => $"{str} [{(i.HasValue ? i.Value.WhichInventory + ", " + i.Value.WhichItem : "null")}]");
-				Log.D($"{msg1}\n{msg2}\n{msg3}",
-					Config.DebugMode);
+				Log.D(string.Join(Environment.NewLine, new[] { msg1, msg2, msg3, msg4 }),
+					ModEntry.Config.DebugMode);
 			}
 
 			// Identify items to be consumed from inventory to fulfil ingredients requirements
@@ -285,14 +283,14 @@ namespace LoveOfCooking.Objects
 			int numPerCraft = recipe.numberProducedPerCraft;
 
 			{
-				string msg1 = "Indices: " + (ingredientsToConsume != null
+				string msg1 = "Indices: " + (ingredientsToConsume is not null
 					? ingredientsToConsume.Aggregate("", (str, pair) => $"{str} ({pair.Key} {pair.Value})")
 					: "null");
 				Log.D($"{msg1}",
-					Config.DebugMode);
+					ModEntry.Config.DebugMode);
 			}
 
-			for (int i = 0; i < quantity && ingredientsToConsume != null; ++i)
+			for (int i = 0; i < quantity && ingredientsToConsume is not null; ++i)
 			{
 				// Consume ingredients from source lists
 				foreach (KeyValuePair<int, int> indexAndQuantity in ingredientsToConsume.ToList())
@@ -454,7 +452,7 @@ namespace LoveOfCooking.Objects
 			Item item = recipe.createItem();
 
 			// Track experience for items cooked
-			if (Config.AddCookingSkillAndRecipes)
+			if (ModEntry.Config.AddCookingSkillAndRecipes)
 			{
 				if (!ModEntry.Instance.States.Value.FoodCookedToday.ContainsKey(recipe.name))
 					ModEntry.Instance.States.Value.FoodCookedToday[recipe.name] = 0;
@@ -516,7 +514,7 @@ namespace LoveOfCooking.Objects
 
 		internal bool RemoveFromIngredients(int ingredientsIndex)
 		{
-			if (ingredientsIndex < 0 || ingredientsIndex >= this.CurrentIngredients.Count || this.CurrentIngredients[ingredientsIndex] == null)
+			if (ingredientsIndex < 0 || ingredientsIndex >= this.CurrentIngredients.Count || this.CurrentIngredients[ingredientsIndex] is null)
 				return false;
 			this.CurrentIngredients[ingredientsIndex] = null;
 			return true;
@@ -525,7 +523,7 @@ namespace LoveOfCooking.Objects
 		internal void AutoFillIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems)
 		{
 			// Don't fill slots if the player isn't able to cook the recipe
-			if (recipe == null || this.MaxIngredients < recipe.recipeList.Count
+			if (recipe is null || this.MaxIngredients < recipe.recipeList.Count
 				|| 1 > this.GetAmountCraftable(recipe: recipe, sourceItems: sourceItems, limitToCurrentIngredients: false))
 				return;
 
@@ -536,7 +534,7 @@ namespace LoveOfCooking.Objects
 				.ToList();
 
 			// Skip if no matching ingredients are found
-			if (ingredients == null || ingredients.Count == 0)
+			if (ingredients is null || ingredients.Count == 0)
 				return;
 
 			// Reduce ingredients to try and complete the recipe in as many slots as we have,

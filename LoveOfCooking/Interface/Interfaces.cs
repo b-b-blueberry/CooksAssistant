@@ -10,10 +10,11 @@ namespace LoveOfCooking.Interface
 {
 	internal static class Interfaces
 	{
-		private static IModHelper Helper;
-		private static IManifest ModManifest;
+		private static IModHelper Helper => ModEntry.Instance.Helper;
+		private static IManifest ModManifest => ModEntry.Instance.ModManifest;
 		private static ITranslationHelper i18n => Helper.Translation;
 
+		private static bool IsLoaded;
 		private static double TotalSecondsOnLoaded;
 
 		// Loaded APIs
@@ -24,6 +25,7 @@ namespace LoveOfCooking.Interface
 		// Loaded mods
 		internal static bool UsingSVE;
 		internal static bool UsingPPJACrops;
+		internal static bool UsingCustomCC;
 		internal static bool UsingNettlesCrops;
 		internal static bool UsingManaBar;
 		internal static bool UsingLevelExtender;
@@ -32,29 +34,68 @@ namespace LoveOfCooking.Interface
 		internal static bool UsingFarmhouseKitchenStart;
 
 
-		internal static void Init(IModHelper helper, IManifest manifest)
+		/// <summary>
+		/// Perform first-time checks for mod-provided APIs used for registering events and hooks, or adding custom content.
+		/// </summary>
+		/// <returns>Whether mod-provided APIs were initialised without issue.</returns>
+		internal static bool Init()
 		{
-			Helper = helper;
-			ModManifest = manifest;
+			try
+			{
+				if (!IsLoaded)
+				{
+					IdentifyLoadedOptionalMods();
+
+					JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
+					if (JsonAssets is null)
+					{
+						Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
+						return false;
+					}
+				}
+				return true;
+			}
+			catch (Exception e)
+			{
+				Log.E($"Failed to initialise mod-provided APIs:{Environment.NewLine}{e}");
+				return false;
+			}
 		}
 
-		internal static void LoadInterfaces()
+		/// <summary>
+		/// Load content only once from available mod-provided APIs.
+		/// </summary>
+		/// <returns>Whether assets have been successfully loaded.</returns>
+		internal static bool Load()
 		{
-			GetLoadedMods();
-
-			LoadJsonAssetsObjects();
-			LoadProducerFrameworkRules();
-			LoadModConfigMenuElements();
-			LoadLevelExtenderApi();
+			try
+			{
+				if (!IsLoaded)
+				{
+					LoadCustomCommunityCentreContent();
+					IsLoaded = LoadSpaceCoreAPI()
+						&& LoadJsonAssetsObjects()
+						&& LoadProducerFrameworkRules()
+						&& LoadModConfigMenuElements()
+						&& LoadLevelExtenderApi();
+				}
+				return IsLoaded;
+			}
+			catch (Exception e)
+			{
+				Log.E($"Failed to load content from mod-provided APIs:{Environment.NewLine}{e}");
+				return false;
+			}
 		}
 
-		private static void GetLoadedMods()
+		private static void IdentifyLoadedOptionalMods()
 		{
 			ManaBar = Helper.ModRegistry.GetApi<IManaBarAPI>("spacechase0.ManaBar");
-			UsingManaBar = ManaBar != null;
+			UsingManaBar = ManaBar is not null;
 
 			UsingSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
 			UsingPPJACrops = Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
+			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
@@ -69,25 +110,14 @@ namespace LoveOfCooking.Interface
 			.Any(id => Helper.ModRegistry.IsLoaded(id));
 		}
 
-		internal static void RegisterEvents()
-		{
-			Helper.Events.GameLoop.GameLaunched += GameLoop_GameLaunched;
-		}
-
 		internal static void SaveLoadedBehaviours()
 		{
 			// Attempt to register Level Extender compatibility
-			if (LevelExtender != null)
+			if (LevelExtender is not null)
 			{
 				TotalSecondsOnLoaded = Game1.currentGameTime.TotalGameTime.TotalSeconds;
 				Helper.Events.GameLoop.OneSecondUpdateTicked += Event_RegisterLevelExtenderLate;
 			}
-		}
-
-		private static void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
-		{
-			LoadSpaceCoreAPI();
-			LoadCustomCommunityCentreContent();
 		}
 
 		private static void Event_RegisterLevelExtenderLate(object sender, OneSecondUpdateTickedEventArgs e)
@@ -101,20 +131,27 @@ namespace LoveOfCooking.Interface
 			}
 		}
 
-		private static void LoadSpaceCoreAPI()
+		private static bool LoadSpaceCoreAPI()
 		{
 			ISpaceCoreAPI spaceCore = Helper.ModRegistry
 				.GetApi<ISpaceCoreAPI>
 				("spacechase0.SpaceCore");
+			if (spaceCore is null)
+			{
+				Log.E("Can't access the SpaceCore API. Is the mod installed correctly?");
+				return false;
+			}
+
+			spaceCore.RegisterSerializerType(type: typeof(Objects.CookingTool));
 			spaceCore.RegisterSerializerType(type: typeof(CustomBush));
+
+			return true;
 		}
 
 		private static void LoadCustomCommunityCentreContent()
 		{
-			ICustomCommunityCentreAPI ccc = Helper.ModRegistry
-				.GetApi<ICustomCommunityCentreAPI>
-				("blueberry.CustomCommunityCentre");
-			if (ccc != null && Utils.AreNewCropsActive())
+			ICustomCommunityCentreAPI ccc = Helper.ModRegistry.GetApi<ICustomCommunityCentreAPI>("blueberry.CustomCommunityCentre");
+			if (UsingCustomCC && ccc is not null && Utils.AreNewCropsActive())
 			{
 				Log.D("Registering CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
@@ -127,15 +164,8 @@ namespace LoveOfCooking.Interface
 			}
 		}
 
-		private static void LoadJsonAssetsObjects()
+		private static bool LoadJsonAssetsObjects()
 		{
-			JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
-			if (JsonAssets == null)
-			{
-				Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
-				return;
-			}
-
 			if (ModEntry.Config.DebugMode)
 				Log.W("Loading Basic Objects Pack.");
 			JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.BasicObjectsPackPath));
@@ -180,32 +210,34 @@ namespace LoveOfCooking.Interface
 					Log.W("Loading Nettles Pack.");
 				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NettlesPackPath));
 			}
+			return true;
 		}
 
-		private static void LoadProducerFrameworkRules()
+		private static bool LoadProducerFrameworkRules()
 		{
 			if (!ModEntry.PFMEnabled)
-				return;
+				return true;
 
 			IProducerFrameworkAPI producerFramework = Helper.ModRegistry.GetApi<IProducerFrameworkAPI>("DIGUS.ProducerFrameworkMod");
-			if (producerFramework == null)
+			if (producerFramework is null)
 			{
 				Log.E("Can't access the Producer Framework API. Is the mod installed correctly?");
-				return;
+				return false;
 			}
 
 			if (ModEntry.Config.DebugMode)
 				Log.W("Loading Producer Framework Pack.");
 
 			producerFramework.AddContentPack(directory: Path.Combine(Helper.DirectoryPath, AssetManager.ProducerFrameworkPackPath));
+			return true;
 		}
 
-		private static void LoadModConfigMenuElements()
+		private static bool LoadModConfigMenuElements()
 		{
 			IGenericModConfigMenuAPI gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuAPI>("spacechase0.GenericModConfigMenu");
-			if (gmcm == null)
+			if (gmcm is null)
 			{
-				return;
+				return true;
 			}
 
 			gmcm.RegisterModConfig(ModEntry.Instance.ModManifest, () => ModEntry.Config = new Config(), () => Helper.WriteConfig(ModEntry.Config));
@@ -253,7 +285,7 @@ namespace LoveOfCooking.Interface
 			{
 				BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
 				PropertyInfo property = typeof(Config).GetProperty(entry, flags);
-				if (property != null)
+				if (property is not null)
 				{
 					string i18nKey = $"config.option.{entry.ToLower()}_";
 					if (property.PropertyType == typeof(bool))
@@ -290,9 +322,10 @@ namespace LoveOfCooking.Interface
 						labelDesc: null);
 				}
 			}
+			return true;
 		}
 
-		private static void LoadLevelExtenderApi()
+		private static bool LoadLevelExtenderApi()
 		{
 			if (UsingLevelExtender)
 			{
@@ -307,12 +340,13 @@ namespace LoveOfCooking.Interface
 				}
 				finally
 				{
-					if (LevelExtender == null)
+					if (LevelExtender is null)
 					{
 						Log.W("Level Extender is loaded, but the API was inaccessible.");
 					}
 				}
 			}
+			return true;
 		}
 
 		private static void RegisterSkillsWithLevelExtender()
@@ -329,7 +363,7 @@ namespace LoveOfCooking.Interface
 		{
 			int mana = ManaBar.GetMana(farmer: who);
 			int maxMana = ManaBar.GetMaxMana(farmer: who);
-			bool gameFlags = Context.IsWorldReady && Game1.activeClickableMenu == null && !Game1.eventUp;
+			bool gameFlags = Context.IsWorldReady && Game1.activeClickableMenu is null && !Game1.eventUp;
 			bool manaFlags = mana > 0 && maxMana > 0 && mana < maxMana;
 			return gameFlags && manaFlags;
 		}
@@ -339,7 +373,7 @@ namespace LoveOfCooking.Interface
 			StardewValley.Objects.Chest chest = null;
 
 			Type kitchen = Type.GetType("CommunityKitchen.Kitchen, CommunityKitchen");
-			if (kitchen != null)
+			if (kitchen is not null)
             {
 				chest = Helper.Reflection
 					.GetMethod(type: kitchen, name: "GetKitchenFridge")
@@ -352,7 +386,7 @@ namespace LoveOfCooking.Interface
 		internal static Type GetMod_RemoteFridgeStorage()
 		{
 			Type mod = Type.GetType("RemoteFridgeStorage.ModEntry, RemoteFridgeStorage");
-			if (mod == null && Helper.ModRegistry.IsLoaded("EternalSoap.RemoteFridgeStorage"))
+			if (mod is null && Helper.ModRegistry.IsLoaded("EternalSoap.RemoteFridgeStorage"))
 			{
 				Log.E("Unable to load Remote Fridge Storage: one or both of these mods is now incompatible."
 					  + "\nChests will not be usable from the cooking page.");
@@ -363,7 +397,7 @@ namespace LoveOfCooking.Interface
 		internal static Type GetMod_ConvenientChests()
 		{
 			Type mod = Type.GetType("ConvenientChests.ModEntry, ConvenientChests");
-			if (mod == null && Helper.ModRegistry.IsLoaded("aEnigma.ConvenientChests"))
+			if (mod is null && Helper.ModRegistry.IsLoaded("aEnigma.ConvenientChests"))
 			{
 				Log.E("Unable to load Convenient Chests: one or both of these mods is now incompatible."
 					  + "\nChests will not be usable from the cooking page.");
