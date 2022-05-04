@@ -186,8 +186,6 @@ namespace LoveOfCooking
 		{
 			string cmd = Config.ConsoleCommandPrefix;
 
-			Tools.AddConsoleCommands(cmd);
-
 			Helper.ConsoleCommands.Add(cmd + "menu", "Open cooking menu.", (s, args) =>
 			{
 				if (!Utils.PlayerAgencyLostCheck())
@@ -1563,9 +1561,8 @@ namespace LoveOfCooking
 					+ "-- OTHERS --"
 					+ $"\nFarmHouseLevel:   {Utils.GetFarmhouseKitchenLevel(Game1.getLocationFromName("FarmHouse") as FarmHouse)}"
 					+ $"\nMaxIngredients:   {Utils.GetFarmersMaxUsableIngredients()}"
-					+ $"\nCookbookUnlockedMail: {Game1.player.mailReceived.Contains(MailCookbookUnlocked)}"
-					Config.DebugMode);
 					+ $"\nLanguage:         {LocalizedContentManager.CurrentLanguageCode.ToString().ToUpper()}\n",
+					Config.DebugMode);
 			}
 			catch (Exception e)
 			{

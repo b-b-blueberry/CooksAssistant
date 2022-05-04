@@ -65,7 +65,7 @@ namespace LoveOfCooking
 		[XmlIgnore]
 		public static Dictionary<string, BushDefinition> BushDefinitions;
 		[XmlIgnore]
-		public static List<Texture2D> BushTextures;
+		public static Dictionary<string, Texture2D> BushTextures;
 
 		// Preserved values
 		public readonly NetStringDictionary<int, NetInt> HeldProduce = new NetStringDictionary<int, NetInt>();
@@ -436,6 +436,7 @@ namespace LoveOfCooking
 
 					if (!string.IsNullOrEmpty(this.Definition.SoundWhenShaken))
 						DelayedAction.playSoundAfterDelay(this.Definition.SoundWhenShaken, 100);
+
 					Color leafColour;
 					switch (season)
 					{
@@ -546,7 +547,7 @@ namespace LoveOfCooking
 					tileLocation.X * Game1.tileSize + (bounds.Width / 2),
 					(tileLocation.Y + this.Definition.TilesHigh) * Game1.tileSize));
 			spriteBatch.Draw(
-				texture: CustomBush.BushTextures.First(tx => tx.Name == this.Definition.SourceTexture),
+				texture: CustomBush.BushTextures[this.Definition.SourceTexture],
 				position: screenPosition,
 				sourceRectangle: this.SourceRectangle.Value,
 				color: Color.White * this.AlphaField.GetValue(),
@@ -642,10 +643,10 @@ namespace LoveOfCooking
 				<Dictionary<string, CustomBush.BushDefinition>>
 				(path: $"{AssetManager.LocalBushDataPath}.json");
 			CustomBush.BushTextures = CustomBush.BushDefinitions.Values
-				.Select(d => d.SourceTexture)
+				.Select(selector: d => d.SourceTexture)
 				.Distinct()
-				.Select(assetKey => Game1.content.Load<Texture2D>(assetKey))
-				.ToList();
+				.Select(selector: assetKey => (assetKey: assetKey, texture: Game1.content.Load<Texture2D>(assetKey)))
+				.ToDictionary(keySelector: pair => pair.assetKey, elementSelector: pair => pair.texture);
 		}
 	}
 }
