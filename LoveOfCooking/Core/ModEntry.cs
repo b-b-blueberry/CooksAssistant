@@ -804,82 +804,165 @@ namespace LoveOfCooking
 			float currentRegen = States.Value.HealthRegeneration + States.Value.StaminaRegeneration;
 			if (Context.IsWorldReady && !Game1.eventUp && Game1.farmEvent is null && currentRegen > 0)
 			{
+				const int heightFromBottom = 4 * Game1.pixelZoom;
 				const int otherBarWidth = 12 * Game1.pixelZoom;
-				const int margin = 3 * Game1.pixelZoom;
-				const int spacing = 2 * Game1.pixelZoom;
-				const int borderWidth = 3 * Game1.pixelZoom;
-				int otherBarCount = States.Value.LastTickShowedHealthBar ? 2 : 1;
-				int xOffset = ((otherBarWidth) * (1 + otherBarCount)) + (spacing * otherBarCount);
+				const int otherBarSpacing = 1 * Game1.pixelZoom;
 
-				// Draw background
-				int backgroundWidth = AssetManager.RegenBarArea.Width * Game1.pixelZoom;
-				int backgroundHeight = AssetManager.RegenBarArea.Height * Game1.pixelZoom;
-				Vector2 topOfBar = new Vector2(
-					viewport.Right - xOffset,
-					viewport.Bottom - margin - backgroundHeight);
-				if (Game1.isOutdoorMapSmallerThanViewport())
+				Point barIconOffset = new Point(x: -1, y: 1);
+
+				int otherBarCount = States.Value.LastTickShowedHealthBar ? 2 : 1;
+				int width = AssetManager.RegenBarArea.Width * Game1.pixelZoom;
+				int height = AssetManager.RegenBarArea.Height * Game1.pixelZoom;
+
+				int sourceWidth = AssetManager.RegenBarArea.Width;
+				int sourceHeight = AssetManager.RegenBarArea.Height;
+				Vector2 regenBarOrigin = new Vector2(
+					x: viewport.Right - (sourceWidth * Game1.pixelZoom / 2) - (otherBarWidth * (1 + otherBarCount)),
+					y: viewport.Bottom - heightFromBottom - (sourceHeight * Game1.pixelZoom));
+
+				// Regen bar sprites
 				{
-					topOfBar.X = Math.Min(topOfBar.X, -Game1.viewport.X + Game1.currentLocation.Map.Layers[0].LayerWidth * 64 - xOffset);
+					// region of cursors spritesheet asset to find base game regen bar sprite
+					Rectangle originalArea = new Rectangle(256, 408, 12, 56);
+					// starting region of original region to read data from
+					Rectangle sourceArea = new Rectangle(
+						x: originalArea.X,
+						y: originalArea.Y,
+						width: sourceWidth / 2,
+						height: sourceHeight / 2);
+					// starting target region on screen to draw to
+					Rectangle destArea = new Rectangle(
+						x: (int)regenBarOrigin.X,
+						y: (int)regenBarOrigin.Y,
+						width: sourceArea.Width * Game1.pixelZoom,
+						height: sourceArea.Height * Game1.pixelZoom);
+
+					Point[] sourceOffsets = new Point[]
+					{
+						Point.Zero,
+						new Point(originalArea.Width - sourceArea.Width, 0),
+						new Point(0, originalArea.Height - sourceArea.Height),
+						new Point(originalArea.Width - sourceArea.Width, originalArea.Height - sourceArea.Height)
+					};
+					Point[] destOffsets = new Point[]
+					{
+						Point.Zero,
+						new Point(destArea.Width, 0),
+						new Point(0, destArea.Height),
+						new Point(destArea.Width, destArea.Height)
+					};
+					for (int i = 0; i < 4; ++i)
+					{
+						Rectangle newSourceArea = sourceArea;
+						newSourceArea.X += sourceOffsets[i].X;
+						newSourceArea.Y += sourceOffsets[i].Y;
+						Rectangle newDestArea = destArea;
+						newDestArea.X += destOffsets[i].X;
+						newDestArea.Y += destOffsets[i].Y;
+
+						e.SpriteBatch.Draw(
+							texture: Game1.mouseCursors,
+							sourceRectangle: newSourceArea,
+							destinationRectangle: newDestArea,
+							color: Color.White,
+							rotation: 0f,
+							origin: Vector2.Zero,
+							effects: SpriteEffects.None,
+							layerDepth: 1f);
+					}
+					// cooking skill icon
+					e.SpriteBatch.Draw(
+						texture: ModEntry.SpriteSheet,
+						sourceRectangle: AssetManager.CookingSkillIconArea,
+						position: new Vector2(
+							x: destArea.X - (barIconOffset.X * Game1.pixelZoom),
+							y: destArea.Y - (barIconOffset.Y * Game1.pixelZoom)),
+						color: Color.White,
+						rotation: 0f,
+						origin: Vector2.Zero,
+						scale: Game1.pixelZoom,
+						effects: SpriteEffects.None,
+						layerDepth: 1f);
 				}
 
-				e.SpriteBatch.Draw(
-					texture: ModEntry.SpriteSheet,
-					position: topOfBar,
-					sourceRectangle: AssetManager.RegenBarArea,
-					color: Color.White,
-					rotation: 0f,
-					origin: Vector2.Zero,
-					scale: Game1.pixelZoom,
-					effects: SpriteEffects.None,
-					layerDepth: 1f);
-
-				// Draw fill colour
-				Color colour = Utility.getRedToGreenLerpColor(0.5f);
-				float startingRegen = States.Value.HealthAndStaminaRegenRunningValue;
-				int barHeight = backgroundHeight - 10 - 56;
-				int height = (int)(currentRegen / startingRegen * barHeight);
-				Rectangle barArea = new Rectangle(
-					(int)topOfBar.X + borderWidth,
-					(int)topOfBar.Y + backgroundHeight - height - borderWidth,
-					backgroundWidth - (borderWidth * 2),
-					height);
-				// fill colour body
-				e.SpriteBatch.Draw(
-					texture: Game1.staminaRect,
-					destinationRectangle: barArea,
-					sourceRectangle: Game1.staminaRect.Bounds,
-					color: colour,
-					rotation: 0f,
-					origin: Vector2.Zero,
-					effects: SpriteEffects.None,
-					layerDepth: 1f);
-				// fill colour top border
-				barArea.Height = 4;
-				colour.R = (byte)Math.Max(0, colour.R - 50);
-				colour.G = (byte)Math.Max(0, colour.G - 50);
-				e.SpriteBatch.Draw(
-					texture: Game1.staminaRect,
-					destinationRectangle: barArea,
-					sourceRectangle: Game1.staminaRect.Bounds,
-					color: colour,
-					rotation: 0f,
-					origin: Vector2.Zero,
-					effects: SpriteEffects.None,
-					layerDepth: 1f);
-
-				// Draw value
-				if (Game1.getOldMouseX() >= topOfBar.X
-					&& Game1.getOldMouseY() >= topOfBar.Y
-					&& Game1.getOldMouseX() < topOfBar.X + 32f)
+				// Regen bar fill colour
 				{
-					SpriteFont font = Game1.smallFont;
-					string text = $"H +{Math.Max(0, States.Value.HealthRegeneration)}\nE +{Math.Max(0, States.Value.StaminaRegeneration)}";
-					Vector2 position = topOfBar + new Vector2(0f - font.MeasureString(text).X - spacing, 0f);
-					e.SpriteBatch.DrawString(
-						font,
-						text,
-						position,
-						Color.White);
+					Point borderWidth = new Point(
+						x: 3 * Game1.pixelZoom,
+						y: 3 * Game1.pixelZoom);
+					float startingRegen = States.Value.HealthAndStaminaRegenRunningValue;
+					float fillColourHeightRatio = currentRegen / startingRegen;
+					int xOffset = borderWidth.X;
+					int yOffset = barIconOffset.Y + (AssetManager.CookingSkillIconArea.Height * Game1.pixelZoom);
+					width -= (xOffset + borderWidth.X);
+					height -= (yOffset + borderWidth.Y);
+
+					// Draw background
+					Vector2 fillColourOrigin = new Vector2(
+						x: regenBarOrigin.X + xOffset,
+						y: regenBarOrigin.Y + yOffset + height + (1 * Game1.pixelZoom) - (int)(height * fillColourHeightRatio));
+					if (Game1.isOutdoorMapSmallerThanViewport())
+					{
+						fillColourOrigin.X = Math.Min(fillColourOrigin.X, -Game1.viewport.X + (Game1.currentLocation.Map.Layers[0].LayerWidth * Game1.tileSize));
+					}
+					e.SpriteBatch.Draw(
+						texture: ModEntry.SpriteSheet,
+						position: fillColourOrigin,
+						sourceRectangle: AssetManager.RegenBarArea,
+						color: Color.White,
+						rotation: 0f,
+						origin: Vector2.Zero,
+						scale: Game1.pixelZoom,
+						effects: SpriteEffects.None,
+						layerDepth: 1f);
+
+					// Draw fill colour
+					Color colour = Utility.getRedToGreenLerpColor(0.5f);
+					Rectangle destArea = new Rectangle(
+						x: (int)fillColourOrigin.X,
+						y: (int)fillColourOrigin.Y,
+						width: width,
+						height: (int)(height * fillColourHeightRatio));
+					// fill colour body
+					e.SpriteBatch.Draw(
+						texture: Game1.staminaRect,
+						destinationRectangle: destArea,
+						sourceRectangle: Game1.staminaRect.Bounds,
+						color: colour,
+						rotation: 0f,
+						origin: Vector2.Zero,
+						effects: SpriteEffects.None,
+						layerDepth: 1f);
+					// fill colour top border
+					destArea.Height = 1 * Game1.pixelZoom;
+					colour.R = (byte)Math.Max(0, colour.R - 50);
+					colour.G = (byte)Math.Max(0, colour.G - 50);
+					e.SpriteBatch.Draw(
+						texture: Game1.staminaRect,
+						destinationRectangle: destArea,
+						sourceRectangle: Game1.staminaRect.Bounds,
+						color: colour,
+						rotation: 0f,
+						origin: Vector2.Zero,
+						effects: SpriteEffects.None,
+						layerDepth: 1f);
+
+					// Draw value
+					if (Game1.getOldMouseX() >= fillColourOrigin.X
+						&& Game1.getOldMouseY() >= fillColourOrigin.Y
+						&& Game1.getOldMouseX() < fillColourOrigin.X + 32f)
+					{
+						SpriteFont font = Game1.smallFont;
+						string text = $"H +{Math.Max(0, States.Value.HealthRegeneration)}{Environment.NewLine}E +{Math.Max(0, States.Value.StaminaRegeneration)}";
+						Vector2 position = fillColourOrigin + new Vector2(
+							x: 0f - font.MeasureString(text).X - otherBarSpacing,
+							y: 0f);
+						e.SpriteBatch.DrawString(
+							spriteFont: font,
+							text: text,
+							position: position,
+							color: Color.White);
+					}
 				}
 			}
 
