@@ -927,26 +927,6 @@ namespace LoveOfCooking
 			if (Utils.PlayerAgencyLostCheck())
 				return;
 
-			// Debug hotkeys
-			if (Config.DebugMode)
-			{
-				switch (e.Button)
-				{
-					case SButton.F5:
-						Game1.currentLocation.largeTerrainFeatures.Add(
-							new Bush(e.Cursor.GrabTile, 1, Game1.currentLocation));
-						return;
-					case SButton.F6:
-						Game1.currentLocation.largeTerrainFeatures.Add(
-							new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, BushNameNettle));
-						return;
-					case SButton.F7:
-						Game1.currentLocation.largeTerrainFeatures.Add(
-							new CustomBush(e.Cursor.GrabTile, Game1.currentLocation, BushNameRedberry));
-						return;
-				}
-			}
-
 			// World interactions:
 			if (Game1.currentBillboard != 0 || Game1.activeClickableMenu is not null || Game1.menuUp // No menus
 			    || !Game1.player.CanMove) // Player agency enabled
