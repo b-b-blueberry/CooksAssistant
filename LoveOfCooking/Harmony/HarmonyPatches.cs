@@ -181,6 +181,25 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 		}
 
+		public static void CraftingRecipe_Constructor_Postfix(
+			StardewValley.CraftingRecipe __instance)
+		{
+			bool isEnglishLocale = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.en);
+			bool isCooksAssistantContent = __instance.name.StartsWith(ModEntry.ObjectPrefix, StringComparison.InvariantCulture);
+			char separator = '/';
+			string info = ((__instance.isCookingRecipe && StardewValley.CraftingRecipe.cookingRecipes.ContainsKey(__instance.name))
+				? StardewValley.CraftingRecipe.cookingRecipes[__instance.name]
+				: (StardewValley.CraftingRecipe.craftingRecipes.ContainsKey(__instance.name)
+					? StardewValley.CraftingRecipe.craftingRecipes[__instance.name]
+					: null));
+			int displayNameIndex = __instance.isCookingRecipe ? 4 : 5;
+			string[] infoSplit = info?.Split(separator);
+			if (isEnglishLocale && isCooksAssistantContent && infoSplit?.Length >= displayNameIndex)
+			{
+				__instance.DisplayName = infoSplit[^1];
+			}
+		}
+
 		public static void Object_GetPriceAfterMultipliers_Postfix(
 			StardewValley.Object __instance,
 			ref float __result, 
