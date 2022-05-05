@@ -429,14 +429,9 @@ namespace LoveOfCooking
 		/// </summary>
 		public static int GetFarmhouseKitchenLevel(FarmHouse farmHouse)
 		{
-			// A basic (modded) farmhouse has a maximum of 1 slot,
-			// and a farmhouse with a kitchen has a minimum of 2+ slots
-			int level = Math.Max(farmHouse.upgradeLevel, Utils.GetFarmersMaxUsableIngredients());
-			if (farmHouse.upgradeLevel == 0 && Interface.Interfaces.UsingFarmhouseKitchenStart)
-			{
-				level = 1;
-			}
-			return level;
+			// A basic farmhouse has a maximum of 1 slot if a kitchen is modded in,
+			// and a farmhouse with a kitchen has a minimum of 1+ slots
+			return farmHouse.upgradeLevel == 0 ? 1 : Utils.GetFarmersMaxUsableIngredients();
 		}
 
 		public static int GetFarmersMaxUsableIngredients()
