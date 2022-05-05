@@ -13,7 +13,7 @@ using Object = StardewValley.Object;
 
 namespace LoveOfCooking
 {
-	public class AssetManager
+	public static class AssetManager
 	{
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 
@@ -52,7 +52,7 @@ namespace LoveOfCooking
 		public static string GameContentSkillRecipeTablePath { get; private set; } = "CookingSkillLevelUpRecipes";
 		public static string GameContentContextTagDataPath { get; private set; } = "ContextTags";
 
-		// Local paths: filepaths without extension passed to Helper.Content.Load<T>()
+		// Local paths: filepaths without extension passed to Load()
 		// These are the paths for our default data files bundled with the mod in our assets folder.
 		public static readonly string RootLocalContentPath = "assets";
 		public static string LocalSpriteSheetPath { get; private set; } = "sprites";
@@ -74,7 +74,7 @@ namespace LoveOfCooking
 		public static string ProducerFrameworkPackPath { get; private set; } = "[PFM] ProducerFrameworkPack";
 		public static string CommunityCentreContentPackPath { get; private set; } = "[CCC] KitchenContentPack";
 
-		// Assets to edit: asset keys passed to CanEdit<T>()
+		// Assets to edit: asset keys passed to Edit()
 		private static readonly List<string> AssetsToEdit = new List<string>
 		{
 			@"Data/BigCraftablesInformation",
@@ -92,11 +92,6 @@ namespace LoveOfCooking
 			@"TileSheets/tools",
 		};
 
-
-		public AssetManager()
-		{
-			ModEntry.Instance.Helper.Events.Content.AssetRequested += this.OnAssetRequested;
-		}
 
 		internal static bool Init()
 		{
@@ -130,17 +125,17 @@ namespace LoveOfCooking
 			return true;
 		}
 
-		private void OnAssetRequested(object sender, AssetRequestedEventArgs e)
+		internal static void OnAssetRequested(object sender, AssetRequestedEventArgs e)
 		{
-			this.Load(e: e);
+			AssetManager.Load(e: e);
 
 			if (Game1.player is null || AssetManager.AssetsToEdit.All(s => !e.NameWithoutLocale.IsEquivalentTo(s)))
 				return;
 
-			e.Edit(apply: this.EditAsset, priority: AssetEditPriority.Late);
+			e.Edit(apply: AssetManager.EditAsset, priority: AssetEditPriority.Late);
 		}
 
-		private void Load(AssetRequestedEventArgs e)
+		private static void Load(AssetRequestedEventArgs e)
 		{
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentSpriteSheetPath))
 			{
@@ -186,34 +181,34 @@ namespace LoveOfCooking
 			}
 		}
 
-		private void EditAsset(IAssetData asset)
+		private static void EditAsset(IAssetData asset)
 		{
 			if (asset.DataType == typeof(Texture2D) && asset.AsImage().Data.IsDisposed)
 				return;
 
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/BigCraftablesInformation"))
 			{
-				this.EditBigCraftables(asset: asset);
+				AssetManager.EditBigCraftables(asset: asset);
 			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/CookingRecipes"))
 			{
-				this.EditCookingRecipes(asset: asset);
+				AssetManager.EditCookingRecipes(asset: asset);
 			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/ObjectContextTags"))
 			{
-				this.EditContextTags(asset: asset);
+				AssetManager.EditContextTags(asset: asset);
 			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/ObjectInformation"))
 			{
-				this.EditObjects(asset: asset);
+				AssetManager.EditObjects(asset: asset);
 			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Monsters"))
 			{
-				this.EditMonsters(asset: asset);
+				AssetManager.EditMonsters(asset: asset);
 			}
 		}
 
-		private void EditBigCraftables(IAssetData asset)
+		private static void EditBigCraftables(IAssetData asset)
 		{
 			var data = asset.AsDictionary<int, string>().Data;
 
@@ -234,7 +229,7 @@ namespace LoveOfCooking
 			return;
 		}
 
-		private void EditCookingRecipes(IAssetData asset)
+		private static void EditCookingRecipes(IAssetData asset)
 		{
 			// Edit fields of vanilla recipes to use new ingredients
 			// Do NOT call RebuildBuffs from within this method
@@ -489,7 +484,7 @@ namespace LoveOfCooking
 			}
 		}
 
-		private void EditMonsters(IAssetData asset)
+		private static void EditMonsters(IAssetData asset)
 		{
 			if (Interface.Interfaces.JsonAssets is null || Game1.currentLocation is null)
 				return;
@@ -527,7 +522,7 @@ namespace LoveOfCooking
 			}
 		}
 
-		private void EditContextTags(IAssetData asset)
+		private static void EditContextTags(IAssetData asset)
 		{
 			var dict = Game1.content.Load
 				<Dictionary<string, string>>
@@ -540,7 +535,7 @@ namespace LoveOfCooking
 			asset.AsDictionary<string, string>().ReplaceWith(data);
 		}
 
-		private void EditObjects(IAssetData asset)
+		private static void EditObjects(IAssetData asset)
 		{
 			// Edit fields of vanilla objects to revalue and recategorise some produce
 
@@ -588,7 +583,7 @@ namespace LoveOfCooking
 					data[obj.Key] = Utils.UpdateEntry(data[obj.Key], obj.Value);
 
 				if (ModEntry.Config.AddRecipeRebalancing)
-					this.RebuildBuffs(ref data);
+					AssetManager.RebuildBuffs(ref data);
 
 				asset.AsDictionary<int, string>().ReplaceWith(data);
 
@@ -604,7 +599,7 @@ namespace LoveOfCooking
 			}
 		}
 
-		private void RebuildBuffs(ref IDictionary<int, string> data)
+		private static void RebuildBuffs(ref IDictionary<int, string> data)
 		{
 			// Reconstruct buffs of all cooking items in the game using our ingredients-to-buffs chart
 			var cookingRecipes = Game1.content.Load

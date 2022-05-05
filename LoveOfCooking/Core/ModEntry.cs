@@ -178,9 +178,7 @@ namespace LoveOfCooking
 
 
 			// Asset editors
-			AssetManager assetManager = new AssetManager();
-			this.Helper.Content.AssetLoaders.Add(assetManager);
-			this.Helper.Content.AssetEditors.Add(assetManager);
+			this.Helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
 
 			// Game events
 			this.RegisterEvents();
@@ -1501,8 +1499,8 @@ namespace LoveOfCooking
 			// Invalidate and reload assets requiring JA indexes
 			Log.D("Invalidating assets on save loaded.",
 				Config.DebugMode);
-			Helper.Content.InvalidateCache(@"Data/ObjectInformation");
-			Helper.Content.InvalidateCache(@"Data/CookingRecipes");
+			this.Helper.GameContent.InvalidateCache(@"Data/ObjectInformation");
+			this.Helper.GameContent.InvalidateCache(@"Data/CookingRecipes");
 
 			// Populate NPC home locations for cooking range usage
 			var npcData = Game1.content.Load
@@ -1542,7 +1540,7 @@ namespace LoveOfCooking
 			CustomBush.Reload();
 
 			// Invalidate other known assets that we edit using our own
-			this.Helper.Content.InvalidateCache(@"LooseSprites/Cursors");
+			this.Helper.GameContent.InvalidateCache(@"LooseSprites/Cursors");
 		}
 
 		private void PrintConfig()
