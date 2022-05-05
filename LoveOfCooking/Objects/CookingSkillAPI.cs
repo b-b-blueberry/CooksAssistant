@@ -21,6 +21,7 @@ namespace LoveOfCooking.Objects
 		bool IsEnabled();
 		CookingSkill GetSkill();
 		int GetLevel();
+		int GetMaximumLevel();
 		Dictionary<ICookingSkillAPI.Profession, bool> GetCurrentProfessions(long playerID = -1L);
 		bool HasProfession(ICookingSkillAPI.Profession profession, long playerID = -1L);
 		bool AddExperienceDirectly(int experience);
@@ -60,6 +61,12 @@ namespace LoveOfCooking.Objects
 		public int GetLevel()
 		{
 			return SpaceCore.Skills.GetSkillLevel(Game1.player, CookingSkill.InternalName);
+		}
+
+		/// <returns>Maximum possible skill level.</returns>
+		public int GetMaximumLevel()
+		{
+			return this.GetSkill().ExperienceCurve.Length;
 		}
 
 		/// <returns>A dictionary of all possible Cooking professions and whether each is active.</returns>
