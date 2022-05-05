@@ -29,9 +29,6 @@
 	"AutoConsumeOilAndSeasoning": [
 		"false"
 	],
-	"NettlesEnabled": [
-		"true"
-	],
 	"NettlesLocations": [
 		"Farm",
 		"Forest",
