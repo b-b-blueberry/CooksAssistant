@@ -260,7 +260,7 @@ namespace LoveOfCooking
 
 		public static bool AreNettlesActive()
 		{
-			return ModEntry.NettlesEnabled && !Interface.Interfaces.UsingNettlesCrops;
+			return !Interface.Interfaces.UsingNettlesCrops;
 		}
 
 		public static void TrySpawnNettles()

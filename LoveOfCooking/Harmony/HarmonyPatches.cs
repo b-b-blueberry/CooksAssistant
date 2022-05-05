@@ -32,12 +32,18 @@ namespace LoveOfCooking.HarmonyPatches
 			try
 			{
 				// Perform miscellaneous patches
-				Type[] types;
+				Type[] parameters;
 
 				// Legacy: Upgrade cooking tool in any instance it's claimed by the player, including interactions with Clint's shop and mail delivery mods
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Tool), "actionWhenClaimed"),
 					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Tool_ActionWhenClaimed_Prefix)));
+
+				// Correctly assign display name field for CraftingRecipe instances in English locale
+				parameters = new Type[] { typeof(string), typeof(bool) };
+				harmony.Patch(
+					original: AccessTools.Constructor(type: typeof(StardewValley.CraftingRecipe), parameters: parameters),
+					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CraftingRecipe_Constructor_Postfix)));
 
 				// Handle sale price bonus profession for Cooking skill by affecting object sale multipliers
 				harmony.Patch(
@@ -53,10 +59,16 @@ namespace LoveOfCooking.HarmonyPatches
 				harmony.Patch(
 					original: AccessTools.Method(typeof(StardewValley.Utility), nameof(StardewValley.Utility.getBlacksmithUpgradeStock)),
 					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Utility_GetBlacksmithUpgradeStock_Postfix)));
+
+				// Add Redberry Sapling to Traveling Merchant stock
+				harmony.Patch(
+					original: AccessTools.Method(typeof(StardewValley.Utility), "generateLocalTravelingMerchantStock"),
+					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Utility_generateLocalTravelingMerchantStock_Postfix)));
+
 				// Hide buffs in cooked foods not yet eaten
 				if (ModEntry.HideBuffIconsOnItems)
 				{
-					types = new Type[]
+					parameters = new Type[]
 					{
 						typeof(SpriteBatch), typeof(System.Text.StringBuilder),
 						typeof(SpriteFont), typeof(int), typeof(int), typeof(int),
@@ -65,7 +77,8 @@ namespace LoveOfCooking.HarmonyPatches
 						typeof(IList<Item>)
 					};
 					harmony.Patch(
-						original: AccessTools.Method(typeof(StardewValley.Menus.IClickableMenu), "drawHoverText", parameters: types),
+						original: AccessTools.Method(typeof(StardewValley.Menus.IClickableMenu), "drawHoverText",
+							parameters: parameters),
 						prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(IClickableMenu_DrawHoverText_Prefix)));
 				}
 			}
@@ -118,6 +131,27 @@ namespace LoveOfCooking.HarmonyPatches
 		{
 			Objects.CookingTool.AddToShopStock(itemPriceAndStock: __result, who: who);
 		}
+
+		public static void Utility_generateLocalTravelingMerchantStock_Postfix(
+			int seed,
+			Dictionary<ISalable, int[]> __result)
+		{
+			Random r = new Random(seed);
+			float chance = float.Parse(ModEntry.ItemDefinitions["RedberrySaplingChance"]
+				.First(s => s.StartsWith("Merchant")).Split(':', 2).Last());
+			if (r.NextDouble() >= chance)
+				return;
+
+			int index = r.Next(__result.Count);
+			var newResults = __result.Take(index).ToList();
+			StardewValley.Object o = new StardewValley.Object(
+				parentSheetIndex: Interface.Interfaces.JsonAssets.GetObjectId(name: string.Empty), // TODO: seed name
+				initialStack: 1);
+			newResults.AddItem(new KeyValuePair<ISalable, int[]>(o, new int[] { o.Price, 1 }));
+			newResults.AddRange(__result.Skip(index).ToList());
+			__result = newResults.ToDictionary(keySelector: pair => pair.Key, elementSelector: pair => pair.Value);
+		}
+
 		public static void IClickableMenu_DrawHoverText_Prefix(
 			ref string[] buffIconsToDisplay,
 			StardewValley.Item hoveredItem)

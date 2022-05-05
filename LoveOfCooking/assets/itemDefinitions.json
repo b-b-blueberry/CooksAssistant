@@ -29,6 +29,9 @@
 	"AutoConsumeOilAndSeasoning": [
 		"false"
 	],
+	"NettlesEnabled": [
+		"true"
+	],
 	"NettlesLocations": [
 		"Farm",
 		"Forest",
@@ -50,6 +53,9 @@
 	],
 	"ShopDiscounts": [
 		"Saloon:35"
+	],
+	"RedberrySaplingChance": [
+		"Merchant:0.01"
 	],
 	"RegenSkillModifiers": [
 		"Combat:0.025",

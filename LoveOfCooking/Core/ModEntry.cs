@@ -116,8 +116,6 @@ namespace LoveOfCooking
 
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
-		internal const bool NettlesEnabled = true;
-		internal const bool RedberriesEnabled = false;
 		internal const bool PFMEnabled = false;
 		internal const bool HideBuffIconsOnItems = false;
 		internal static bool PrintRename => false;

@@ -550,12 +550,6 @@ namespace LoveOfCooking
 						ModEntry.Config.DebugMode);
 					return;
 				}
-				if (!ModEntry.RedberriesEnabled)
-				{
-					Log.D($"Did not edit {asset.AssetName}: Redberries not yet enabled in code.",
-						ModEntry.Config.DebugMode);
-					return;
-				}
 
 				try
 				{
