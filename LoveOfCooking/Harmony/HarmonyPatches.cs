@@ -5,6 +5,8 @@ using StardewValley;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace LoveOfCooking.HarmonyPatches
 {
@@ -44,6 +46,11 @@ namespace LoveOfCooking.HarmonyPatches
 				harmony.Patch(
 					original: AccessTools.Constructor(type: typeof(StardewValley.CraftingRecipe), parameters: parameters),
 					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(CraftingRecipe_Constructor_Postfix)));
+
+				// Correctly sort recipes by display name in base game cooking menu
+				harmony.Patch(
+					original: AccessTools.Method(type: typeof(StardewValley.Menus.CraftingPage), name: "layoutRecipes"),
+					prefix: new HarmonyMethod(methodType: typeof(HarmonyPatches), methodName: nameof(HarmonyPatches.CraftingPage_LayoutRecipes_Prefix)));
 
 				// Handle sale price bonus profession for Cooking skill by affecting object sale multipliers
 				harmony.Patch(
@@ -200,6 +207,23 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 		}
 
+		/// <summary>
+		/// Force cooking recipe sorting by display name in game menus.
+		/// </summary>
+		public static void CraftingPage_LayoutRecipes_Prefix(
+			bool ___cooking,
+			List<string> playerRecipes)
+		{
+			if (!___cooking)
+				return;
+
+			Dictionary<string, string> splitRecipes = playerRecipes.ToDictionary(
+				keySelector: s => s,
+				elementSelector: s => StardewValley.CraftingRecipe.cookingRecipes.TryGetValue(s, out string data)
+					&& data.Split('/') is string[] split
+					&& split.Length > 4 ? split.Last() : s);
+			playerRecipes.Sort((a, b) => splitRecipes[a].CompareTo(splitRecipes[b]));
+		}
 		public static void Object_GetPriceAfterMultipliers_Postfix(
 			StardewValley.Object __instance,
 			ref float __result, 
