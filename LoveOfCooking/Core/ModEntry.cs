@@ -37,6 +37,8 @@ namespace LoveOfCooking
 		internal const string MailPrefix = "blueberry.cac.mail."; // DO NOT EDIT
 		internal static int NexusId { get; private set; }
 
+		internal static bool IsEnglishLocale => LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.en);
+
 		// Player session state
 		public readonly PerScreen<State> States = new PerScreen<State>(createNewState: () => new State());
 		public class State

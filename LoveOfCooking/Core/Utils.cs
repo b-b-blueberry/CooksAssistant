@@ -497,7 +497,7 @@ namespace LoveOfCooking
 		/// </summary>
 		internal static void UpdateEnglishRecipeDisplayNames(ref List<CraftingRecipe> recipes)
 		{
-			if (LocalizedContentManager.CurrentLanguageCode == LocalizedContentManager.LanguageCode.en)
+			if (ModEntry.IsEnglishLocale)
 			{
 				foreach (CraftingRecipe recipe in recipes.Where(r => r.DisplayName.StartsWith(ModEntry.ObjectPrefix)))
 				{

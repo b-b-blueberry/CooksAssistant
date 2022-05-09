@@ -79,9 +79,9 @@ namespace LoveOfCooking.HarmonyPatches
 					{
 						typeof(SpriteBatch), typeof(System.Text.StringBuilder),
 						typeof(SpriteFont), typeof(int), typeof(int), typeof(int),
-						typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(int),
-						typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe),
-						typeof(IList<Item>)
+						typeof(string), typeof(int), typeof(string[]), typeof(StardewValley.Item), typeof(int), typeof(int),
+						typeof(int), typeof(int), typeof(int), typeof(float), typeof(StardewValley.CraftingRecipe),
+						typeof(IList<StardewValley.Item>)
 					};
 					harmony.Patch(
 						original: AccessTools.Method(typeof(StardewValley.Menus.IClickableMenu), "drawHoverText",
@@ -95,7 +95,10 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 		}
 
-		private static bool Utility_ShowHoldingItem_Prefix(
+		/// <summary>
+		/// Draws the cooking tool sprite in place of default object draw logic when receiving an upgraded cooking tool.
+		/// </summary>
+		public static bool Utility_ShowHoldingItem_Prefix(
 			Farmer who)
 		{
 			try
@@ -104,7 +107,7 @@ namespace LoveOfCooking.HarmonyPatches
 				{
 					TemporaryAnimatedSprite sprite = new TemporaryAnimatedSprite(
 						textureName: AssetManager.GameContentSpriteSheetPath,
-						sourceRect: Objects.CookingTool.CookingToolSourceRectangle(upgradeLevel: (who.mostRecentlyGrabbedItem as Tool).UpgradeLevel),
+						sourceRect: Objects.CookingTool.CookingToolSourceRectangle(upgradeLevel: (who.mostRecentlyGrabbedItem as StardewValley.Tool).UpgradeLevel),
 						animationInterval: 2500f,
 						animationLength: 1,
 						numberOfLoops: 0,
@@ -132,6 +135,9 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 		}
 
+		/// <summary>
+		/// Tries to add cooking tool to Blacksmith shop stock.
+		/// </summary>
 		public static void Utility_GetBlacksmithUpgradeStock_Postfix(
 			Dictionary<ISalable, int[]> __result,
 			Farmer who)
@@ -139,6 +145,9 @@ namespace LoveOfCooking.HarmonyPatches
 			Objects.CookingTool.AddToShopStock(itemPriceAndStock: __result, who: who);
 		}
 
+		/// <summary>
+		/// Tries to add unique custom items to the Traveling Merchant shop stock.
+		/// </summary>
 		public static void Utility_generateLocalTravelingMerchantStock_Postfix(
 			int seed,
 			Dictionary<ISalable, int[]> __result)
@@ -159,6 +168,9 @@ namespace LoveOfCooking.HarmonyPatches
 			__result = newResults.ToDictionary(keySelector: pair => pair.Key, elementSelector: pair => pair.Value);
 		}
 
+		/// <summary>
+		/// Raises flag to obscure buffs given by foods in their tooltip until recorded as having been eaten at least once.
+		/// </summary>
 		public static void IClickableMenu_DrawHoverText_Prefix(
 			ref string[] buffIconsToDisplay,
 			StardewValley.Item hoveredItem)
@@ -188,22 +200,20 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 		}
 
+		/// <summary>
+		/// Force recipe display names in English locale games.
+		/// </summary>
 		public static void CraftingRecipe_Constructor_Postfix(
 			StardewValley.CraftingRecipe __instance)
 		{
-			bool isEnglishLocale = LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.en);
-			bool isCooksAssistantContent = __instance.name.StartsWith(ModEntry.ObjectPrefix, StringComparison.InvariantCulture);
-			char separator = '/';
-			string info = ((__instance.isCookingRecipe && StardewValley.CraftingRecipe.cookingRecipes.ContainsKey(__instance.name))
-				? StardewValley.CraftingRecipe.cookingRecipes[__instance.name]
-				: (StardewValley.CraftingRecipe.craftingRecipes.ContainsKey(__instance.name)
-					? StardewValley.CraftingRecipe.craftingRecipes[__instance.name]
-					: null));
+			bool isCooksAssistantContent = __instance.name.StartsWith(ModEntry.ObjectPrefix, StringComparison.OrdinalIgnoreCase);
 			int displayNameIndex = __instance.isCookingRecipe ? 4 : 5;
-			string[] infoSplit = info?.Split(separator);
-			if (isEnglishLocale && isCooksAssistantContent && infoSplit?.Length >= displayNameIndex)
+			if (ModEntry.IsEnglishLocale && isCooksAssistantContent
+				&& (StardewValley.CraftingRecipe.cookingRecipes.TryGetValue(__instance.name, out string data)
+					|| StardewValley.CraftingRecipe.craftingRecipes.TryGetValue(__instance.name, out data))
+				&& data.Split('/') is string[] split && split.Length >= displayNameIndex)
 			{
-				__instance.DisplayName = infoSplit[^1];
+				__instance.DisplayName = split.Last();
 			}
 		}
 
@@ -224,45 +234,49 @@ namespace LoveOfCooking.HarmonyPatches
 					&& split.Length > 4 ? split.Last() : s);
 			playerRecipes.Sort((a, b) => splitRecipes[a].CompareTo(splitRecipes[b]));
 		}
+
+		/// <summary>
+		/// Apply custom sale price modifiers when calculating prices for any game objects.
+		/// </summary>
 		public static void Object_GetPriceAfterMultipliers_Postfix(
 			StardewValley.Object __instance,
 			ref float __result, 
 			float startPrice,
 			long specificPlayerID = -1L)
 		{
-			if (ModEntry.CookingSkillApi.IsEnabled())
+			if (!ModEntry.CookingSkillApi.IsEnabled())
+				return;
+			
+			float multiplier = 1f;
+			foreach (StardewValley.Farmer player in Game1.getAllFarmers())
 			{
-				float multiplier = 1f;
-				foreach (Farmer player in Game1.getAllFarmers())
+				if (Game1.player.useSeparateWallets)
 				{
-					if (Game1.player.useSeparateWallets)
+					if (specificPlayerID == -1)
 					{
-						if (specificPlayerID == -1)
-						{
-							if (player.UniqueMultiplayerID != Game1.player.UniqueMultiplayerID || !player.isActive())
-							{
-								continue;
-							}
-						}
-						else if (player.UniqueMultiplayerID != specificPlayerID)
+						if (player.UniqueMultiplayerID != Game1.player.UniqueMultiplayerID || !player.isActive())
 						{
 							continue;
 						}
 					}
-					else if (!player.isActive())
+					else if (player.UniqueMultiplayerID != specificPlayerID)
 					{
 						continue;
 					}
-
-					// Add bonus price for having the sale value Cooking skill profession
-					bool hasSaleProfession = ModEntry.CookingSkillApi.HasProfession(Objects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID);
-					if (hasSaleProfession && __instance.Category == ModEntry.CookingCategory)
-					{
-						multiplier *= Objects.CookingSkill.SalePriceModifier;
-					}
 				}
-				__result *= multiplier;
+				else if (!player.isActive())
+				{
+					continue;
+				}
+
+				// Add bonus price for having the sale value Cooking skill profession
+				bool hasSaleProfession = ModEntry.CookingSkillApi.HasProfession(Objects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID);
+				if (hasSaleProfession && __instance.Category == ModEntry.CookingCategory)
+				{
+					multiplier *= Objects.CookingSkill.SalePriceModifier;
+				}
 			}
+			__result *= multiplier;
 		}
 	}
 }

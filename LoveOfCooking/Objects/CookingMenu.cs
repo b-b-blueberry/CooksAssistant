@@ -276,7 +276,7 @@ namespace LoveOfCooking.Objects
 			this._locale = LocalizedContentManager.CurrentLanguageCode.ToString();
 			if (!CookTextSourceWidths.ContainsKey(this._locale))
 			{
-				this._locale = "en";
+				this._locale = LocalizedContentManager.LanguageCode.en.ToString();
 			}
 			this._resizeKoreanFonts = Config.ResizeKoreanFonts;
 			this.initializeUpperRightCloseButton();
