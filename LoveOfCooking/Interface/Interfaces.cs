@@ -46,7 +46,9 @@ namespace LoveOfCooking.Interface
 				{
 					IdentifyLoadedOptionalMods();
 
-					JsonAssets = Helper.ModRegistry.GetApi<IJsonAssetsApi>("spacechase0.JsonAssets");
+					JsonAssets = Helper.ModRegistry
+						.GetApi<IJsonAssetsApi>
+						("spacechase0.JsonAssets");
 					if (JsonAssets is null)
 					{
 						Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
@@ -90,7 +92,9 @@ namespace LoveOfCooking.Interface
 
 		private static void IdentifyLoadedOptionalMods()
 		{
-			ManaBar = Helper.ModRegistry.GetApi<IManaBarAPI>("spacechase0.ManaBar");
+			ManaBar = Helper.ModRegistry
+				.GetApi<IManaBarAPI>
+				("spacechase0.ManaBar");
 			UsingManaBar = ManaBar is not null;
 
 			UsingSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
@@ -150,7 +154,9 @@ namespace LoveOfCooking.Interface
 
 		private static void LoadCustomCommunityCentreContent()
 		{
-			ICustomCommunityCentreAPI ccc = Helper.ModRegistry.GetApi<ICustomCommunityCentreAPI>("blueberry.CustomCommunityCentre");
+			ICustomCommunityCentreAPI ccc = Helper.ModRegistry
+				.GetApi<ICustomCommunityCentreAPI>
+				("blueberry.CustomCommunityCentre");
 			if (UsingCustomCC && ccc is not null && Utils.AreNewCropsActive())
 			{
 				Log.D("Registering CustomCommunityCentre content.",
@@ -218,7 +224,9 @@ namespace LoveOfCooking.Interface
 			if (!ModEntry.PFMEnabled)
 				return true;
 
-			IProducerFrameworkAPI producerFramework = Helper.ModRegistry.GetApi<IProducerFrameworkAPI>("DIGUS.ProducerFrameworkMod");
+			IProducerFrameworkAPI producerFramework = Helper.ModRegistry
+				.GetApi<IProducerFrameworkAPI>
+				("DIGUS.ProducerFrameworkMod");
 			if (producerFramework is null)
 			{
 				Log.E("Can't access the Producer Framework API. Is the mod installed correctly?");
@@ -234,7 +242,9 @@ namespace LoveOfCooking.Interface
 
 		private static bool LoadModConfigMenuElements()
 		{
-			IGenericModConfigMenuAPI gmcm = Helper.ModRegistry.GetApi<IGenericModConfigMenuAPI>("spacechase0.GenericModConfigMenu");
+			IGenericModConfigMenuAPI gmcm = Helper.ModRegistry
+				.GetApi<IGenericModConfigMenuAPI>
+				("spacechase0.GenericModConfigMenu");
 			if (gmcm is null)
 			{
 				return true;
@@ -331,7 +341,9 @@ namespace LoveOfCooking.Interface
 			{
 				try
 				{
-					LevelExtender = Helper.ModRegistry.GetApi<ILevelExtenderAPI>("Devin_Lematty.Level_Extender");
+					LevelExtender = Helper.ModRegistry
+						.GetApi<ILevelExtenderAPI>
+						("Devin_Lematty.Level_Extender");
 				}
 				catch (Exception e)
 				{
