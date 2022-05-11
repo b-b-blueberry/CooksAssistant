@@ -178,7 +178,6 @@ namespace LoveOfCooking
 				return false;
 			}
 
-
 			// Asset editors
 			this.Helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
 
@@ -949,8 +948,8 @@ namespace LoveOfCooking
 
 					// Draw value
 					if (Game1.getOldMouseX() >= fillColourOrigin.X
-						&& Game1.getOldMouseY() >= fillColourOrigin.Y
-						&& Game1.getOldMouseX() < fillColourOrigin.X + 32f)
+						&& Game1.getOldMouseY() >= regenBarOrigin.Y
+						&& Game1.getOldMouseX() < fillColourOrigin.X + width)
 					{
 						SpriteFont font = Game1.smallFont;
 						string text = $"H +{Math.Max(0, States.Value.HealthRegeneration)}{Environment.NewLine}E +{Math.Max(0, States.Value.StaminaRegeneration)}";
