@@ -283,7 +283,7 @@ namespace LoveOfCooking.Objects
 			this.trashCan = null;
 			this._cookingManager = new CookingManager(cookingMenu: this)
 			{
-				MaxIngredients = Utils.GetNearbyCookingStationLevel()
+				MaxIngredients = Objects.CookingTool.GetIngredientsSlotsForToolUpgradeLevel(upgradeLevel: Objects.CookingTool.GetEffectiveGlobalToolUpgradeLevel())
 			};
 
 			this._iconShakeTimerField = Helper.Reflection.GetField<Dictionary<int, double>>(inventory, "_iconShakeTimer");
@@ -305,7 +305,7 @@ namespace LoveOfCooking.Objects
 			// Default autofill preferences if none set
 			if (!Game1.player.modData.ContainsKey(ModEntry.AssetPrefix + "autofill"))
 			{
-				IsUsingAutofill = false;
+				this.IsUsingAutofill = false;
 			}
 			Log.D($"Autofill on startup: {IsUsingAutofill}",
 				Config.DebugMode);
@@ -3419,6 +3419,7 @@ namespace LoveOfCooking.Objects
 			textPosition.Y = _cookbookRightRect.Y + _cookbookRightRect.Height - (50 * Scale) - Game1.smallFont.MeasureString(
 				Game1.parseText(text: text, whichFont: Game1.smallFont, width: textWidth)).Y * yScale;
 
+			// Visual display for frying pan uses default icon if not using cooking tool upgrades
 			int fryingPanLevel = ModEntry.Config.AddCookingToolProgression ? ModEntry.Instance.States.Value.CookingToolLevel : 0;
 			if (_showCookingConfirmPopup)
 			{

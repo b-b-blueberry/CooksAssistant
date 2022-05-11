@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
+using System;
 using System.Collections.Generic;
 using System.Xml.Serialization;
 
@@ -164,9 +165,9 @@ namespace LoveOfCooking.Objects
 		{
 			// With tool progression disabled, the effective upgrade level will always be the maximum value
 			int upgradeLevel = (ModEntry.Config.AddCookingToolProgression && ModEntry.Instance.States.Value.CookingToolLevel < CookingTool.MaxUpgradeLevel)
-				? ModEntry.Instance.States.Value.CookingToolLevel
-				: -1;
-			return CookingTool.GetIngredientsSlotsForToolUpgradeLevel(upgradeLevel: upgradeLevel);
+				? Math.Max(0, Math.Min(CookingTool.MaxUpgradeLevel, ModEntry.Instance.States.Value.CookingToolLevel))
+				: CookingTool.MaxUpgradeLevel;
+			return upgradeLevel;
 		}
 
 		/// <summary>

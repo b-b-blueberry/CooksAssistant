@@ -66,6 +66,11 @@ namespace LoveOfCooking.Objects
 			{
 				return !(obj1 == obj2);
 			}
+
+			public override bool Equals(object obj)
+			{
+				return this == obj;
+			}
 		}
 
 
@@ -89,7 +94,7 @@ namespace LoveOfCooking.Objects
 			float addedRate = float.Parse(ModEntry.ItemDefinitions["BurnChancePerIngredient"][0]);
 			float chance = Math.Max(minimumChance, (baseRate + (addedRate * recipe.getNumberOfIngredients()))
 				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
-				- (ModEntry.Instance.States.Value.CookingToolLevel / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
+				- (Objects.CookingTool.GetEffectiveGlobalToolUpgradeLevel() / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
 
 			return chance;
 		}

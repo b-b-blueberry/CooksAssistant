@@ -14,9 +14,6 @@
 	"ShowWalletItems": [
 		"true"
 	],
-	"CookingUseRange": [
-		"3"
-	],
 	"NpcKitchenFriendshipRequired": [
 		"6"
 	],
