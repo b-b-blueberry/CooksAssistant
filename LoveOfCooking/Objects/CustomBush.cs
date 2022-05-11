@@ -647,8 +647,6 @@ namespace LoveOfCooking
 				.Distinct()
 				.Select(selector: assetKey => (assetKey: assetKey, texture: Game1.content.Load<Texture2D>(assetKey)))
 				.ToDictionary(keySelector: pair => pair.assetKey, elementSelector: pair => pair.texture);
-			CustomBush.SeedDefinitions = CustomBush.BushDefinitions
-				.ToDictionary(keySelector: pair => pair.Key, elementSelector: pair => pair.Value.Seed);
 		}
 	}
 }
