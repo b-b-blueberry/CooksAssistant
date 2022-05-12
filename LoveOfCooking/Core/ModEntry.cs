@@ -953,9 +953,9 @@ namespace LoveOfCooking
 					{
 						SpriteFont font = Game1.smallFont;
 						string text = $"H +{Math.Max(0, States.Value.HealthRegeneration)}{Environment.NewLine}E +{Math.Max(0, States.Value.StaminaRegeneration)}";
-						Vector2 position = fillColourOrigin + new Vector2(
-							x: 0f - font.MeasureString(text).X - otherBarSpacing,
-							y: 0f);
+						Vector2 position = regenBarOrigin + new Vector2(
+							x: (-4 * Game1.pixelZoom) - font.MeasureString("H +000").X - otherBarSpacing,
+							y: 0);
 						e.SpriteBatch.DrawString(
 							spriteFont: font,
 							text: text,
