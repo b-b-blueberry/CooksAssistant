@@ -18,20 +18,24 @@ namespace LoveOfCooking.HarmonyPatches
 				postfix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Postfix)));
 		}
 
-        public static void CraftItem_Prefix(uint __state)
+        public static void CraftItem_Prefix()
 		{
-			__state = Game1.stats.ItemsCooked;
+			ModEntry.Instance.States.Value.ItemsCooked = Game1.stats.ItemsCooked;
 		}
 
+		/// <summary>
+		/// Unique crafting behaviours for when the Cooking Menu is disabled.
+		/// </summary>
 		public static void CraftItem_Postfix(CraftingPage __instance,
-			uint __state,
 			Item ___lastCookingHover,
 			ClickableTextureComponent c)
 		{
-			if (Game1.stats.ItemsCooked <= __state)
-			{
+			// Do nothing if the Cooking Menu is enabled
+			if (ModEntry.Config.AddCookingMenu)
 				return;
-			}
+
+			if (Game1.stats.ItemsCooked <= ModEntry.Instance.States.Value.ItemsCooked)
+				return;
 
 			Item item = ___lastCookingHover;
 			CraftingRecipe recipe = new CraftingRecipe(item.Name, isCookingRecipe: true);
