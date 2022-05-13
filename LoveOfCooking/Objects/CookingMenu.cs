@@ -18,6 +18,7 @@ namespace LoveOfCooking.Objects
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 		private static Texture2D Texture => ModEntry.SpriteSheet;
 		private readonly CookingManager _cookingManager;
+		private bool cooking = true; // Used for simple reflection checks alongside CraftingPage instances
 
 		// Spritesheet source areas
 		// Custom spritesheet

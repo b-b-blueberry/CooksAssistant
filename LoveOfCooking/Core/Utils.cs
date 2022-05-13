@@ -41,6 +41,11 @@ namespace LoveOfCooking
 			Game1.player.mailReceived.Remove(ModEntry.MailFryingPanWhoops);
 		}
 
+		internal static bool IsCookingMenu(IClickableMenu menu)
+		{
+			return menu is not null && ModEntry.Instance.Helper.Reflection.GetField<bool>(obj: menu, name: "cooking", required: false)?.GetValue() is true;
+		}
+
 		internal static void PopulateMissingRecipes()
 		{
 			// Add any missing starting recipes
@@ -223,10 +228,7 @@ namespace LoveOfCooking
 
 		public static List<CraftingRecipe> TakeRecipesFromCraftingPage(CraftingPage cm, bool cookingOnly = true)
 		{
-			bool cooking = ModEntry.Instance.Helper.Reflection
-				.GetField<bool>(cm, "cooking")
-				.GetValue();
-			if (cooking || !cookingOnly)
+			if (Utils.IsCookingMenu(cm) || !cookingOnly)
 			{
 				cm.exitThisMenuNoSound();
 				return cm.pagesOfCraftingRecipes
