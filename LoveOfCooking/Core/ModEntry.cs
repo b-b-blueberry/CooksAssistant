@@ -52,6 +52,7 @@ namespace LoveOfCooking
 			// Add Cooking Menu
 			public CookingMenu.Filter LastFilterThisSession = CookingMenu.Filter.None;
 			public bool LastFilterReversed;
+			public uint ItemsCooked;
 
 			// Add Cooking Skill
 			public readonly Dictionary<string, int> FoodCookedToday = new Dictionary<string, int>();
