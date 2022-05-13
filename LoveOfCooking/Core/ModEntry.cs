@@ -1141,17 +1141,11 @@ namespace LoveOfCooking
 				return;
 			}
 
-			if (e.NewMenu is not null
-				&& (e.NewMenu is CraftingPage || nameof(e.NewMenu).EndsWith(nameof(CraftingPage), StringComparison.InvariantCultureIgnoreCase))
-				&& Helper.Reflection.GetField<bool>(e.NewMenu, "cooking") is IReflectedField<bool> isCookingMenu and not null
-				&& isCookingMenu.GetValue())
+			// Open the new Cooking Menu as a substitute when a cooking CraftingPage is opened
+			if (Config.AddCookingMenu && e.NewMenu is not Objects.CookingMenu && Utils.IsCookingMenu(e.NewMenu))
 			{
-				// Open the new Cooking Menu as a substitute when a cooking CraftingPage is opened
-				if (Config.AddCookingMenu)
-				{
-                    Utils.ReplaceCraftingMenu(lastMenu: e.NewMenu);
-				}
-
+				Utils.ReplaceCraftingMenu(lastMenu: e.NewMenu);
+				
 				return;
 			}
 		}
