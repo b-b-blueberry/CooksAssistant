@@ -67,11 +67,6 @@ namespace LoveOfCooking.HarmonyPatches
 					original: AccessTools.Method(typeof(StardewValley.Utility), nameof(StardewValley.Utility.getBlacksmithUpgradeStock)),
 					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Utility_GetBlacksmithUpgradeStock_Postfix)));
 
-				// Add Redberry Sapling to Traveling Merchant stock
-				harmony.Patch(
-					original: AccessTools.Method(typeof(StardewValley.Utility), "generateLocalTravelingMerchantStock"),
-					postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Utility_generateLocalTravelingMerchantStock_Postfix)));
-
 				// Hide buffs in cooked foods not yet eaten
 				if (ModEntry.HideBuffIconsOnItems)
 				{
@@ -125,8 +120,12 @@ namespace LoveOfCooking.HarmonyPatches
 						motion = new Vector2(0f, -0.1f)
 					};
 					Game1.currentLocation.temporarySprites.Add(sprite);
+					return false;
 				}
-				return false;
+				else
+				{
+					return true;
+				}
 			}
 			catch (Exception ex)
 			{
@@ -143,29 +142,6 @@ namespace LoveOfCooking.HarmonyPatches
 			Farmer who)
 		{
 			Objects.CookingTool.AddToShopStock(itemPriceAndStock: __result, who: who);
-		}
-
-		/// <summary>
-		/// Tries to add unique custom items to the Traveling Merchant shop stock.
-		/// </summary>
-		public static void Utility_generateLocalTravelingMerchantStock_Postfix(
-			int seed,
-			Dictionary<ISalable, int[]> __result)
-		{
-			Random r = new Random(seed);
-			float chance = float.Parse(ModEntry.ItemDefinitions["RedberrySaplingChance"]
-				.First(s => s.StartsWith("Merchant")).Split(':', 2).Last());
-			if (r.NextDouble() >= chance)
-				return;
-
-			int index = r.Next(__result.Count);
-			var newResults = __result.Take(index).ToList();
-			StardewValley.Object o = new StardewValley.Object(
-				parentSheetIndex: Interface.Interfaces.JsonAssets.GetObjectId(name: string.Empty), // TODO: seed name
-				initialStack: 1);
-			newResults.AddItem(new KeyValuePair<ISalable, int[]>(o, new int[] { o.Price, 1 }));
-			newResults.AddRange(__result.Skip(index).ToList());
-			__result = newResults.ToDictionary(keySelector: pair => pair.Key, elementSelector: pair => pair.Value);
 		}
 
 		/// <summary>

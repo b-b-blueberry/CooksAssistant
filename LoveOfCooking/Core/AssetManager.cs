@@ -202,10 +202,6 @@ namespace LoveOfCooking
 			{
 				AssetManager.EditObjects(asset: asset);
 			}
-			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Monsters"))
-			{
-				AssetManager.EditMonsters(asset: asset);
-			}
 		}
 
 		private static void EditBigCraftables(IAssetData asset)
@@ -481,44 +477,6 @@ namespace LoveOfCooking
 			catch (Exception e) when (e is ArgumentException or NullReferenceException or KeyNotFoundException)
 			{
 				Log.E($"Did not patch {asset.Name}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
-			}
-		}
-
-		private static void EditMonsters(IAssetData asset)
-		{
-			if (Interface.Interfaces.JsonAssets is null || Game1.currentLocation is null)
-				return;
-			if (!ModEntry.Config.AddNewCropsAndStuff)
-			{
-				Log.D($"Did not edit {asset.Name}: New crops are disabled in config file.",
-					ModEntry.Config.DebugMode);
-				return;
-			}
-			try
-			{
-				var data = asset.AsDictionary<string, string>().Data;
-				var monsterData = new Dictionary<string, string[]>
-					{
-						{"Shadow Shaman", new[] {$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .0035"
-							+ (Utils.AreNettlesActive() ? $" {Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.Instance.NettleName)} .05" : "")}},
-						{"Wilderness Golem", new[] {$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .0065"}},
-						{"Mummy", new[] {$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .0022"}},
-						{"Pepper Rex", new[] {$"{Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "redberry_seeds")} .02"}},
-					};
-				foreach (KeyValuePair<string, string[]> monster in monsterData)
-					data[monster.Key] = Utils.UpdateEntry(data[monster.Key], monster.Value, append: true);
-
-				asset.AsDictionary<string, string>().ReplaceWith(data);
-
-				if (ModEntry.PrintRename)
-					Log.D($"Edited {asset.Name}:" + data.Where(pair => monsterData.ContainsKey(pair.Key))
-							.Aggregate("", (s, pair) => $"{s}{Environment.NewLine}{pair.Key}: {pair.Value}"),
-						ModEntry.Config.DebugMode);
-			}
-			catch (Exception e) when (e is ArgumentException or NullReferenceException or KeyNotFoundException)
-			{
-				Log.D($"Did not patch {asset.Name}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}",
-					ModEntry.Config.DebugMode);
 			}
 		}
 

@@ -136,6 +136,11 @@ namespace LoveOfCooking
 			this.Helper.Events.GameLoop.GameLaunched += this.GameLoop_GameLaunched;
 		}
 
+		public override object GetApi()
+		{
+			return new CookingSkillAPI(reflection: this.Helper.Reflection);
+		}
+
 		private bool Init()
 		{
 			// Interfaces
@@ -1495,9 +1500,9 @@ namespace LoveOfCooking
 			// Invalidate and reload assets requiring JA indexes
 			Log.D("Invalidating assets on save loaded.",
 				Config.DebugMode);
-			this.Helper.GameContent.InvalidateCache(@"Data/ObjectInformation");
-			this.Helper.GameContent.InvalidateCache(@"Data/CookingRecipes");
-
+			this.Helper.GameContent.InvalidateCacheAndLocalized(@"Data/ObjectInformation");
+			this.Helper.GameContent.InvalidateCacheAndLocalized(@"Data/CookingRecipes");
+			
 			// Populate NPC home locations for cooking range usage
 			var npcData = Game1.content.Load
 				<Dictionary<string, string>>
@@ -1536,7 +1541,7 @@ namespace LoveOfCooking
 			CustomBush.Reload();
 
 			// Invalidate other known assets that we edit using our own
-			this.Helper.GameContent.InvalidateCache(@"LooseSprites/Cursors");
+			this.Helper.GameContent.InvalidateCacheAndLocalized(@"LooseSprites/Cursors");
 		}
 
 		private void PrintConfig()
