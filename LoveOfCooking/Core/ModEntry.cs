@@ -12,6 +12,7 @@ using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 // TODO: UPDATE: Ingredients bounce when added to cooking slots, puff when removed, unless using autofill
@@ -39,15 +40,59 @@ namespace LoveOfCooking
 
 		internal static bool IsEnglishLocale => LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.en);
 
+		public struct Regen
+		{
+			public float HP;
+			public float EP;
+
+			public float Total => this.HP + this.EP;
+
+			public Regen(float hp, float ep)
+			{
+				this.HP = hp;
+				this.EP = ep;
+			}
+
+			public static implicit operator Regen(int operand)
+			{
+				return new Regen { HP = operand, EP = operand };
+			}
+
+			public static implicit operator Regen(float operand)
+			{
+				return new Regen { HP = operand, EP = operand };
+			}
+
+			public static Regen operator +(Regen lhs, Regen rhs)
+			{
+				return new Regen { HP = lhs.HP + rhs.HP, EP = lhs.EP + rhs.EP };
+			}
+
+			public static Regen operator *(Regen lhs, Regen rhs)
+			{
+				return new Regen { HP = lhs.HP * rhs.HP, EP = lhs.EP * rhs.EP };
+			}
+
+			public static Regen operator ++(Regen operand)
+			{
+				return new Regen { HP = operand.HP++, EP = operand.EP++ };
+			}
+
+			public override string ToString()
+			{
+				return $"H{HP} E{EP}";
+			}
+		}
+
 		// Player session state
-		public readonly PerScreen<State> States = new PerScreen<State>(createNewState: () => new State());
+		public readonly PerScreen<State> States = new(createNewState: () => new State());
 		public class State
 		{
 			// Persistent player data
 			public int CookingToolLevel = 0;
 			public bool IsUsingRecipeGridView = false;
-			public List<string> FoodsEaten = new List<string>();
-			public List<string> FavouriteRecipes = new List<string>();
+			public List<string> FoodsEaten = new();
+			public List<string> FavouriteRecipes = new();
 
 			// Add Cooking Menu
 			public CookingMenu.Filter LastFilterThisSession = CookingMenu.Filter.None;
@@ -55,22 +100,27 @@ namespace LoveOfCooking
 			public uint ItemsCooked;
 
 			// Add Cooking Skill
-			public readonly Dictionary<string, int> FoodCookedToday = new Dictionary<string, int>();
+			public readonly Dictionary<string, int> FoodCookedToday = new();
 
 			// Food Healing Takes Time
-			public float RegenSkillModifier;
-			public int HealthOnLastTick;
-			public float StaminaOnLastTick;
-			public int HealthRegeneration, StaminaRegeneration;
-			public int HealthAndStaminaRegenRunningValue;
-			public uint RegenTicksCurr;
-			public readonly Queue<uint> RegenTicksDiff = new Queue<uint>();
+			/// <summary> Cached result of all skill modifiers affecting food regeneration as a multiplier. </summary>
+			public float RegenerationSkillModifier;
+			/// <summary> Current food regeneration values waiting to be added to player status bars. </summary>
+			public Regen Regeneration;
+			/// <summary> Total regeneration amount to be added to player status bars since last emptied. </summary>
+			public Regen RegenerationTotal;
+			/// <summary> Player status bar values as of the previous game tick. </summary>
+			public Regen StatusOnLastTick;
+			/// <summary> Current incremental tick count for player status bars before regeneration is applied to either. </summary>
+			public Regen RegenerationCounter;
+			/// <summary> Instance of the last edible object consumed by the player. </summary>
 			public StardewValley.Object LastFoodEaten;
-			public bool LastFoodWasDrink;
+			/// <summary> Whether the player health status bar was visible on the previous game tick. </summary>
 			public bool LastTickShowedHealthBar;
 
 			// debug
-			public float RegenTickRate;
+			public Regen RegenTickRate;
+			public readonly Queue<Regen> RegenTicksDiff = new();
 		}
 
 		// Object definitions
@@ -550,67 +600,85 @@ namespace LoveOfCooking
 				// Track player HP/EP to use in reverting instant food healing
 				if (Game1.player is not null && Context.IsWorldReady)
 				{
-					States.Value.HealthOnLastTick = Game1.player.health;
-					States.Value.StaminaOnLastTick = Game1.player.Stamina;
+					States.Value.StatusOnLastTick = new Regen { HP = Game1.player.health, EP = Game1.player.Stamina };
 				}
 
-				// Game not paused:
+				// Do not regenerate if game is paused
 				if ((!Game1.IsMultiplayer && !Game1.game1.IsActive) || (Game1.activeClickableMenu is not null && !Game1.shouldTimePass()))
+				{
 					return;
+				}
 
 				// Check to regenerate HP/EP for player over time
-				if (States.Value.HealthRegeneration < 1 && States.Value.StaminaRegeneration < 1)
+				if (States.Value.Regeneration.HP < 1 && States.Value.Regeneration.EP < 1)
 				{
-					States.Value.HealthAndStaminaRegenRunningValue = 0;
+					States.Value.RegenerationTotal = 0;
 					return;
 				}
 
+				// End HP/EP regeneration on player KO
 				if (Game1.player.health < 1)
 				{
-					States.Value.HealthRegeneration = 0;
-					States.Value.StaminaRegeneration = 0;
-					States.Value.HealthOnLastTick = 1;
-					States.Value.StaminaOnLastTick = 1;
+					States.Value.StatusOnLastTick = 1;
 					return;
 				}
 
 				// Fetch all components for the rate of HP/EP regeneration
-				const float healthToStaminaRatio = 3f;
 				int cookingLevel = CookingSkillApi.GetLevel();
-				float panicMultiplier = ((Game1.player.health * healthToStaminaRatio) + Game1.player.Stamina)
-					/ ((Game1.player.maxHealth * healthToStaminaRatio) + Game1.player.MaxStamina);
+				Regen panicMultiplier = new Regen
+				{
+					HP = Game1.player.health / Game1.player.maxHealth,
+					EP = Game1.player.Stamina / Game1.player.MaxStamina
+				};
 				float foodMultiplier = Utils.GetFoodRegenRate(States.Value.LastFoodEaten);
 				int baseRate = int.Parse(ItemDefinitions["RegenBaseRate"][0]);
 				float overallScale = float.Parse(ItemDefinitions["RegenSpeedScale"][0]);
 
-				// Calculate regeneration
-				double rate = (baseRate - baseRate * States.Value.RegenSkillModifier) * foodMultiplier * 100d;
-				rate = Math.Floor(Math.Max(36 - cookingLevel * 1.75f, rate * panicMultiplier) / overallScale);
+				// Calculate regeneration for both status bars
+				Regen rate = baseRate - (baseRate * States.Value.RegenerationSkillModifier * foodMultiplier * 100);
+				float calculateRate(float value, float mult) => (float)Math.Floor(Math.Max(36 - cookingLevel * 1.75f, value * mult) / overallScale);
+				rate.HP = (int)(calculateRate(value: rate.HP, mult: panicMultiplier.HP) / float.Parse(ModEntry.ItemDefinitions["RegenHealthRate"][0]));
+				rate.EP = (int)(calculateRate(value: rate.EP, mult: panicMultiplier.EP) / float.Parse(ModEntry.ItemDefinitions["RegenEnergyRate"][0]));
+				States.Value.RegenTickRate = rate;
+				bool diff = false;
 
-				States.Value.RegenTickRate = (float)rate;
-				++States.Value.RegenTicksCurr;
+				// Regenerate player HP/EP when tick count is greater than required tick rate:
 
-				// Regenerate player HP/EP when 
-				if (States.Value.RegenTicksCurr < rate)
-					return;
-
-				States.Value.RegenTicksDiff.Enqueue(States.Value.RegenTicksCurr);
-				if (States.Value.RegenTicksDiff.Count > 5)
-					States.Value.RegenTicksDiff.Dequeue();
-				States.Value.RegenTicksCurr = 0;
-
-				if (States.Value.HealthRegeneration > 0)
+				if (States.Value.Regeneration.HP > 0 && States.Value.RegenerationCounter.HP < States.Value.RegenTickRate.HP)
 				{
-					if (Game1.player.health < Game1.player.maxHealth)
-						++Game1.player.health;
-					--States.Value.HealthRegeneration;
+					++States.Value.RegenerationCounter.HP;
+					if (States.Value.RegenerationCounter.HP >= rate.HP)
+					{
+						States.Value.RegenerationCounter.HP = 0;
+						if (States.Value.Regeneration.HP > 0)
+						{
+							if (Game1.player.health < Game1.player.maxHealth)
+								++Game1.player.health;
+							--States.Value.Regeneration.HP;
+							diff = true;
+						}
+					}
 				}
-
-				if (States.Value.StaminaRegeneration > 0)
+				if (States.Value.Regeneration.EP > 0 && States.Value.RegenerationCounter.EP < States.Value.RegenTickRate.EP)
 				{
-					if (Game1.player.Stamina < Game1.player.MaxStamina)
-						++Game1.player.Stamina;
-					--States.Value.StaminaRegeneration;
+					++States.Value.RegenerationCounter.EP;
+					if (States.Value.RegenerationCounter.EP >= rate.EP)
+					{
+						States.Value.RegenerationCounter.EP = 0;
+						if (States.Value.Regeneration.EP > 0)
+						{
+							if (Game1.player.Stamina < Game1.player.MaxStamina)
+								++Game1.player.Stamina;
+							--States.Value.Regeneration.EP;
+							diff = true;
+						}
+					}
+				}
+				if (diff)
+				{
+					States.Value.RegenTicksDiff.Enqueue(States.Value.RegenerationCounter);
+					if (States.Value.RegenTicksDiff.Count > 5)
+						States.Value.RegenTicksDiff.Dequeue();
 				}
 			}
 		}
@@ -806,8 +874,7 @@ namespace LoveOfCooking
 		{
 			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.GetTitleSafeArea();
 
-			float currentRegen = States.Value.HealthRegeneration + States.Value.StaminaRegeneration;
-			if (Context.IsWorldReady && !Game1.eventUp && Game1.farmEvent is null && currentRegen > 0)
+			if (Context.IsWorldReady && Game1.farmEvent is null && States.Value.Regeneration.Total > 0)
 			{
 				const int heightFromBottom = 4 * Game1.pixelZoom;
 				const int otherBarWidth = 12 * Game1.pixelZoom;
@@ -895,8 +962,7 @@ namespace LoveOfCooking
 					Point borderWidth = new Point(
 						x: 3 * Game1.pixelZoom,
 						y: 3 * Game1.pixelZoom);
-					float startingRegen = States.Value.HealthAndStaminaRegenRunningValue;
-					float fillColourHeightRatio = currentRegen / startingRegen;
+					float fillColourHeightRatio = (float)States.Value.Regeneration.Total / States.Value.RegenerationTotal.Total;
 					int xOffset = borderWidth.X;
 					int yOffset = barIconOffset.Y + (AssetManager.CookingSkillIconArea.Height * Game1.pixelZoom);
 					width -= (xOffset + borderWidth.X);
@@ -958,7 +1024,7 @@ namespace LoveOfCooking
 						&& Game1.getOldMouseX() < fillColourOrigin.X + width)
 					{
 						SpriteFont font = Game1.smallFont;
-						string text = $"H +{Math.Max(0, States.Value.HealthRegeneration)}{Environment.NewLine}E +{Math.Max(0, States.Value.StaminaRegeneration)}";
+						string text = $"H +{Math.Max(0, States.Value.Regeneration.HP)}{Environment.NewLine}E +{Math.Max(0, States.Value.Regeneration.EP)}";
 						Vector2 position = regenBarOrigin + new Vector2(
 							x: (-4 * Game1.pixelZoom) - font.MeasureString("H +000").X - otherBarSpacing,
 							y: 0);
@@ -971,37 +1037,62 @@ namespace LoveOfCooking
 				}
 			}
 
-			if (!Config.DebugMode)
-				return;
-
 			// Draw debug info if enabled
+			if (Config.DebugMode)
 			{
-				Vector2 position = new Vector2(
-					x: viewport.Right - 125,
-					y: Math.Max(viewport.Top + 420, viewport.Bottom - 224 - 48 - (int)((Game1.player.MaxStamina - 270) * 0.625f)));
-				string[] debugFields = new string[]
-				{
-					$"CUR  {States.Value.RegenTicksCurr}",
-					$"RATE {States.Value.RegenTickRate}",
-					$"HP+   {States.Value.HealthRegeneration}",
-					$"EP+   {States.Value.StaminaRegeneration}"
+				string[] debugLines;
+				Vector2 linePosition;
+				Vector2 blockPosition;
+				Vector2 margin = new Vector2(
+					x: 16,
+					y: 224 + (int)((Game1.player.MaxStamina - 270) * 0.625f));
+
+				// Labels
+				debugLines = new[] {
+					new string('\n', States.Value.RegenTicksDiff.Count),
+					"TICKS",
+					"RATE",
+					"REGEN"
 				};
-				for (int i = 0; i < debugFields.Length; ++i)
+				linePosition = blockPosition = new Vector2(
+					x: viewport.Right - margin.X,
+					y: viewport.Bottom - margin.Y);
+				foreach (string debugLine in debugLines.Reverse())
 				{
-					e.SpriteBatch.DrawString(
-						spriteFont: Game1.smallFont,
-						text: debugFields[i],
-						position: position,
-						color: Color.White);
-					position.Y -= Game1.smallFont.MeasureString(debugFields[i]).Y - 8;
+					Vector2 textSize = Game1.smallFont.MeasureString(debugLine);
+					linePosition.X = blockPosition.X - textSize.X;
+					linePosition.Y -= textSize.Y;
+					Utility.drawTextWithColoredShadow(
+						b: e.SpriteBatch,
+						text: debugLine,
+						font: Game1.smallFont,
+						position: linePosition,
+						color: Color.White,
+						shadowColor: Color.DarkSlateBlue);
 				}
-				for (int i = 0; i < States.Value.RegenTicksDiff.Count; ++i)
+
+				// Values
+				debugLines = States.Value.RegenTicksDiff
+					.Select(regen => regen)
+					.Concat(new[]{
+						States.Value.RegenerationCounter,
+						States.Value.RegenTickRate,
+						States.Value.Regeneration})
+					.Select(regen => regen.ToString())
+					.ToArray();
+				blockPosition.X -= 220;
+				linePosition = blockPosition;
+				foreach (string debugLine in debugLines.Reverse())
 				{
-					e.SpriteBatch.DrawString(
-						spriteFont: Game1.smallFont,
-						text: $"{(i == 0 ? "DIFF" : "      ")}   {States.Value.RegenTicksDiff.ToArray()[States.Value.RegenTicksDiff.Count - 1 - i]}",
-						position: new Vector2(position.X, position.Y - i * 24),
-						color: Color.White * ((States.Value.RegenTicksDiff.Count - 1 - i + 1f) / (States.Value.RegenTicksDiff.Count / 2f)));
+					Vector2 textSize = Game1.smallFont.MeasureString(debugLine);
+					linePosition.Y -= textSize.Y;
+					Utility.drawTextWithColoredShadow(
+						b: e.SpriteBatch,
+						text: debugLine,
+						font: Game1.smallFont,
+						position: linePosition,
+						color: Color.White,
+						shadowColor: Color.DarkSlateBlue);
 				}
 			}
 		}
@@ -1175,13 +1266,13 @@ namespace LoveOfCooking
 
 		private void SpaceEvents_ItemEaten(object sender, EventArgs e)
 		{
-			if (!(Game1.player.itemToEat is StardewValley.Object food)
+			if (Game1.player.itemToEat is not StardewValley.Object food
 				// Don't consider Life Elixir (ID 773) for food behaviours or healing over time
 				|| Game1.player.itemToEat.ParentSheetIndex == 773)
 				return;
 
-			string[] objectData = Game1.objectInformation[food.ParentSheetIndex].Split('/');
-			States.Value.LastFoodWasDrink = objectData.Length > 6 && objectData[6] == "drink";
+			string[] foodData = Game1.objectInformation[food.ParentSheetIndex].Split('/');
+			bool isDrink = foodData.Length > 6 && foodData[6] == "drink";
 			States.Value.LastFoodEaten = food;
 
 			Log.D($"Ate food: {food?.Name ?? "null"}"
@@ -1194,7 +1285,7 @@ namespace LoveOfCooking
 				// Whoops
 				// Yes, it's come up before
 				Game1.addMail(MailCookbookUnlocked);
-				Game1.addHUDMessage(new HUDMessage("You ate the cookbook, gaining its knowledge.\nHow did this happen??"));
+				Game1.addHUDMessage(new HUDMessage($"You ate the cookbook, gaining its knowledge.{Environment.NewLine}How did this happen??"));
 			}
 
 			// Determine food healing
@@ -1202,12 +1293,18 @@ namespace LoveOfCooking
 			int foodStamina = food.staminaRecoveredOnConsumption();
 			if (Config.FoodHealingTakesTime)
 			{
-				// Regenerate health/energy over time
-				Game1.player.health = States.Value.HealthOnLastTick;
-				Game1.player.Stamina = States.Value.StaminaOnLastTick;
-				States.Value.HealthAndStaminaRegenRunningValue += foodHealth + foodStamina;
-				States.Value.HealthRegeneration += foodHealth;
-				States.Value.StaminaRegeneration += foodStamina;
+				// Regenerate health/energy over time:
+
+				// Add new regen values to current amount
+				States.Value.Regeneration.HP += foodHealth;
+				States.Value.Regeneration.EP += foodStamina;
+
+				// Reset total regeneration values to start from current remaining amount
+				States.Value.RegenerationTotal = States.Value.Regeneration;
+
+				// Reset player regen values to before having eaten food
+				Game1.player.health = (int)Math.Ceiling(States.Value.StatusOnLastTick.HP);
+				Game1.player.Stamina = States.Value.StatusOnLastTick.EP;
 			}
 			else if (CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.Restoration))
 			{
@@ -1218,24 +1315,24 @@ namespace LoveOfCooking
 					Game1.player.Stamina + food.staminaRecoveredOnConsumption() * (CookingSkill.RestorationAltValue / 100f));
 			}
 
-			Buff lastBuff = States.Value.LastFoodWasDrink
+			Buff foodBuff = isDrink
 				? Game1.buffsDisplay.drink
 				: Game1.buffsDisplay.food;
 			Log.D($"OnItemEaten"
 				+ $" | Ate food:  {food.Name}"
-				+ $" | Last buff: {lastBuff?.displaySource ?? "null"} (source: {lastBuff?.source ?? "null"})",
+				+ $" | Last buff: {foodBuff?.displaySource ?? "null"} (source: {foodBuff?.source ?? "null"})",
 				Config.DebugMode);
 
 			// Check to boost buff duration
 			if (CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.BuffDuration)
-			    && food.displayName == lastBuff?.displaySource)
+			    && food.displayName == foodBuff?.displaySource)
 			{
-				int duration = lastBuff.millisecondsDuration;
+				int duration = foodBuff.millisecondsDuration;
 				if (duration > 0)
 				{
 					float rate = (Game1.player.health + Game1.player.Stamina) / (Game1.player.maxHealth + Game1.player.MaxStamina);
 					duration += (int) Math.Floor(CookingSkill.BuffDurationValue * 1000 * rate);
-					lastBuff.millisecondsDuration = duration;
+					foodBuff.millisecondsDuration = duration;
 				}
 			}
 
@@ -1249,11 +1346,11 @@ namespace LoveOfCooking
 			if (ItemDefinitions["FoodsThatGiveLeftovers"].Contains(food.Name)
 				&& Config.AddRecipeRebalancing && Interface.Interfaces.JsonAssets is not null)
 			{
-				string name = food.Name.StartsWith(ObjectPrefix)
+				string leftoversName = food.Name.StartsWith(ObjectPrefix)
 					? $"{food.Name}_half"
 					: $"{food.Name.ToLower().Split(' ').Aggregate(ObjectPrefix, (s, s1) => s + s1)}" + "_half";
 				StardewValley.Object leftovers = new StardewValley.Object(
-					Interface.Interfaces.JsonAssets.GetObjectId(name),
+					Interface.Interfaces.JsonAssets.GetObjectId(leftoversName),
 					1);
 				Utils.AddOrDropItem(leftovers);
 			}
@@ -1261,51 +1358,51 @@ namespace LoveOfCooking
 			// Handle unique kebab effects
 			if (food.Name.StartsWith(ModEntry.ObjectPrefix) && food.name.EndsWith("kebab"))
 			{
-				double roll = Game1.random.NextDouble();
-				int duration = -1;
-				string message = "";
-				string displaySource = "";
-				int[] stats = null;
-				if (roll < 0.08f)
+				double kebabRoll = Game1.random.NextDouble();
+				int kebabDuration = -1;
+				string kebabMessage = "";
+				string kebabSource = "";
+				int[] kebabStats = null;
+				if (kebabRoll < 0.08f)
 				{
 					// Remove any health/energy restoration from bad kebabs
 					if (Config.FoodHealingTakesTime)
 					{
-						States.Value.HealthRegeneration -= foodHealth;
-						States.Value.StaminaRegeneration -= foodStamina;
+						States.Value.Regeneration.HP -= foodHealth;
+						States.Value.Regeneration.EP -= foodStamina;
 					}
 					else
 					{
-						Game1.player.health = States.Value.HealthOnLastTick;;
-						Game1.player.Stamina = States.Value.StaminaOnLastTick;
+						Game1.player.health = (int)Math.Ceiling(States.Value.StatusOnLastTick.HP);
+						Game1.player.Stamina = States.Value.StatusOnLastTick.EP;
 					}
 
-					if (roll > 0.04f)
+					if (kebabRoll > 0.04f)
 					{
-						message = i18n.Get("item.kebab.bad");
+						kebabMessage = i18n.Get("item.kebab.bad");
 						// Add no debuffs
 					}
 					else
 					{
-						message = i18n.Get("item.kebab.worst");
-						displaySource = i18n.Get("buff.kebab.inspect",
+						kebabMessage = i18n.Get("item.kebab.worst");
+						kebabSource = i18n.Get("buff.kebab.inspect",
 							new { quality = i18n.Get("buff.kebab.quality_worst") });
-						duration = KebabMalusDuration;
-						if (roll < 0.02f)
+						kebabDuration = KebabMalusDuration;
+						if (kebabRoll < 0.02f)
 						{
 							// Add a debuff for a random non-combat stat
-							int[] nonCombatStats = new[] { 0, 0, 0, 0 };
-							nonCombatStats[Game1.random.Next(stats.Length - 1)] = KebabNonCombatBonus * -1;
-							stats = new int[]
+							int[] kebabNonCombatStats = new[] { 0, 0, 0, 0 };
+							kebabNonCombatStats[Game1.random.Next(kebabStats.Length - 1)] = KebabNonCombatBonus * -1;
+							kebabStats = new int[]
 							{
-								nonCombatStats[0], nonCombatStats[1], nonCombatStats[2], 0, 0, nonCombatStats[3],
+								kebabNonCombatStats[0], kebabNonCombatStats[1], kebabNonCombatStats[2], 0, 0, kebabNonCombatStats[3],
 								0, 0, 0, 0, 0, 0
 							};
 						}
 						else
 						{
 							// Add a debuff for combat stats
-							stats = new int[]
+							kebabStats = new int[]
 							{
 								0, 0, 0, 0, 0, 0,
 								0, 0, 0, 0,
@@ -1314,13 +1411,13 @@ namespace LoveOfCooking
 						}
 					}
 				}
-				else if (roll < 0.18f)
+				else if (kebabRoll < 0.18f)
 				{
 					// Add extra health/energy restoration for great kebabs
 					if (Config.FoodHealingTakesTime)
 					{
-						States.Value.HealthRegeneration += Game1.player.maxHealth / 10;
-						States.Value.StaminaRegeneration += Game1.player.MaxStamina / 10;
+						States.Value.Regeneration.HP += Game1.player.maxHealth / 10;
+						States.Value.Regeneration.EP += Game1.player.MaxStamina / 10;
 					}
 					else
 					{
@@ -1330,30 +1427,30 @@ namespace LoveOfCooking
 							Game1.player.Stamina + Game1.player.MaxStamina / 10f);
 					}
 
-					displaySource = i18n.Get("buff.kebab.inspect",
+					kebabSource = i18n.Get("buff.kebab.inspect",
 						new { quality = i18n.Get("buff.kebab.quality_best") });
-					message = i18n.Get("item.kebab.best");
-					duration = KebabBonusDuration;
+					kebabMessage = i18n.Get("item.kebab.best");
+					kebabDuration = KebabBonusDuration;
 					// Add a buff for both non-combat and combat stats
-					stats = new int[]
+					kebabStats = new int[]
 					{
 						0, 0, KebabNonCombatBonus, 0, 0, 0,
 						0, 0, 0, 0,
 						KebabCombatBonus, KebabCombatBonus
 					};
 				}
-				if (!string.IsNullOrEmpty(message))
+				if (!string.IsNullOrEmpty(kebabMessage))
 				{
-					Game1.addHUDMessage(new HUDMessage(message: message, leaveMeNull: null));
+					Game1.addHUDMessage(new HUDMessage(message: kebabMessage, leaveMeNull: null));
 				}
-				if (stats is not null)
+				if (kebabStats is not null)
 				{
-					Buff buff = new Buff(
-						farming: stats[0], fishing: stats[1], mining: stats[2], digging: stats[3],
-						luck: stats[4], foraging: stats[5], crafting: stats[6], maxStamina: stats[7],
-						magneticRadius: stats[8], speed: stats[9], defense: stats[10], attack: stats[11],
-						minutesDuration: duration, source: food.Name, displaySource: displaySource);
-					Game1.buffsDisplay.tryToAddFoodBuff(buff, duration);
+					Buff kebabBuff = new Buff(
+						farming: kebabStats[0], fishing: kebabStats[1], mining: kebabStats[2], digging: kebabStats[3],
+						luck: kebabStats[4], foraging: kebabStats[5], crafting: kebabStats[6], maxStamina: kebabStats[7],
+						magneticRadius: kebabStats[8], speed: kebabStats[9], defense: kebabStats[10], attack: kebabStats[11],
+						minutesDuration: kebabDuration, source: food.Name, displaySource: kebabSource);
+					Game1.buffsDisplay.tryToAddFoodBuff(kebabBuff, kebabDuration);
 				}
 			}
 		}

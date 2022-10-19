@@ -110,7 +110,7 @@ namespace LoveOfCooking
 				scalingCurrent[i] = level * value;
 				scalingMax[i] = 10 * value;
 			}
-			ModEntry.Instance.States.Value.RegenSkillModifier = scalingCurrent.Sum() / scalingMax.Sum();
+			ModEntry.Instance.States.Value.RegenerationSkillModifier = scalingCurrent.Sum() / scalingMax.Sum();
 		}
 
 		/// <summary>

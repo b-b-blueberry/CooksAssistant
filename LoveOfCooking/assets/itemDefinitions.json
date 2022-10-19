@@ -48,6 +48,12 @@
 	"ShopDiscounts": [
 		"Saloon:35"
 	],
+	"RegenHealthRate": [
+		"0.3"
+	],
+	"RegenEnergyRate": [
+		"1.0"
+	],
 	"RegenSkillModifiers": [
 		"Combat:0.025",
 		"Foraging:0.0025",
