@@ -12,15 +12,7 @@ using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-
-// TODO: UPDATE: Ingredients bounce when added to cooking slots, puff when removed, unless using autofill
-
-// TODO: COMPATIBILITY: Skill Prestige (https://www.nexusmods.com/stardewvalley/mods/569)
-// TODO: COMPATIBILITY: Level Extender (https://www.nexusmods.com/stardewvalley/mods/1471)
-//		No current errors or issues, but doesn't interact, either
-// TODO: COMPATIBILITY: Tool Upgrade Delivery (https://www.nexusmods.com/stardewvalley/mods/5421)
 
 namespace LoveOfCooking
 {
@@ -40,52 +32,8 @@ namespace LoveOfCooking
 
 		internal static bool IsEnglishLocale => LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.en);
 
-		public struct Regen
-		{
-			public float HP;
-			public float EP;
-
-			public float Total => this.HP + this.EP;
-
-			public Regen(float hp, float ep)
-			{
-				this.HP = hp;
-				this.EP = ep;
-			}
-
-			public static implicit operator Regen(int operand)
-			{
-				return new Regen { HP = operand, EP = operand };
-			}
-
-			public static implicit operator Regen(float operand)
-			{
-				return new Regen { HP = operand, EP = operand };
-			}
-
-			public static Regen operator +(Regen lhs, Regen rhs)
-			{
-				return new Regen { HP = lhs.HP + rhs.HP, EP = lhs.EP + rhs.EP };
-			}
-
-			public static Regen operator *(Regen lhs, Regen rhs)
-			{
-				return new Regen { HP = lhs.HP * rhs.HP, EP = lhs.EP * rhs.EP };
-			}
-
-			public static Regen operator ++(Regen operand)
-			{
-				return new Regen { HP = operand.HP++, EP = operand.EP++ };
-			}
-
-			public override string ToString()
-			{
-				return $"H{HP} E{EP}";
-			}
-		}
-
 		// Player session state
-		public readonly PerScreen<State> States = new(createNewState: () => new State());
+		public readonly PerScreen<State> States = new(createNewState: () => new());
 		public class State
 		{
 			// Persistent player data
@@ -102,25 +50,8 @@ namespace LoveOfCooking
 			// Add Cooking Skill
 			public readonly Dictionary<string, int> FoodCookedToday = new();
 
-			// Food Healing Takes Time
-			/// <summary> Cached result of all skill modifiers affecting food regeneration as a multiplier. </summary>
-			public float RegenerationSkillModifier;
-			/// <summary> Current food regeneration values waiting to be added to player status bars. </summary>
-			public Regen Regeneration;
-			/// <summary> Total regeneration amount to be added to player status bars since last emptied. </summary>
-			public Regen RegenerationTotal;
-			/// <summary> Player status bar values as of the previous game tick. </summary>
-			public Regen StatusOnLastTick;
-			/// <summary> Current incremental tick count for player status bars before regeneration is applied to either. </summary>
-			public Regen RegenerationCounter;
-			/// <summary> Instance of the last edible object consumed by the player. </summary>
-			public StardewValley.Object LastFoodEaten;
-			/// <summary> Whether the player health status bar was visible on the previous game tick. </summary>
-			public bool LastTickShowedHealthBar;
-
-			// debug
-			public Regen RegenTickRate;
-			public readonly Queue<Regen> RegenTicksDiff = new();
+			// Food Heals Over Time
+			public Regeneration Regeneration = new();
 		}
 
 		// Object definitions
@@ -253,7 +184,6 @@ namespace LoveOfCooking
 			this.Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
 			this.Helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
 			this.Helper.Events.Display.MenuChanged += this.Display_MenuChanged;
-			this.Helper.Events.Display.Rendered += this.Display_Rendered;
 			this.Helper.Events.Multiplayer.PeerContextReceived += this.Multiplayer_PeerContextReceived;
 			this.Helper.Events.Multiplayer.PeerConnected += this.Multiplayer_PeerConnected;
 
@@ -539,8 +469,8 @@ namespace LoveOfCooking
 			// God damn it
 			Utils.CleanUpSaveFiles();
 
-			// Set values for Food Heals Over Time
-			Utils.CalculateFoodRegenModifiers();
+			// Food Heals Over Time
+			States.Value.Regeneration.UpdateDefinitions();
 
 			// Perform behaviours for adding CustomBush instances to the world
 			if (Utils.AreNettlesActive())
@@ -585,7 +515,6 @@ namespace LoveOfCooking
 			// Remove contextual event handlers
 			Helper.Events.Input.ButtonPressed -= this.Event_TryDropInItem;
 			Helper.Events.Player.InventoryChanged -= this.Event_CheckForDroppedInItem;
-			Helper.Events.Display.RenderingHud -= this.Event_DrawRegenBar;
 
 			// Reset session state
 			States.Value = new State();
@@ -594,93 +523,6 @@ namespace LoveOfCooking
 		private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
 		{
 			AssetManager.IsCurrentHoveredItemHidingBuffs = false;
-
-			if (Config.FoodHealingTakesTime)
-			{
-				// Track player HP/EP to use in reverting instant food healing
-				if (Game1.player is not null && Context.IsWorldReady)
-				{
-					States.Value.StatusOnLastTick = new Regen { HP = Game1.player.health, EP = Game1.player.Stamina };
-				}
-
-				// Do not regenerate if game is paused
-				if ((!Game1.IsMultiplayer && !Game1.game1.IsActive) || (Game1.activeClickableMenu is not null && !Game1.shouldTimePass()))
-				{
-					return;
-				}
-
-				// Check to regenerate HP/EP for player over time
-				if (States.Value.Regeneration.HP < 1 && States.Value.Regeneration.EP < 1)
-				{
-					States.Value.RegenerationTotal = 0;
-					return;
-				}
-
-				// End HP/EP regeneration on player KO
-				if (Game1.player.health < 1)
-				{
-					States.Value.StatusOnLastTick = 1;
-					return;
-				}
-
-				// Fetch all components for the rate of HP/EP regeneration
-				int cookingLevel = CookingSkillApi.GetLevel();
-				Regen panicMultiplier = new Regen
-				{
-					HP = Game1.player.health / Game1.player.maxHealth,
-					EP = Game1.player.Stamina / Game1.player.MaxStamina
-				};
-				float foodMultiplier = Utils.GetFoodRegenRate(States.Value.LastFoodEaten);
-				int baseRate = int.Parse(ItemDefinitions["RegenBaseRate"][0]);
-				float overallScale = float.Parse(ItemDefinitions["RegenSpeedScale"][0]);
-
-				// Calculate regeneration for both status bars
-				Regen rate = baseRate - (baseRate * States.Value.RegenerationSkillModifier * foodMultiplier * 100);
-				float calculateRate(float value, float mult) => (float)Math.Floor(Math.Max(36 - cookingLevel * 1.75f, value * mult) / overallScale);
-				rate.HP = (int)(calculateRate(value: rate.HP, mult: panicMultiplier.HP) / float.Parse(ModEntry.ItemDefinitions["RegenHealthRate"][0]));
-				rate.EP = (int)(calculateRate(value: rate.EP, mult: panicMultiplier.EP) / float.Parse(ModEntry.ItemDefinitions["RegenEnergyRate"][0]));
-				States.Value.RegenTickRate = rate;
-				bool diff = false;
-
-				// Regenerate player HP/EP when tick count is greater than required tick rate:
-
-				if (States.Value.Regeneration.HP > 0 && States.Value.RegenerationCounter.HP < States.Value.RegenTickRate.HP)
-				{
-					++States.Value.RegenerationCounter.HP;
-					if (States.Value.RegenerationCounter.HP >= rate.HP)
-					{
-						States.Value.RegenerationCounter.HP = 0;
-						if (States.Value.Regeneration.HP > 0)
-						{
-							if (Game1.player.health < Game1.player.maxHealth)
-								++Game1.player.health;
-							--States.Value.Regeneration.HP;
-							diff = true;
-						}
-					}
-				}
-				if (States.Value.Regeneration.EP > 0 && States.Value.RegenerationCounter.EP < States.Value.RegenTickRate.EP)
-				{
-					++States.Value.RegenerationCounter.EP;
-					if (States.Value.RegenerationCounter.EP >= rate.EP)
-					{
-						States.Value.RegenerationCounter.EP = 0;
-						if (States.Value.Regeneration.EP > 0)
-						{
-							if (Game1.player.Stamina < Game1.player.MaxStamina)
-								++Game1.player.Stamina;
-							--States.Value.Regeneration.EP;
-							diff = true;
-						}
-					}
-				}
-				if (diff)
-				{
-					States.Value.RegenTicksDiff.Enqueue(States.Value.RegenerationCounter);
-					if (States.Value.RegenTicksDiff.Count > 5)
-						States.Value.RegenTicksDiff.Dequeue();
-				}
-			}
 		}
 
 		private void Event_LoadLate(object sender, OneSecondUpdateTickedEventArgs e)
@@ -869,234 +711,6 @@ namespace LoveOfCooking
 			}
 		}
 
-		[EventPriority(EventPriority.Low)]
-		private void Event_DrawRegenBar(object sender, RenderingHudEventArgs e)
-		{
-			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.GetTitleSafeArea();
-
-			if (Context.IsWorldReady && Game1.farmEvent is null && States.Value.Regeneration.Total > 0)
-			{
-				const int heightFromBottom = 4 * Game1.pixelZoom;
-				const int otherBarWidth = 12 * Game1.pixelZoom;
-				const int otherBarSpacing = 1 * Game1.pixelZoom;
-
-				Point barIconOffset = new Point(x: -1, y: 1);
-
-				int otherBarCount = States.Value.LastTickShowedHealthBar ? 2 : 1;
-				int width = AssetManager.RegenBarArea.Width * Game1.pixelZoom;
-				int height = AssetManager.RegenBarArea.Height * Game1.pixelZoom;
-
-				int sourceWidth = AssetManager.RegenBarArea.Width;
-				int sourceHeight = AssetManager.RegenBarArea.Height;
-				Vector2 regenBarOrigin = new Vector2(
-					x: viewport.Right - (sourceWidth * Game1.pixelZoom / 2) - (otherBarWidth * (1 + otherBarCount)),
-					y: viewport.Bottom - heightFromBottom - (sourceHeight * Game1.pixelZoom));
-
-				// Regen bar sprites
-				{
-					// region of cursors spritesheet asset to find base game regen bar sprite
-					Rectangle originalArea = new Rectangle(256, 408, 12, 56);
-					// starting region of original region to read data from
-					Rectangle sourceArea = new Rectangle(
-						x: originalArea.X,
-						y: originalArea.Y,
-						width: sourceWidth / 2,
-						height: sourceHeight / 2);
-					// starting target region on screen to draw to
-					Rectangle destArea = new Rectangle(
-						x: (int)regenBarOrigin.X,
-						y: (int)regenBarOrigin.Y,
-						width: sourceArea.Width * Game1.pixelZoom,
-						height: sourceArea.Height * Game1.pixelZoom);
-
-					Point[] sourceOffsets = new Point[]
-					{
-						Point.Zero,
-						new Point(originalArea.Width - sourceArea.Width, 0),
-						new Point(0, originalArea.Height - sourceArea.Height),
-						new Point(originalArea.Width - sourceArea.Width, originalArea.Height - sourceArea.Height)
-					};
-					Point[] destOffsets = new Point[]
-					{
-						Point.Zero,
-						new Point(destArea.Width, 0),
-						new Point(0, destArea.Height),
-						new Point(destArea.Width, destArea.Height)
-					};
-					for (int i = 0; i < 4; ++i)
-					{
-						Rectangle newSourceArea = sourceArea;
-						newSourceArea.X += sourceOffsets[i].X;
-						newSourceArea.Y += sourceOffsets[i].Y;
-						Rectangle newDestArea = destArea;
-						newDestArea.X += destOffsets[i].X;
-						newDestArea.Y += destOffsets[i].Y;
-
-						e.SpriteBatch.Draw(
-							texture: Game1.mouseCursors,
-							sourceRectangle: newSourceArea,
-							destinationRectangle: newDestArea,
-							color: Color.White,
-							rotation: 0f,
-							origin: Vector2.Zero,
-							effects: SpriteEffects.None,
-							layerDepth: 1f);
-					}
-					// cooking skill icon
-					e.SpriteBatch.Draw(
-						texture: ModEntry.SpriteSheet,
-						sourceRectangle: AssetManager.CookingSkillIconArea,
-						position: new Vector2(
-							x: destArea.X - (barIconOffset.X * Game1.pixelZoom),
-							y: destArea.Y - (barIconOffset.Y * Game1.pixelZoom)),
-						color: Color.White,
-						rotation: 0f,
-						origin: Vector2.Zero,
-						scale: Game1.pixelZoom,
-						effects: SpriteEffects.None,
-						layerDepth: 1f);
-				}
-
-				// Regen bar fill colour
-				{
-					Point borderWidth = new Point(
-						x: 3 * Game1.pixelZoom,
-						y: 3 * Game1.pixelZoom);
-					float fillColourHeightRatio = (float)States.Value.Regeneration.Total / States.Value.RegenerationTotal.Total;
-					int xOffset = borderWidth.X;
-					int yOffset = barIconOffset.Y + (AssetManager.CookingSkillIconArea.Height * Game1.pixelZoom);
-					width -= (xOffset + borderWidth.X);
-					height -= (yOffset + borderWidth.Y);
-
-					// Draw background
-					Vector2 fillColourOrigin = new Vector2(
-						x: regenBarOrigin.X + xOffset,
-						y: regenBarOrigin.Y + yOffset + height + (1 * Game1.pixelZoom) - (int)(height * fillColourHeightRatio));
-					if (Game1.isOutdoorMapSmallerThanViewport())
-					{
-						fillColourOrigin.X = Math.Min(fillColourOrigin.X, -Game1.viewport.X + (Game1.currentLocation.Map.Layers[0].LayerWidth * Game1.tileSize));
-					}
-					e.SpriteBatch.Draw(
-						texture: ModEntry.SpriteSheet,
-						position: fillColourOrigin,
-						sourceRectangle: AssetManager.RegenBarArea,
-						color: Color.White,
-						rotation: 0f,
-						origin: Vector2.Zero,
-						scale: Game1.pixelZoom,
-						effects: SpriteEffects.None,
-						layerDepth: 1f);
-
-					// Draw fill colour
-					Color colour = Utility.getRedToGreenLerpColor(0.5f);
-					Rectangle destArea = new Rectangle(
-						x: (int)fillColourOrigin.X,
-						y: (int)fillColourOrigin.Y,
-						width: width,
-						height: (int)(height * fillColourHeightRatio));
-					// fill colour body
-					e.SpriteBatch.Draw(
-						texture: Game1.staminaRect,
-						destinationRectangle: destArea,
-						sourceRectangle: Game1.staminaRect.Bounds,
-						color: colour,
-						rotation: 0f,
-						origin: Vector2.Zero,
-						effects: SpriteEffects.None,
-						layerDepth: 1f);
-					// fill colour top border
-					destArea.Height = 1 * Game1.pixelZoom;
-					colour.R = (byte)Math.Max(0, colour.R - 50);
-					colour.G = (byte)Math.Max(0, colour.G - 50);
-					e.SpriteBatch.Draw(
-						texture: Game1.staminaRect,
-						destinationRectangle: destArea,
-						sourceRectangle: Game1.staminaRect.Bounds,
-						color: colour,
-						rotation: 0f,
-						origin: Vector2.Zero,
-						effects: SpriteEffects.None,
-						layerDepth: 1f);
-
-					// Draw value
-					if (Game1.getOldMouseX() >= fillColourOrigin.X
-						&& Game1.getOldMouseY() >= regenBarOrigin.Y
-						&& Game1.getOldMouseX() < fillColourOrigin.X + width)
-					{
-						SpriteFont font = Game1.smallFont;
-						string text = $"H +{Math.Max(0, States.Value.Regeneration.HP)}{Environment.NewLine}E +{Math.Max(0, States.Value.Regeneration.EP)}";
-						Vector2 position = regenBarOrigin + new Vector2(
-							x: (-4 * Game1.pixelZoom) - font.MeasureString("H +000").X - otherBarSpacing,
-							y: 0);
-						e.SpriteBatch.DrawString(
-							spriteFont: font,
-							text: text,
-							position: position,
-							color: Color.White);
-					}
-				}
-			}
-
-			// Draw debug info if enabled
-			if (Config.DebugMode)
-			{
-				string[] debugLines;
-				Vector2 linePosition;
-				Vector2 blockPosition;
-				Vector2 margin = new Vector2(
-					x: 16,
-					y: 224 + (int)((Game1.player.MaxStamina - 270) * 0.625f));
-
-				// Labels
-				debugLines = new[] {
-					new string('\n', States.Value.RegenTicksDiff.Count),
-					"TICKS",
-					"RATE",
-					"REGEN"
-				};
-				linePosition = blockPosition = new Vector2(
-					x: viewport.Right - margin.X,
-					y: viewport.Bottom - margin.Y);
-				foreach (string debugLine in debugLines.Reverse())
-				{
-					Vector2 textSize = Game1.smallFont.MeasureString(debugLine);
-					linePosition.X = blockPosition.X - textSize.X;
-					linePosition.Y -= textSize.Y;
-					Utility.drawTextWithColoredShadow(
-						b: e.SpriteBatch,
-						text: debugLine,
-						font: Game1.smallFont,
-						position: linePosition,
-						color: Color.White,
-						shadowColor: Color.DarkSlateBlue);
-				}
-
-				// Values
-				debugLines = States.Value.RegenTicksDiff
-					.Select(regen => regen)
-					.Concat(new[]{
-						States.Value.RegenerationCounter,
-						States.Value.RegenTickRate,
-						States.Value.Regeneration})
-					.Select(regen => regen.ToString())
-					.ToArray();
-				blockPosition.X -= 220;
-				linePosition = blockPosition;
-				foreach (string debugLine in debugLines.Reverse())
-				{
-					Vector2 textSize = Game1.smallFont.MeasureString(debugLine);
-					linePosition.Y -= textSize.Y;
-					Utility.drawTextWithColoredShadow(
-						b: e.SpriteBatch,
-						text: debugLine,
-						font: Game1.smallFont,
-						position: linePosition,
-						color: Color.White,
-						shadowColor: Color.DarkSlateBlue);
-				}
-			}
-		}
-
 		private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
 			if (!Context.IsWorldReady || Game1.currentLocation is null)
@@ -1158,11 +772,6 @@ namespace LoveOfCooking
 					return;
 				}
 			}
-		}
-
-		private void Display_Rendered(object sender, RenderedEventArgs e)
-		{
-			States.Value.LastTickShowedHealthBar = Game1.showingHealthBar;
 		}
 
 		[EventPriority(EventPriority.Low)]
@@ -1267,13 +876,12 @@ namespace LoveOfCooking
 		private void SpaceEvents_ItemEaten(object sender, EventArgs e)
 		{
 			if (Game1.player.itemToEat is not StardewValley.Object food
-				// Don't consider Life Elixir (ID 773) for food behaviours or healing over time
+				// Don't consider Life Elixir (ID 773) for food behaviours or Food Heals Over Time
 				|| Game1.player.itemToEat.ParentSheetIndex == 773)
 				return;
 
 			string[] foodData = Game1.objectInformation[food.ParentSheetIndex].Split('/');
 			bool isDrink = foodData.Length > 6 && foodData[6] == "drink";
-			States.Value.LastFoodEaten = food;
 
 			Log.D($"Ate food: {food?.Name ?? "null"}"
 				+ $"{Environment.NewLine}Buffs: (food: {Game1.buffsDisplay.food?.displaySource ?? "null"})"
@@ -1289,22 +897,9 @@ namespace LoveOfCooking
 			}
 
 			// Determine food healing
-			int foodHealth = food.healthRecoveredOnConsumption();
-			int foodStamina = food.staminaRecoveredOnConsumption();
 			if (Config.FoodHealingTakesTime)
 			{
-				// Regenerate health/energy over time:
-
-				// Add new regen values to current amount
-				States.Value.Regeneration.HP += foodHealth;
-				States.Value.Regeneration.EP += foodStamina;
-
-				// Reset total regeneration values to start from current remaining amount
-				States.Value.RegenerationTotal = States.Value.Regeneration;
-
-				// Reset player regen values to before having eaten food
-				Game1.player.health = (int)Math.Ceiling(States.Value.StatusOnLastTick.HP);
-				Game1.player.Stamina = States.Value.StatusOnLastTick.EP;
+				States.Value.Regeneration.Eat(food: food);
 			}
 			else if (CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.Restoration))
 			{
@@ -1368,13 +963,13 @@ namespace LoveOfCooking
 					// Remove any health/energy restoration from bad kebabs
 					if (Config.FoodHealingTakesTime)
 					{
-						States.Value.Regeneration.HP -= foodHealth;
-						States.Value.Regeneration.EP -= foodStamina;
+						States.Value.Regeneration.Add(
+							hp: -food.healthRecoveredOnConsumption(),
+							ep: -food.staminaRecoveredOnConsumption());
 					}
 					else
 					{
-						Game1.player.health = (int)Math.Ceiling(States.Value.StatusOnLastTick.HP);
-						Game1.player.Stamina = States.Value.StatusOnLastTick.EP;
+						States.Value.Regeneration.RevertPlayer();
 					}
 
 					if (kebabRoll > 0.04f)
@@ -1416,8 +1011,7 @@ namespace LoveOfCooking
 					// Add extra health/energy restoration for great kebabs
 					if (Config.FoodHealingTakesTime)
 					{
-						States.Value.Regeneration.HP += Game1.player.maxHealth / 10;
-						States.Value.Regeneration.EP += Game1.player.MaxStamina / 10;
+						States.Value.Regeneration.Add(hp: Game1.player.maxHealth / 10, ep: Game1.player.MaxStamina / 10);
 					}
 					else
 					{
@@ -1538,10 +1132,6 @@ namespace LoveOfCooking
 					Helper.Events.Input.ButtonPressed += this.Event_TryDropInItem;
 					Helper.Events.Player.InventoryChanged += this.Event_CheckForDroppedInItem;
 				}
-				if (Config.ShowFoodRegenBar)
-				{
-					Helper.Events.Display.RenderingHud += this.Event_DrawRegenBar;
-				}
 
 				// Load local persistent data from saved modData
 				States.Value.IsUsingRecipeGridView = false;
@@ -1610,7 +1200,10 @@ namespace LoveOfCooking
 				NpcHomeLocations.Add(npc.Key, npc.Value.Split('/')[10].Split(' ')[0]);
 			}
 
-			// Add or remove cooking animation draw fix per the config
+			// Food Heals Over Time
+			States.Value.Regeneration.RegisterEvents(helper: Helper);
+
+			// Cooking Animations
 			if (Config.PlayCookingAnimation)
 			{
 				Helper.Events.Display.RenderedWorld += this.Event_DrawCookingAnimation;

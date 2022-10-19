@@ -89,30 +89,6 @@ namespace LoveOfCooking
 			}
 		}
 
-		internal static void CalculateFoodRegenModifiers()
-		{
-			// Calculate food regeneration rate from skill levels
-			float[] scalingCurrent = new float[ModEntry.ItemDefinitions["RegenSkillModifiers"].Count];
-			float[] scalingMax = new float[ModEntry.ItemDefinitions["RegenSkillModifiers"].Count];
-			for (int i = 0; i < ModEntry.ItemDefinitions["RegenSkillModifiers"].Count; ++i)
-			{
-				string[] split = ModEntry.ItemDefinitions["RegenSkillModifiers"][i].Split(':');
-				string name = split[0];
-				bool isDefined = Enum.TryParse(name, out ModEntry.SkillIndex skillIndex);
-				int level = isDefined
-					? Game1.player.GetSkillLevel((int)Enum.Parse(typeof(ModEntry.SkillIndex), name))
-					: SpaceCore.Skills.GetSkill(name) is not null
-						? Game1.player.GetCustomSkillLevel(name)
-						: -1;
-				float value = float.Parse(split[1]);
-				if (level < 0)
-					continue;
-				scalingCurrent[i] = level * value;
-				scalingMax[i] = 10 * value;
-			}
-			ModEntry.Instance.States.Value.RegenerationSkillModifier = scalingCurrent.Sum() / scalingMax.Sum();
-		}
-
 		/// <summary>
 		/// I keep forgetting the method name
 		/// </summary>
