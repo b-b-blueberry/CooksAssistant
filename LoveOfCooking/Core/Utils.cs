@@ -158,10 +158,9 @@ namespace LoveOfCooking
 		/// </summary>
 		public static float GetFoodRegenRate(StardewValley.Object food)
 		{
+			float rate = 0f;
 			// Health regenerates faster when...
 
-			// drinking drinks
-			float rate = ModEntry.Instance.States.Value.LastFoodWasDrink ? 0.12f : 0.075f;
 			// consuming quality foods
 			rate += food.Quality * 0.0085f;
 			// under the 'tipsy' debuff
