@@ -352,13 +352,17 @@ namespace LoveOfCooking
 
 		public static void AddToShopAtItemIndex(ShopMenu menu, StardewValley.Object o, string targetItemName = "", int price = -1, int stock = -1)
 		{
+			// Remove existing entries
+			menu.forSale.Remove(o);
+			menu.itemPriceAndStock.Remove(o);
+
 			if (stock < 1)
 				stock = int.MaxValue;
 			if (price < 0)
 				price = o.salePrice();
 			price = (int)(price * Game1.MasterPlayer.difficultyModifier);
 
-			// Add sale info
+			// Add sale entry
 			menu.itemPriceAndStock.Add(o, new[] { price, stock });
 
 			// Add shop entry
