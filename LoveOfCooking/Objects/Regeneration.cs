@@ -213,7 +213,7 @@ namespace LoveOfCooking
 			}
 
 			// Do not regenerate if game is paused
-			if ((!Game1.IsMultiplayer && !Game1.game1.IsActive) || (Game1.activeClickableMenu is not null && !Game1.shouldTimePass()))
+			if ((!Game1.IsMultiplayer && (!Game1.game1.IsActive || Game1.eventUp)) || (Game1.activeClickableMenu is not null && !Game1.shouldTimePass()))
 			{
 				return;
 			}
