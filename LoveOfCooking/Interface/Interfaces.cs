@@ -250,9 +250,13 @@ namespace LoveOfCooking.Interface
 				return true;
 			}
 
-			gmcm.RegisterModConfig(ModEntry.Instance.ModManifest, () => ModEntry.Config = new Config(), () => Helper.WriteConfig(ModEntry.Config));
-			gmcm.SubscribeToChange(ModManifest,
-				changeHandler: (string key, bool value) =>
+			gmcm.Register(
+				mod: ModEntry.Instance.ModManifest,
+				reset: () => ModEntry.Config = new Config(),
+				save: () => Helper.WriteConfig(ModEntry.Config));
+			gmcm.OnFieldChanged(
+				mod: ModManifest,
+				onChange: (string key, object value) =>
 				{
 					Log.D($"Config check: {key} => {value}",
 						ModEntry.Config.DebugMode);
@@ -300,12 +304,12 @@ namespace LoveOfCooking.Interface
 					string i18nKey = $"config.option.{entry.ToLower()}_";
 					if (property.PropertyType == typeof(bool))
 					{
-						gmcm.RegisterSimpleOption(
-							ModManifest,
-							optionName: i18n.Get(i18nKey + "name"),
-							optionDesc: i18n.Get(i18nKey + "description"),
-							optionGet: () => (bool)property.GetValue(ModEntry.Config),
-							optionSet: (bool value) =>
+						gmcm.AddBoolOption(
+							mod: ModManifest,
+							name: () => i18n.Get(i18nKey + "name"),
+							tooltip: () => i18n.Get(i18nKey + "description"),
+							getValue: () => (bool)property.GetValue(ModEntry.Config),
+							setValue: (bool value) =>
 							{
 								Log.D($"Config edit: {property.Name} - {property.GetValue(ModEntry.Config)} => {value}",
 									ModEntry.Config.DebugMode);
@@ -314,22 +318,21 @@ namespace LoveOfCooking.Interface
 					}
 					else if (property.Name == "DefaultSearchFilter")
 					{
-						gmcm.RegisterChoiceOption(
-							ModManifest,
-							optionName: i18n.Get(i18nKey + "name"),
-							optionDesc: i18n.Get(i18nKey + "description"),
-							optionGet: () => (string)property.GetValue(ModEntry.Config),
-							optionSet: (string value) => property.SetValue(ModEntry.Config, value),
-							choices: Enum.GetNames(typeof(Objects.CookingMenu.Filter)));
+						gmcm.AddTextOption(
+							mod: ModManifest,
+							name: () => i18n.Get(i18nKey + "name"),
+							tooltip: () => i18n.Get(i18nKey + "description"),
+							getValue: () => (string)property.GetValue(ModEntry.Config),
+							setValue: (string value) => property.SetValue(ModEntry.Config, value),
+							allowedValues: Enum.GetNames(typeof(Objects.CookingMenu.Filter)));
 					}
 				}
 				else
 				{
 					string i18nKey = $"config.{entry}_";
-					gmcm.RegisterLabel(
-						ModManifest,
-						labelName: i18n.Get(i18nKey + "label"),
-						labelDesc: null);
+					gmcm.AddSectionTitle(
+						mod: ModManifest,
+						text: () => i18n.Get(i18nKey + "label"));
 				}
 			}
 			return true;
