@@ -409,7 +409,7 @@ namespace LoveOfCooking
 					keg.heldObject.Value = preserve(name: name, index: Interface.Interfaces.JsonAssets.GetObjectId(name));
 					if (!probe)
 					{
-						keg.MinutesUntilReady = 180;
+						keg.MinutesUntilReady = int.Parse(ModEntry.ItemDefinitions["NettlesKegDuration"][0]);
 						Game1.currentLocation.playSound("Ship");
 						bubbles(color: Color.Lime * 0.75f);
 					}
@@ -423,7 +423,7 @@ namespace LoveOfCooking
 				keg.heldObject.Value = preserve(name: name, index: Interface.Interfaces.JsonAssets.GetObjectId(name));
 				if (!probe)
 				{
-					keg.MinutesUntilReady = 1900;
+					keg.MinutesUntilReady = int.Parse(ModEntry.ItemDefinitions["CiderKegDuration"][0]);
 					Game1.currentLocation.playSound("Ship");
 					bubbles(color: Color.White * 0.75f);
 				}
