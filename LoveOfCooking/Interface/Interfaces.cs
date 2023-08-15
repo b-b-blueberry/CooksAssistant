@@ -31,7 +31,6 @@ namespace LoveOfCooking.Interface
 		internal static bool UsingManaBar;
 		internal static bool UsingLevelExtender;
 		internal static bool UsingBigBackpack;
-		internal static bool UsingProducerFramework;
 		internal static bool UsingFarmhouseKitchenStart;
 
 
@@ -78,7 +77,6 @@ namespace LoveOfCooking.Interface
 					LoadCustomCommunityCentreContent();
 					IsLoaded = LoadSpaceCoreAPI()
 						&& LoadJsonAssetsObjects()
-						&& LoadProducerFrameworkRules()
 						&& LoadModConfigMenuElements()
 						&& LoadLevelExtenderApi();
 				}
@@ -105,7 +103,6 @@ namespace LoveOfCooking.Interface
 			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-			UsingProducerFramework = Helper.ModRegistry.IsLoaded("Digus.ProducerFrameworkMod");
 			UsingFarmhouseKitchenStart = new string[]
 			{
 				"Allayna.Kitchen",
@@ -218,27 +215,6 @@ namespace LoveOfCooking.Interface
 					Log.W("Loading Nettles Pack.");
 				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NettlesPackPath));
 			}
-			return true;
-		}
-
-		private static bool LoadProducerFrameworkRules()
-		{
-			if (!ModEntry.PFMEnabled)
-				return true;
-
-			IProducerFrameworkAPI producerFramework = Helper.ModRegistry
-				.GetApi<IProducerFrameworkAPI>
-				("DIGUS.ProducerFrameworkMod");
-			if (producerFramework is null)
-			{
-				Log.E("Can't access the Producer Framework API. Is the mod installed correctly?");
-				return false;
-			}
-
-			if (ModEntry.Config.DebugMode)
-				Log.W("Loading Producer Framework Pack.");
-
-			producerFramework.AddContentPack(directory: Path.Combine(Helper.DirectoryPath, AssetManager.ProducerFrameworkPackPath));
 			return true;
 		}
 

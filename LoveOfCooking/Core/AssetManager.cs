@@ -71,7 +71,6 @@ namespace LoveOfCooking
 		public static string NewRecipesPackPath { get; private set; } = "NewRecipesPack";
 		public static string NewCropsPackPath { get; private set; } = "NewCropsPack";
 		public static string NettlesPackPath { get; private set; } = "NettlesPack";
-		public static string ProducerFrameworkPackPath { get; private set; } = "[PFM] ProducerFrameworkPack";
 		public static string CommunityCentreContentPackPath { get; private set; } = "[CCC] KitchenContentPack";
 
 		// Assets to edit: asset keys passed to Edit()

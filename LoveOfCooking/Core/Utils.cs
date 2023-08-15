@@ -233,12 +233,12 @@ namespace LoveOfCooking
 
 		public static bool AreNewCropsActive()
         {
-			return ModEntry.Config.AddNewCropsAndStuff && !Interface.Interfaces.UsingPPJACrops;
+			return ModEntry.Config.AddNewCropsAndStuff && Interface.Interfaces.JsonAssets is not null && !Interface.Interfaces.UsingPPJACrops;
         }
 
 		public static bool AreNettlesActive()
 		{
-			return !Interface.Interfaces.UsingNettlesCrops;
+			return Interface.Interfaces.JsonAssets is not null && !Interface.Interfaces.UsingNettlesCrops;
 		}
 
 		public static void TrySpawnNettles()
@@ -339,6 +339,98 @@ namespace LoveOfCooking
 					existingBuff.millisecondsDuration = 6000;
 				}
 			}
+		}
+
+		/// <summary>
+		/// Attempts to set held object values on a given keg, playing effects and activating keg on interaction.
+		/// </summary>
+		/// <param name="keg">Object on location, used as target of drop-in object.</param>
+		/// <param name="dropIn">Object on farmer.</param>
+		/// <param name="probe">Whether farmer is observing keg, rather than interacting.</param>
+		/// <param name="who">Farmer observing or interacting-with keg.</param>
+		/// <returns>Whether any custom behaviours were applied to the given keg, if not probe.</returns>
+		public static bool TryKegDropInAction(StardewValley.Object keg, StardewValley.Object dropIn, bool probe, StardewValley.Farmer who)
+		{
+			StardewValley.Object preserve(string name, int index)
+			{
+				return new StardewValley.Object(
+					tileLocation: Vector2.Zero,
+					parentSheetIndex: index,
+					Givenname: name,
+					canBeSetDown: false,
+					canBeGrabbed: true,
+					isHoedirt: false,
+					isSpawnedObject: false);
+			}
+			void bubbles(Color color)
+			{
+				Game1.currentLocation.playSound("bubbles");
+				Multiplayer multiplayer = ModEntry.Instance.Helper.Reflection.GetField<Multiplayer>(typeof(Game1), "multiplayer").GetValue();
+				multiplayer.broadcastSprites(
+					location: who.currentLocation,
+					sprites: new TemporaryAnimatedSprite(
+						textureName: "TileSheets\\animations",
+						sourceRect: new Rectangle(x: 256, y: 1856, width: 64, height: 128),
+						animationInterval: 80f,
+						animationLength: 6,
+						numberOfLoops: 999999,
+						position: ((keg.TileLocation + new Vector2(x: 0, y: -2)) * Game1.tileSize),
+						flicker: false,
+						flipped: false,
+						layerDepth: ((keg.TileLocation.Y + 1f) * Game1.tileSize / 10000f) + (1 / 10000f),
+						alphaFade: 0f,
+						color: color,
+						scale: 1f,
+						scaleChange: 0f,
+						rotation: 0f,
+						rotationChange: 0f)
+					{
+						alphaFade = 0.005f
+					});
+			}
+
+			if (Utils.AreNettlesActive()
+				&& dropIn.Category == StardewValley.Object.GreensCategory
+				&& dropIn.Name.EndsWith("nettles", StringComparison.InvariantCultureIgnoreCase))
+			{
+				if (ModEntry.CookingSkillApi.IsEnabled()
+					&& ModEntry.CookingSkillApi.GetLevel() < int.Parse(ModEntry.ItemDefinitions["NettlesUsableLevel"][0]))
+				{
+					if (!probe)
+					{
+						// Ignore Nettles used on Kegs to make Nettle Tea when Cooking skill level is too low
+						Game1.playSound("cancel");
+					}
+				}
+				else
+				{
+					// Nettle Tea
+					string name = ModEntry.Instance.NettleTeaName;
+					keg.heldObject.Value = preserve(name: name, index: Interface.Interfaces.JsonAssets.GetObjectId(name));
+					if (!probe)
+					{
+						keg.MinutesUntilReady = int.Parse(ModEntry.ItemDefinitions["NettlesKegDuration"][0]);
+						Game1.currentLocation.playSound("Ship");
+						bubbles(color: Color.Lime * 0.75f);
+					}
+					return true;
+				}
+			}
+			else if (dropIn.Name.EndsWith("Apple", StringComparison.InvariantCulture))
+			{
+				// Cider
+				var name = ModEntry.ObjectPrefix + "cider";
+				keg.heldObject.Value = preserve(name: name, index: Interface.Interfaces.JsonAssets.GetObjectId(name));
+				if (!probe)
+				{
+					keg.MinutesUntilReady = int.Parse(ModEntry.ItemDefinitions["CiderKegDuration"][0]);
+					Game1.currentLocation.playSound("Ship");
+					bubbles(color: Color.White * 0.75f);
+				}
+				return true;
+			}
+
+			return false;
 		}
 
 		/// <summary>
