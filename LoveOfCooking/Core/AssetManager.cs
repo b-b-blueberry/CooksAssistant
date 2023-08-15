@@ -202,6 +202,10 @@ namespace LoveOfCooking
 			{
 				AssetManager.EditContextTags(asset: asset);
 			}
+			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/mail"))
+			{
+				AssetManager.EditMail(asset: asset);
+			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/ObjectInformation"))
 			{
 				AssetManager.EditObjects(asset: asset);
@@ -494,6 +498,16 @@ namespace LoveOfCooking
 			{
 				data[ModEntry.ObjectPrefix + entry.Key] = entry.Value;
 			}
+			asset.AsDictionary<string, string>().ReplaceWith(data);
+		}
+
+		private static void EditMail(IAssetData asset)
+		{
+			var data = asset.AsDictionary<string, string>().Data;
+
+			// Send Mom's Cookbook in the mail to allow cooking
+			data.Add(ModEntry.MailCookbookUnlocked, i18n.Get("mail.cookbook_unlocked"));
+
 			asset.AsDictionary<string, string>().ReplaceWith(data);
 		}
 

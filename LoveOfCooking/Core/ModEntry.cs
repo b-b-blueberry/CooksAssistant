@@ -165,9 +165,6 @@ namespace LoveOfCooking
 				return false;
 			}
 
-			// Asset editors
-			this.Helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
-
 			// Game events
 			this.RegisterEvents();
 
@@ -176,6 +173,7 @@ namespace LoveOfCooking
 
 		private void RegisterEvents()
 		{
+			this.Helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
 			this.Helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
 			this.Helper.Events.GameLoop.Saving += this.GameLoop_Saving;
 			this.Helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
