@@ -533,8 +533,7 @@ namespace LoveOfCooking
 						{206, new[] {null, null, "45"}}, // Pizza
 						{220, new[] {null, null, "60"}}, // Chocolate Cake
 						{221, new[] {null, null, "75"}}, // Pink Cake
-						{419, new[] {null, "220", "-300", "Basic -26"}}, // Vinegar
-						{247, new[] {null, null, "-300", "Basic -26", null, i18n.Get("item.oil.description")}}, // Oil
+						{247, new[] {null, null, "-300", null, null, i18n.Get("item.oil.description")}}, // Oil
 						{432, new[] {null, null, "-300", null, null, i18n.Get("item.truffleoil.description")}}, // Truffle Oil
 						{917, new[] {null, null, null, null, null, data[917].Split('/')[5].Split('.')[0] + '.'}}, // Qi Seasoning
 						//{Interface.Interfaces.JsonAssets.GetObjectId(ObjectPrefix + "sugarcane"), new[] {null, null, null, "Basic"}},
