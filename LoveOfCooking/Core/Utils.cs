@@ -233,12 +233,12 @@ namespace LoveOfCooking
 
 		public static bool AreNewCropsActive()
         {
-			return ModEntry.Config.AddNewCropsAndStuff && !Interface.Interfaces.UsingPPJACrops;
+			return ModEntry.Config.AddNewCropsAndStuff && Interface.Interfaces.JsonAssets is not null && !Interface.Interfaces.UsingPPJACrops;
         }
 
 		public static bool AreNettlesActive()
 		{
-			return !Interface.Interfaces.UsingNettlesCrops;
+			return Interface.Interfaces.JsonAssets is not null && !Interface.Interfaces.UsingNettlesCrops;
 		}
 
 		public static void TrySpawnNettles()
