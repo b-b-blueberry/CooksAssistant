@@ -80,26 +80,6 @@ namespace LoveOfCooking.Objects
 		}
 
 		/// <summary>
-		/// Calculates the chance to 'burn' an object when cooking its recipe,
-		/// reducing the expected outcome stack, and awarding the player a less-useful consolation object.
-		/// </summary>
-		public static float GetBurnChance(CraftingRecipe recipe)
-		{
-			float minimumChance = 0f;
-			if (!ModEntry.Config.FoodCanBurn || Interface.Interfaces.JsonAssets is null)
-				return minimumChance;
-
-			int cookingLevel = ModEntry.CookingSkillApi.GetLevel();
-			float baseRate = float.Parse(ModEntry.ItemDefinitions["BurnChanceBase"][0]);
-			float addedRate = float.Parse(ModEntry.ItemDefinitions["BurnChancePerIngredient"][0]);
-			float chance = Math.Max(minimumChance, (baseRate + (addedRate * recipe.getNumberOfIngredients()))
-				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
-				- (Objects.CookingTool.GetEffectiveGlobalToolUpgradeLevel() / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
-
-			return chance;
-		}
-
-		/// <summary>
 		/// Checks whether an item can be used in cooking recipes.
 		/// Doesn't check for edibility; oil, vinegar, jam, honey, wood, etc are inedible yet used in some recipes.
 		/// </summary>
@@ -420,21 +400,6 @@ namespace LoveOfCooking.Objects
 				}
 			}
 
-			// Apply burn chance to destroy cooked food at random
-			int burntCount = 0;
-			List<int> qualities = qualityStacks.Keys.ToList();
-			foreach (int quality in qualities)
-			{
-				for (int i = qualityStacks[quality] - 1; i >= 0; i -= numPerCraft)
-				{
-					if (CookingManager.GetBurnChance(recipe) > Game1.random.NextDouble())
-					{
-						qualityStacks[quality] -= numPerCraft;
-						++burntCount;
-					}
-				}
-			}
-
 			// Create item list from quality stacks
 			List<StardewValley.Object> itemsCooked = new List<StardewValley.Object>();
 			foreach (KeyValuePair<int, int> pair in qualityStacks.Where(pair => pair.Value > 0))
@@ -445,15 +410,14 @@ namespace LoveOfCooking.Objects
 				itemsCooked.Add(item);
 			}
 
-			CookingMenu.LastBurntCount = burntCount;
 			return itemsCooked;
 		}
 
-		internal int CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity)
+		internal void CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity)
 		{
 			// Craft items to be cooked from recipe
 			List<StardewValley.Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity);
-			int quantityCooked = Math.Max(0, (itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft) - CookingMenu.LastBurntCount);
+			int quantityCooked = Math.Max(0, (itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft));
 			Item item = recipe.createItem();
 
 			// Track experience for items cooked
@@ -484,17 +448,6 @@ namespace LoveOfCooking.Objects
 			{
 				Utils.AddOrDropItem(cookedItem);
 			}
-
-			// Add burnt items
-			if (CookingMenu.LastBurntCount > 0)
-			{
-				Item burntItem = new StardewValley.Object(
-					Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"),
-					CookingMenu.LastBurntCount);
-				Utils.AddOrDropItem(burntItem);
-			}
-
-			return CookingMenu.LastBurntCount;
 		}
 
 		internal bool AddToIngredients(int whichInventory, int whichItem, int itemId)

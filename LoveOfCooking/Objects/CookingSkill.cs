@@ -147,14 +147,6 @@ namespace LoveOfCooking.Objects
 		public override List<string> GetExtraLevelUpInfo(int level)
 		{
 			var list = new List<string>();
-			if (ModEntry.Config.FoodCanBurn)
-			{
-				list.Add(i18n.Get("menu.cooking_skill.levelup_burn", new
-					{
-						Number = $"{(level * BurnChanceModifier * BurnChanceReduction):0.00}"
-					}));
-			}
-
 			Translation extra = i18n.Get($"menu.cooking_skill.levelupbonus.{level}");
 			if (extra.HasValue() && (level != CraftNettleTeaLevel || Utils.AreNettlesActive()))
 			{
@@ -166,19 +158,7 @@ namespace LoveOfCooking.Objects
 
 		public override string GetSkillPageHoverText(int level)
 		{
-			string hoverText = string.Empty;
-
-			if (ModEntry.Config.FoodCanBurn)
-			{
-				hoverText += Environment.NewLine + i18n.Get(
-					key: "menu.cooking_skill.levelup_burn",
-					tokens: new
-					{
-						Number = $"{(level * BurnChanceModifier * BurnChanceReduction):0.00}"
-					});
-			}
-
-			return hoverText;
+			return string.Empty;
 		}
 	}
 }

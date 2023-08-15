@@ -1128,7 +1128,6 @@ namespace LoveOfCooking
 					  + $"{Environment.NewLine}Cooking Animation:  {Config.PlayCookingAnimation}"
 					  + $"{Environment.NewLine}Healing Takes Time: {Config.FoodHealingTakesTime}"
 					  + $"{Environment.NewLine}Hide Food Buffs:    {Config.HideFoodBuffsUntilEaten}"
-					  + $"{Environment.NewLine}Food Can Burn:      {Config.FoodCanBurn}"
 					  + $"{Environment.NewLine}-------------"
 					  + $"{Environment.NewLine}ShowFoodRegenBar:         {Config.ShowFoodRegenBar}"
 					  + $"{Environment.NewLine}RememberLastSearchFilter: {Config.RememberLastSearchFilter}"

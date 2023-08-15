@@ -242,7 +242,6 @@ namespace LoveOfCooking.Objects
 		private bool _showCookingConfirmPopup;
 		private int _mouseHeldTicks;
 		private string _locale;
-		internal static int LastBurntCount;
 		private readonly IReflectedField<Dictionary<int, double>> _iconShakeTimerField;
 		internal static readonly int SpriteId = (int)Game1.player.UniqueMultiplayerID + 5050505;
 
@@ -1096,7 +1095,7 @@ namespace LoveOfCooking.Objects
 			}
 		}
 
-		internal static List<FarmerSprite.AnimationFrame> AnimateForRecipe(CraftingRecipe recipe, int quantity, int burntCount, bool containsFish)
+		internal static List<FarmerSprite.AnimationFrame> AnimateForRecipe(CraftingRecipe recipe, int quantity, bool containsFish)
 		{
 			// TODO: FIX: Why doesn't HUD draw while animating
 			Game1.freezeControls = true;
@@ -1289,34 +1288,6 @@ namespace LoveOfCooking.Objects
 
 				// Compile frames
 				frames = frames.Concat(newFrames).ToList();
-			}
-
-			// Burn the whole entire house down
-			// TODO: FIX: How do i do this
-			burntCount = 0;
-			if (burntCount > 0)
-			{
-				int frameCount = 4, loopCount = 8;
-				spritePosition = new Vector2(Game1.player.Position.X, Game1.player.Position.Y - 40 * spriteScale);
-				sprite = new TemporaryAnimatedSprite(
-					textureName: Game1.animationsName,
-					//sourceRect: new Rectangle(0, 1856, 64, 64), // Smoke
-					sourceRect: new Rectangle(0, 1916, 64, 64), // Fire
-					animationInterval: ms, animationLength: frameCount, numberOfLoops: loopCount,
-					position: spritePosition,
-					flicker: false, flipped: false);
-
-				frames[frames.Count - 1] = new FarmerSprite.AnimationFrame(
-					frames[frames.Count - 1].frame, frames[frames.Count - 1].milliseconds + (ms * frameCount * loopCount))
-				{
-					frameEndBehavior = delegate
-					{
-						Game1.player.FacingDirection = 2;
-						Game1.player.jitterStrength = 0.2f;
-						Game1.player.jump();
-						multiplayer.broadcastSprites(Game1.currentLocation, sprite);
-					}
-				};
 			}
 
 			// Avoid animation problems?
@@ -1909,13 +1880,14 @@ namespace LoveOfCooking.Objects
 			if (craftableCount < 1)
 				return false;
 
-			int burntCount = _cookingManager.CookRecipe(recipe: recipe, sourceItems: _allInventories, quantity: craftableCount);
 			if (Config.PlayCookingAnimation)
 			{
 				if (Game1.activeClickableMenu is CookingMenu cookingMenu)
 				{
 					Game1.displayHUD = true;
-					CookingMenu.AnimateForRecipe(recipe: recipe, quantity: quantity, burntCount: burntCount,
+					CookingMenu.AnimateForRecipe(
+						recipe: recipe,
+						quantity: quantity,
 						containsFish: recipe.recipeList.Any(pair => new StardewValley.Object(pair.Key, 0).Category == -4));
 					cookingMenu.PopMenuStack(playSound: false, tryToQuit: true);
 				}
