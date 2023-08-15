@@ -25,6 +25,7 @@ namespace LoveOfCooking.Interface
 		// Loaded mods
 		internal static bool UsingSVE;
 		internal static bool UsingPPJACrops;
+		internal static bool UsingPPJATreesAndRecipes;
 		internal static bool UsingCustomCC;
 		internal static bool UsingNettlesCrops;
 		internal static bool UsingManaBar;
@@ -99,6 +100,7 @@ namespace LoveOfCooking.Interface
 
 			UsingSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
 			UsingPPJACrops = Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
+			UsingPPJATreesAndRecipes = Helper.ModRegistry.IsLoaded("paradigmnomad.morefood");
 			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");

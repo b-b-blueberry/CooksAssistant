@@ -71,7 +71,7 @@ namespace LoveOfCooking
 			Luck
 		}
 		// safe item names
-		internal string ChocolateName { get { return Interface.Interfaces.UsingPPJACrops ? "Chocolate" : $"{ObjectPrefix}chocolate"; } }
+		internal string ChocolateName { get { return Interface.Interfaces.UsingPPJATreesAndRecipes ? "Chocolate" : $"{ObjectPrefix}chocolate"; } }
 		internal string CabbageName { get { return Interface.Interfaces.UsingPPJACrops ? "Cabbage" : $"{ObjectPrefix}cabbage"; } }
 		internal string OnionName { get { return Interface.Interfaces.UsingPPJACrops ? "Onion" : $"{ObjectPrefix}onion"; } }
 		internal string CarrotName { get { return Interface.Interfaces.UsingPPJACrops ? "Carrot" : $"{ObjectPrefix}carrot"; } }
