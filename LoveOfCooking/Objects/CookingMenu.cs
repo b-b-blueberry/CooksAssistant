@@ -3225,11 +3225,11 @@ namespace LoveOfCooking.Objects
 			this.DrawHorizontalDivider(b, 0, textPosition.Y, _lineWidth, isLeftSide);
 			textPosition.Y += TextDividerGap;
 			text = i18n.Get("menu.cooking_recipe.ingredients_label");
-			this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, isLeftSide, false, SubtextColour);
+			this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, isLeftSide, false, SubtextColour);
 			if (Game1.options.showAdvancedCraftingInformation)
 			{
 				this.DrawText(b, $"({_recipeCraftableCount})", 1f, _cookbookLeftRect.Width - MarginLeft - MarginRight, textPosition.Y,
-					null, isLeftSide, true, SubtextColour);
+                    textWidth, isLeftSide, true, SubtextColour);
 			}
 			textPosition.Y += Game1.smallFont.MeasureString(
 			Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale;
@@ -3319,7 +3319,7 @@ namespace LoveOfCooking.Objects
 						layerDepth: 0.87f,
 						c: Color.AntiqueWhite);
 					// Ingredient name
-					this.DrawText(b, ingredientNameText, 1f, (12 * Scale), textPosition.Y, null, isLeftSide, false, drawColour);
+					this.DrawText(b, ingredientNameText, 1f, (12 * Scale), textPosition.Y, textWidth, isLeftSide, false, drawColour);
 
 					// Ingredient stock
 					if (Game1.options.showAdvancedCraftingInformation)
@@ -3475,7 +3475,7 @@ namespace LoveOfCooking.Objects
 
 			this.DrawHorizontalDivider(b, 0, textPosition.Y, _lineWidth, false);
 			textPosition.Y += TextDividerGap;
-			this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, false, false, SubtextColour);
+			this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, false, SubtextColour);
 			textPosition.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale;
 			this.DrawHorizontalDivider(b, 0, textPosition.Y, _lineWidth, false);
 			textPosition.Y += ((6 * Scale) / 2);
@@ -3585,7 +3585,7 @@ namespace LoveOfCooking.Objects
 						sourceRect: new Rectangle(0, 428, 10, 10),
 						color: Color.White, rotation: 0f, origin: Vector2.Zero, scale: SmallScale);
 				textPosition.X += xOffset;
-				this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, false, false, Game1.textColor);
+				this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, false, Game1.textColor);
 				textPosition.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * yScale;
 				// Health
 				text = Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3118",
@@ -3605,7 +3605,7 @@ namespace LoveOfCooking.Objects
 						sourceRect: new Rectangle(0, 428 + 10, 10, 10),
 						color: Color.White, rotation: 0f, origin: Vector2.Zero, scale: SmallScale);
 				textPosition.X += xOffset;
-				this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, false, false, Game1.textColor);
+				this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, false, Game1.textColor);
 
 				// Buff duration
 				text = $"+{(_recipeBuffDuration / 60)}:{(_recipeBuffDuration % 60):00}";
@@ -3628,7 +3628,7 @@ namespace LoveOfCooking.Objects
 							sourceRect: new Rectangle(434, 475, 9, 9),
 							color: Color.White, rotation: 0f, origin: Vector2.Zero, scale: SmallScale);
 					textPosition.X += xOffset;
-					this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, false, false, Game1.textColor);
+					this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, false, Game1.textColor);
 					textPosition.Y -= Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * 1.1f * yScale;
 				}
 
@@ -3663,7 +3663,7 @@ namespace LoveOfCooking.Objects
 						text = (_recipeBuffs[i] > 0 ? "+" : "")
 							   + _recipeBuffs[i]
 							   + " " + i18n.Get($"menu.cooking_recipe.buff.{i}");
-						this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, null, false, false, Game1.textColor);
+						this.DrawText(b, text, 1f, textPosition.X, textPosition.Y, textWidth, false, false, Game1.textColor);
 						textPosition.Y += Game1.smallFont.MeasureString(Game1.parseText(text: text, whichFont: Game1.smallFont, width: textWidth)).Y * yScale;
 						textPosition.X -= xOffset;
 					}
