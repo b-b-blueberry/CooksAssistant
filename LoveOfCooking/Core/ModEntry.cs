@@ -8,7 +8,6 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Locations;
 using StardewValley.Menus;
-using StardewValley.TerrainFeatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -75,8 +74,6 @@ namespace LoveOfCooking
 		internal string CabbageName { get { return Interface.Interfaces.UsingPPJACrops ? "Cabbage" : $"{ObjectPrefix}cabbage"; } }
 		internal string OnionName { get { return Interface.Interfaces.UsingPPJACrops ? "Onion" : $"{ObjectPrefix}onion"; } }
 		internal string CarrotName { get { return Interface.Interfaces.UsingPPJACrops ? "Carrot" : $"{ObjectPrefix}carrot"; } }
-		internal string NettleName { get { return Interface.Interfaces.UsingNettlesCrops ? "Nettles" : $"{ObjectPrefix}nettles"; } }
-		internal string NettleTeaName { get { return Interface.Interfaces.UsingNettlesCrops ? "Nettle Tea" : $"{ObjectPrefix}nettletea"; } }
 		// cook at kitchens
 		internal static Dictionary<string, string> NpcHomeLocations = null;
 		internal static readonly List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
@@ -90,9 +87,6 @@ namespace LoveOfCooking
 		private const int KebabMalusDuration = 140;
 		private const int KebabCombatBonus = 3;
 		private const int KebabNonCombatBonus = 2;
-		// bushes
-		internal const string BushNameNettle = "Nettle";
-		internal const string BushNameRedberry = "Redberry";
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
@@ -177,7 +171,6 @@ namespace LoveOfCooking
 			this.Helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
 			this.Helper.Events.GameLoop.Saving += this.GameLoop_Saving;
 			this.Helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
-			this.Helper.Events.GameLoop.DayEnding += this.GameLoop_DayEnding;
 			this.Helper.Events.GameLoop.ReturnedToTitle += this.GameLoop_ReturnedToTitle;
 			this.Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
 			this.Helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
@@ -188,9 +181,6 @@ namespace LoveOfCooking
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
 			SpaceEvents.BeforeGiftGiven += this.SpaceEvents_BeforeGiftGiven;
 			SpaceEvents.AddWalletItems += this.SpaceEvents_AddWalletItems;
-
-			Events.BushShaken += this.Events_BushShaken;
-			Events.BushToolUsed += this.Events_BushToolUsed;
 		}
 
 		private void AddConsoleCommands()
@@ -345,13 +335,6 @@ namespace LoveOfCooking
 					} 
 				});
 			this.Helper.ConsoleCommands.Add(
-				name: cmd + "spawn_nettles",
-				documentation: "Add nettle bushes to the world. Spawn limit is ignored.",
-				callback: (s, args) =>
-				{
-					Utils.SpawnNettles(force: true);
-				});
-			this.Helper.ConsoleCommands.Add(
 				name: cmd + "unstuck_me",
 				documentation: "Unlocks player movement if stuck in animations.",
 				callback: (s, args) =>
@@ -409,30 +392,6 @@ namespace LoveOfCooking
 					this.PrintModData();
 					this.PrintCookingSkill();
 				});
-			this.Helper.ConsoleCommands.Add(
-				name: cmd + "bush",
-				documentation: "Add a bush or seed.",
-				callback: (s, args) =>
-				{
-					if (args.Length < 1)
-						return;
-
-					switch (args[0])
-					{
-						case "b":
-							Game1.currentLocation.largeTerrainFeatures.Add(
-								new Bush(Game1.GetPlacementGrabTile(), 1, Game1.currentLocation));
-							return;
-						case "n":
-							Game1.currentLocation.largeTerrainFeatures.Add(
-								new CustomBush(Game1.GetPlacementGrabTile(), Game1.currentLocation, BushNameNettle));
-							return;
-						case "r":
-							Game1.currentLocation.largeTerrainFeatures.Add(
-								new CustomBush(Game1.GetPlacementGrabTile(), Game1.currentLocation, BushNameRedberry));
-							return;
-					}
-				});
 		}
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
@@ -470,13 +429,6 @@ namespace LoveOfCooking
 			// Food Heals Over Time
 			States.Value.Regeneration.UpdateDefinitions();
 
-			// Perform behaviours for adding CustomBush instances to the world
-			if (Utils.AreNettlesActive())
-			{
-				Utils.TrySpawnNettles();
-				CustomBush.FindBushesGlobally(variety: BushNameNettle, remove: false);
-			}
-
 			// Add the cookbook for the player once they've reached the unlock date
 			// Internally day and month are zero-indexed, but are one-indexed in data file for consistency with year
 			// Alternatively if the player somehow upgrades their house early, add the cookbook mail
@@ -494,17 +446,6 @@ namespace LoveOfCooking
 				{
 					Game1.addMail(MailCookbookUnlocked);
 				}
-			}
-		}
-
-		private void GameLoop_DayEnding(object sender, DayEndingEventArgs e)
-		{
-			// Clear existing nettles at the start of each season
-			if (Utils.AreNettlesActive()
-				&& (Game1.dayOfMonth == 28
-					|| Helper.ModRegistry.IsLoaded("Entoarox.EntoaroxFramework")))
-			{
-				CustomBush.FindBushesGlobally(variety: $"{ModManifest.UniqueID}.Nettles", remove: true);
 			}
 		}
 
@@ -999,16 +940,6 @@ namespace LoveOfCooking
 			}
 		}
 
-		private void Events_BushToolUsed(object sender, EventArgs e)
-		{
-			
-		}
-
-		private void Events_BushShaken(object sender, EventArgs e)
-		{
-			Utils.ShakeNettles(bush: ((BushShakenEventArgs)e).Bush);
-		}
-
 		private void SaveLoadedBehaviours()
 		{
 			try
@@ -1108,7 +1039,6 @@ namespace LoveOfCooking
 			ModEntry.SpriteSheet = Game1.content.Load
 				<Texture2D>
 				(AssetManager.GameContentSpriteSheetPath);
-			CustomBush.Reload();
 
 			// Invalidate other known assets that we edit using our own
 			this.Helper.GameContent.InvalidateCacheAndLocalized(@"LooseSprites/Cursors");

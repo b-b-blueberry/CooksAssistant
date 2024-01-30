@@ -14,7 +14,6 @@ namespace LoveOfCooking.Objects
 		public static readonly string InternalName = ModEntry.AssetPrefix + "CookingSkill"; // DO NOT EDIT
 
 		public static int MaxFoodStackPerDayForExperienceGains;
-		public static int CraftNettleTeaLevel;
 
 		public static int GiftBoostValue;
 		public static float SalePriceModifier;
@@ -156,7 +155,7 @@ namespace LoveOfCooking.Objects
 			}
 
 			Translation extra = i18n.Get($"menu.cooking_skill.levelupbonus.{level}");
-			if (extra.HasValue() && (level != CraftNettleTeaLevel || Utils.AreNettlesActive()))
+			if (extra.HasValue())
 			{
 				list.Add(extra);
 			}

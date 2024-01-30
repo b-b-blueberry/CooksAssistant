@@ -20,25 +20,6 @@
 	"AutoConsumeOilAndSeasoning": [
 		"false"
 	],
-	"NettlesLocations": [
-		"Farm",
-		"Forest",
-		"Mountain",
-		"Railroad"
-	],
-	"NettlesAddedRange": [
-		"1",
-		"3"
-	],
-	"NettlesDailyChancePerLocation": [
-		"0.15"
-	],
-	"NettlesUsableLevel": [
-		"2"
-	],
-	"NettlesDamage": [
-		"5"
-	],
 	"ShopDiscounts": [
 		"Saloon:35"
 	],

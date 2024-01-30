@@ -44,8 +44,6 @@ namespace LoveOfCooking
 		private static readonly List<string> _gameContentAssetPaths = new List<string>();
 		public static readonly string RootGameContentPath = PathUtilities.NormalizeAssetName("Mods/blueberry.LoveOfCooking.Assets");
 		public static string GameContentSpriteSheetPath { get; private set; } = "Sprites";
-		public static string GameContentBushDataPath { get; private set; } = "BushDefinitions";
-		public static string GameContentBushSpriteSheetPath { get; private set; } = "BushSprites";
 		public static string GameContentIngredientBuffDataPath { get; private set; } = "IngredientBuffChart";
 		public static string GameContentDefinitionsPath { get; private set; } = "ItemDefinitions";
 		public static string GameContentSkillValuesPath { get; private set; } = "CookingSkillValues";
@@ -56,8 +54,6 @@ namespace LoveOfCooking
 		// These are the paths for our default data files bundled with the mod in our assets folder.
 		public static readonly string RootLocalContentPath = "assets";
 		public static string LocalSpriteSheetPath { get; private set; } = "sprites";
-		public static string LocalBushDataPath { get; private set; } = "bushDefinitions";
-		public static string LocalBushSpriteSheetPath { get; private set; } = "bushSprites";
 		public static string LocalIngredientBuffDataPath { get; private set; } = "ingredientBuffChart";
 		public static string LocalDefinitionsPath { get; private set; } = "itemDefinitions";
 		public static string LocalSkillValuesPath { get; private set; } = "cookingSkillValues";
@@ -70,7 +66,6 @@ namespace LoveOfCooking
 		public static string BasicObjectsPackPath { get; private set; } = "BasicObjectsPack";
 		public static string NewRecipesPackPath { get; private set; } = "NewRecipesPack";
 		public static string NewCropsPackPath { get; private set; } = "NewCropsPack";
-		public static string NettlesPackPath { get; private set; } = "NettlesPack";
 		public static string CommunityCentreContentPackPath { get; private set; } = "[CCC] KitchenContentPack";
 
 		// Assets to edit: asset keys passed to Edit()
@@ -146,12 +141,6 @@ namespace LoveOfCooking
 			{
 				e.LoadFromModFile<Dictionary<string, string>>(
 					relativePath: $"{AssetManager.LocalIngredientBuffDataPath}.json",
-					priority: AssetLoadPriority.Exclusive);
-			}
-			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentBushSpriteSheetPath))
-			{
-				e.LoadFromModFile<Texture2D>(
-					relativePath: $"{AssetManager.LocalBushSpriteSheetPath}.png",
 					priority: AssetLoadPriority.Exclusive);
 			}
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentDefinitionsPath))

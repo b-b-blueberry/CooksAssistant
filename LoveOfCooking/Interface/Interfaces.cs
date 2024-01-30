@@ -27,7 +27,6 @@ namespace LoveOfCooking.Interface
 		internal static bool UsingPPJACrops;
 		internal static bool UsingPPJATreesAndRecipes;
 		internal static bool UsingCustomCC;
-		internal static bool UsingNettlesCrops;
 		internal static bool UsingManaBar;
 		internal static bool UsingLevelExtender;
 		internal static bool UsingBigBackpack;
@@ -100,7 +99,6 @@ namespace LoveOfCooking.Interface
 			UsingPPJACrops = Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
 			UsingPPJATreesAndRecipes = Helper.ModRegistry.IsLoaded("paradigmnomad.morefood");
 			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
-			UsingNettlesCrops = Helper.ModRegistry.IsLoaded("uberkwefty.wintercrops");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
 			UsingFarmhouseKitchenStart = new string[]
@@ -146,7 +144,6 @@ namespace LoveOfCooking.Interface
 			}
 
 			spaceCore.RegisterSerializerType(type: typeof(Objects.CookingTool));
-			spaceCore.RegisterSerializerType(type: typeof(CustomBush));
 
 			return true;
 		}
@@ -199,21 +196,6 @@ namespace LoveOfCooking.Interface
 				if (ModEntry.Config.DebugMode)
 					Log.W("Loading New Crops Pack.");
 				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NewCropsPackPath));
-			}
-
-			if (UsingNettlesCrops)
-			{
-				Log.I("Did not add nettles: Other mods already add these items.");
-			}
-			else if (!Utils.AreNettlesActive())
-			{
-				Log.I("Did not add nettles: Currently disabled in code.");
-			}
-			else
-			{
-				if (ModEntry.Config.DebugMode)
-					Log.W("Loading Nettles Pack.");
-				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NettlesPackPath));
 			}
 			return true;
 		}

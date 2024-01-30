@@ -17,14 +17,6 @@ namespace LoveOfCooking.HarmonyPatches
 			Harmony harmony = new Harmony(id);
 			try
 			{
-				BushPatches.Patch(harmony);
-			}
-			catch (Exception ex)
-			{
-				Log.E("" + ex);
-			}
-			try
-			{
 				CraftingPagePatches.Patch(harmony);
 			}
 			catch (Exception ex)
