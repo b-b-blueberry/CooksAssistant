@@ -97,7 +97,7 @@ G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hot Curry				Hearty Stew + Hot Pepper + Rice						+Speed -Defence
 	✔	Hot Pot Roast			Cranberry Sauce + Roots Platter + Stuffing + Onion	Superfood, personal pref
 	✔	Hunter's Plate			Potato + Cabbage + Horseradish						New ingredients
-	✔	Kebab					Tortilla + Tomato + Onion (Kebab bonus)				Runescape, tortilla
+	✔	Kebab					Tortilla + Tomato + Onion							Runescape, tortilla
 	✔	Loaded Potato			Baked Potato + Tuna + Corn							Augmented recipe
 	✔	Lobster Bake			Lobster												Add opportunity value to an appealing ingredient
 	?	Onion Soup				Onion + Garlic + Cheese								Onion / Outmoded

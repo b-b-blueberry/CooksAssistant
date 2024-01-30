@@ -81,12 +81,6 @@ namespace LoveOfCooking
 			498, 499, 631, 632, 633
 		};
 		internal static readonly List<int> IndoorsTileIndexesOfFridges = new List<int>{ 173, 258, 500, 634 };
-		// kebab
-		private const string KebabBuffSource = AssetPrefix + "kebab";
-		private const int KebabBonusDuration = 220;
-		private const int KebabMalusDuration = 140;
-		private const int KebabCombatBonus = 3;
-		private const int KebabNonCombatBonus = 2;
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
@@ -776,104 +770,6 @@ namespace LoveOfCooking
 					Interface.Interfaces.JsonAssets.GetObjectId(leftoversName),
 					1);
 				Utils.AddOrDropItem(leftovers);
-			}
-
-			// Handle unique kebab effects
-			if (food.Name.StartsWith(ModEntry.ObjectPrefix) && food.name.EndsWith("kebab"))
-			{
-				double kebabRoll = Game1.random.NextDouble();
-				int kebabDuration = -1;
-				string kebabMessage = "";
-				string kebabSource = "";
-				int[] kebabStats = null;
-				if (kebabRoll < 0.08f)
-				{
-					// Remove any health/energy restoration from bad kebabs
-					if (Config.FoodHealingTakesTime)
-					{
-						States.Value.Regeneration.Add(
-							hp: -food.healthRecoveredOnConsumption(),
-							ep: -food.staminaRecoveredOnConsumption());
-					}
-					else
-					{
-						States.Value.Regeneration.RevertPlayer();
-					}
-
-					if (kebabRoll > 0.04f)
-					{
-						kebabMessage = i18n.Get("item.kebab.bad");
-						// Add no debuffs
-					}
-					else
-					{
-						kebabMessage = i18n.Get("item.kebab.worst");
-						kebabSource = i18n.Get("buff.kebab.inspect",
-							new { quality = i18n.Get("buff.kebab.quality_worst") });
-						kebabDuration = KebabMalusDuration;
-						if (kebabRoll < 0.02f)
-						{
-							// Add a debuff for a random non-combat stat
-							int[] kebabNonCombatStats = new[] { 0, 0, 0, 0 };
-							kebabNonCombatStats[Game1.random.Next(kebabStats.Length - 1)] = KebabNonCombatBonus * -1;
-							kebabStats = new int[]
-							{
-								kebabNonCombatStats[0], kebabNonCombatStats[1], kebabNonCombatStats[2], 0, 0, kebabNonCombatStats[3],
-								0, 0, 0, 0, 0, 0
-							};
-						}
-						else
-						{
-							// Add a debuff for combat stats
-							kebabStats = new int[]
-							{
-								0, 0, 0, 0, 0, 0,
-								0, 0, 0, 0,
-								KebabCombatBonus * -1, KebabCombatBonus * -1
-							};
-						}
-					}
-				}
-				else if (kebabRoll < 0.18f)
-				{
-					// Add extra health/energy restoration for great kebabs
-					if (Config.FoodHealingTakesTime)
-					{
-						States.Value.Regeneration.Add(hp: Game1.player.maxHealth / 10, ep: Game1.player.MaxStamina / 10);
-					}
-					else
-					{
-						Game1.player.health = Math.Min(Game1.player.maxHealth,
-							Game1.player.health + Game1.player.maxHealth / 10);
-						Game1.player.Stamina = Math.Min(Game1.player.MaxStamina,
-							Game1.player.Stamina + Game1.player.MaxStamina / 10f);
-					}
-
-					kebabSource = i18n.Get("buff.kebab.inspect",
-						new { quality = i18n.Get("buff.kebab.quality_best") });
-					kebabMessage = i18n.Get("item.kebab.best");
-					kebabDuration = KebabBonusDuration;
-					// Add a buff for both non-combat and combat stats
-					kebabStats = new int[]
-					{
-						0, 0, KebabNonCombatBonus, 0, 0, 0,
-						0, 0, 0, 0,
-						KebabCombatBonus, KebabCombatBonus
-					};
-				}
-				if (!string.IsNullOrEmpty(kebabMessage))
-				{
-					Game1.addHUDMessage(new HUDMessage(message: kebabMessage, leaveMeNull: null));
-				}
-				if (kebabStats is not null)
-				{
-					Buff kebabBuff = new Buff(
-						farming: kebabStats[0], fishing: kebabStats[1], mining: kebabStats[2], digging: kebabStats[3],
-						luck: kebabStats[4], foraging: kebabStats[5], crafting: kebabStats[6], maxStamina: kebabStats[7],
-						magneticRadius: kebabStats[8], speed: kebabStats[9], defense: kebabStats[10], attack: kebabStats[11],
-						minutesDuration: kebabDuration, source: food.Name, displaySource: kebabSource);
-					Game1.buffsDisplay.tryToAddFoodBuff(kebabBuff, kebabDuration);
-				}
 			}
 		}
 		
