@@ -27,6 +27,7 @@ namespace LoveOfCooking
 		internal const string AssetPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
 		internal const string ObjectPrefix = "blueberry.cac."; // DO NOT EDIT
 		internal const string MailPrefix = "blueberry.cac.mail."; // DO NOT EDIT
+		internal const string QueryPrefix = "BLUEBERRY_LOC_"; // DO NOT EDIT
 		internal static int NexusId { get; private set; }
 
 		internal static bool IsEnglishLocale => LocalizedContentManager.CurrentLanguageCode.Equals(LocalizedContentManager.LanguageCode.en);
@@ -139,6 +140,17 @@ namespace LoveOfCooking
 			catch (Exception e)
 			{
 				Log.E($"Error in starting asset manager:{Environment.NewLine}{e}");
+				return false;
+			}
+
+			// Game state queries
+			try
+			{
+				Queries.RegisterAll();
+			}
+			catch (Exception e)
+			{
+				Log.E($"Error in registering game state queries:{Environment.NewLine}{e}");
 				return false;
 			}
 
