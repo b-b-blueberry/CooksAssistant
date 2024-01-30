@@ -1,8 +1,5 @@
 ﻿{
 	"nettles": "color_green, forage_item",
-	"nettletea": "color_green, drink_item, dye_medium",
-	"cider": "color_gold, drink_item, alcohol_item",
-	"perry": "color_gold, drink_item, alcohol_item",
 	"burntfood": "color_black, trash_item",
 	"chocolate": "color_dark_brown, food_sweet",
 	"cookbook": "",

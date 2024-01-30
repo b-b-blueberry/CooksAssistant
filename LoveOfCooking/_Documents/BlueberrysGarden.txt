@@ -66,9 +66,6 @@
 		LATER: Goblin cooking
 			https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
 
-	Patches:
-	✔	Cider -> Keg + Apple
-	?	Vinegar -> Keg + Wine/Cider
 	✔	Nettle Tea -> Keg + Nettles
 
 	Ingredients:
