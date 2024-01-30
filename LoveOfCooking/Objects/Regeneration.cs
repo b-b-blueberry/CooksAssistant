@@ -131,31 +131,30 @@ namespace LoveOfCooking
 		{
 			// Calculate food regeneration rate from skill levels
 			const int maxLevel = 10;
-			float[] scalingCurrent = new float[ModEntry.ItemDefinitions["RegenSkillModifiers"].Count];
-			float[] scalingMax = new float[scalingCurrent.Length];
-			for (int i = 0; i < ModEntry.ItemDefinitions["RegenSkillModifiers"].Count; ++i)
+			float scalingCurrent = 0;
+			float scalingMax = 0;
+			foreach (var pair in ModEntry.ItemDefinitions.RegenSkillModifiers)
 			{
-				string[] split = ModEntry.ItemDefinitions["RegenSkillModifiers"][i].Split(':');
-				string name = split[0];
+				string name = pair.Key;
 				bool isDefined = Enum.TryParse(name, out ModEntry.SkillIndex skillIndex);
 				int level = isDefined
 					? Game1.player.GetSkillLevel((int)Enum.Parse(typeof(ModEntry.SkillIndex), name))
 					: SpaceCore.Skills.GetSkill(name) is not null
 						? Game1.player.GetCustomSkillLevel(name)
 						: -1;
-				float value = float.Parse(split[1]);
+				float value = pair.Value;
 				if (level < 0)
 					continue;
-				scalingCurrent[i] = level * value;
-				scalingMax[i] = maxLevel * value;
+				scalingCurrent += level * value;
+				scalingMax += maxLevel * value;
 			}
 
 			// Set values
-			this.SkillModifierRate = scalingCurrent.Sum() / scalingMax.Sum();
-			this.BaseRate = int.Parse(ModEntry.ItemDefinitions["RegenBaseRate"][0]);
-			this.HealthRate = float.Parse(ModEntry.ItemDefinitions["RegenHealthRate"][0]);
-			this.EnergyRate = float.Parse(ModEntry.ItemDefinitions["RegenEnergyRate"][0]);
-			this.FinalRate = float.Parse(ModEntry.ItemDefinitions["RegenFinalRate"][0]);
+			this.SkillModifierRate = scalingCurrent / scalingMax;
+			this.BaseRate = ModEntry.ItemDefinitions.RegenBaseRate;
+			this.HealthRate = ModEntry.ItemDefinitions.RegenHealthRate;
+			this.EnergyRate = ModEntry.ItemDefinitions.RegenEnergyRate;
+			this.FinalRate = ModEntry.ItemDefinitions.RegenFinalRate;
 		}
 
 		/// <summary>

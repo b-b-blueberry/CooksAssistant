@@ -8,76 +8,42 @@
 		"1",
 		"1"
 	],
-	"ConsoleCommandPrefix": [
-		"bb.loc."
-	],
-	"ShowWalletItems": [
-		"true"
-	],
-	"NpcKitchenFriendshipRequired": [
-		"6"
-	],
-	"AutoConsumeOilAndSeasoning": [
-		"false"
-	],
-	"ShopDiscounts": [
-		"Saloon:35"
-	],
-	"RegenBaseRate": [
-		"128"
-	],
-	"RegenHealthRate": [
-		"0.3"
-	],
-	"RegenEnergyRate": [
-		"1.0"
-	],
-	"RegenFinalRate": [
-		"2.5"
-	],
-	"RegenSkillModifiers": [
-		"Combat:0.025",
-		"Foraging:0.0025",
-		"Cooking:0.01",
-		"blueberry.LoveOfCooking.CookingSkill:0.01"
-	],
-	"BurnChanceBase": [
-		"0.22"
-	],
-	"BurnChancePerIngredient": [
-		"0.0035"
-	],
-	"CookingSkillExperienceGlobalScaling": [
-		"1.0"
-	],
-	"CookingSkillExperienceNewRecipeBonus": [
-		"34"
-	],
-	"CookingSkillExperienceDailyBonus": [
-		"12"
-	],
-	"CookingSkillExperienceIngredientsBaseValue": [
-		"1.0"
-	],
-	"CookingSkillExperienceIngredientsBonusScaling": [
-		"0.2"
-	],
-	"CookingSkillExperienceIngredientsFinalBaseValue": [
-		"5.0"
-	],
-	"CookingSkillExperienceIngredientsBonusFinalMultiplier": [
-		"4.0"
-	],
-	"FoodsThatGiveLeftovers": [
-		"Pizza",
-		"Chocolate Cake",
-		"Pink Cake",
-		"blueberry.cac.cake",
-		"blueberry.cac.seafoodsando",
-		"blueberry.cac.eggsando",
-		"blueberry.cac.saladsando",
-		"blueberry.cac.watermelon"
-	],
+	"ConsoleCommandPrefix": "bb.loc.",
+	"ShowWalletItems": true,
+	"NpcKitchenFriendshipRequired": 6,
+	"AutoConsumeOilAndSeasoning": false,
+	"ShopDiscounts": {
+		"Saloon": 35
+	},
+	"RegenBaseRate": 128,
+	"RegenHealthRate": 0.3,
+	"RegenEnergyRate": 1.0,
+	"RegenFinalRate": 2.5,
+	"RegenSkillModifiers": {
+		"Combat": 0.025,
+		"Foraging": 0.0025,
+		"Cooking": 0.01,
+		"blueberry.LoveOfCooking.CookingSkill": 0.01
+	},
+	"BurnChanceBase": 0.22,
+	"BurnChancePerIngredient": 0.0035,
+	"CookingSkillExperienceGlobalScaling": 1.0,
+	"CookingSkillExperienceNewRecipeBonus": 34,
+	"CookingSkillExperienceDailyBonus": 12,
+	"CookingSkillExperienceIngredientsBaseValue": 1.0,
+	"CookingSkillExperienceIngredientsBonusScaling": 0.2,
+	"CookingSkillExperienceIngredientsFinalBaseValue": 5.0,
+	"CookingSkillExperienceIngredientsBonusFinalMultiplier": 4.0,
+	"FoodsThatGiveLeftovers": {
+
+		"Pizza": "blueberry.cac.pizza_half",
+		"Chocolate Cake": "blueberry.cac.chocolatecake_half",
+		"Pink Cake": "blueberry.cac.pinkcake_half",
+		"blueberry.cac.cake": "blueberry.cac.cake_half",
+		"blueberry.cac.seafoodsando": "blueberry.cac.seafoodsando_half",
+		"blueberry.cac.eggsando": "blueberry.cac.eggsando_half",
+		"blueberry.cac.saladsando": "blueberry.cac.saladsando_half"
+	},
 	"MarmaladeFoods": [
 		"lemon",
 		"lime",

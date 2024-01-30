@@ -1104,22 +1104,22 @@ namespace LoveOfCooking.Objects
 			//Game1.activeClickableMenu = null; // not work!
 
 			string name = recipe.name.ToLower();
-			bool isBaked = ModEntry.ItemDefinitions["BakeyFoods"].Any(o => name.StartsWith(o)
-				|| ModEntry.ItemDefinitions["CakeyFoods"].Any(o => name.EndsWith(o)));
+			bool isBaked = ModEntry.ItemDefinitions.BakeyFoods.Any(name.StartsWith)
+				|| ModEntry.ItemDefinitions.CakeyFoods.Any(name.EndsWith);
 			string startSound, sound, endSound;
-			if (ModEntry.ItemDefinitions["SoupyFoods"].Any(x => name.EndsWith(x)))
+			if (ModEntry.ItemDefinitions.SoupyFoods.Any(name.EndsWith))
 			{
 				startSound = "dropItemInWater";
 				sound = "dropItemInWater";
 				endSound = "bubbles";
 			}
-			else if (ModEntry.ItemDefinitions["DrinkyFoods"].Any(x => name.EndsWith(x)))
+			else if (ModEntry.ItemDefinitions.DrinkyFoods.Any(name.EndsWith))
 			{
 				startSound = "Milking";
 				sound = "dropItemInWater";
 				endSound = "bubbles";
 			}
-			else if (ModEntry.ItemDefinitions["SaladyFoods"].Any(x => name.EndsWith(x)))
+			else if (ModEntry.ItemDefinitions.SaladyFoods.Any(name.EndsWith))
 			{
 				startSound = "daggerswipe";
 				sound = "daggerswipe";
@@ -1177,7 +1177,7 @@ namespace LoveOfCooking.Objects
 				};
 
 			// Oven-baked foods
-			if (isBaked && !ModEntry.ItemDefinitions["PancakeyFoods"].Any(o => name.Contains(o)))
+			if (isBaked && !ModEntry.ItemDefinitions.PancakeyFoods.Any(name.Contains))
 			{
 				frames[frames.Count - 1] = new FarmerSprite.AnimationFrame(58, ms * 2);
 				frames.Add(new FarmerSprite.AnimationFrame(44, ms * 8)
@@ -1193,7 +1193,7 @@ namespace LoveOfCooking.Objects
 			}
 
 			// Dough-tossing foods
-			if (ModEntry.ItemDefinitions["PizzayFoods"].Any(o => name.Contains(o)))
+			if (ModEntry.ItemDefinitions.PizzayFoods.Any(name.Contains))
 			{
 				Game1.player.faceDirection(2);
 
@@ -1240,7 +1240,7 @@ namespace LoveOfCooking.Objects
 			}
 
 			// Pan-flipping foods
-			else if (ModEntry.ItemDefinitions["PancakeyFoods"].Any(o => name.Contains(o)))
+			else if (ModEntry.ItemDefinitions.PancakeyFoods.Any(name.Contains))
 			{
 				ms = 100;
 

@@ -73,7 +73,7 @@ namespace LoveOfCooking.Objects
 			}
 
 			// Read starting recipes from general data file
-			foreach (string entry in ModEntry.ItemDefinitions["StartingRecipes"])
+			foreach (string entry in ModEntry.ItemDefinitions.StartingRecipes)
 			{
 				StartingRecipes.Add(entry);
 			}

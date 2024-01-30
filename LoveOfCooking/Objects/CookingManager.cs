@@ -90,8 +90,8 @@ namespace LoveOfCooking.Objects
 				return minimumChance;
 
 			int cookingLevel = ModEntry.CookingSkillApi.GetLevel();
-			float baseRate = float.Parse(ModEntry.ItemDefinitions["BurnChanceBase"][0]);
-			float addedRate = float.Parse(ModEntry.ItemDefinitions["BurnChancePerIngredient"][0]);
+			float baseRate = ModEntry.ItemDefinitions.BurnChanceBase;
+			float addedRate = ModEntry.ItemDefinitions.BurnChancePerIngredient;
 			float chance = Math.Max(minimumChance, (baseRate + (addedRate * recipe.getNumberOfIngredients()))
 				- cookingLevel * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction
 				- (Objects.CookingTool.GetEffectiveGlobalToolUpgradeLevel() / 2f) * CookingSkill.BurnChanceModifier * CookingSkill.BurnChanceReduction);
@@ -347,7 +347,7 @@ namespace LoveOfCooking.Objects
 			bool hasOilPerk = ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ImprovedOil);
 
 			// Gather seasonings as ingredients to use for improving cooked item qualities
-			bool consumeSeasoningsFromInventory = bool.Parse(ModEntry.ItemDefinitions["AutoConsumeOilAndSeasoning"][0]);
+			bool consumeSeasoningsFromInventory = ModEntry.ItemDefinitions.AutoConsumeOilAndSeasoning;
 			List<Ingredient> ingredientsForSeasonings = new List<Ingredient>();
 			if (consumeSeasoningsFromInventory)
 			{

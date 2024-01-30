@@ -329,7 +329,7 @@ namespace LoveOfCooking.Interface
 			LevelExtender.initializeSkill(
 				name: Objects.CookingSkill.InternalName,
 				xp: ModEntry.CookingSkillApi.GetTotalCurrentExperience(),
-				xp_mod: float.Parse((ModEntry.ItemDefinitions)["CookingSkillExperienceGlobalScaling"][0]),
+				xp_mod: ModEntry.ItemDefinitions.CookingSkillExperienceGlobalScaling,
 				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(),
 				cats: null);
 		}

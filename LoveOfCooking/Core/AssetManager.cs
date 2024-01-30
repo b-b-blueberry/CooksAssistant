@@ -543,7 +543,7 @@ namespace LoveOfCooking
 					};
 
 				// Apply above recipe changes
-				foreach (KeyValuePair<int, string[]> obj in objectData.Where(o => !ModEntry.ItemDefinitions["FoodsThatGiveLeftovers"].Contains(data[o.Key].Split('/')[0])))
+				foreach (KeyValuePair<int, string[]> obj in objectData.Where(o => !ModEntry.ItemDefinitions.FoodsThatGiveLeftovers.TryGetValue(data[o.Key].Split('/')[0], out var _)))
 					data[obj.Key] = Utils.UpdateEntry(data[obj.Key], obj.Value);
 
 				if (ModEntry.Config.AddRecipeRebalancing)

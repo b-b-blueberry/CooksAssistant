@@ -55,7 +55,7 @@ namespace LoveOfCooking
 
 		// Object definitions
 		internal static Dictionary<string, string> IngredientBuffChart;
-		internal static Dictionary<string, List<string>> ItemDefinitions;
+		internal static Definitions ItemDefinitions;
 
 		// Others:
 		// base game reference
@@ -179,7 +179,7 @@ namespace LoveOfCooking
 
 		private void AddConsoleCommands()
 		{
-			string cmd = ModEntry.ItemDefinitions["ConsoleCommandPrefix"][0];
+			string cmd = ModEntry.ItemDefinitions.ConsoleCommandPrefix;
 
 			IEnumerable<string> forgetLoveOfCookingRecipes() {
 				IEnumerable<string> recipes = CookingSkill.CookingSkillLevelUpRecipes.Values
@@ -428,9 +428,9 @@ namespace LoveOfCooking
 			// Alternatively if the player somehow upgrades their house early, add the cookbook mail
 			if (Config.AddCookingMenu && !Game1.player.hasOrWillReceiveMail(MailCookbookUnlocked))
 			{
-				int day = int.Parse(ItemDefinitions["CookbookMailDate"][0]) - 1;
-				int month = int.Parse(ItemDefinitions["CookbookMailDate"][1]) - 1;
-				int year = int.Parse(ItemDefinitions["CookbookMailDate"][2]);
+				int day = ItemDefinitions.CookbookMailDate[0] - 1;
+				int month = ItemDefinitions.CookbookMailDate[1] - 1;
+				int year = ItemDefinitions.CookbookMailDate[2];
 				int gameMonth = Utility.getSeasonNumber(Game1.currentSeason);
 				bool reachedNextYear = (Game1.year > year);
 				bool reachedNextMonth = (Game1.year == year && gameMonth > month);
@@ -563,7 +563,7 @@ namespace LoveOfCooking
 						string npc = NpcHomeLocations.FirstOrDefault(pair => pair.Value == Game1.currentLocation.Name).Key;
 						if (!string.IsNullOrEmpty(npc))
 						{
-							if (Game1.player.getFriendshipHeartLevelForNPC(npc) >= int.Parse(ItemDefinitions["NpcKitchenFriendshipRequired"][0]))
+							if (Game1.player.getFriendshipHeartLevelForNPC(npc) >= ItemDefinitions.NpcKitchenFriendshipRequired)
 							{
 								if (Game1.player.team.specialOrders.Any(order => order is not null && order.objectives.Any(
 									obj => obj is DonateObjective dobj && dobj.dropBox.Value.EndsWith("Kitchen"))))
@@ -638,10 +638,6 @@ namespace LoveOfCooking
 			// Add new objects to shop menus and edit shop stock
 			if (e.NewMenu is ShopMenu menu and not null && Interface.Interfaces.JsonAssets is not null)
 			{
-				int discount = int.Parse(ModEntry.ItemDefinitions["ShopDiscounts"]
-					.Select(s => s.Split(':'))
-					.FirstOrDefault(split => split.First() == menu.storeContext)
-					?.LastOrDefault() ?? "0");
 				if (menu.storeContext == "SeedShop")
 				{
 					// Sort Pierre's shop to bring new crops alongside base game crops
@@ -651,9 +647,9 @@ namespace LoveOfCooking
 				{
 					// Add chocolate to shops
 					StardewValley.Object o = new StardewValley.Object(
-						tileLocation: Vector2.Zero,
-						parentSheetIndex: Interface.Interfaces.JsonAssets.GetObjectId(name: ChocolateName),
-						initialStack: int.MaxValue);
+						Interface.Interfaces.JsonAssets.GetObjectId(name: ChocolateName),
+						int.MaxValue);
+					ModEntry.ItemDefinitions.ShopDiscounts.TryGetValue(menu.storeContext, out int discount);
 					int price = o.Price - discount;
 					if (menu.storeContext == "JojaMart")
 					{
@@ -760,13 +756,10 @@ namespace LoveOfCooking
 			}
 
 			// Add leftovers from viable foods to the inventory, or drop it on the ground if full
-			if (ItemDefinitions["FoodsThatGiveLeftovers"].Contains(food.Name)
+			if (ModEntry.ItemDefinitions.FoodsThatGiveLeftovers.TryGetValue(food.Name, out string leftoversName)
 				&& Config.AddRecipeRebalancing && Interface.Interfaces.JsonAssets is not null)
 			{
-				string leftoversName = food.Name.StartsWith(ObjectPrefix)
-					? $"{food.Name}_half"
-					: $"{food.Name.ToLower().Split(' ').Aggregate(ObjectPrefix, (s, s1) => s + s1)}" + "_half";
-				StardewValley.Object leftovers = new StardewValley.Object(
+				StardewValley.Object leftovers = new(
 					Interface.Interfaces.JsonAssets.GetObjectId(leftoversName),
 					1);
 				Utils.AddOrDropItem(leftovers);
@@ -805,8 +798,8 @@ namespace LoveOfCooking
 			{
 				// Cookbook
 				StardewValley.Object o = new StardewValley.Object(
-					parentSheetIndex: Interface.Interfaces.JsonAssets.GetObjectId(name: ModEntry.ObjectPrefix + "cookbook"),
-					initialStack: 1);
+					Interface.Interfaces.JsonAssets.GetObjectId(name: ModEntry.ObjectPrefix + "cookbook"),
+					1);
 				Rectangle sourceRect = GameLocation.getSourceRectForObject(tileIndex: o.ParentSheetIndex);
 				menu.specialItems.Add(new ClickableTextureComponent(
 					name: string.Empty,
