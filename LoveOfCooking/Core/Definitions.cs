@@ -16,6 +16,7 @@ namespace LoveOfCooking
 		public float RegenEnergyRate;
 		public float RegenFinalRate;
 		public Dictionary<string, int> RegenSkillModifiers;
+		public string[] EdibleItemsWithNoFoodBehaviour;
 		public float BurnChanceBase;
 		public float BurnChancePerIngredient;
 		public float CookingSkillExperienceGlobalScaling;

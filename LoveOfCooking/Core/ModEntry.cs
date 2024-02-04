@@ -707,7 +707,7 @@ namespace LoveOfCooking
 		{
 			if (Game1.player.itemToEat is not StardewValley.Object food
 				// Don't consider Life Elixir (ID 773) for food behaviours or Food Heals Over Time
-				|| Game1.player.itemToEat.ParentSheetIndex == 773)
+				|| ModEntry.ItemDefinitions.EdibleItemsWithNoFoodBehaviour.Contains(Game1.player.itemToEat.Name))
 				return;
 
 			string[] foodData = Game1.objectInformation[food.ParentSheetIndex].Split('/');

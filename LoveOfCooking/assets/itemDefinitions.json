@@ -25,6 +25,9 @@
 		"Cooking": 0.01,
 		"blueberry.LoveOfCooking.CookingSkill": 0.01
 	},
+	"EdibleItemsWithNoFoodBehaviour": [
+		"Life Elixir"
+	],
 	"BurnChanceBase": 0.22,
 	"BurnChancePerIngredient": 0.0035,
 	"CookingSkillExperienceGlobalScaling": 1.0,
