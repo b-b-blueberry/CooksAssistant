@@ -145,7 +145,7 @@ namespace LoveOfCooking
 			}
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentDefinitionsPath))
 			{
-				e.LoadFromModFile<Dictionary<string, List<string>>>(
+				e.LoadFromModFile<Definitions>(
 					relativePath: $"{AssetManager.LocalDefinitionsPath}.json",
 					priority: AssetLoadPriority.Exclusive);
 			}

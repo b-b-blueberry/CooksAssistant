@@ -932,7 +932,7 @@ namespace LoveOfCooking
 		{
 			// Reload our own assets
 			ModEntry.ItemDefinitions = Game1.content.Load
-				<Dictionary<string, List<string>>>
+				<Definitions>
 				(AssetManager.GameContentDefinitionsPath);
 			ModEntry.IngredientBuffChart = Game1.content.Load
 				<Dictionary<string, string>>
