@@ -242,6 +242,7 @@ namespace LoveOfCooking.Interface
 				"changes",
 
 				"PlayCookingAnimation",
+				"PlayCookbookAnimation",
 				"AddRecipeRebalancing",
 				"AddBuffReassigning",
 				"HideFoodBuffsUntilEaten",

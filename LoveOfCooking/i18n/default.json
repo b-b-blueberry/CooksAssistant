@@ -16,6 +16,8 @@
 	"config.option.addreciperebalancing_description": "Food stat buff amounts and durations are rebalanced for each recipe!\nBuff values are repicked.\nBuff duration decreases with edibility and increases with gold value.\nSome ingredients add extra health restoration instead of buffs.",
 	"config.option.addbuffreassigning_name": "Tie recipe buffs to ingredients",
 	"config.option.addbuffreassigning_description": "Buff stat choices are reassigned to recipes based on the ingredients used!\nNormally causes no major changes, instead recipe effects are a little more predictable.",
+	"config.option.playcookbookanimation_name": "Cookbook animations",
+	"config.option.playcookbookanimation_description": "Whether to play a quick menu animation on using the kitchen.",
 	"config.option.playcookinganimation_name": "Cooking animations",
 	"config.option.playcookinganimation_description": "Your farmer plays a little animation when cooking at the kitchen,\nbased on what sort of food you're cooking and its ingredients.",
 	"config.option.hidefoodbuffsuntileaten_name": "Hide food buffs until eaten",

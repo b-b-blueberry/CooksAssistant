@@ -8,6 +8,7 @@
 		public bool AddNewCropsAndStuff { get; set; } = true;
 		public bool AddRecipeRebalancing { get; set; } = true;
 		public bool AddBuffReassigning { get; set; } = false;
+		public bool PlayCookbookAnimation { get; set; } = true;
 		public bool PlayCookingAnimation { get; set; } = true;
 		public bool HideFoodBuffsUntilEaten { get; set; } = false;
 		public bool FoodHealingTakesTime { get; set; } = false;

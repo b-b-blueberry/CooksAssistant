@@ -138,6 +138,13 @@ namespace LoveOfCooking.Objects
 					// Update frame based on frame time and elapsed time
 					this._frame = this.LastFrame - 1 - (elapsed / CookbookAnimation.FrameTime);
 
+					// Skip animation per config value
+					if (!ModEntry.Config.PlayCookbookAnimation)
+					{
+						this._frame = this.FirstFrame;
+						ratio = 1;
+					}
+
 					// Update position based on elapsed time
 					this._offset = new Point(
 						x: (int)(x * Math.Cos(ratio * Math.PI / 2)),
@@ -160,6 +167,13 @@ namespace LoveOfCooking.Objects
 
 					// Update frame based on frame time and elapsed time
 					this._frame = elapsed / CookbookAnimation.FastFrameTime;
+
+					// Skip animation per config value
+					if (!ModEntry.Config.PlayCookbookAnimation)
+					{
+						this._frame = this.LastFrame;
+						inverse = 1;
+					}
 
 					// Update position based on elapsed time
 					this._offset = new Point(
