@@ -61,7 +61,8 @@
 		"pizza",
 		"pitta",
 		"calzone",
-		"tortilla"
+		"tortilla",
+		"naan"
 	],
 	"PancakeyFoods": [
 		"pancake",
@@ -75,7 +76,6 @@
 		"cakes",
 		"pie",
 		"pudding",
-		"bake",
 		"biscuit",
 		"brownie",
 		"brownies",
@@ -94,18 +94,23 @@
 		"cookie",
 		"roast",
 		"bake",
-		"cupcake"
+		"cupcake",
+		"flan",
+		"flapjack",
+		"lasagna"
 	],
 	"SaladyFoods": [
 		"coleslaw",
 		"salad",
 		"lunch",
 		"taco",
+		"nigiri",
 		"roll",
 		"sashimi",
 		"sushi",
 		"sandwich",
-		"unagi"
+		"unagi",
+		"zushi"
 	],
 	"DrinkyFoods": [
 		"candy",
@@ -120,7 +125,8 @@
 		"mocha",
 		"latte",
 		"cappucino",
-		"drink"
+		"drink",
+		"syllabub"
 	],
 	"SoupyFoods": [
 		"soup",
@@ -129,6 +135,8 @@
 		"stew",
 		"pot",
 		"broth",
-		"stock"
+		"stock",
+		"gumbo",
+		"goulash"
 	]
 }
