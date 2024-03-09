@@ -44,6 +44,7 @@ namespace LoveOfCooking
 		private static readonly List<string> _gameContentAssetPaths = new List<string>();
 		public static readonly string RootGameContentPath = PathUtilities.NormalizeAssetName("Mods/blueberry.LoveOfCooking.Assets");
 		public static string GameContentSpriteSheetPath { get; private set; } = "Sprites";
+		public static string GameContentCookbookSpriteSheetPath { get; private set; } = "CookbookSprites";
 		public static string GameContentIngredientBuffDataPath { get; private set; } = "IngredientBuffChart";
 		public static string GameContentDefinitionsPath { get; private set; } = "ItemDefinitions";
 		public static string GameContentSkillValuesPath { get; private set; } = "CookingSkillValues";
@@ -54,6 +55,7 @@ namespace LoveOfCooking
 		// These are the paths for our default data files bundled with the mod in our assets folder.
 		public static readonly string RootLocalContentPath = "assets";
 		public static string LocalSpriteSheetPath { get; private set; } = "sprites";
+		public static string LocalCookbookSpriteSheetPath { get; private set; } = "cookbook-sprites";
 		public static string LocalIngredientBuffDataPath { get; private set; } = "ingredientBuffChart";
 		public static string LocalDefinitionsPath { get; private set; } = "itemDefinitions";
 		public static string LocalSkillValuesPath { get; private set; } = "cookingSkillValues";
@@ -135,6 +137,12 @@ namespace LoveOfCooking
 			{
 				e.LoadFromModFile<Texture2D>(
 					relativePath: $"{AssetManager.LocalSpriteSheetPath}.png",
+					priority: AssetLoadPriority.Exclusive);
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentCookbookSpriteSheetPath))
+			{
+				e.LoadFromModFile<Texture2D>(
+					relativePath: $"{AssetManager.LocalCookbookSpriteSheetPath}.png",
 					priority: AssetLoadPriority.Exclusive);
 			}
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentIngredientBuffDataPath))
