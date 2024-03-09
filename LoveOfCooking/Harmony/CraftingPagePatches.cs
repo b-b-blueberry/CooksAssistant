@@ -75,14 +75,14 @@ namespace LoveOfCooking.HarmonyPatches
 					//qualityStacks[0] += numPerCraft;
 				}
 
+				// Add cooking skill experience
+				ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
+					item, numIngredients: recipe.getNumberOfIngredients(), item.Stack, applyExperience: true);
+
 				// Update tracked stats
 				if (!ModEntry.Instance.States.Value.FoodCookedToday.ContainsKey(item.Name))
 					ModEntry.Instance.States.Value.FoodCookedToday[item.Name] = 0;
 				ModEntry.Instance.States.Value.FoodCookedToday[item.Name] += item.Stack;
-
-				// Add cooking skill experience
-				ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
-					item, numIngredients: recipe.getNumberOfIngredients(), item.Stack, applyExperience: true);
 			}
 		}
 	}
