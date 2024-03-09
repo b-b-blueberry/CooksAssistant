@@ -86,7 +86,7 @@ namespace LoveOfCooking.Objects
 
 		public override string GetName()
 		{
-			return i18n.Get("menu.cooking_recipe.buff.12");
+			return i18n.Get("menu.cooking_skill.name");
 		}
 		
 		public override List<string> GetExtraLevelUpInfo(int level)

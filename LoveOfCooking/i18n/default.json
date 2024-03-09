@@ -96,6 +96,7 @@
 	"mail.cookbook_unlocked.after": "You received Mom's Cookbook. Recipes you learn will be saved here to cook at kitchens in town.",
 
 	// Cooking skill
+	"menu.cooking_skill.name": "Cooking",
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
 	"menu.cooking_skill.levelupbonus.2": "You can now brew Nettle Tea.",
 	//"menu.cooking_skill.levelupbonus.3": "You can now craft {{Name}}.",
