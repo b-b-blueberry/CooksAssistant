@@ -101,14 +101,7 @@ namespace LoveOfCooking.Interface
 			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-			UsingFarmhouseKitchenStart = new string[]
-			{
-				"Allayna.Kitchen",
-				"Froststar11.CustomFarmhouse",
-				"burakmese.products",
-				"minervamaga.FR.BiggerFarmhouses"
-			}
-			.Any(id => Helper.ModRegistry.IsLoaded(id));
+			UsingFarmhouseKitchenStart = ModEntry.ItemDefinitions.FarmhouseKitchenStartModIDs.Any(Helper.ModRegistry.IsLoaded);
 		}
 
 		internal static void SaveLoadedBehaviours()

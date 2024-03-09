@@ -71,6 +71,12 @@
 	],
 	"BurnChanceBase": 0.22,
 	"BurnChancePerIngredient": 0.0035,
+	"FarmhouseKitchenStartModIDs": [
+		"Allayna.Kitchen",
+		"burakmese.products",
+		"Froststar11.CustomFarmhouse",
+		"minervamaga.FR.BiggerFarmhouses"
+	],
 	"FoodsThatGiveLeftovers": {
 
 		"Pizza": "blueberry.cac.pizza_half",

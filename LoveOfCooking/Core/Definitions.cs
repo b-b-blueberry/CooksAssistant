@@ -50,6 +50,7 @@ namespace LoveOfCooking
 		public string[] EdibleItemsWithNoFoodBehaviour;
 		public float BurnChanceBase;
 		public float BurnChancePerIngredient;
+		public string[] FarmhouseKitchenStartModIDs;
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
 		public string[] MarmaladeyFoods;
 		public string[] PizzayFoods;
