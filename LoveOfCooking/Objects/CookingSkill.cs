@@ -13,23 +13,6 @@ namespace LoveOfCooking.Objects
 		private static ITranslationHelper i18n => ModEntry.Instance.Helper.Translation;
 		public static readonly string InternalName = ModEntry.AssetPrefix + "CookingSkill"; // DO NOT EDIT
 
-		public static int MaxFoodStackPerDayForExperienceGains;
-
-		public static int GiftBoostValue;
-		public static float SalePriceModifier;
-		public static float ExtraPortionChance;
-		public static int RestorationValue;
-		public static int RestorationAltValue;
-		public static int BuffRateValue;
-		public static int BuffDurationValue;
-
-		public static float BurnChanceReduction;
-		public static float BurnChanceModifier;
-
-		public static readonly IList<string> StartingRecipes = new List<string>();
-		public static readonly IDictionary<int, IList<string>> CookingSkillLevelUpRecipes = new Dictionary<int, IList<string>>();
-		public static readonly IDictionary<string, int> FoodsThatBuffCookingSkill = new Dictionary<string, int>();
-
 		public class SkillProfession : SpaceCore.Skills.Skill.Profession
 		{
 			public SkillProfession(SpaceCore.Skills.Skill skill, string theId) : base(skill, theId) {}
@@ -45,46 +28,9 @@ namespace LoveOfCooking.Objects
 			Log.D($"Registering skill {InternalName}",
 				ModEntry.Config.DebugMode);
 
-			// Read class values from definitions data file
-			var cookingSkillValues = Game1.content.Load
-				<Dictionary<string, string>>
-				(AssetManager.GameContentSkillValuesPath);
-			System.Reflection.FieldInfo[] fields = this
-				.GetType()
-				.GetFields(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Static);
-			foreach (System.Reflection.FieldInfo field in fields)
-			{
-				System.Type type = field.GetValue(this).GetType();
-				if (type == typeof(int))
-					field.SetValue(this, int.Parse(cookingSkillValues[field.Name]));
-				else if (type == typeof(float))
-					field.SetValue(this, float.Parse(cookingSkillValues[field.Name]));
-				else if (type == typeof(double))
-					field.SetValue(this, double.Parse(cookingSkillValues[field.Name]));
-			}
-
-			// Read cooking skill level up recipes from data file
-			var cookingSkillLevelUpTable = Game1.content.Load
-				<Dictionary<string, List<string>>>
-				(AssetManager.GameContentSkillRecipeTablePath);
-			foreach (KeyValuePair<string, List<string>> pair in cookingSkillLevelUpTable)
-			{
-				CookingSkillLevelUpRecipes.Add(int.Parse(pair.Key), pair.Value);
-			}
-
-			// Read starting recipes from general data file
-			foreach (string entry in ModEntry.ItemDefinitions.StartingRecipes)
-			{
-				StartingRecipes.Add(entry);
-			}
-
 			// Set experience values
-			List<int> experienceBarColourSplit = cookingSkillValues["ExperienceBarColor"]
-				.Split(' ')
-				.ToList()
-				.ConvertAll(int.Parse);
-			ExperienceBarColor = new Color(experienceBarColourSplit[0], experienceBarColourSplit[1], experienceBarColourSplit[2]);
-			ExperienceCurve = new[] { 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 }; // values same as for base game skills
+			this.ExperienceBarColor = ModEntry.ItemDefinitions.CookingSkillValues.ExperienceBarColor;
+			this.ExperienceCurve = ModEntry.ItemDefinitions.CookingSkillValues.ExperienceCurve.ToArray(); 
 
 			int size;
 
@@ -126,8 +72,8 @@ namespace LoveOfCooking.Objects
 					Name = i18n.Get($"{id}{extra}.name"),
 					Description = i18n.Get($"{id}{extra}.description",
 					new { // v-- Skill profession description values are tokenised here
-						SaleValue = $"{((SalePriceModifier - 1) * 100):0}",
-						RestorationAltValue = $"{(RestorationAltValue):0}",
+						SaleValue = $"{((ModEntry.ItemDefinitions.CookingSkillValues.SalePriceModifier - 1) * 100):0}",
+						RestorationAltValue = $"{(ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue):0}",
 					})
 				};
 				// Skill professions are paired and applied
@@ -150,7 +96,7 @@ namespace LoveOfCooking.Objects
 			{
 				list.Add(i18n.Get("menu.cooking_skill.levelup_burn", new
 					{
-						Number = $"{(level * BurnChanceModifier * BurnChanceReduction):0.00}"
+						Number = $"{(level * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceModifier * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceReduction):0.00}"
 					}));
 			}
 
@@ -173,7 +119,7 @@ namespace LoveOfCooking.Objects
 					key: "menu.cooking_skill.levelup_burn",
 					tokens: new
 					{
-						Number = $"{(level * BurnChanceModifier * BurnChanceReduction):0.00}"
+						Number = $"{(level * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceModifier * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceReduction):0.00}"
 					});
 			}
 

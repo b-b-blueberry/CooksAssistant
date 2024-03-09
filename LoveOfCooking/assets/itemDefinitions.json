@@ -7,6 +7,48 @@
 		"1",
 		"1"
 	],
+	"CookingSkillValues": {
+		// Level rewards
+		"LevelUpRecipes": {
+			"0": [],
+			"1": [ "burrito", "fritters" ],
+			"2": [ "porridge", "breakfast" ],
+			"3": [ "lobster", "loadedpotato", "stuffedpotato" ],
+			"4": [ "cake", "hotcocoa", "waffles", "mornay" ],
+			"5": [],
+			"6": [ "redberrypie", "unagi", "cabbagepot", "stew", "onionsoup" ],
+			"7": [ "applepie", "eggsando", "skewers", "tropicalsalad", "burger" ],
+			"8": [ "admiralpie", "saladsando", "dwarfstew", "roast", "hunters" ],
+			"9": [ "gardenpie", "seafoodsando", "curry", "kebab", "oceanplatter" ],
+			"10": []
+		},
+		// Experience gains
+		"ExperienceBarColor": {
+			"R": 57,
+			"G": 135,
+			"B": 214
+		},
+		"ExperienceCurve": [ 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 ],
+		"GlobalExperienceRate": 1.0,
+		"MaxFoodStackPerDayForExperienceGains": 20,
+		"ExperienceGlobalScaling": 1.0,
+		"ExperienceNewRecipeBonus": 34,
+		"ExperienceDailyBonus": 12,
+		"ExperienceIngredientsBaseValue": 1.0,
+		"ExperienceIngredientsBonusScaling": 0.2,
+		"ExperienceIngredientsFinalBaseValue": 5.0,
+		"ExperienceIngredientsBonusFinalMultiplier": 4.0,
+		// Profession bonuses
+		"GiftBoostValue": 10,
+		"SalePriceModifier": 1.3,
+		"ExtraPortionChance": 0.125,
+		"RestorationValue": 35,
+		"RestorationAltValue": 5,
+		"BuffRateValue": 3,
+		"BuffDurationValue": 36,
+		"BurnChanceReduction": 0.015,
+		"BurnChanceModifier": 1.5
+	},
 	"ConsoleCommandPrefix": "bb.loc.",
 	"ShowWalletItems": true,
 	"NpcKitchenFriendshipRequired": 6,
@@ -29,13 +71,6 @@
 	],
 	"BurnChanceBase": 0.22,
 	"BurnChancePerIngredient": 0.0035,
-	"CookingSkillExperienceGlobalScaling": 1.0,
-	"CookingSkillExperienceNewRecipeBonus": 34,
-	"CookingSkillExperienceDailyBonus": 12,
-	"CookingSkillExperienceIngredientsBaseValue": 1.0,
-	"CookingSkillExperienceIngredientsBonusScaling": 0.2,
-	"CookingSkillExperienceIngredientsFinalBaseValue": 5.0,
-	"CookingSkillExperienceIngredientsBonusFinalMultiplier": 4.0,
 	"FoodsThatGiveLeftovers": {
 
 		"Pizza": "blueberry.cac.pizza_half",

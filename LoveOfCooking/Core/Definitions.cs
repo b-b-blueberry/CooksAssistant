@@ -2,10 +2,41 @@
 
 namespace LoveOfCooking
 {
+	public class SkillValues
+	{
+		// Level rewards
+		public IDictionary<int, IList<string>> LevelUpRecipes;
+		// Experience gains
+		public Color ExperienceBarColor;
+		public List<int> ExperienceCurve;
+		public int MaxFoodStackPerDayForExperienceGains;
+		public float ExperienceGlobalScaling;
+		public int ExperienceNewRecipeBonus;
+		public int ExperienceDailyBonus;
+		public float ExperienceIngredientsBaseValue;
+		public float ExperienceIngredientsBonusScaling;
+		public float ExperienceIngredientsFinalBaseValue;
+		public float ExperienceIngredientsBonusFinalMultiplier;
+		// Profession bonuses
+		public int GiftBoostValue;
+		public float SalePriceModifier;
+		public float ExtraPortionChance;
+		public int RestorationValue;
+		public int RestorationAltValue;
+		public int BuffRateValue;
+		public int BuffDurationValue;
+		public float BurnChanceReduction;
+		public float BurnChanceModifier;
+		public string BurntItemCreated;
+		public List<string> BurntItemAlternatives;
+		public float BurntItemAlternativeChance;
+	}
+
 	public class Definitions
 	{
 		public string[] StartingRecipes;
 		public int[] CookbookMailDate;
+		public SkillValues CookingSkillValues;
 		public string ConsoleCommandPrefix;
 		public bool ShowWalletItems;
 		public uint NpcKitchenFriendshipRequired;
@@ -19,13 +50,6 @@ namespace LoveOfCooking
 		public string[] EdibleItemsWithNoFoodBehaviour;
 		public float BurnChanceBase;
 		public float BurnChancePerIngredient;
-		public float CookingSkillExperienceGlobalScaling;
-		public int CookingSkillExperienceNewRecipeBonus;
-		public int CookingSkillExperienceDailyBonus;
-		public float CookingSkillExperienceIngredientsBaseValue;
-		public float CookingSkillExperienceIngredientsBonusScaling;
-		public float CookingSkillExperienceIngredientsFinalBaseValue;
-		public float CookingSkillExperienceIngredientsBonusFinalMultiplier;
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
 		public string[] MarmaladeyFoods;
 		public string[] PizzayFoods;

@@ -194,7 +194,7 @@ namespace LoveOfCooking
 			string cmd = ModEntry.ItemDefinitions.ConsoleCommandPrefix;
 
 			IEnumerable<string> forgetLoveOfCookingRecipes() {
-				IEnumerable<string> recipes = CookingSkill.CookingSkillLevelUpRecipes.Values
+				IEnumerable<string> recipes = ModEntry.ItemDefinitions.CookingSkillValues.LevelUpRecipes.Values
 					.SelectMany(s => s);
 				foreach (string recipe in recipes)
 				{
@@ -735,9 +735,9 @@ namespace LoveOfCooking
 			{
 				// Add additional health
 				Game1.player.health = (int) Math.Min(Game1.player.maxHealth,
-					Game1.player.health + food.healthRecoveredOnConsumption() * (CookingSkill.RestorationAltValue / 100f));
+					Game1.player.health + food.healthRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
 				Game1.player.Stamina = (int) Math.Min(Game1.player.MaxStamina,
-					Game1.player.Stamina + food.staminaRecoveredOnConsumption() * (CookingSkill.RestorationAltValue / 100f));
+					Game1.player.Stamina + food.staminaRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
 			}
 
 			Buff foodBuff = isDrink
@@ -756,7 +756,7 @@ namespace LoveOfCooking
 				if (duration > 0)
 				{
 					float rate = (Game1.player.health + Game1.player.Stamina) / (Game1.player.maxHealth + Game1.player.MaxStamina);
-					duration += (int) Math.Floor(CookingSkill.BuffDurationValue * 1000 * rate);
+					duration += (int) Math.Floor(ModEntry.ItemDefinitions.CookingSkillValues.BuffDurationValue * 1000 * rate);
 					foodBuff.millisecondsDuration = duration;
 				}
 			}
@@ -792,7 +792,7 @@ namespace LoveOfCooking
 			// Cooking skill professions influence gift value of Cooking objects
 			if (CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.GiftBoost) && e.Gift.Category == CookingCategory)
 			{
-				Game1.player.changeFriendship(CookingSkill.GiftBoostValue, e.Npc);
+				Game1.player.changeFriendship(ModEntry.ItemDefinitions.CookingSkillValues.GiftBoostValue, e.Npc);
 			}
 		}
 

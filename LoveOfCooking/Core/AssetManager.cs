@@ -47,8 +47,6 @@ namespace LoveOfCooking
 		public static string GameContentCookbookSpriteSheetPath { get; private set; } = "CookbookSprites";
 		public static string GameContentIngredientBuffDataPath { get; private set; } = "IngredientBuffChart";
 		public static string GameContentDefinitionsPath { get; private set; } = "ItemDefinitions";
-		public static string GameContentSkillValuesPath { get; private set; } = "CookingSkillValues";
-		public static string GameContentSkillRecipeTablePath { get; private set; } = "CookingSkillLevelUpRecipes";
 		public static string GameContentContextTagDataPath { get; private set; } = "ContextTags";
 
 		// Local paths: filepaths without extension passed to Load()
@@ -58,8 +56,6 @@ namespace LoveOfCooking
 		public static string LocalCookbookSpriteSheetPath { get; private set; } = "cookbook-sprites";
 		public static string LocalIngredientBuffDataPath { get; private set; } = "ingredientBuffChart";
 		public static string LocalDefinitionsPath { get; private set; } = "itemDefinitions";
-		public static string LocalSkillValuesPath { get; private set; } = "cookingSkillValues";
-		public static string LocalSkillRecipeTablePath { get; private set; } = "cookingSkillLevelUpRecipes";
 		public static string LocalContextTagDataPath { get; private set; } = "contextTags";
 
 		// Content pack paths: filepaths without extension passed to JsonAssets.LoadAssets()
@@ -155,18 +151,6 @@ namespace LoveOfCooking
 			{
 				e.LoadFromModFile<Definitions>(
 					relativePath: $"{AssetManager.LocalDefinitionsPath}.json",
-					priority: AssetLoadPriority.Exclusive);
-			}
-			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentSkillRecipeTablePath))
-			{
-				e.LoadFromModFile<Dictionary<string, List<string>>>(
-					relativePath: $"{AssetManager.LocalSkillRecipeTablePath}.json",
-					priority: AssetLoadPriority.Exclusive);
-			}
-			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentSkillValuesPath))
-			{
-				e.LoadFromModFile<Dictionary<string, string>>(
-					relativePath: $"{AssetManager.LocalSkillValuesPath}.json",
 					priority: AssetLoadPriority.Exclusive);
 			}
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentContextTagDataPath))

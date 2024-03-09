@@ -137,7 +137,7 @@ namespace LoveOfCooking
 				rate *= 1.3f;
 			// cooking skill professions are unlocked
 			if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.Restoration))
-				rate += rate / CookingSkill.RestorationValue;
+				rate += rate / ModEntry.ItemDefinitions.CookingSkillValues.RestorationValue;
 			// sitting or lying down
 			if (Game1.player.IsSitting() || Game1.player.isInBed.Value)
 				rate *= 1.4f;

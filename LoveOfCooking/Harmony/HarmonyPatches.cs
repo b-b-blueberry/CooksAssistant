@@ -241,7 +241,7 @@ namespace LoveOfCooking.HarmonyPatches
 				bool hasSaleProfession = ModEntry.CookingSkillApi.HasProfession(Objects.ICookingSkillAPI.Profession.SalePrice, player.UniqueMultiplayerID);
 				if (hasSaleProfession && __instance.Category == ModEntry.CookingCategory)
 				{
-					multiplier *= Objects.CookingSkill.SalePriceModifier;
+					multiplier *= ModEntry.ItemDefinitions.CookingSkillValues.SalePriceModifier;
 				}
 			}
 			__result *= multiplier;
