@@ -69,6 +69,8 @@
 	"EdibleItemsWithNoFoodBehaviour": [
 		"Life Elixir"
 	],
+	"IndoorsTileIndexesOfKitchens": [ 498, 499, 631, 632, 633 ],
+	"IndoorsTileIndexesOfFridges": [ 173, 258, 500, 634 ],
 	"BurnChanceBase": 0.22,
 	"BurnChancePerIngredient": 0.0035,
 	"FarmhouseKitchenStartModIDs": [

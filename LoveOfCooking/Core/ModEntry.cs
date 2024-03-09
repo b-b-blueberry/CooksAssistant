@@ -77,11 +77,6 @@ namespace LoveOfCooking
 		internal string CarrotName { get { return Interface.Interfaces.UsingPPJACrops ? "Carrot" : $"{ObjectPrefix}carrot"; } }
 		// cook at kitchens
 		internal static Dictionary<string, string> NpcHomeLocations = null;
-		internal static readonly List<int> IndoorsTileIndexesThatActAsCookingStations = new List<int>
-		{
-			498, 499, 631, 632, 633
-		};
-		internal static readonly List<int> IndoorsTileIndexesOfFridges = new List<int>{ 173, 258, 500, 634 };
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
@@ -567,8 +562,8 @@ namespace LoveOfCooking
 				string action = Game1.currentLocation.doesTileHaveProperty((int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, "Action", "Buildings");
 				if (tile is not null)
 				{
-					bool isCookingStationTile = IndoorsTileIndexesThatActAsCookingStations.Contains(tile.TileIndex);
-					bool isFridgeTile = IndoorsTileIndexesOfFridges.Contains(tile.TileIndex);
+					bool isCookingStationTile = ModEntry.ItemDefinitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
+					bool isFridgeTile = ModEntry.ItemDefinitions.IndoorsTileIndexesOfFridges.Contains(tile.TileIndex);
 					if (!Game1.currentLocation.IsOutdoors && isCookingStationTile)
 					{
 						// Try to open a new cooking menu when in NPC homes

@@ -48,6 +48,8 @@ namespace LoveOfCooking
 		public float RegenFinalRate;
 		public Dictionary<string, float> RegenSkillModifiers;
 		public string[] EdibleItemsWithNoFoodBehaviour;
+		public int[] IndoorsTileIndexesOfKitchens;
+		public int[] IndoorsTileIndexesOfFridges;
 		public float BurnChanceBase;
 		public float BurnChancePerIngredient;
 		public string[] FarmhouseKitchenStartModIDs;
