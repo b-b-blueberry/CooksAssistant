@@ -59,13 +59,6 @@ namespace LoveOfCooking
 				}
 			}
 
-			// Ensure vanilla campfire recipe is added
-			if (!Game1.player.craftingRecipes.ContainsKey("Campfire"))
-			{
-				// Re-add campfire to the player's recipe list if it's otherwise missing
-				Game1.player.craftingRecipes["Campfire"] = 0;
-			}
-
 			if (ModEntry.Config.AddCookingSkillAndRecipes)
 			{
 				// Clear daily cooking to free up Cooking experience gains
