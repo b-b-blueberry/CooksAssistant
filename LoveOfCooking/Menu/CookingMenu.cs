@@ -657,46 +657,6 @@ namespace LoveOfCooking.Menu
             }
         }
 
-        public void OpenIngredientsPage()
-        {
-			/*
-			if (_stack.Any() && _stack.Peek() is State.Ingredients)
-				_stack.Pop();
-			_stack.Push(State.Ingredients);
-			
-			// Setup new page
-			this._ingredientsPage.IsVisible = true;
-			_searchTabButton.sourceRect.X = SearchTabButtonSource.X;
-			_ingredientsTabButton.sourceRect.X = SearchTabButtonSource.X + SearchTabButtonSource.Width;
-			this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
-
-			if (Game1.options.SnappyMenus)
-			{
-				this.setCurrentlySnappedComponentTo(_searchResults.Any()
-					? this.UsingSearchGridView
-						? _searchGridClickables.First().myID
-						: _searchListClickables.First().myID
-				: _searchBarClickable.myID);
-			}
-			*/
-		}
-
-		public void CloseIngredientsPage()
-        {
-			/*
-			if (_stack.Any() && _stack.Peek() is State.Ingredients)
-				_stack.Pop();
-			_ingredientsTabButton.sourceRect.X = IngredientsTabButtonSource.X;
-			
-			this._ingredientsPage.IsVisible = false;
-
-			if (_stack.Any() && _stack.Peek() is State.Search)
-			{
-				this.FilterRecipes(_lastFilterUsed, _searchBarTextBox.Text);
-			}
-			*/
-		}
-
 		public void OpenCraftingPage()
 		{
 			// Setup new page
@@ -745,7 +705,6 @@ namespace LoveOfCooking.Menu
             switch (to)
             {
                 case State.Search:
-					this.CloseIngredientsPage();
 					this.CloseRecipePage();
 
 					this.OpenSearchPage();

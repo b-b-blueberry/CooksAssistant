@@ -76,12 +76,12 @@ namespace LoveOfCooking
 			// Add the cookbook for the player once they've reached the unlock date
 			// Internally day and month are zero-indexed, but are one-indexed in data file for consistency with year
 			// Alternatively if the player somehow upgrades their house early, add the cookbook mail
-			if (ModEntry.Config.AddCookingMenu && Utils.HasOrWillReceiveCookbook(who: Game1.player) && !Utils.HasCookbook(who: Game1.player))
+			if (ModEntry.Config.AddCookingMenu && !Utils.HasOrWillReceiveCookbook(who: Game1.player) && !Utils.HasCookbook(who: Game1.player))
 			{
 				bool unlockedFarmhouseKitchen = Game1.player.HouseUpgradeLevel > 0;
 				if (force || unlockedFarmhouseKitchen || Utils.IsCookbookMailDateMet())
 				{
-					Utils.AddCookbook(immediately: false);
+					Utils.AddCookbook(immediately: force);
 					return true;
 				}
 			}
