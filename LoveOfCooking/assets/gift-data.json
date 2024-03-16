@@ -1,8 +1,8 @@
 ﻿{
     "Universal": {
         "Universal_Love": "",
-        "Universal_Like": "chocolate eggsando_half saladsando_half seafoodsando_half",
-        "Universal_Neutral": "",
+        "Universal_Like": "eggsando_half saladsando_half seafoodsando_half",
+        "Universal_Neutral": "chocolate",
         "Universal_Dislike": "burntfood",
         "Universal_Hate": ""
     },
