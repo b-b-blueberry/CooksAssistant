@@ -1,4 +1,16 @@
 ﻿{
+	"CategoryDisplayInformation": {
+		"-81": [ "22", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.forage.label]" ],
+		"-80": [ "591", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.flower.label]" ],
+		"-79": [ "406", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.fruit.label]" ],
+		"-75": [ "278", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.vegetable.label]" ],
+		"-14": [ "640", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.meat.label]" ],
+		"-7": [ "662", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cooking.label]" ],
+		"-2": [ "60", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.gem.label]" ],
+		"-12": [ "546", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mineral.label]" ],
+		"-15": [ "380", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.metal.label]" ],
+		"-74": [ "770", "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seed.label]" ]
+	},
 	"StartingRecipes": [
 		"Fried Egg"
 	],
@@ -8,18 +20,18 @@
 		1
 	],
 	"CookingSkillValues": {
-		// Level rewards
+		// Level-up pages
 		"LevelUpRecipes": {
 			"0": [],
-			"1": [ "burrito", "fritters" ],
-			"2": [ "porridge", "breakfast" ],
-			"3": [ "lobster", "loadedpotato", "stuffedpotato" ],
-			"4": [ "cake", "hotcocoa", "waffles", "mornay" ],
+			"1": [ "bakedpotato", "burrito", "quiche" ],
+			"2": [ "crepes", "hotcocoa", "breakfast", "waffles" ],
+			"3": [ "arancini", "craymornay", "leeks", "lobster" ],
+			"4": [ "chocoflan", "parfait", "profiteroles", "mousse" ],
 			"5": [],
-			"6": [ "redberrypie", "unagi", "cabbagepot", "stew", "onionsoup" ],
-			"7": [ "applepie", "eggsando", "skewers", "tropicalsalad", "burger" ],
-			"8": [ "admiralpie", "saladsando", "dwarfstew", "roast", "hunters" ],
-			"9": [ "gardenpie", "seafoodsando", "curry", "kebab", "oceanplatter" ],
+			"6": [ "cocococktail", "kebab", "nigiri", "unagi", "fruity" ],
+			"7": [ "cherrypie", "eggsando", "lasagna", "summersalad", "burger" ],
+			"8": [ "applepie", "saladsando", "pilaf", "roast", "hunters" ],
+			"9": [ "admiralpie", "seafoodsando", "curry", "paella", "oceanplatter" ],
 			"10": []
 		},
 		// Experience gains
@@ -50,9 +62,38 @@
 		"BurnChanceModifier": 1.5
 	},
 	"ConsoleCommandPrefix": "bb.loc.",
+	"CookingMenuTextColour": {
+		"R": 35,
+		"G": 15,
+		"B": 35,
+		"A": 255
+	},
+	"CookingMenuDividerColour": {
+		"R": 75,
+		"G": 35,
+		"B": 25,
+		"A": 128
+	},
+	"CookingMenuInfoCardColour": {
+		"R": 255,
+		"G": 228,
+		"B": 196,
+		"A": 255
+	},
+	"CookingMenuInfoBorderColour": {
+		"R": 75,
+		"G": 25,
+		"B": 25,
+		"A": 255
+	},
+	"KoreanFontScale": {
+		"X": 1.250,
+		"Y": 0.825
+	},
 	"ShowWalletItems": true,
+	"ShowLockedIngredientsSlots": true,
+	"MaxCookingQuantity": 999,
 	"NpcKitchenFriendshipRequired": 6,
-	"AutoConsumeOilAndSeasoning": false,
 	"ShopDiscounts": {
 		"Saloon": 35
 	},
@@ -80,11 +121,6 @@
 		"minervamaga.FR.BiggerFarmhouses"
 	],
 	"FoodsThatGiveLeftovers": {
-
-		"Pizza": "blueberry.cac.pizza_half",
-		"Chocolate Cake": "blueberry.cac.chocolatecake_half",
-		"Pink Cake": "blueberry.cac.pinkcake_half",
-		"blueberry.cac.cake": "blueberry.cac.cake_half",
 		"blueberry.cac.seafoodsando": "blueberry.cac.seafoodsando_half",
 		"blueberry.cac.eggsando": "blueberry.cac.eggsando_half",
 		"blueberry.cac.saladsando": "blueberry.cac.saladsando_half"

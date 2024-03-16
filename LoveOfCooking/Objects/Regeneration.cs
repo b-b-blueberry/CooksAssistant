@@ -1,12 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using LoveOfCooking.Menu;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceCore;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LoveOfCooking
 {
@@ -17,13 +18,14 @@ namespace LoveOfCooking
 			public float HP;
 			public float EP;
 
-			public float Total => this.HP + this.EP;
+			public readonly float Total => this.HP + this.EP;
 
 			public Regen(float hp, float ep)
 			{
 				this.HP = hp;
 				this.EP = ep;
 			}
+
 
 			public static implicit operator Regen(int operand)
 			{
@@ -105,6 +107,31 @@ namespace LoveOfCooking
 
 		/// <summary> Queue of the most recent 5 tick counts for regenerating player status bars. </summary>
 		protected readonly Queue<Regen> TickerHistory = new();
+
+		/// <summary>
+		/// Reset all variables to default values.
+		/// </summary>
+		public void Reset()
+		{
+			// Active variables
+			this.IsHealthBarVisible = false;
+			this.LastFoodEaten = new();
+			this.PlayerValue = new();
+			this.RemainingValue = new();
+			this.InitialValue = new();
+			this.TicksCurrent = new();
+			this.TicksRequired = new();
+
+			// Config variables
+			this.BaseRate = 0;
+			this.FinalRate = 0;
+			this.HealthRate = 0;
+			this.EnergyRate = 0;
+			this.SkillModifierRate = 0;
+
+			// Debug variables
+			this.TickerHistory.Clear();
+		}
 		
 		/// <summary>
 		/// Register listeners/handlers for game and SMAPI event hooks.
@@ -298,7 +325,7 @@ namespace LoveOfCooking
 				return;
 			}
 
-			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.GetTitleSafeArea();
+			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
 
 			const int heightFromBottom = 4 * Game1.pixelZoom;
 			const int otherBarWidth = 12 * Game1.pixelZoom;
@@ -369,7 +396,7 @@ namespace LoveOfCooking
 				// cooking skill icon
 				e.SpriteBatch.Draw(
 					texture: ModEntry.SpriteSheet,
-					sourceRectangle: AssetManager.CookingSkillIconArea,
+					sourceRectangle: CookingMenu.CookingSkillIconArea,
 					position: new Vector2(
 						x: destArea.X - (barIconOffset.X * Game1.pixelZoom),
 						y: destArea.Y - (barIconOffset.Y * Game1.pixelZoom)),
@@ -388,7 +415,7 @@ namespace LoveOfCooking
 					y: 3 * Game1.pixelZoom);
 				float fillColourHeightRatio = (float)this.RemainingValue.Total / this.InitialValue.Total;
 				int xOffset = borderWidth.X;
-				int yOffset = barIconOffset.Y + (AssetManager.CookingSkillIconArea.Height * Game1.pixelZoom);
+				int yOffset = barIconOffset.Y + (CookingMenu.CookingSkillIconArea.Height * Game1.pixelZoom);
 				width -= (xOffset + borderWidth.X);
 				height -= (yOffset + borderWidth.Y);
 

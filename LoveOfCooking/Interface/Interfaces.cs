@@ -1,4 +1,5 @@
-﻿using StardewModdingAPI;
+﻿using LoveOfCooking.Menu;
+using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
 using System;
@@ -8,7 +9,7 @@ using System.Reflection;
 
 namespace LoveOfCooking.Interface
 {
-	internal static class Interfaces
+    internal static class Interfaces
 	{
 		private static IModHelper Helper => ModEntry.Instance.Helper;
 		private static IManifest ModManifest => ModEntry.Instance.ModManifest;
@@ -18,16 +19,10 @@ namespace LoveOfCooking.Interface
 		private static double TotalSecondsOnLoaded;
 
 		// Loaded APIs
-		internal static IJsonAssetsApi JsonAssets;
 		internal static ILevelExtenderAPI LevelExtender;
-		internal static IManaBarAPI ManaBar;
 
 		// Loaded mods
-		internal static bool UsingSVE;
-		internal static bool UsingPPJACrops;
-		internal static bool UsingPPJATreesAndRecipes;
 		internal static bool UsingCustomCC;
-		internal static bool UsingManaBar;
 		internal static bool UsingLevelExtender;
 		internal static bool UsingBigBackpack;
 		internal static bool UsingFarmhouseKitchenStart;
@@ -41,19 +36,7 @@ namespace LoveOfCooking.Interface
 		{
 			try
 			{
-				if (!IsLoaded)
-				{
-					IdentifyLoadedOptionalMods();
-
-					JsonAssets = Helper.ModRegistry
-						.GetApi<IJsonAssetsApi>
-						("spacechase0.JsonAssets");
-					if (JsonAssets is null)
-					{
-						Log.E("Can't access the Json Assets API. Is the mod installed correctly?");
-						return false;
-					}
-				}
+				// No required APIs to load
 				return true;
 			}
 			catch (Exception e)
@@ -73,9 +56,9 @@ namespace LoveOfCooking.Interface
 			{
 				if (!IsLoaded)
 				{
+					IdentifyLoadedOptionalMods();
 					LoadCustomCommunityCentreContent();
 					IsLoaded = LoadSpaceCoreAPI()
-						&& LoadJsonAssetsObjects()
 						&& LoadModConfigMenuElements()
 						&& LoadLevelExtenderApi();
 				}
@@ -90,14 +73,6 @@ namespace LoveOfCooking.Interface
 
 		private static void IdentifyLoadedOptionalMods()
 		{
-			ManaBar = Helper.ModRegistry
-				.GetApi<IManaBarAPI>
-				("spacechase0.ManaBar");
-			UsingManaBar = ManaBar is not null;
-
-			UsingSVE = Helper.ModRegistry.IsLoaded("FlashShifter.StardewValleyExpandedCP");
-			UsingPPJACrops = Helper.ModRegistry.IsLoaded("PPJA.FruitsAndVeggies");
-			UsingPPJATreesAndRecipes = Helper.ModRegistry.IsLoaded("paradigmnomad.morefood");
 			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
@@ -136,8 +111,6 @@ namespace LoveOfCooking.Interface
 				return false;
 			}
 
-			spaceCore.RegisterSerializerType(type: typeof(Objects.CookingTool));
-
 			return true;
 		}
 
@@ -146,7 +119,7 @@ namespace LoveOfCooking.Interface
 			ICustomCommunityCentreAPI ccc = Helper.ModRegistry
 				.GetApi<ICustomCommunityCentreAPI>
 				("blueberry.CustomCommunityCentre");
-			if (UsingCustomCC && ccc is not null && Utils.AreNewCropsActive())
+			if (UsingCustomCC && ccc is not null)
 			{
 				Log.D("Registering CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
@@ -157,40 +130,6 @@ namespace LoveOfCooking.Interface
 				Log.D("Did not register CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
 			}
-		}
-
-		private static bool LoadJsonAssetsObjects()
-		{
-			if (ModEntry.Config.DebugMode)
-				Log.W("Loading Basic Objects Pack.");
-			JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.BasicObjectsPackPath));
-
-			if (!ModEntry.Config.AddCookingSkillAndRecipes)
-			{
-				Log.W("Did not add new recipes: Recipe additions are disabled in config file.");
-			}
-			else
-			{
-				if (ModEntry.Config.DebugMode)
-					Log.W("Loading New Recipes Pack.");
-				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NewRecipesPackPath));
-			}
-
-			if (!ModEntry.Config.AddNewCropsAndStuff)
-			{
-				Log.W("Did not add new objects: New stuff is disabled in config file.");
-			}
-			else if (UsingPPJACrops)
-			{
-				Log.I("Did not add new crops: [PPJA] Fruits and Veggies already adds these objects.");
-			}
-			else
-			{
-				if (ModEntry.Config.DebugMode)
-					Log.W("Loading New Crops Pack.");
-				JsonAssets.LoadAssets(path: Path.Combine(Helper.DirectoryPath, AssetManager.NewCropsPackPath));
-			}
-			return true;
 		}
 
 		private static bool LoadModConfigMenuElements()
@@ -207,20 +146,6 @@ namespace LoveOfCooking.Interface
 				mod: ModEntry.Instance.ModManifest,
 				reset: () => ModEntry.Config = new Config(),
 				save: () => Helper.WriteConfig(ModEntry.Config));
-			gmcm.OnFieldChanged(
-				mod: ModManifest,
-				onChange: (string key, object value) =>
-				{
-					Log.D($"Config check: {key} => {value}",
-						ModEntry.Config.DebugMode);
-
-					if (key == i18n.Get($"config.option.{"AddNewCropsAndStuff".ToLower()}_name")
-						&& Helper.ModRegistry.IsLoaded("blueberry.CommunityKitchen"))
-                    {
-						// Show warning when using 
-						Log.W("Changes to Community Kitchen bundles won't be applied until you reopen the game.");
-                    }
-				});
 
 			string[] entries = new[]
 			{
@@ -229,15 +154,11 @@ namespace LoveOfCooking.Interface
 				"AddCookingMenu",
 				"AddCookingSkillAndRecipes",
 				"AddCookingToolProgression",
-				//"AddCookingQuestline",
-				"AddNewCropsAndStuff",
 
 				"changes",
 
 				"PlayCookingAnimation",
 				"PlayCookbookAnimation",
-				"AddRecipeRebalancing",
-				"AddBuffReassigning",
 				"HideFoodBuffsUntilEaten",
 				"FoodHealingTakesTime",
 				"FoodCanBurn",
@@ -278,7 +199,7 @@ namespace LoveOfCooking.Interface
 							tooltip: () => i18n.Get(i18nKey + "description"),
 							getValue: () => (string)property.GetValue(ModEntry.Config),
 							setValue: (string value) => property.SetValue(ModEntry.Config, value),
-							allowedValues: Enum.GetNames(typeof(Objects.CookingMenu.Filter)));
+							allowedValues: Enum.GetNames(typeof(CookingMenu.Filter)));
 					}
 				}
 				else
@@ -326,15 +247,6 @@ namespace LoveOfCooking.Interface
 				xp_mod: ModEntry.ItemDefinitions.CookingSkillValues.ExperienceGlobalScaling,
 				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(),
 				cats: null);
-		}
-
-		internal static bool IsManaBarReadyToDraw(Farmer who)
-		{
-			int mana = ManaBar.GetMana(farmer: who);
-			int maxMana = ManaBar.GetMaxMana(farmer: who);
-			bool gameFlags = Context.IsWorldReady && Game1.activeClickableMenu is null && !Game1.eventUp;
-			bool manaFlags = mana > 0 && maxMana > 0 && mana < maxMana;
-			return gameFlags && manaFlags;
 		}
 
 		internal static StardewValley.Objects.Chest GetCommunityCentreFridge(StardewValley.Locations.CommunityCenter cc)

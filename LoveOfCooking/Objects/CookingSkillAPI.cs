@@ -10,7 +10,7 @@ namespace LoveOfCooking.Objects
 	{
 		public enum Profession // DO NOT EDIT
 		{
-			ImprovedOil,
+			ImprovedSeasoning,
 			Restoration,
 			GiftBoost,
 			SalePrice,
@@ -188,7 +188,7 @@ namespace LoveOfCooking.Objects
 			CookingSkill skill = this.GetSkill();
 
 			// Reward players for cooking brand new recipes
-			int newBonus = Game1.player.recipesCooked.ContainsKey(item.ParentSheetIndex)
+			int newBonus = Game1.player.recipesCooked.ContainsKey(item.ItemId)
 				? 0
 				: ModEntry.ItemDefinitions.CookingSkillValues.ExperienceNewRecipeBonus;
 

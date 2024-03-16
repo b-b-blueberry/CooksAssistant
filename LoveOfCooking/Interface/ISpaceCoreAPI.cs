@@ -16,6 +16,5 @@ namespace LoveOfCooking
 		/// </summary>
 		void RegisterSerializerType(Type type);
 		void RegisterCustomProperty(Type declaringType, string name, Type propType, MethodInfo getter, MethodInfo setter);
-		void RegisterCustomLocationContext(string name, Func<Random, LocationWeather> getLocationWeatherForTomorrowFunc);
 	}
 }

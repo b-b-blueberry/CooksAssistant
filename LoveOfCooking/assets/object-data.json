@@ -1,0 +1,961 @@
+﻿{
+    "blueberry.cac.admiralpie": {
+        "Name": "blueberry.cac.admiralpie",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.admiralpie.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.admiralpie.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 395,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 0,
+        "Edibility": 81,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 103,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 1,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 18,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_sand",
+            "food_bakery"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.applepie": {
+        "Name": "blueberry.cac.applepie",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.applepie.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.applepie.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 380,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 1,
+        "Edibility": 88,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_sand",
+            "food_bakery",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.arancini": {
+        "Name": "blueberry.cac.arancini",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.arancini.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.arancini.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 90,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 2,
+        "Edibility": 18,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_orange"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.bakedpotato": {
+        "Name": "blueberry.cac.bakedpotato",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.bakedpotato.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.bakedpotato.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 40,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 3,
+        "Edibility": 55,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_sand"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.breakfast": {
+        "Name": "blueberry.cac.breakfast",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.breakfast.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.breakfast.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 185,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 4,
+        "Edibility": 48,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 100,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 1,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 0,
+                    "Speed": 1,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_yellow",
+            "drink_item",
+            "food_breakfast"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.burger": {
+        "Name": "blueberry.cac.burger",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burger.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burger.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 180,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 5,
+        "Edibility": 63,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_pink",
+            "food_sandwich"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.burntfood": {
+        "Name": "blueberry.cac.burntfood",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burntfood.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burntfood.description]",
+        "Type": "Junk",
+        "Category": -999,
+        "Price": 80,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 6,
+        "Edibility": 18,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_black",
+            "trash_item"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.burrito": {
+        "Name": "blueberry.cac.burrito",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burrito.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burrito.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 185,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 7,
+        "Edibility": 63,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_brown",
+            "food_sandwich"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.cherrypie": {
+        "Name": "blueberry.cac.cherrypie",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cherrypie.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cherrypie.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 180,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 8,
+        "Edibility": 58,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_red",
+            "food_bakery"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.chocoflan": {
+        "Name": "blueberry.cac.chocoflan",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocoflan.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocoflan.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 90,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 9,
+        "Edibility": 46,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_brown",
+            "food_bakery"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.chocolate": {
+        "Name": "blueberry.cac.chocolate",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocolate.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocolate.description]",
+        "Type": "Junk",
+        "Category": -999,
+        "Price": 280,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 10,
+        "Edibility": 10,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 144,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 50,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_dark_brown",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.cocococktail": {
+        "Name": "blueberry.cac.cocococktail",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cocococktail.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cocococktail.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 80,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 11,
+        "Edibility": 34,
+        "IsDrink": true,
+        "Buffs": [
+            {
+                "Id": "Tipsy",
+                "BuffId": "17",
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 0,
+                "IsDebuff": false,
+                "GlowColor": null,
+                "CustomAttributes": null,
+                "CustomFields": null
+            }
+        ],
+        "ContextTags": [
+            "alcohol_item",
+            "color_white",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.craymornay": {
+        "Name": "blueberry.cac.craymornay",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.craymornay.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.craymornay.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 180,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 12,
+        "Edibility": 52,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_dark_gray",
+            "food_seafood"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.crepes": {
+        "Name": "blueberry.cac.crepes",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.crepes.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.crepes.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 95,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 13,
+        "Edibility": 58,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Tipsy",
+                "BuffId": "17",
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 0,
+                "IsDebuff": false,
+                "GlowColor": null,
+                "CustomAttributes": null,
+                "CustomFields": null
+            }
+        ],
+        "ContextTags": [
+            "alcohol_item",
+            "color_orange",
+            "food_bakery",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.mousse": {
+        "Name": "blueberry.cac.mousse",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mousse.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mousse.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 40,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 14,
+        "Edibility": 24,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_brown",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.curry": {
+        "Name": "blueberry.cac.curry",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.curry.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.curry.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 220,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 15,
+        "Edibility": 80,
+        "IsDrink": true,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 77,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 0,
+                    "Speed": 1,
+                    "Defense": -3,
+                    "Attack": 2
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_red",
+            "dye_strong",
+            "food_soup",
+            "food_spicy"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.eggsando": {
+        "Name": "blueberry.cac.eggsando",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 190,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 16,
+        "Edibility": 66,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_white",
+            "food_sandwich"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.eggsando_half": {
+        "Name": "blueberry.cac.eggsando_half",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando_half.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando_half.description]",
+        "Type": "Junk",
+        "Category": -999,
+        "Price": 40,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 17,
+        "Edibility": 33,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_white"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.fruity": {
+        "Name": "blueberry.cac.fruity",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.fruity.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.fruity.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 180,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 18,
+        "Edibility": 48,
+        "IsDrink": true,
+        "Buffs": [
+            {
+                "Id": "Tipsy",
+                "BuffId": "17",
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 0,
+                "IsDebuff": false,
+                "GlowColor": null,
+                "CustomAttributes": null,
+                "CustomFields": null
+            }
+        ],
+        "ContextTags": [
+            "alcohol_item",
+            "color_red",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.hotcocoa": {
+        "Name": "blueberry.cac.hotcocoa",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hotcocoa.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hotcocoa.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 200,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 19,
+        "Edibility": 65,
+        "IsDrink": true,
+        "Buffs": [
+            {
+                "Id": "Drink",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 90,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 2,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_dark_brown",
+            "dye_strong",
+            "drink_item",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.hunters": {
+        "Name": "blueberry.cac.hunters",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hunters.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hunters.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 170,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 20,
+        "Edibility": 65,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 210,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 1,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_brown",
+            "food_soup"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.kebab": {
+        "Name": "blueberry.cac.kebab",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.kebab.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.kebab.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 97,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 21,
+        "Edibility": 48,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_red",
+            "food_sandwich",
+            "food_spicy"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.lasagna": {
+        "Name": "blueberry.cac.lasagna",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lasagna.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lasagna.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 380,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 22,
+        "Edibility": 62,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_sand",
+            "food_bakery"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.leeks": {
+        "Name": "blueberry.cac.leeks",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.leeks.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.leeks.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 90,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 23,
+        "Edibility": 28,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 160,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 1,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 1,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_sand"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.lobster": {
+        "Name": "blueberry.cac.lobster",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lobster.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lobster.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 150,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 24,
+        "Edibility": 28,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_red",
+            "food_seafood"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.nigiri": {
+        "Name": "blueberry.cac.nigiri",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.nigiri.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.nigiri.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 60,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 25,
+        "Edibility": 38,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_gold",
+            "food_sushi"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.oceanplatter": {
+        "Name": "blueberry.cac.oceanplatter",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.oceanplatter.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.oceanplatter.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 420,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 26,
+        "Edibility": 84,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_cyan",
+            "dye_medium",
+            "food_seafood"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.paella": {
+        "Name": "blueberry.cac.paella",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.paella.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.paella.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 340,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 27,
+        "Edibility": 74,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_gold",
+            "dye_medium",
+            "food_seafood"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.parfait": {
+        "Name": "blueberry.cac.parfait",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.parfait.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.parfait.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 280,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 28,
+        "Edibility": 22,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_purple",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.pilaf": {
+        "Name": "blueberry.cac.pilaf",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.pilaf.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.pilaf.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 140,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 29,
+        "Edibility": 28,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_sand"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.profiteroles": {
+        "Name": "blueberry.cac.profiteroles",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.profiteroles.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.profiteroles.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 60,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 30,
+        "Edibility": 26,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_brown",
+            "food_sweet",
+            "food_bakery"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.quiche": {
+        "Name": "blueberry.cac.quiche",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.quiche.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.quiche.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 250,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 31,
+        "Edibility": 55,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_gold",
+            "food_bakery"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.roast": {
+        "Name": "blueberry.cac.roast",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.roast.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.roast.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 440,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 32,
+        "Edibility": 89,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_brown",
+            "dye_medium",
+            "food_soup"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.saladsando": {
+        "Name": "blueberry.cac.saladsando",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 195,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 33,
+        "Edibility": 33,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_green",
+            "food_salad",
+            "food_sandwich"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.saladsando_half": {
+        "Name": "blueberry.cac.saladsando_half",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando_half.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando_half.description]",
+        "Type": "Junk",
+        "Category": -999,
+        "Price": 75,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 34,
+        "Edibility": 66,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_green"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.seafoodsando": {
+        "Name": "blueberry.cac.seafoodsando",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 200,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 35,
+        "Edibility": 47,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_cyan",
+            "food_sandwich",
+            "food_seafood"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.seafoodsando_half": {
+        "Name": "blueberry.cac.seafoodsando_half",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando_half.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando_half.description]",
+        "Type": "Junk",
+        "Category": -999,
+        "Price": 80,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 36,
+        "Edibility": 47,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_cyan"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.summersalad": {
+        "Name": "blueberry.cac.summersalad",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.summersalad.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.summersalad.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 425,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 37,
+        "Edibility": 98,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_purple",
+            "food_salad"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.unagi": {
+        "Name": "blueberry.cac.unagi",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.unagi.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.unagi.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 240,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 38,
+        "Edibility": 40,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [
+            "color_green",
+            "food_sushi"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.waffles": {
+        "Name": "blueberry.cac.waffles",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.waffles.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.waffles.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 380,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 39,
+        "Edibility": 45,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 142,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 1,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 1,
+                    "MaxStamina": 20,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_purple",
+            "dye_medium",
+            "food_breakfast",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
+    "blueberry.cac.cookbook": {
+        "Name": "blueberry.cac.cookbook",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cookbook.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cookbook.description]",
+        "Type": "Junk",
+        "Category": -999,
+        "Price": 0,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 40,
+        "Edibility": 0,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [],
+        "CustomFields": {}
+    }
+}

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using Microsoft.Xna.Framework;
 
 namespace LoveOfCooking
 {
 	public class SkillValues
 	{
-		// Level rewards
+		// Level-up pages
 		public IDictionary<int, IList<string>> LevelUpRecipes;
 		// Experience gains
 		public Color ExperienceBarColor;
@@ -34,13 +35,20 @@ namespace LoveOfCooking
 
 	public class Definitions
 	{
+		public Dictionary<string, string[]> CategoryDisplayInformation;
 		public string[] StartingRecipes;
 		public int[] CookbookMailDate;
 		public SkillValues CookingSkillValues;
 		public string ConsoleCommandPrefix;
+		public Color CookingMenuTextColour;
+		public Color CookingMenuDividerColour;
+		public Color CookingMenuInfoCardColour;
+		public Color CookingMenuInfoBorderColour;
+		public Vector2 KoreanFontScale;
 		public bool ShowWalletItems;
+		public bool ShowLockedIngredientsSlots;
+		public uint MaxCookingQuantity;
 		public uint NpcKitchenFriendshipRequired;
-		public bool AutoConsumeOilAndSeasoning;
 		public Dictionary<string, int> ShopDiscounts;
 		public int RegenBaseRate;
 		public float RegenHealthRate;

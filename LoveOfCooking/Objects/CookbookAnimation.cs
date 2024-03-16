@@ -45,13 +45,33 @@ namespace LoveOfCooking.Objects
 		private static float FadeTo => 0.5f;
 		private static readonly Point Size = new(x: 256, y: 256);
 
-		public CookbookAnimation() {}
+		public CookbookAnimation()
+		{
+			this.Reset();
+		}
 
 		public static void Reload(IModHelper helper)
 		{
 			CookbookAnimation._texture = Game1.content.Load
 				<Texture2D>
 				(AssetManager.GameContentCookbookSpriteSheetPath);
+		}
+
+		public void Reset()
+		{
+			// Timer
+			this._start = 0;
+
+			// Animation
+			this._animation = Animation.None;
+			this._frame = 0;
+			this._fade = 0;
+			this._isVisible = false;
+			this._isPlaying = false;
+			this._alpha = 0;
+			this._scale = 0;
+			this._offset = Point.Zero;
+			this._onComplete = null;
 		}
 
 		public void Register(IModHelper helper)
@@ -234,7 +254,7 @@ namespace LoveOfCooking.Objects
 
 		private void Draw(object sender, RenderedHudEventArgs e)
 		{
-			if (this._fade <= 0 || CookbookAnimation._texture == null)
+			if (this._fade <= 0 || CookbookAnimation._texture is null)
 				return;
 
 			Rectangle area = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;

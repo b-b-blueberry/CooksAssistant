@@ -1,0 +1,129 @@
+{
+    "blueberry.LoveOfCooking.cookingtool.level0": {
+        "ClassName": "GenericTool",
+        "Name": "blueberry.LoveOfCooking.cookingtool.level0",
+        "AttachmentSlots": -1,
+        "SalePrice": -1,
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.description.basic]",
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+        "SpriteIndex": 0,
+        "MenuSpriteIndex": -1,
+        "UpgradeLevel": 0,
+        "ApplyUpgradeLevelToDisplayName": false,
+        "ConventionalUpgradeFrom": null,
+        "UpgradeFrom": null,
+        "CanBeLostOnDeath": false,
+        "SetProperties": null,
+        "ModData": null,
+        "CustomFields": {}
+    },
+    "blueberry.LoveOfCooking.cookingtool.level1": {
+        "ClassName": "GenericTool",
+        "Name": "blueberry.LoveOfCooking.cookingtool.level1",
+        "AttachmentSlots": -1,
+        "SalePrice": 1000,
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.description.copper]",
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+        "SpriteIndex": 1,
+        "MenuSpriteIndex": -1,
+        "UpgradeLevel": 1,
+        "ApplyUpgradeLevelToDisplayName": true,
+        "ConventionalUpgradeFrom": null,
+        "UpgradeFrom": [
+            {
+                "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 0 0",
+                "Price": -1,
+                "RequireToolId": null,
+                "TradeItemId": "(O)334",
+                "TradeItemAmount": 5
+            }
+        ],
+        "CanBeLostOnDeath": false,
+        "SetProperties": null,
+        "ModData": null,
+        "CustomFields": {}
+    },
+    "blueberry.LoveOfCooking.cookingtool.level2": {
+        "ClassName": "GenericTool",
+        "Name": "blueberry.LoveOfCooking.cookingtool.level2",
+        "AttachmentSlots": -1,
+        "SalePrice": 2500,
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.description.steel]",
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+        "SpriteIndex": 2,
+        "MenuSpriteIndex": -1,
+        "UpgradeLevel": 2,
+        "ApplyUpgradeLevelToDisplayName": true,
+        "ConventionalUpgradeFrom": null,
+        "UpgradeFrom": [
+            {
+                "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 1 1",
+                "Price": -1,
+                "RequireToolId": null,
+                "TradeItemId": "(O)335",
+                "TradeItemAmount": 5
+            }
+        ],
+        "CanBeLostOnDeath": false,
+        "SetProperties": null,
+        "ModData": null,
+        "CustomFields": {}
+    },
+    "blueberry.LoveOfCooking.cookingtool.level3": {
+        "ClassName": "GenericTool",
+        "Name": "blueberry.LoveOfCooking.cookingtool.level3",
+        "AttachmentSlots": -1,
+        "SalePrice": 5000,
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.description.gold]",
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+        "SpriteIndex": 3,
+        "MenuSpriteIndex": -1,
+        "UpgradeLevel": 3,
+        "ApplyUpgradeLevelToDisplayName": true,
+        "ConventionalUpgradeFrom": null,
+        "UpgradeFrom": [
+            {
+                "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 2 2",
+                "Price": -1,
+                "RequireToolId": null,
+                "TradeItemId": "(O)336",
+                "TradeItemAmount": 5
+            }
+        ],
+        "CanBeLostOnDeath": false,
+        "SetProperties": null,
+        "ModData": null,
+        "CustomFields": {}
+    },
+    "blueberry.LoveOfCooking.cookingtool.level4": {
+        "ClassName": "GenericTool",
+        "Name": "blueberry.LoveOfCooking.cookingtool.level4",
+        "AttachmentSlots": -1,
+        "SalePrice": 12500,
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.description.iridium]",
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+        "SpriteIndex": 4,
+        "MenuSpriteIndex": -1,
+        "UpgradeLevel": 4,
+        "ApplyUpgradeLevelToDisplayName": true,
+        "ConventionalUpgradeFrom": null,
+        "UpgradeFrom": [
+            {
+                "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 3 3",
+                "Price": -1,
+                "RequireToolId": null,
+                "TradeItemId": "(O)337",
+                "TradeItemAmount": 5
+            }
+        ],
+        "CanBeLostOnDeath": false,
+        "SetProperties": null,
+        "ModData": null,
+        "CustomFields": {}
+    }
+}

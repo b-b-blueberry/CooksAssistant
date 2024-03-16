@@ -1,12 +1,12 @@
-﻿using HarmonyLib;
-using StardewValley;
+﻿using StardewValley;
 using StardewValley.Menus;
+using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking.HarmonyPatches
 {
 	public static class CraftingPagePatches
 	{
-		public static void Patch(Harmony harmony)
+		public static void Patch(HarmonyLib.Harmony harmony)
 		{
 			Log.D($"Applying patches to CraftingPage.clickCraftingRecipe",
 				ModEntry.Config.DebugMode);
@@ -38,14 +38,14 @@ namespace LoveOfCooking.HarmonyPatches
 				return;
 
 			Item item = ___lastCookingHover;
-			CraftingRecipe recipe = new CraftingRecipe(item.Name, isCookingRecipe: true);
+			CraftingRecipe recipe = new(name: item.Name, isCookingRecipe: true);
 
 			// Apply burn chance to destroy cooked food at random
 			/*
 			if (GameObjects.CookingMenu.GetBurnChance(recipe) > Game1.random.NextDouble())
 			{
 				// Add burnt food to inventory if possible
-				var burntItem = new StardewValley.Object(Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), 1);
+				var burntItem = new ItemRegistry.Create<StardewValley.Object>(Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), 1);
 				ModEntry.AddOrDropItem(burntItem);
 
 				// Hunt down the usual food to be incinerated
