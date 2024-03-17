@@ -37,9 +37,9 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle CookingSlotOpenSource = new(0, 208, 28, 28);
         internal static readonly Rectangle CookingSlotLockedSource = new(28, 208, 28, 28);
         internal static readonly Rectangle CookButtonSource = new(128, 0, 16, 22);
-		internal static readonly Rectangle FoldedTabButtonSource = new(32, 0, 16, 16);
-		internal static readonly Rectangle SearchTabButtonSource = new(48, 0, 16, 16);
-		internal static readonly Rectangle IngredientsTabButtonSource = new(64, 0, 16, 16);
+		internal static readonly Rectangle FoldedTabButtonSource = new(32, 0, 18, 19);
+		internal static readonly Rectangle SearchTabButtonSource = new(50, 0, 18, 19);
+		internal static readonly Rectangle IngredientsTabButtonSource = new(68, 0, 18, 19);
         internal static readonly Rectangle FilterContainerSource = new(245, 180, 9, 20);
         internal static readonly Rectangle FilterIconSource = new(66, 208, 12, 12);
         internal static readonly Rectangle ToggleViewButtonSource = new(96, 224, 16, 16);
@@ -388,7 +388,7 @@ namespace LoveOfCooking.Menu
             }
 
 			// Tab buttons
-			this._searchTabButton.bounds.X = this._cookbookLeftRect.X - 10 * Scale;
+			this._searchTabButton.bounds.X = this._cookbookLeftRect.X - 12 * Scale;
 			this._searchTabButton.bounds.Y = this._cookbookLeftRect.Y + 18 * Scale;
 
             // Page layouts
