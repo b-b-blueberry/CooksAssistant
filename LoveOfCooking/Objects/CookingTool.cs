@@ -14,6 +14,14 @@ namespace LoveOfCooking.Objects
 		public const int MaxUpgradeLevel = 4;
 		public const int MinIngredients = 1;
 		public const int MaxIngredients = 6;
+		public enum Level
+		{
+			Basic,
+			Copper,
+			Steel,
+			Gold,
+			Iridium
+		}
 
 		/// <summary>
 		/// Performs most behaviours from <see cref="Tool.actionWhenPurchased"/>, 

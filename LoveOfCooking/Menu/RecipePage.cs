@@ -215,7 +215,6 @@ namespace LoveOfCooking.Menu
 			bool knowsRecipe = recipe is not null && Game1.player.knowsRecipe(recipe.name);
             bool isKorean = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts;
             Point cursor = Game1.getMousePosition(ui_scale: true);
-            Vector2 textScale = isKorean ? ModEntry.ItemDefinitions.KoreanFontScale : Vector2.One;
             float textHeightCheck;
 			int[] textHeightCheckMilestones = new[] { 60, 100, 120 };
             Vector2 textPosition = Vector2.Zero;
@@ -253,7 +252,7 @@ namespace LoveOfCooking.Menu
                 shadowIntensity: favouriteColour.A / 255 * 0.35f);
 
 			float titleScale = 1f;
-            textWidth = (int)(40.5f * Scale * textScale.Y);
+            textWidth = (int)(40.5f * Scale * this._textScale.Y);
             text = knowsRecipe
                 ? recipe.DisplayName
                 : I18n.Get("menu.cooking_recipe.title_unknown");
@@ -272,8 +271,8 @@ namespace LoveOfCooking.Menu
             // Recipe title
             textPosition.Y = this.LeftButton.bounds.Y + 1 * Scale;
             textPosition.Y -= (Game1.smallFont.MeasureString(
-                Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 6 * Scale) * textScale.Y;
-            textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * textScale.Y * titleScale;
+                Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 6 * Scale) * this._textScale.Y;
+            textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y * titleScale;
             if (textHeightCheck * titleScale > textHeightCheckMilestones[0])
                 textPosition.Y += (textHeightCheck - textHeightCheckMilestones[0]) / 2;
 			this.DrawText(
@@ -288,8 +287,8 @@ namespace LoveOfCooking.Menu
             textPosition.X = 0;
             textPosition.Y = this.LeftButton.bounds.Y + this.LeftButton.bounds.Height + 6 * Scale;
             if (textHeightCheck > textHeightCheckMilestones[0])
-                textPosition.Y += textHeightCheck - 50 * textScale.X;
-            textWidth = (int)(this._textWidth * textScale.X);
+                textPosition.Y += textHeightCheck - 50 * this._textScale.X;
+            textWidth = (int)(this._textWidth * this._textScale.X);
             text = knowsRecipe
                 ? recipe.description
                 : I18n.Get("menu.cooking_recipe.title_unknown");
@@ -304,13 +303,13 @@ namespace LoveOfCooking.Menu
             // Recipe ingredients
             if (textHeightCheck > textHeightCheckMilestones[0] && Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y < 80)
                 textPosition.Y -= 6 * Scale;
-            textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * textScale.Y;
+            textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
             if (textHeightCheck > textHeightCheckMilestones[2])
                 textPosition.Y += 6 * Scale;
             if (textHeightCheck > textHeightCheckMilestones[1] && recipe.getNumberOfIngredients() < 6)
                 textPosition.Y += 6 * Scale;
             textPosition.Y += TextDividerGap + Game1.smallFont.MeasureString(
-                Game1.parseText(textScale.Y < 1 ? "Hippo!\nHippo!" : "Hippo!\nHippo!\nHippo!", Game1.smallFont, textWidth)).Y * textScale.Y;
+                Game1.parseText(this._textScale.Y < 1 ? "Hippo!\nHippo!" : "Hippo!\nHippo!\nHippo!", Game1.smallFont, textWidth)).Y * this._textScale.Y;
 			this.DrawHorizontalDivider(
 				b: b,
 				x: 0,
@@ -336,7 +335,7 @@ namespace LoveOfCooking.Menu
 					colour: SubtextColour);
             }
             textPosition.Y += Game1.smallFont.MeasureString(
-            Game1.parseText(text, Game1.smallFont, textWidth)).Y * textScale.Y;
+            Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
 			this.DrawHorizontalDivider(
 				b: b,
 				x: 0,
@@ -405,7 +404,7 @@ namespace LoveOfCooking.Menu
                     if (Game1.options.showAdvancedCraftingInformation)
                     {
 						Point position = new(
-                            x: (int)(this._lineWidth - 16 * Scale * textScale.X),
+                            x: (int)(this._lineWidth - 16 * Scale * this._textScale.X),
                             y: (int)(textPosition.Y + 0.5f * Scale));
                         b.Draw(
                             texture: Game1.mouseCursors,

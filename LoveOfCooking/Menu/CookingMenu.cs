@@ -37,6 +37,8 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle CookingSlotOpenSource = new(0, 208, 28, 28);
         internal static readonly Rectangle CookingSlotLockedSource = new(28, 208, 28, 28);
         internal static readonly Rectangle CookButtonSource = new(128, 0, 16, 22);
+        internal static readonly Rectangle CookingToolBigIconSource = new(0, 160, 24, 24);
+        internal static readonly Rectangle CookingDropInIconSource = new(119, 196, 10, 12);
 		internal static readonly Rectangle FoldedTabButtonSource = new(32, 0, 18, 19);
 		internal static readonly Rectangle SearchTabButtonSource = new(50, 0, 18, 19);
 		internal static readonly Rectangle IngredientsTabButtonSource = new(68, 0, 18, 19);
@@ -112,10 +114,12 @@ namespace LoveOfCooking.Menu
         internal const string MenuChangeCue = "bigSelect";
         internal const string MenuCloseCue = "bigDeSelect";
         internal const string RecipeCue = "newRecipe";
+        internal const string ScrollCue = "smallSelect";
+        internal const string CookCue = "throwDownITem";
 
-        // Menu data
-        // state
-        public enum State
+		// Menu data
+		// state
+		public enum State
         {
             Opening,
             Search,
@@ -175,9 +179,7 @@ namespace LoveOfCooking.Menu
         // State properties
         public List<IList<Item>> Items => this.InventoryManager.Items;
         public List<CraftingRecipe> Recipes => this._searchPage.Results;
-        public bool ReadyToCook => this.RecipeInfo is not null
-            && this.RecipeInfo.NumReadyToCraft > 0
-            && !this._craftingPage.IsConfirmModalUp;
+        public bool ReadyToCook => this.RecipeInfo?.NumReadyToCraft > 0;
 
         public CookingMenu(List<CraftingRecipe> recipes = null, Dictionary<IInventory, Chest> materialContainers = null, string initialRecipe = null)
             : base(inventory: null, context: null)
@@ -253,6 +255,8 @@ namespace LoveOfCooking.Menu
             {
                 Game1.delayedActions.Add(new(delay: 0, behavior: this.snapToDefaultClickableComponent));
             }
+
+            ModEntry.Instance.States.Value.HasOpenedCookingMenuEver = true;
         }
 
         private void CreateClickableComponents()
@@ -327,15 +331,10 @@ namespace LoveOfCooking.Menu
             this._craftingPage.CookButton.upNeighborID = this._craftingPage.FirstIngredientSlot.myID;
 			this._craftingPage.CookButton.downNeighborID = 0;
 
-			this._craftingPage.ConfirmButton.leftNeighborID = this._craftingPage.QuantityUpButton.myID;
-			this._craftingPage.CancelButton.leftNeighborID = this._craftingPage.QuantityDownButton.myID;
-			this._craftingPage.QuantityUpButton.rightNeighborID = this._craftingPage.QuantityDownButton.rightNeighborID = this._craftingPage.ConfirmButton.myID;
+			this._craftingPage.CookButton.leftNeighborID = this._craftingPage.QuantityUpButton.myID;
+			this._craftingPage.QuantityUpButton.rightNeighborID = this._craftingPage.QuantityDownButton.rightNeighborID = this._craftingPage.CookButton.myID;
 			this._craftingPage.QuantityUpButton.downNeighborID = this._craftingPage.QuantityDownButton.myID;
 			this._craftingPage.QuantityDownButton.upNeighborID = this._craftingPage.QuantityUpButton.myID;
-			this._craftingPage.ConfirmButton.upNeighborID = this._craftingPage.QuantityUpButton.upNeighborID = this._craftingPage.FirstIngredientSlot.myID;
-			this._craftingPage.CancelButton.upNeighborID = this._craftingPage.ConfirmButton.myID;
-			this._craftingPage.ConfirmButton.downNeighborID = this._craftingPage.CancelButton.myID;
-			this._craftingPage.CancelButton.downNeighborID = this._craftingPage.QuantityDownButton.downNeighborID = 0;
 
 			// Child component navigation
 
@@ -447,7 +446,6 @@ namespace LoveOfCooking.Menu
 
 			// Behaviours on recipe changed
 			this._searchPage.GoToRecipe(index: index);
-			this._craftingPage.IsConfirmModalUp = false;
             if (this._recipePage.IsVisible)
             {
 				this.TryAutoFillIngredients();
@@ -525,14 +523,15 @@ namespace LoveOfCooking.Menu
 
 			// Refresh contextual interactibles
 			if (itemWasMoved)
-            {
-                if (this._craftingPage.IsConfirmModalUp)
+			{
+				if (this.RecipeInfo is not null)
+				{
+					this.UpdateCraftableCounts(recipe: this.RecipeInfo.Recipe);
+				}
+				if (this.ReadyToCook)
                 {
-					this._craftingPage.ToggleCookingConfirmPopup(playSound: false);
-                }
-                if (this.RecipeInfo is not null)
-                {
-    				this.UpdateCraftableCounts(recipe: this.RecipeInfo.Recipe);
+                    // Snap to cook button
+					this._craftingPage.OnReadyToCookChanged(playSound: false);
                 }
             }
 
@@ -637,7 +636,6 @@ namespace LoveOfCooking.Menu
             this.RecipeInfo = null;
 
 			// Setup new page
-			this._craftingPage.IsConfirmModalUp = false;
 			this._searchTabButton.sourceRect = FoldedTabButtonSource;
 
             if (Game1.options.SnappyMenus)
@@ -1161,9 +1159,7 @@ namespace LoveOfCooking.Menu
                         // Move out of inventory into crafting page
                         next = this.ReadyToCook
                             ? this._craftingPage.CookButton.myID
-                            : this._craftingPage.IsConfirmModalUp
-                                ? this._craftingPage.ConfirmButton.myID
-                                : this._craftingPage.FirstIngredientSlot.myID;
+                            : this._craftingPage.FirstIngredientSlot.myID;
                     else if (cur == this.InventoryManager.TabButton.myID)
                         next = this._recipePage.IsVisible
 							? this._searchTabButton.myID
@@ -1201,9 +1197,7 @@ namespace LoveOfCooking.Menu
                         // Moving from last ingredient slot
                         next = this.ReadyToCook
                             ? this._craftingPage.CookButton.myID
-                            : this._craftingPage.IsConfirmModalUp
-                                ? this._craftingPage.ConfirmButton.myID
-                                : 0; // First element in inventory
+                            : 0; // First element in inventory
                     else if (cur == this._searchPage.UpButton.myID)
                         // Moving from search results scroll up arrow
                         next = this._searchPage.CanScrollDown

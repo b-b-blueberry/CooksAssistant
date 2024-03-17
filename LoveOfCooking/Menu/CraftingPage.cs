@@ -9,79 +9,40 @@ using Netcode;
 using StardewValley;
 using StardewValley.Menus;
 using static LoveOfCooking.Menu.CookingMenu;
-using static LoveOfCooking.ModEntry;
 using static StardewValley.LocalizedContentManager;
 
 namespace LoveOfCooking.Menu
 {
 	internal class CraftingPage : GenericPage
     {
-        public bool IsConfirmModalUp { get; set; }
         public ClickableComponent FirstIngredientSlot => this.IngredientSlotButtons.First();
         public ClickableComponent LastIngredientSlot => this.IngredientSlotButtons.Last();
 
 		// Layout
-		private readonly LanguageCode _locale;
-        private static readonly Point CookTextSourceOrigin = new(0, 240);
-        private static readonly Dictionary<LanguageCode, Rectangle> CookTextSource = new();
-        private static readonly Dictionary<LanguageCode, int> CookTextSourceWidths = new()
-        {
-            { LanguageCode.en, 32 },
-            { LanguageCode.fr, 45 },
-            { LanguageCode.es, 42 },
-            { LanguageCode.pt, 48 },
-            { LanguageCode.ja, 50 },
-            { LanguageCode.zh, 36 },
-            { LanguageCode.ko, 48 },
-            { LanguageCode.ru, 53 },
-            { LanguageCode.de, 40 },
-            { LanguageCode.it, 48 },
-            { LanguageCode.tr, 27 }
-        };
 		private const int IngredientSlotsWide = 3;
 		private const int IngredientSlotsHigh = 2;
-		private const int CookTextSourceHeight = 16;
-        private const int CookTextSideSourceWidth = 5;
-        private int _cookTextMiddleSourceWidth;
 
 		// Components
 		private Rectangle _cookIconArea;
 		private Rectangle _quantityScrollableArea;
-		public ClickableComponent CookButton { get; private set; }
+		public ClickableTextureComponent CookButton { get; private set; }
 		public ClickableTextureComponent QuantityUpButton { get; private set; }
 		public ClickableTextureComponent QuantityDownButton { get; private set; }
-		public ClickableTextureComponent ConfirmButton { get; private set; }
-		public ClickableTextureComponent CancelButton { get; private set; }
 		public List<ClickableTextureComponent> IngredientSlotButtons { get; private set; } = new();
 
+		// Animations
+		private double _animBounceTimer;
+		private double _animBounceValue;
+
 		// Text entry
-		private readonly SpriteFont _quantityTextFont = Game1.dialogueFont;
-        private Rectangle _quantityTextBoxBounds;
+		private SpriteFont _quantityFont => Game1.dialogueFont;
         private int _quantity;
 
-        public override ClickableComponent DefaultClickableComponent => this.IsConfirmModalUp ? this.ConfirmButton : this.CookButton;
+        public override ClickableComponent DefaultClickableComponent => this.CookButton;
 
         public CraftingPage(CookingMenu menu) : base(menu: menu)
         {
 			this.IsLeftSide = false;
-
-			// 'Cook!' button localisations
-			this._locale = CookTextSourceWidths.ContainsKey(CurrentLanguageCode) ? CurrentLanguageCode : LanguageCode.en;
-			int xOffset = 0;
-			int yOffset = 0;
-            CookTextSource.Clear();
-            foreach (var pair in CookTextSourceWidths)
-            {
-                if (xOffset + pair.Value > CookingMenu.Texture.Width)
-                {
-                    xOffset = 0;
-                    yOffset += CookTextSourceHeight;
-                }
-                CookTextSource.Add(pair.Key, new(
-                    CookTextSourceOrigin.X + xOffset, CookTextSourceOrigin.Y + yOffset,
-                    pair.Value, CookTextSourceHeight));
-                xOffset += pair.Value;
-            }
         }
 
         public bool TryClickIngredientSlot(int x, int y, out int index)
@@ -108,6 +69,7 @@ namespace LoveOfCooking.Menu
             if (this._quantity != value)
 			{
 				this._quantity = value;
+				Game1.playSound(ScrollCue);
 			}
             else
 			{
@@ -115,20 +77,16 @@ namespace LoveOfCooking.Menu
 			}
         }
 
-        public void ToggleCookingConfirmPopup(bool playSound)
+        public void OnReadyToCookChanged(bool playSound)
 		{
             // Reset quantity to cook
 			this._quantity = 1;
 
-            // Toggle popup state
-			this.IsConfirmModalUp = !this.IsConfirmModalUp;
-            if (playSound)
-                Game1.playSound(this.IsConfirmModalUp ? MenuChangeCue : MenuCloseCue);
-
+			// Snap to best component
             if (Game1.options.SnappyMenus)
             {
-				this.Menu.setCurrentlySnappedComponentTo(this.IsConfirmModalUp
-                    ? this.ConfirmButton.myID
+				this.Menu.setCurrentlySnappedComponentTo(this.Menu.ReadyToCook
+                    ? this.CookButton.myID
                     : this.IngredientSlotButtons.First().myID);
             }
         }
@@ -156,52 +114,42 @@ namespace LoveOfCooking.Menu
 		public override List<ClickableComponent> CreateClickableComponents()
         {
 			this.CookButton = new(
-                bounds: Rectangle.Empty,
-                name: "cook");
+				name: "cook",
+				bounds: new(-1, -1, CookingToolBigIconSource.Width * Scale, CookingToolBigIconSource.Height * Scale),
+				label: null,
+				hoverText: null,
+				texture: CookingMenu.Texture,
+				sourceRect: CookingToolBigIconSource,
+				scale: Scale,
+				drawShadow: true);
+
+			int icon = ModEntry.Config.AddCookingToolProgression ? CookingTool.GetEffectiveGlobalLevel() : (int)CookingTool.Level.Steel;
+			this.CookButton.sourceRect.X += this.CookButton.sourceRect.Width * icon;
+
 			this.QuantityUpButton = new(
                 name: "quantityUp",
-                bounds: new(-1, -1, UpSmallButtonSource.Width * Scale, UpSmallButtonSource.Height * Scale),
+                bounds: new(-1, -1, PlusButtonSource.Width * Scale, PlusButtonSource.Height * Scale),
                 label: null,
                 hoverText: null,
-                texture: CookingMenu.Texture,
-                sourceRect: UpSmallButtonSource,
+                texture: Game1.mouseCursors,
+                sourceRect: PlusButtonSource,
                 scale: Scale,
                 drawShadow: true);
 			this.QuantityDownButton = new(
                 name: "quantityDown",
-                bounds: new(-1, -1, DownSmallButtonSource.Width * Scale, DownSmallButtonSource.Height * Scale),
+                bounds: new(-1, -1, MinusButtonSource.Width * Scale, MinusButtonSource.Height * Scale),
                 label: null,
                 hoverText: null,
-                texture: CookingMenu.Texture,
-                sourceRect: DownSmallButtonSource,
+                texture: Game1.mouseCursors,
+                sourceRect: MinusButtonSource,
                 scale: Scale,
-                drawShadow: true);
-			this.ConfirmButton = new(
-                name: "confirm",
-                bounds: new(-1, -1, OkButtonSource.Width, OkButtonSource.Height),
-                label: null,
-                hoverText: null,
-                texture: Game1.mouseCursors,
-                sourceRect: OkButtonSource,
-                scale: 1f,
-                drawShadow: true);
-			this.CancelButton = new(
-                name: "cancel",
-                bounds: new(-1, -1, NoButtonSource.Width, NoButtonSource.Height),
-                label: null,
-                hoverText: null,
-                texture: Game1.mouseCursors,
-                sourceRect: NoButtonSource,
-                scale: 1f,
                 drawShadow: true);
 
             List<ClickableComponent> components = new()
             {
 				this.CookButton,
 				this.QuantityUpButton,
-				this.QuantityDownButton,
-				this.ConfirmButton,
-				this.CancelButton
+				this.QuantityDownButton
             };
             components.AddRange(this.IngredientSlotButtons);
 
@@ -225,9 +173,6 @@ namespace LoveOfCooking.Menu
             base.LayoutComponents(area: area);
 
             Point offset = Point.Zero;
-
-			int extraOffset = 0;
-			int extraSpace = 0;
 
 			// Ingredient slots buttons
 			{
@@ -262,56 +207,43 @@ namespace LoveOfCooking.Menu
 						++i;
 					}
 				}
+
+				offset.Y += maxHeight;
 			}
 
-			// Cook! button
-			offset.X = this.ContentArea.X + this.ContentArea.Width / 2 - MarginRight;
-            offset.Y = this.ContentArea.Y + 86 * Scale;
-			this._cookTextMiddleSourceWidth = Math.Max(9 * Scale, CookTextSource[this._locale].Width);
-			this.CookButton.bounds = new(
-				x: offset.X,
-				y: offset.Y,
-				width: CookTextSideSourceWidth * Scale * 2 + this._cookTextMiddleSourceWidth * Scale,
-				height: CookButtonSource.Height * Scale);
-			this.CookButton.bounds.X -= CookTextSourceWidths[this._locale] / 2 * Scale - CookTextSideSourceWidth * Scale + MarginLeft;
+			// Cooking buttons
+			{
+				int extraSpace;
 
-            // Cooking confirmation popup buttons
-            offset.X -= 40 * Scale;
-            offset.Y -= 9 * Scale;
-			this._cookIconArea = new(
-				x: offset.X,
-				y: offset.Y + 6,
-				width: 90,
-				height: 90);
+				// Cook! button
+				extraSpace = 8 * Scale;
+				offset.Y = this.ContentArea.Height / 4 * 3 - this.CookButton.bounds.Height / 2 - extraSpace;
+				this.CookButton.bounds.X = this.ContentArea.Left + this.ContentArea.Width / 7 * 3;
+				this.CookButton.bounds.Y = this.ContentArea.Top + offset.Y;
 
-            offset.X += 12 * Scale + this._cookIconArea.Width;
-			this.QuantityUpButton.bounds.X = this.QuantityDownButton.bounds.X = offset.X;
-			this.QuantityUpButton.bounds.Y = offset.Y - 12;
-
-			int quantityWidth = 96;
-            Vector2 textSize = this._quantityTextFont.MeasureString(
-                Game1.parseText("999", this._quantityTextFont, quantityWidth));
-
-			extraSpace = (quantityWidth - this.QuantityUpButton.bounds.Width) / 2;
-			this._quantityTextBoxBounds = new(
-                x: this.QuantityUpButton.bounds.X - extraSpace,
-                y: this.QuantityUpButton.bounds.Y + this.QuantityUpButton.bounds.Height + 2 * Scale,
-                width: quantityWidth,
-                height: quantityWidth);
-
-			this.QuantityDownButton.bounds.Y = this._quantityTextBoxBounds.Y + (int)textSize.Y + 5;
-
-			this.ConfirmButton.bounds.X = this.CancelButton.bounds.X
-                = this.QuantityUpButton.bounds.X + this.QuantityUpButton.bounds.Width + extraSpace + 4 * Scale;
-			this.ConfirmButton.bounds.Y = offset.Y - 4 * Scale;
-			this.CancelButton.bounds.Y = this.ConfirmButton.bounds.Y + this.ConfirmButton.bounds.Height + 1 * Scale;
-
-            extraSpace = 4 * Scale;
-			this._quantityScrollableArea = new Rectangle(
-				this._cookIconArea.X - extraSpace,
-				this._cookIconArea.Y - extraSpace,
-				this.ConfirmButton.bounds.X + this.ConfirmButton.bounds.Width - this._cookIconArea.X + extraSpace * 2,
-				this.CancelButton.bounds.Y + this.CancelButton.bounds.Height - this.ConfirmButton.bounds.Y + extraSpace * 2);
+				// Cooking quantity
+				// icon
+				offset.X = this.ContentArea.Width / 3 - Game1.smallestTileSize / 2 * Scale - 6 * Scale;
+				offset.Y += Game1.smallestTileSize / 4 * Scale;
+				this._cookIconArea = new(
+					x: this.ContentArea.Left + offset.X,
+					y: this.ContentArea.Top + offset.Y,
+					width: Game1.smallestTileSize * Scale,
+					height: Game1.smallestTileSize * Scale);
+				// buttons
+				extraSpace = 2 * Scale;
+				offset.X = this._cookIconArea.Left + (this._cookIconArea.Width - this.QuantityUpButton.bounds.Width) / 2;
+				this.QuantityUpButton.bounds.X = this.QuantityDownButton.bounds.X = offset.X;
+				this.QuantityUpButton.bounds.Y = this._cookIconArea.Top - this.QuantityUpButton.bounds.Height - extraSpace;
+				this.QuantityDownButton.bounds.Y = this._cookIconArea.Bottom + extraSpace;
+				// scrollable
+				extraSpace = 4 * Scale;
+				this._quantityScrollableArea = new(
+					x: this.ContentArea.Left,
+					y: this.ContentArea.Center.Y,
+					width: this.ContentArea.Width,
+					height: this.ContentArea.Height / 2);
+			}
 		}
 
         public override void OnKeyPressed(Keys key)
@@ -326,38 +258,33 @@ namespace LoveOfCooking.Menu
 
 		public override void OnPrimaryClick(int x, int y, bool playSound = true)
         {
-            if (this.Menu.ReadyToCook && this.CookButton.bounds.Contains(x, y))
-            {
-				// Cook! button
-				this.ToggleCookingConfirmPopup(playSound: true);
-            }
-            else if (this.IsConfirmModalUp)
-            {
+			// Ingredients in cooking slots and drop-in items are handled in CookingMenu,
+			// since these need to cross-reference the inventory manager
+
+            if (this.Menu.ReadyToCook)
+			{
 				// Quantity up/down buttons
 				this.TryClickQuantityButton(x: x, y: y);
 
-                // Cook OK/Cancel buttons
-                if (this.ConfirmButton.containsPoint(x, y))
-                {
-                    if (this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity))
-                    {
+				// Cook! button
+				if (this.CookButton.bounds.Contains(x, y))
+				{
+					Game1.playSound(CookCue);
+					if (this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity))
+					{
 						this.TryPop();
-                    }
-                    else
-                    {
-                        Game1.playSound(CancelCue);
-                    }
-                }
-                else if (this.CancelButton.containsPoint(x, y))
-                {
-					this.TryPop();
-                }
-            }
+					}
+					else
+					{
+						Game1.playSound(CancelCue);
+					}
+				}
+			}
         }
 
         public override void OnPrimaryClickHeld(int x, int y, bool playSound = true)
         {
-            if (this.IsConfirmModalUp)
+            if (this.Menu.ReadyToCook)
             {
 				this.TryClickQuantityButton(x: x, y: y);
             }
@@ -365,11 +292,12 @@ namespace LoveOfCooking.Menu
 
         public override void OnSecondaryClick(int x, int y, bool playSound = true)
         {
+			// ...
         }
 
         public override void OnScrolled(int x, int y, bool isUp)
         {
-            if (this.IsConfirmModalUp && this._quantityScrollableArea.Contains(x: x, y: y))
+            if (this.Menu.ReadyToCook && this._quantityScrollableArea.Contains(x: x, y: y))
             {
 				this.TryClickQuantityButton(
                     x: this.QuantityUpButton.bounds.X,
@@ -379,361 +307,313 @@ namespace LoveOfCooking.Menu
 
         public override void OnHovered(int x, int y, ref string hoverText)
         {
-            if (this.IsConfirmModalUp)
-            {
-				this.QuantityUpButton.tryHover(x, y, 0.5f);
-				this.QuantityDownButton.tryHover(x, y, 0.5f);
+            const float scaleTo = 0.5f;
 
-				this.ConfirmButton.tryHover(x, y);
-				this.CancelButton.tryHover(x, y);
+			if (this.Menu.ReadyToCook)
+			{
+				this.CookButton.tryHover(x, y, 0f);
+				this.QuantityUpButton.tryHover(x, y, scaleTo);
+				this.QuantityDownButton.tryHover(x, y, scaleTo);
             }
         }
 
         public override void Update(GameTime time)
 		{
-			// ...
+			// Cook! button animation loop plays to completion on hover
+			if (this._animBounceValue > 0.01d || this.CookButton.bounds.Contains(Game1.getMousePosition()))
+			{
+				this._animBounceTimer += time.ElapsedGameTime.Milliseconds;
+				this._animBounceValue = 0.5d + Math.Sin(this._animBounceTimer / 150 % 150) / 2;
+			}
 		}
 
 		public override void Draw(SpriteBatch b)
         {
-            Item item;
-			bool isKorean = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts;
-			Vector2 textScale = isKorean ? ModEntry.ItemDefinitions.KoreanFontScale : Vector2.One;
+			this.DrawCookingSlots(b: b);
 
-			Dictionary<int, double> iconShakeTimer = this.Menu._iconShakeTimerField.GetValue();
-
-            // Cooking slots
-            foreach (ClickableTextureComponent clickable in this.IngredientSlotButtons)
-                clickable.draw(b);
-
-            for (int i = 0; i < this.Menu.CookingManager.CurrentIngredients.Count; ++i)
-            {
-                item = this.Menu.CookingManager.GetItemForIngredient(index: i, sourceItems: this.Menu.Items);
-                if (item is null)
-                    continue;
-
-				Vector2 position = new(
-					x: this.IngredientSlotButtons[i].bounds.X + this.IngredientSlotButtons[i].bounds.Width / 2 - Game1.tileSize / 2,
-					y: this.IngredientSlotButtons[i].bounds.Y + this.IngredientSlotButtons[i].bounds.Height / 2 - Game1.tileSize / 2);
-
-                // Item icon
-                item.drawInMenu(
-                    b,
-                    location: position + (!iconShakeTimer.ContainsKey(i)
-                        ? Vector2.Zero
-                        : 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2))),
-                    scaleSize: 1f,
-                    transparency: 1f,
-                    layerDepth: 0.865f,
-                    drawStackNumber: StackDrawType.Hide,
-                    color: Color.White,
-                    drawShadow: true);
-
-                position = new(
-					x: this.IngredientSlotButtons[i].bounds.X + this.IngredientSlotButtons[i].bounds.Width - 7 * Scale,
-					y: this.IngredientSlotButtons[i].bounds.Y + this.IngredientSlotButtons[i].bounds.Height - 6.2f * Scale);
-                if (item.Stack > 0 && item.Stack < int.MaxValue)
-                {
-                    // Item stack count
-                    Utility.drawTinyDigits(
-                        toDraw: item.Stack,
-                        b: b,
-                        position: position,
-                        scale: SmallScale,
-                        layerDepth: 1f,
-                        c: Color.White);
-                }
-                if (item is StardewValley.Object o && o.Quality > 0)
-                {
-                    // Item quality star
-                    position = new(
-						this.IngredientSlotButtons[i].bounds.X + 3 * Scale,
-						this.IngredientSlotButtons[i].bounds.Y + this.IngredientSlotButtons[i].bounds.Height - 7 * Scale);
-                    b.Draw(
-                        texture: Game1.mouseCursors,
-                        position: position,
-                        sourceRectangle: new Rectangle(o.Quality < 2 ? 338 : 346, o.Quality % 4 == 0 ? 392 : 400, 8, 8),
-                        color: Color.White,
-                        rotation: 0f,
-                        origin: Vector2.Zero,
-                        scale: SmallScale,
-                        effects: SpriteEffects.None,
-                        layerDepth: 1f);
-                }
-            }
-
-            if (this.Menu.RecipeInfo is null)
-                return;
-
-            item = this.Menu.RecipeInfo.Item;
-			CraftingRecipe recipe = this.Menu.RecipeInfo.Recipe;
-			Buff buff = this.Menu.RecipeInfo.Buff;
-			Vector2 textPosition = Vector2.Zero;
-            int textWidth = (int)(this._textWidth * textScale.X);
-            float buffOffsetX = 0;
-            const int spriteWidth = StardewValley.Object.spriteSheetTileSize;
-            string text;
-
-            // Recipe notes
-            text = I18n.Get("menu.cooking_recipe.notes_label");
-            textPosition.Y = this.ContentArea.Y + this.ContentArea.Height - 50 * Scale - Game1.smallFont.MeasureString(
-                Game1.parseText(text: text, whichFont: Game1.smallFont, width: textWidth)).Y * textScale.Y;
-
-			// Visual display for frying pan uses default icon if not using cooking tool upgrades
-			int fryingPanLevel = ModEntry.Config.AddCookingToolProgression ? Instance.States.Value.CookingToolLevel : 0;
-            if (this.IsConfirmModalUp)
-            {
-                textPosition.Y += 5 * Scale;
-                textPosition.X += 16 * Scale;
-				int xOffset = 4 * Scale;
-				int yOffset = 2 * Scale;
-				int yOffsetExtra = (int)(Math.Cos(Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 300 % 300) * (2 * Scale));
-				int ySpacing = Instance.States.Value.CookingToolLevel <= 1 ? 0 : fryingPanLevel / 2 * Scale;
-				int fryingPanOffset = 6 * Scale;
-				int fryingPanX = this._cookIconArea.X + xOffset + fryingPanOffset;
-				int fryingPanY = this._cookIconArea.Y + yOffset + ySpacing + fryingPanOffset;
-
-                // Frying pan
-                b.Draw(
-                    texture: Game1.shadowTexture,
-                    position: new(
-						x: fryingPanX + 0 * Scale,
-						y: fryingPanY + spriteWidth / 2 * Scale + 2 * Scale),
-                    sourceRectangle: null,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    scale: Scale,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-                b.Draw(
-                    texture: CookingTool.Texture,
-                    destinationRectangle: new(
-						x: fryingPanX,
-						y: fryingPanY,
-						width: spriteWidth * Scale,
-						height: spriteWidth * Scale),
-                    sourceRectangle: CookingTool.CookingToolSourceRectangle(level: fryingPanLevel),
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-
-				// Contextual cooking popup
-				recipe?.drawMenuView(b,
-                    x: this._cookIconArea.X + xOffset,
-                    y: this._cookIconArea.Y + yOffset + yOffsetExtra - ySpacing,
-                    shadow: false);
-
-                textPosition.X = this._quantityTextBoxBounds.Center.X - this.ContentArea.X;
-                textPosition.Y = this._quantityTextBoxBounds.Y;
-				this.DrawText(
-                    b: b,
-                    text: this._quantity.ToString(),
-                    x: textPosition.X,
-                    y: textPosition.Y,
-                    w: this._quantityTextBoxBounds.Width,
-                    justify: TextJustify.Centre,
-                    font: Game1.dialogueFont);
-
-				this.QuantityUpButton.draw(b);
-				this.QuantityDownButton.draw(b);
-
-				this.ConfirmButton.draw(b);
-				this.CancelButton.draw(b);
-
-                return;
-            }
-
-            // 'Notes' label
-			this.DrawHorizontalDivider(
-				b: b,
-				x: 0,
-				y: textPosition.Y,
-				w: this._lineWidth - 32);
-            textPosition.Y += TextDividerGap;
-			this.DrawText(
-				b: b,
-				text: text,
-				x: textPosition.X,
-				y: textPosition.Y,
-				colour: SubtextColour);
-            textPosition.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * textScale.Y;
-			this.DrawHorizontalDivider(
-				b: b,
-				x: 0,
-				y: textPosition.Y,
-				w: this._lineWidth - 16);
-            textPosition.Y += 6 * Scale / 2;
-
-            if (item is null)
+            if (this.Menu.RecipeInfo?.Item is null)
                 return;
 
 			if (this.Menu.ReadyToCook)
             {
-                textPosition.Y += 3 * Scale;
-                textPosition.X = this.ContentArea.X + this.ContentArea.Width / 2 - MarginRight;
-                int frypanWidth = false && ModEntry.Config.AddCookingToolProgression ? spriteWidth + 1 * Scale : 0;
+				this.DrawCraftingView(b: b);
+			}
+			else
+			{
+				this.DrawEdibilityView(b: b);
+			}
+        }
 
-                // Cook! button
-                int extraHeight = new[] { LanguageCode.ko, LanguageCode.ja, LanguageCode.zh, LanguageCode.tr }.Contains(this._locale) ? 1 * Scale : 0;
-                Rectangle source = CookButtonSource;
-                source.X += this.Menu.AnimFrame * CookButtonSource.Width;
-				Rectangle dest = new(
-					x: (int)textPosition.X - frypanWidth / 2 * Scale,
-					y: (int)textPosition.Y - extraHeight,
-					width: source.Width * Scale,
-					height: source.Height * Scale + extraHeight);
-                dest.X -= CookTextSourceWidths[this._locale] / 2 * Scale - CookTextSideSourceWidth * Scale + MarginLeft - frypanWidth / 2;
-				Rectangle clickableArea = new(
-					x: dest.X,
-					y: dest.Y - extraHeight,
-					width: CookTextSideSourceWidth * Scale * 2 + (this._cookTextMiddleSourceWidth + frypanWidth) * Scale,
-					height: dest.Height + extraHeight);
-                if (clickableArea.Contains(Game1.getMouseX(), Game1.getMouseY()))
-                    source.Y += source.Height;
-                // left
-                source.Width = CookTextSideSourceWidth;
-                dest.Width = source.Width * Scale;
-                b.Draw(
-                    texture: CookingMenu.Texture,
-                    destinationRectangle: dest,
-                    sourceRectangle: source,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-                // middle and text and frypan
-                source.X = this.Menu.AnimFrame * CookButtonSource.Width + CookButtonSource.X + CookTextSideSourceWidth;
-                source.Width = 1;
-                dest.Width = (this._cookTextMiddleSourceWidth + frypanWidth) * Scale;
-                dest.X += CookTextSideSourceWidth * Scale;
-                b.Draw(
-                    texture: CookingMenu.Texture,
-                    destinationRectangle: dest,
-                    sourceRectangle: source,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-                b.Draw(
-                    texture: CookingMenu.Texture,
-                    destinationRectangle: new Rectangle(
-						x: dest.X + 1 * Scale,
-						y: dest.Y + (int)(2 * Scale + Math.Cos(this.Menu.AnimTimer / (16 * Scale) * 100) * 8),
-						width: CookTextSource[this._locale].Width * Scale,
-						height: CookTextSource[this._locale].Height * Scale + extraHeight),
-                    sourceRectangle: CookTextSource[this._locale],
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-                dest.X += this._cookTextMiddleSourceWidth * Scale;
-                dest.Width = spriteWidth * Scale;
+		private void DrawCookingSlots(SpriteBatch b)
+		{
+			Item item;
+			Vector2 position;
+			Dictionary<int, double> iconShakeTimer = this.Menu._iconShakeTimerField.GetValue();
 
-                // right
-                source.X = this.Menu.AnimFrame * CookButtonSource.Width + CookButtonSource.X + CookButtonSource.Width - CookTextSideSourceWidth;
-                source.Width = CookTextSideSourceWidth;
-                dest.Width = source.Width * Scale;
-                dest.X += frypanWidth * Scale;
-                b.Draw(
-                    texture: CookingMenu.Texture,
-                    destinationRectangle: dest,
-                    sourceRectangle: source,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-            }
-            else if (ModEntry.Config.HideFoodBuffsUntilEaten && !Instance.States.Value.FoodsEaten.Contains(item.Name))
-            {
-                text = I18n.Get("menu.cooking_recipe.notes_unknown");
+			// Cooking slots
+			foreach (ClickableTextureComponent clickable in this.IngredientSlotButtons)
+				clickable.draw(b);
+
+			for (int i = 0; i < this.Menu.CookingManager.CurrentIngredients.Count; ++i)
+			{
+				item = this.Menu.CookingManager.GetItemForIngredient(index: i, sourceItems: this.Menu.Items);
+				if (item is null)
+					continue;
+
+				position = new(
+					x: this.IngredientSlotButtons[i].bounds.X + this.IngredientSlotButtons[i].bounds.Width / 2 - Game1.tileSize / 2,
+					y: this.IngredientSlotButtons[i].bounds.Y + this.IngredientSlotButtons[i].bounds.Height / 2 - Game1.tileSize / 2);
+
+				// Item icon
+				item.drawInMenu(
+					b,
+					location: position + (!iconShakeTimer.ContainsKey(i)
+						? Vector2.Zero
+						: 1f * new Vector2(Game1.random.Next(-1, 2), Game1.random.Next(-1, 2))),
+					scaleSize: 1f,
+					transparency: 1f,
+					layerDepth: 0.865f,
+					drawStackNumber: StackDrawType.Hide,
+					color: Color.White,
+					drawShadow: true);
+
+				if (item.Stack > 0 && item.Stack < int.MaxValue)
+				{
+					// Item stack count
+					position = new(
+						x: this.IngredientSlotButtons[i].bounds.X + this.IngredientSlotButtons[i].bounds.Width - 7 * Scale,
+						y: this.IngredientSlotButtons[i].bounds.Y + this.IngredientSlotButtons[i].bounds.Height - 6.2f * Scale);
+					Utility.drawTinyDigits(
+						toDraw: item.Stack,
+						b: b,
+						position: position,
+						scale: SmallScale,
+						layerDepth: 1f,
+						c: Color.White);
+				}
+				if (item is StardewValley.Object o && o.Quality > 0)
+				{
+					// Item quality star
+					position = new(
+						this.IngredientSlotButtons[i].bounds.X + 3 * Scale,
+						this.IngredientSlotButtons[i].bounds.Y + this.IngredientSlotButtons[i].bounds.Height - 7 * Scale);
+					b.Draw(
+						texture: Game1.mouseCursors,
+						position: position,
+						sourceRectangle: new(
+							x: o.Quality < 2 ? 338 : 346,
+							y: o.Quality % 4 == 0 ? 392 : 400,
+							width: 8,
+							height: 8),
+						color: Color.White,
+						rotation: 0f,
+						origin: Vector2.Zero,
+						scale: SmallScale,
+						effects: SpriteEffects.None,
+						layerDepth: 1f);
+				}
+			}
+		}
+
+		private Vector2 DrawSubheading(SpriteBatch b, Vector2 position, int textWidth, string text)
+		{
+			position.Y = this.ContentArea.Bottom - 50 * Scale
+				- Game1.smallFont.MeasureString(Game1.parseText(text: text, whichFont: Game1.smallFont, width: textWidth)).Y * this._textScale.Y;
+			this.DrawHorizontalDivider(
+				b: b,
+				x: 0,
+				y: position.Y,
+				w: this._lineWidth - 32);
+			position.Y += TextDividerGap;
+			this.DrawText(
+				b: b,
+				text: text,
+				x: position.X,
+			y: position.Y,
+				colour: SubtextColour);
+			position.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
+			this.DrawHorizontalDivider(
+				b: b,
+				x: 0,
+				y: position.Y,
+				w: this._lineWidth - 16);
+			position.Y += 6 * Scale / 2;
+			return position;
+		}
+
+		public void DrawCraftingView(SpriteBatch b)
+		{
+			CraftingRecipe recipe = this.Menu.RecipeInfo.Recipe;
+			int textWidth = (int)(this._textWidth * this._textScale.X);
+			Vector2 position;
+
+			// Draw cooking preview contents
+
+			position = this._cookIconArea.Location.ToVector2();
+
+			// Recipe icon
+			recipe.drawMenuView(
+				b: b,
+				x: (int)position.X,
+				y: (int)position.Y,
+				shadow: false);
+
+			// Recipe quantity to craft
+			Utility.drawTinyDigits(
+				toDraw: this._quantity,
+				b: b,
+				position: this._cookIconArea.Center.ToVector2() + new Vector2(x: this._cookIconArea.Width / 3, y: this._cookIconArea.Height / 5),
+				scale: Scale,
+				layerDepth: 1f,
+				c: Color.White);
+
+			this.QuantityUpButton.draw(b);
+			this.QuantityDownButton.draw(b);
+
+			// Cook button - bouncing frying pan
+			// We don't just call CookButton.draw() here,
+			// since we want the bounce effect without affecting the actual button bounds
+
+			position = this.CookButton.bounds.Center.ToVector2();
+
+			//double bounce = Math.Cos(this.Menu.AnimTimer / (16 * Scale) * 100) * 8;
+			int distance = (3 * Scale);
+			// double bounce = Math.Sin(Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 150 % 150);
+			double bounce = this._animBounceValue;
+
+			// select frying pan level
+			Rectangle source = this.CookButton.sourceRect;
+
+			// shadow
+			source.Y += source.Height;
+			b.Draw(
+				texture: this.CookButton.texture,
+				position: position + new Vector2(x: 0, y: source.Height / 10 * 7 * Scale),
+				sourceRectangle: source,
+				color: Color.White,
+				rotation: 0f,
+				origin: new(x: source.Width / 2, y: source.Height),
+				scale: this.CookButton.scale - 1f + (float)bounce * -0.5f,
+				effects: SpriteEffects.None,
+				layerDepth: 1f);
+
+			// frying pan
+			source.Y -= source.Height;
+			b.Draw(
+				texture: this.CookButton.texture,
+				position: position + new Vector2(x: 0, y: (int)(bounce * -distance)),
+				sourceRectangle: source,
+				color: Color.White,
+				rotation: 0f,
+				origin: source.Size.ToVector2() / 2,
+				scale: this.CookButton.scale,
+				effects: SpriteEffects.None,
+				layerDepth: 1f);
+		}
+
+		public void DrawEdibilityView(SpriteBatch b)
+		{
+			Item item = this.Menu.RecipeInfo.Item;
+			CraftingRecipe recipe = this.Menu.RecipeInfo.Recipe;
+			Buff buff = this.Menu.RecipeInfo.Buff;
+
+			// Draw cooking recipe healing and buff info
+
+			int textWidth = (int)(this._textWidth * this._textScale.X);
+			Vector2 position = Vector2.Zero;
+			string text;
+
+			position = this.DrawSubheading(b: b, position: Vector2.Zero, textWidth: textWidth, text: I18n.Get("menu.cooking_recipe.notes_label"));
+
+			if (ModEntry.Config.HideFoodBuffsUntilEaten && !ModEntry.Instance.States.Value.FoodsEaten.Contains(item.Name))
+			{
+				// Draw unknown information text
+
+				text = I18n.Get("menu.cooking_recipe.notes_unknown");
 				this.DrawText(
 					b: b,
 					text: text,
-					x: textPosition.X,
-					y: textPosition.Y,
+					x: position.X,
+					y: position.Y,
 					w: textWidth,
 					colour: SubtextColour);
-            }
-            else
-            {
-                const float xOffset = 8.25f * Scale;
-                int stamina = item.staminaRecoveredOnConsumption();
-                int health = item.healthRecoveredOnConsumption();
-                Vector2 textSize;
+			}
+			else
+			{
+				// Draw healing and buff information
+
+				const float xOffset = 8.25f * Scale;
+				int stamina = item.staminaRecoveredOnConsumption();
+				int health = item.healthRecoveredOnConsumption();
+				float buffOffsetX = 0;
+				Vector2 textSize;
 
 				// Energy
-				textPosition.X = (CurrentLanguageCode is LanguageCode.zh ? 2 : -2) * Scale;
-                text = buff is null
-                    ? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3116", stamina)
-                    : stamina > 0 ? $"+{stamina}" : $"{stamina}";
-                b.Draw(
-                    texture: Game1.mouseCursors,
-                    position: new(x: this.ContentArea.X + textPosition.X, y: textPosition.Y),
-                    sourceRectangle: EnergyIconSource,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    scale: SmallScale,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-                textPosition.X += xOffset;
+				position.X = (CurrentLanguageCode is LanguageCode.zh ? 2 : -2) * Scale;
+				text = buff is null
+					? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3116", stamina)
+					: stamina > 0 ? $"+{stamina}" : $"{stamina}";
+				b.Draw(
+					texture: Game1.mouseCursors,
+					position: new(x: this.ContentArea.X + position.X, y: position.Y),
+					sourceRectangle: EnergyIconSource,
+					color: Color.White,
+					rotation: 0f,
+					origin: Vector2.Zero,
+					scale: SmallScale,
+					effects: SpriteEffects.None,
+					layerDepth: 1f);
+				position.X += xOffset;
 				this.DrawText(
 					b: b,
 					text: text,
-					x: textPosition.X,
-					y: textPosition.Y);
-                textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
-                buffOffsetX = textSize.X;
-				textPosition.Y += textSize.Y * textScale.Y;
-
-                // Health
-                text = buff is null
-                    ? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3118", health)
-					: stamina > 0 ? $"+{health}" : $"{health}";
-				textPosition.X -= xOffset;
-                b.Draw(
-                    texture: Game1.mouseCursors,
-                    position: new(x: this.ContentArea.X + textPosition.X, y: textPosition.Y),
-                    sourceRectangle: HealthIconSource,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: Vector2.Zero,
-                    scale: SmallScale,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-                textPosition.X += xOffset;
-				this.DrawText(
-				    b: b,
-				    text: text,
-				    x: textPosition.X,
-				    y: textPosition.Y);
+				x: position.X,
+					y: position.Y);
 				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
-                if (buffOffsetX < textSize.X)
-                    buffOffsetX = textSize.X;
+				buffOffsetX = textSize.X;
+				position.Y += textSize.Y * this._textScale.Y;
+
+				// Health
+				text = buff is null
+					? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3118", health)
+					: stamina > 0 ? $"+{health}" : $"{health}";
+				position.X -= xOffset;
+				b.Draw(
+					texture: Game1.mouseCursors,
+					position: new(x: this.ContentArea.X + position.X, y: position.Y),
+					sourceRectangle: HealthIconSource,
+					color: Color.White,
+					rotation: 0f,
+					origin: Vector2.Zero,
+					scale: SmallScale,
+					effects: SpriteEffects.None,
+					layerDepth: 1f);
+				position.X += xOffset;
+				this.DrawText(
+					b: b,
+					text: text,
+				x: position.X,
+					y: position.Y);
+				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+				if (buffOffsetX < textSize.X)
+					buffOffsetX = textSize.X;
 
 				// Buffs
 				if (buff is null)
-                    return;
+					return;
 
 				// Buff duration
-                float duration = (float)buff.totalMillisecondsDuration / Game1.realMilliSecondsPerGameMinute;
+				float duration = (float)buff.totalMillisecondsDuration / Game1.realMilliSecondsPerGameMinute;
 				text = buff.totalMillisecondsDuration == Buff.ENDLESS
 					? I18n.Get("menu.cooking_recipe.buff.daily")
 					: $" {(int)(duration / 60)}:{(duration % 60):00}";
 
 				// Duration icon
-				textPosition.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * 1.1f * textScale.Y;
-				textPosition.X -= xOffset;
+				position.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * 1.1f * this._textScale.Y;
+				position.X -= xOffset;
 				b.Draw(
 					texture: Game1.mouseCursors,
-					position: new(x: this.ContentArea.X + textPosition.X, y: textPosition.Y),
+					position: new(x: this.ContentArea.X + position.X, y: position.Y),
 					sourceRectangle: DurationIconSource,
 					color: Color.White,
 					rotation: 0f,
@@ -743,40 +623,40 @@ namespace LoveOfCooking.Menu
 					layerDepth: 1f);
 
 				// Duration value
-				textPosition.X += xOffset;
+				position.X += xOffset;
 				this.DrawText(
 					b: b,
 					text: text,
-					x: textPosition.X,
-					y: textPosition.Y);
-                textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
-				textPosition.Y -= textSize.Y * 1.1f * textScale.Y;
-				textPosition.Y -= textSize.Y * textScale.Y;
+				x: position.X,
+					y: position.Y);
+				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+				position.Y -= textSize.Y * 1.1f * this._textScale.Y;
+				position.Y -= textSize.Y * this._textScale.Y;
 				if (buffOffsetX < textSize.X)
 					buffOffsetX = textSize.X;
 
-                textSize = Game1.smallFont.MeasureString(Game1.parseText("+66:66", Game1.smallFont, textWidth));
+				textSize = Game1.smallFont.MeasureString(Game1.parseText("+66:66", Game1.smallFont, textWidth));
 				buffOffsetX = Math.Max(buffOffsetX, textSize.X);
-                buffOffsetX += xOffset / 2;
+				buffOffsetX += xOffset / 2;
 
 				// Buffs
-                if (!string.IsNullOrEmpty(buff.displayName))
+				if (!string.IsNullOrEmpty(buff.displayName))
 				{
-                    Vector2 buffPosition = new(
-                        x: textPosition.X + buffOffsetX,
-                        y: textPosition.Y + textSize.Y);
+					Vector2 buffPosition = new(
+						x: position.X + buffOffsetX,
+						y: position.Y + textSize.Y);
 
-                    // Unique buff icon
-                    Rectangle source = Game1.getSourceRectForStandardTileSheet(
-                        tileSheet: buff.iconTexture,
-                        tilePosition: buff.iconSheetIndex,
-                        width: 16,
-                        height: 16);
+					// Unique buff icon
+					Rectangle source = Game1.getSourceRectForStandardTileSheet(
+						tileSheet: buff.iconTexture,
+						tilePosition: buff.iconSheetIndex,
+						width: 16,
+						height: 16);
 					b.Draw(
 						texture: buff.iconTexture,
 						position: new(
-                            x: this.ContentArea.X + buffPosition.X,
-                            y: buffPosition.Y),
+							x: this.ContentArea.X + buffPosition.X,
+							y: buffPosition.Y),
 						sourceRectangle: source,
 						color: Color.White,
 						rotation: 0f,
@@ -786,7 +666,7 @@ namespace LoveOfCooking.Menu
 						layerDepth: 1f);
 					buffPosition.X += xOffset * 1.5f;
 
-                    // Unique buff title
+					// Unique buff title
 					this.DrawText(
 						b: b,
 						text: buff.displayName,
@@ -794,76 +674,76 @@ namespace LoveOfCooking.Menu
 						y: buffPosition.Y);
 				}
 				else if (buff.HasAnyEffects() && buff.effects is not null)
-                {
-                    const int width = 3;
-                    const int height = 3;
+				{
+					const int width = 3;
+					const int height = 3;
 					int count = 0;
-                    List<NetFloat> attributes = new()
-                    {
-                        buff.effects.FarmingLevel,
-                        buff.effects.FishingLevel,
-                        buff.effects.MiningLevel,
-                        null, // Crafting
-                        buff.effects.LuckLevel,
-                        buff.effects.ForagingLevel,
-                        null, // Digging
-                        buff.effects.MaxStamina,
-                        buff.effects.MagneticRadius,
-                        buff.effects.Speed,
-                        buff.effects.Defense,
-                        buff.effects.Attack
-                    };
-                    int numToDisplay = attributes.Count(a => a is not null && a.Value != 0);
-                    for (int i = 0; i < attributes.Count && count < width * height; ++i)
-                    {
+					List<NetFloat> attributes = new()
+					{
+						buff.effects.FarmingLevel,
+						buff.effects.FishingLevel,
+						buff.effects.MiningLevel,
+						null, // Crafting
+						buff.effects.LuckLevel,
+						buff.effects.ForagingLevel,
+						null, // Digging
+						buff.effects.MaxStamina,
+						buff.effects.MagneticRadius,
+						buff.effects.Speed,
+						buff.effects.Defense,
+						buff.effects.Attack
+					};
+					int numToDisplay = attributes.Count(a => a is not null && a.Value != 0);
+					for (int i = 0; i < attributes.Count && count < width * height; ++i)
+					{
 						if (attributes[i] is null || attributes[i].Value == 0)
-                            continue;
+							continue;
 
-                        int row = count / width;
-                        int col = count % height;
-                        ++count;
+						int row = count / width;
+						int col = count % height;
+						++count;
 
 						float value = attributes[i].Value;
 						Vector2 buffPosition = new(
-                            x: textPosition.X + textSize.X * row + buffOffsetX,
-                            y: textPosition.Y + textSize.Y * col);
+							x: position.X + textSize.X * row + buffOffsetX,
+							y: position.Y + textSize.Y * col);
 
-                        // Buff icon
-                        b.Draw(
-                            texture: Game1.mouseCursors,
-                            position: new(
-                                x: this.ContentArea.X + buffPosition.X,
-                                y: buffPosition.Y),
-                            sourceRectangle: new(x: 10 + 10 * i, y: 428, width: 10, height: 10),
-                            color: Color.White,
-                            rotation: 0f,
-                            origin: Vector2.Zero,
-                            scale: SmallScale,
-                            effects: SpriteEffects.None,
-                            layerDepth: 1f);
+						// Buff icon
+						b.Draw(
+							texture: Game1.mouseCursors,
+							position: new(
+								x: this.ContentArea.X + buffPosition.X,
+								y: buffPosition.Y),
+							sourceRectangle: new(x: 10 + 10 * i, y: 428, width: 10, height: 10),
+							color: Color.White,
+							rotation: 0f,
+							origin: Vector2.Zero,
+							scale: SmallScale,
+							effects: SpriteEffects.None,
+							layerDepth: 1f);
 
 						// Buff amount and attribute
 						buffPosition.X += xOffset;
-                        text = value > 0 ? $"+{value}" : $"{value}";
+						text = value > 0 ? $"+{value}" : $"{value}";
 
-                        // Show attribute name if we're only showing a single column
-                        if (numToDisplay <= height)
-                            text += " " + I18n.Get($"menu.cooking_recipe.buff.{i}");
+						// Show attribute name if we're only showing a single column
+						if (numToDisplay <= height)
+							text += " " + I18n.Get($"menu.cooking_recipe.buff.{i}");
 						this.DrawText(
 							b: b,
 							text: text,
 							x: buffPosition.X,
 							y: buffPosition.Y);
-                    }
-                }
-            }
-        }
+					}
+				}
+			}
+		}
 
-        public override bool TryPop()
+		public override bool TryPop()
         {
-            if (this.IsConfirmModalUp)
+            if (this.Menu.ReadyToCook)
             {
-				this.ToggleCookingConfirmPopup(playSound: true);
+				this.OnReadyToCookChanged(playSound: true);
                 return false;
             }
             return true;

@@ -16,6 +16,7 @@ namespace LoveOfCooking.Menu
 
         protected int _lineWidth;
         protected int _textWidth;
+        protected Vector2 _textScale;
         protected Point _offset;
 
 		protected enum TextJustify
@@ -45,12 +46,15 @@ namespace LoveOfCooking.Menu
 
 			this._lineWidth = this.ContentArea.Width - 12 * Scale;
 			this._textWidth = this._lineWidth + TextMuffinTopOverDivider * 2;
-        }
+            this._textScale = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts
+                ? ModEntry.ItemDefinitions.KoreanFontScale
+                : Vector2.One;
+		}
 
-        protected void DrawText(SpriteBatch b, string text, float x, float y, float w = -1, float scale = 1f, SpriteFont font = null, TextJustify justify = TextJustify.Left, Color? colour = null)
+        protected void DrawText(SpriteBatch b, string text, float x, float y, float w = -1, float scale = 1f, SpriteFont font = null, TextJustify justify = TextJustify.Left, Color? colour = null, bool absolute = false)
         {
             font ??= Game1.smallFont;
-            Point position = this.ContentArea.Location;
+            Point position = absolute ? Point.Zero : this.ContentArea.Location;
             position.Y -= this.Menu.yPositionOnScreen;
 
             // Adjust text position
@@ -66,7 +70,7 @@ namespace LoveOfCooking.Menu
                     whichFont: font,
                     width: (int)w),
                 font: font,
-                position: new Vector2(
+                position: new(
                     x: position.X + x,
                     y: position.Y + y),
                 color: colour ?? TextColour,
