@@ -339,10 +339,6 @@ namespace LoveOfCooking.Menu
 
 			// Child component navigation
 
-			// inventory nav buttons
-			this.InventoryManager.UpButton.rightNeighborID = 0; // first element in inventory
-			this.InventoryManager.DownButton.rightNeighborID = this.GetColumnCount() * 2; // first element in 3rd row of inventory
-
             if (this.InventoryManager.ShouldShowInventoryElements)
             {
 				this.InventoryManager.InventorySelectButtons.First().leftNeighborID = this.InventoryManager.UseHorizontalInventoryButtonArea
@@ -1132,7 +1128,7 @@ namespace LoveOfCooking.Menu
                     else if (cur == this._craftingPage.FirstIngredientSlot.myID && this._recipePage.IsVisible)
                         next = this._recipePage.CanScrollRight ? this._recipePage.RightButton.myID : this._recipePage.RecipeIconButton.myID;
                     else if (isInventoryPopUp && !isHorizontal
-                        && (cur == this.InventoryManager.TabButton.myID || cur == this.InventoryManager.UpButton.myID || cur == this.InventoryManager.DownButton.myID))
+                        && (cur == this.InventoryManager.TabButton.myID))
                         next = this.InventoryManager.InventorySelectButtons.First().myID;
                     else if (cur == this._searchPage.UpButton.myID || cur == this._searchPage.DownButton.myID)
                         next = this._searchPage.IsGridView
@@ -1147,10 +1143,6 @@ namespace LoveOfCooking.Menu
                         next = this._recipePage.CanScrollRight ? this._recipePage.RightButton.myID : this._craftingPage.FirstIngredientSlot.myID;
                     else if (cur == this.InventoryManager.TabButton.myID)
                         next = this.GetColumnCount();
-                    else if (cur == this.InventoryManager.UpButton.myID)
-                        next = 0;
-                    else if (cur == this.InventoryManager.UpButton.myID)
-                        next = this.GetColumnCount() * 2;
                     else if (this._searchPage.IsGridView
                             && this._searchPage.ResultsGridClickables.Any(c => c.myID == cur && int.Parse(string.Join("", c.name.Where(char.IsDigit))) % 4 == 3)
                             || this._searchPage.ResultsListClickables.Any(c => c.myID == cur))
@@ -1173,13 +1165,9 @@ namespace LoveOfCooking.Menu
                                 ? this._craftingPage.ConfirmButton.myID
                                 : this._craftingPage.FirstIngredientSlot.myID;
                     else if (cur == this.InventoryManager.TabButton.myID)
-                        next = this.InventoryManager.UpButton.myID;
-                    else if (cur == this.InventoryManager.UpButton.myID)
                         next = this._recipePage.IsVisible
 							? this._searchTabButton.myID
                             : this._searchPage.SearchBarClickable.myID;
-                    else if (cur == this.InventoryManager.DownButton.myID)
-                        next = this.InventoryManager.TabButton.myID;
                     else if (cur == this._searchPage.DownButton.myID)
                         // Moving from search results scroll down button
                         next = this._searchPage.CanScrollUp
@@ -1216,11 +1204,6 @@ namespace LoveOfCooking.Menu
                             : this._craftingPage.IsConfirmModalUp
                                 ? this._craftingPage.ConfirmButton.myID
                                 : 0; // First element in inventory
-                    else if (cur == this.InventoryManager.TabButton.myID)
-                        next = this.InventoryManager.DownButton.myID;
-                    else if (cur == this.InventoryManager.UpButton.myID)
-                        next = this.InventoryManager.TabButton.myID;
-                    // no behaviour for _inventoryDownButton
                     else if (cur == this._searchPage.UpButton.myID)
                         // Moving from search results scroll up arrow
                         next = this._searchPage.CanScrollDown

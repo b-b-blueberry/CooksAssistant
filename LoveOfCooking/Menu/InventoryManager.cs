@@ -34,8 +34,6 @@ namespace LoveOfCooking.Menu
 		private Rectangle _inventoriesPopupArea;
 		private Rectangle _inventoryCardArea;
 		public ClickableTextureComponent TabButton { get; private set; }
-		public ClickableTextureComponent UpButton { get; private set; }
-		public ClickableTextureComponent DownButton { get; private set; }
 		public List<ClickableTextureComponent> InventorySelectButtons { get; private set; } = new();
 
 		// Inventory management
@@ -178,13 +176,6 @@ namespace LoveOfCooking.Menu
 					x: this.TabButton.bounds.X + 2 * this.TabButton.baseScale,
 					y: this.TabButton.bounds.Y + 2 * this.TabButton.baseScale),
 				scale: this.TabButton.scale);
-
-			// Inventory nav buttons
-			if (this.ShouldShowInventoryElements)
-			{
-				this.UpButton.draw(b);
-				this.DownButton.draw(b);
-			}
 
 			// Items
 			if (this.ShowInventoriesPopup)
@@ -418,22 +409,6 @@ namespace LoveOfCooking.Menu
 				texture: CookingMenu.Texture,
 				sourceRect: InventoryTabButtonSource,
 				scale: Scale);
-			this.UpButton = new(
-				name: "inventoryUp",
-				bounds: new(-1, -1, UpSmallButtonSource.Width * Scale, UpSmallButtonSource.Height * Scale),
-				label: null,
-				hoverText: null,
-				texture: CookingMenu.Texture,
-				sourceRect: UpSmallButtonSource,
-				scale: Scale);
-			this.DownButton = new(
-				name: "inventoryDown",
-				bounds: new(-1, -1, DownSmallButtonSource.Width * Scale, DownSmallButtonSource.Height * Scale),
-				label: null,
-				hoverText: null,
-				texture: CookingMenu.Texture,
-				sourceRect: DownSmallButtonSource,
-				scale: Scale);
 
 			// inventory buttons and ingredients slots
 			for (int i = 0; i < this.InventorySelectButtons.Count; ++i)
@@ -455,9 +430,7 @@ namespace LoveOfCooking.Menu
 			}
 
 			List<ClickableComponent> components = new() {
-				this.TabButton,
-				this.UpButton,
-				this.DownButton
+				this.TabButton
 			};
 			components.AddRange(this.InventorySelectButtons);
 
@@ -523,9 +496,6 @@ namespace LoveOfCooking.Menu
 			offset.Y = 1 * Scale;
 			this.TabButton.bounds.X = this._inventoryCardArea.X - this.TabButton.bounds.Width + 1 * Scale;
 			this.TabButton.bounds.Y = this._inventoryCardArea.Y + (this._inventoryCardArea.Height - InventoryTabButtonSource.Height * Scale) / 2;
-			this.UpButton.bounds.X = this.DownButton.bounds.X = this.TabButton.bounds.X + offset.X;
-			this.UpButton.bounds.Y = this.TabButton.bounds.Y - this.UpButton.bounds.Height - offset.Y;
-			this.DownButton.bounds.Y = this.TabButton.bounds.Y + this.TabButton.bounds.Height + offset.Y;
 			if (this.ShouldShowInventoryElements)
 			{
 				const int areaPadding = 3 * Scale;
@@ -620,14 +590,6 @@ namespace LoveOfCooking.Menu
 				{
 					this.ToggleInventoriesPopup(playSound: true);
 				}
-				else if (this.UpButton.containsPoint(x, y))
-				{
-					this.ChangeInventory(selectNext: false, loop: true);
-				}
-				else if (this.DownButton.containsPoint(x, y))
-				{
-					this.ChangeInventory(selectNext: true, loop: true);
-				}
 				else if (this.ShowInventoriesPopup)
 				{
 					foreach (ClickableTextureComponent clickable in this.InventorySelectButtons)
@@ -675,8 +637,6 @@ namespace LoveOfCooking.Menu
 			if (this.ShouldShowInventoryElements)
 			{
 				this.TabButton.tryHover(x, y, 0.5f);
-				this.UpButton.tryHover(x, y, 0.5f);
-				this.DownButton.tryHover(x, y, 0.5f);
 				foreach (ClickableTextureComponent clickable in this.InventorySelectButtons)
 				{
 					clickable.tryHover(x, y, 0.5f);
