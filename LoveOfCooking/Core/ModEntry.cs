@@ -397,18 +397,18 @@ namespace LoveOfCooking
 				});
 			this.Helper.ConsoleCommands.Add(
 				name: cmd + "give_cookbook",
-				documentation: "Adds the cookbook to your wallet items, allowing kitchens to be used.",
+				documentation: "Adds the cookbook to your mailbox, allowing kitchens to be used when claimed.",
 				callback: (s, args) =>
 				{
-					if (!Utils.TryAddCookbook(force: true))
+					if (!Utils.TryAddCookbook(who: Game1.player, force: true))
 					{
 						Log.D("Didn't add cookbook: already in your mailbox or wallet items.");
 					}
 					else
 					{
-						Utils.AddCookbook(immediately: true);
-						Utils.PlayCookbookReceivedSequence();
-						Log.D($"Added the cookbook to your wallet items.");
+						Utils.AddCookbook(who: Game1.player);
+						// Utils.PlayCookbookReceivedSequence();
+						Log.D($"Added the cookbook to your mailbox.");
 					} 
 				});
 			this.Helper.ConsoleCommands.Add(
@@ -503,7 +503,7 @@ namespace LoveOfCooking
 			this.States.Value.Regeneration.UpdateDefinitions();
 
 			// Send cookbook mail if conditions met
-			Utils.TryAddCookbook();
+			Utils.TryAddCookbook(who: Game1.player);
 		}
 
 		private void GameLoop_ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
@@ -650,7 +650,7 @@ namespace LoveOfCooking
 			{
 				// Whoops
 				// Yes, it's come up before
-				Utils.AddCookbook(immediately: true);
+				Utils.AddCookbook(who: Game1.player);
 				Game1.addHUDMessage(new HUDMessage($"You ate the cookbook, gaining its knowledge."));
 			}
 

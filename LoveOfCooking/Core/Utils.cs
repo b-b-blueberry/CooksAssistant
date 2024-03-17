@@ -6,6 +6,7 @@ using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.SpecialOrders.Objectives;
@@ -63,15 +64,12 @@ namespace LoveOfCooking
 			return reachedNextYear || reachedNextMonth || reachedMailDate;
 		}
 
-		public static void AddCookbook(bool immediately)
+		public static void AddCookbook(Farmer who)
 		{
-			if (immediately)
-				Game1.player.mailReceived.Add(ModEntry.MailCookbookUnlocked);
-			else
-				Game1.addMail(ModEntry.MailCookbookUnlocked);
+			who.mailbox.Add(ModEntry.MailCookbookUnlocked);
 		}
 
-		public static bool TryAddCookbook(bool force = false)
+		public static bool TryAddCookbook(Farmer who, bool force = false)
 		{
 			// Add the cookbook for the player once they've reached the unlock date
 			// Internally day and month are zero-indexed, but are one-indexed in data file for consistency with year
@@ -81,7 +79,7 @@ namespace LoveOfCooking
 				bool unlockedFarmhouseKitchen = Game1.player.HouseUpgradeLevel > 0;
 				if (force || unlockedFarmhouseKitchen || Utils.IsCookbookMailDateMet())
 				{
-					Utils.AddCookbook(immediately: force);
+					Utils.AddCookbook(who: who);
 					return true;
 				}
 			}
@@ -179,6 +177,10 @@ namespace LoveOfCooking
 
 		internal static void PlayCookbookReceivedSequence()
 		{
+			// Holy fuck
+			Game1.player.RemoveMail(ModEntry.MailCookbookUnlocked);
+			Game1.player.mailReceived.Add(ModEntry.MailCookbookUnlocked);
+
 			// I swear to god
 			Game1.player.completelyStopAnimatingOrDoingAction();
 			Game1.player.FarmerSprite.ClearAnimation();
