@@ -94,9 +94,6 @@
 	"ShowLockedIngredientsSlots": true,
 	"MaxCookingQuantity": 999,
 	"NpcKitchenFriendshipRequired": 6,
-	"ShopDiscounts": {
-		"Saloon": 35
-	},
 	"RegenBaseRate": 128,
 	"RegenHealthRate": 0.3,
 	"RegenEnergyRate": 1.0,

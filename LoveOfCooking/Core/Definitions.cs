@@ -49,7 +49,6 @@ namespace LoveOfCooking
 		public bool ShowLockedIngredientsSlots;
 		public uint MaxCookingQuantity;
 		public uint NpcKitchenFriendshipRequired;
-		public Dictionary<string, int> ShopDiscounts;
 		public int RegenBaseRate;
 		public float RegenHealthRate;
 		public float RegenEnergyRate;

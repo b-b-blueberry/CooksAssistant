@@ -39,6 +39,8 @@ namespace LoveOfCooking
 		public static string GameContentObjectSpriteSheetPath { get; private set; } = "ObjectSprites";
 		public static string GameContentToolSpriteSheetPath { get; private set; } = "ToolSprites";
 		public static string GameContentObjectDataPath { get; private set; } = "ObjectData";
+		public static string GameContentShopDataPath { get; private set; } = "ShopData";
+		public static string GameContentToolDataPath { get; private set; } = "ToolData";
 		public static string GameContentDefinitionsPath { get; private set; } = "ItemDefinitions";
 
 		// Local paths: filepaths without extension passed to Load()
@@ -161,6 +163,18 @@ namespace LoveOfCooking
 			{
 				e.LoadFromModFile<Texture2D>(
 					relativePath: $"{AssetManager.LocalToolSpriteSheetPath}.png",
+					priority: AssetLoadPriority.Exclusive);
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentToolDataPath))
+			{
+				e.LoadFromModFile<Dictionary<string, ToolData>>(
+					relativePath: $"{AssetManager.LocalToolDataPath}.json",
+					priority: AssetLoadPriority.Exclusive);
+			}
+			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentShopDataPath))
+			{
+				e.LoadFromModFile<Dictionary<string, List<ShopItemData>>>(
+					relativePath: $"{AssetManager.LocalShopDataPath}.json",
 					priority: AssetLoadPriority.Exclusive);
 			}
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentObjectDataPath))
@@ -383,9 +397,9 @@ namespace LoveOfCooking
 		private static void EditShops(IAssetData asset)
 		{
 			var data = asset.AsDictionary<string, ShopData>().Data;
-			var newData = ModEntry.Instance.Helper.ModContent.Load
+			var newData = Game1.content.Load
 				<Dictionary<string, List<ShopItemData>>>
-				(AssetManager.LocalShopDataPath + ".json");
+				(AssetManager.GameContentShopDataPath);
 
 			// Add new items to shops
 			foreach (var pair in newData)
@@ -397,9 +411,9 @@ namespace LoveOfCooking
 		private static void EditTools(IAssetData asset)
 		{
 			var data = asset.AsDictionary<string, ToolData>().Data;
-			var newData = ModEntry.Instance.Helper.ModContent.Load
+			var newData = Game1.content.Load
 				<Dictionary<string, ToolData>>
-				(AssetManager.LocalToolDataPath + ".json");
+				(AssetManager.GameContentToolDataPath);
 
 			// Add new tool definitions
 			foreach (var pair in newData)
