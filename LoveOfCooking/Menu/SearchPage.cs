@@ -309,7 +309,7 @@ namespace LoveOfCooking.Menu
             }
         }
 
-        public void SnapSearchBox()
+        public void SnapFromBelow()
         {
             if (this.Results.Any())
             {

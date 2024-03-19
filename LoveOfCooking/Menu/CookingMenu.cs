@@ -79,7 +79,8 @@ namespace LoveOfCooking.Menu
         internal const int Scale = 4;
         internal const int SmallScale = 3;
 
-		// Clickables
+        // Clickables
+        public readonly List<ClickableComponent> CookingMenuClickableComponents = new(); // Required on PopulateClickableComponentList
 		internal ClickableTextureComponent _searchTabButton;
 
 		// Layout dimensions (variable with screen size)
@@ -231,9 +232,10 @@ namespace LoveOfCooking.Menu
 			// Setup menu elements layout
 			this.CreateClickableComponents();
 			this.LayoutComponents();
+			this.populateClickableComponentList();
 
-            // Open first page
-            this._searchPage.FirstTimeSetup();
+			// Open first page
+			this._searchPage.FirstTimeSetup();
             if (string.IsNullOrEmpty(initialRecipe))
             {
                 // Go to home page
@@ -255,8 +257,8 @@ namespace LoveOfCooking.Menu
             // Select default component
             if (Game1.options.gamepadControls || Game1.options.SnappyMenus)
             {
-                Game1.delayedActions.Add(new(delay: 0, behavior: this.snapToDefaultClickableComponent));
-            }
+                this.snapToDefaultClickableComponent();
+			}
 
             ModEntry.Instance.States.Value.HasOpenedCookingMenuEver = true;
         }
@@ -301,8 +303,8 @@ namespace LoveOfCooking.Menu
 			// Create links between components
 			this.SetUpComponentNavigationBetweenPages();
 
-			// Add clickables to implicit navigation
-			this.populateClickableComponentList();
+            // Add clickables to implicit navigation
+            this.CookingMenuClickableComponents.AddRange(components);
         }
 
         private void SetUpComponentNavigationBetweenPages()
@@ -620,8 +622,8 @@ namespace LoveOfCooking.Menu
                     ModEntry.Instance.States.Value.IsUsingAutofill
                     ? this.ReadyToCook
                         ? this._craftingPage.DefaultClickableComponent.myID
-                        : 0
-                    : 0);
+                        : this._recipePage.RecipeIconButton.myID
+                    : this._recipePage.RecipeIconButton.myID);
             }
         }
 
@@ -830,15 +832,16 @@ namespace LoveOfCooking.Menu
             if (!this.IsGoodState())
                 return;
 
-            if (oldRegion == 9000 && this.currentlySnappedComponent is not null)
-            {
-                switch (direction)
+			if (oldRegion == 9000 && this.currentlySnappedComponent is not null)
+			{
+				switch (direction)
                 {
                     // Up
                     case 0:
                         if (this._searchPage.IsVisible)
-                        {
-                        }
+						{
+                            this._searchPage.SnapFromBelow();
+						}
                         break;
                     // Right
                     case 1:
@@ -1202,7 +1205,10 @@ namespace LoveOfCooking.Menu
                         next = this.ReadyToCook
                             ? this._craftingPage.CookButton.myID
                             : 0; // First element in inventory
-                    else if (cur == this._searchPage.UpButton.myID)
+					else if (cur == this._searchTabButton.myID)
+                        // Moving from search tab to inventory tab
+                        next = this.InventoryManager.TabButton.myID;
+					else if (cur == this._searchPage.UpButton.myID)
                         // Moving from search results scroll up arrow
                         next = this._searchPage.CanScrollDown
                             ? this._searchPage.DownButton.myID
