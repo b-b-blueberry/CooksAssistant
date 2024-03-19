@@ -117,7 +117,8 @@ namespace LoveOfCooking.Menu
         internal const string MenuCloseCue = "bigDeSelect";
         internal const string RecipeCue = "newRecipe";
         internal const string ScrollCue = "smallSelect";
-        internal const string CookCue = "throwDownITem";
+        internal const string BlockedCue = "thudStep";
+		internal const string CookCue = "throwDownITem";
 
 		// Menu data
 		// state
