@@ -33,6 +33,7 @@ namespace LoveOfCooking.Menu
 		// Animations
 		private double _animBounceTimer;
 		private double _animBounceValue;
+		private double _animAlpha;
 
 		// Text entry
 		private SpriteFont _quantityFont => Game1.dialogueFont;
@@ -73,7 +74,7 @@ namespace LoveOfCooking.Menu
 			}
             else
 			{
-				Game1.playSound(CancelCue);
+				Game1.playSound(BlockedCue);
 			}
         }
 
@@ -322,8 +323,13 @@ namespace LoveOfCooking.Menu
 			// Cook! button animation loop plays to completion on hover
 			if (this._animBounceValue > 0.01d || this.CookButton.bounds.Contains(Game1.getMousePosition()))
 			{
+				this._animAlpha = Math.Min(1, this._animAlpha + 0.01f * time.ElapsedGameTime.Milliseconds);
 				this._animBounceTimer += time.ElapsedGameTime.Milliseconds;
 				this._animBounceValue = 0.5d + Math.Sin(this._animBounceTimer / 150 % 150) / 2;
+			}
+			else
+			{
+				this._animAlpha = Math.Max(0, this._animAlpha - 0.01f * time.ElapsedGameTime.Milliseconds);
 			}
 		}
 
@@ -481,6 +487,13 @@ namespace LoveOfCooking.Menu
 			// double bounce = Math.Sin(Game1.currentGameTime.TotalGameTime.TotalMilliseconds / 150 % 150);
 			double bounce = this._animBounceValue;
 
+			// small fires
+			const int fireFrames = 4 - 1;
+			Rectangle fireSource = FireSmallSource;
+			fireSource.X += fireSource.Width * ((int)Math.Round(this._animBounceValue * fireFrames * 2) % fireFrames);
+			float fireScale = (0.5f + (float)this._animBounceValue / 2) * Scale;
+			float fireAlpha = (float)this._animAlpha / 2 + (float)this._animBounceValue / 2;
+
 			// select frying pan level
 			Rectangle source = this.CookButton.sourceRect;
 
@@ -497,6 +510,29 @@ namespace LoveOfCooking.Menu
 				effects: SpriteEffects.None,
 				layerDepth: 1f);
 
+			// fire left
+			b.Draw(
+				texture: this.CookButton.texture,
+				position: position + new Vector2(x: -4 * Scale, y: 9 * Scale),
+				sourceRectangle: fireSource,
+				color: Color.White * fireAlpha,
+				rotation: 0f,
+				origin: new(x: fireSource.Width / 3 * 2, y: fireSource.Height / 3 * 2),
+				scale: fireScale / 2,
+				effects: SpriteEffects.None,
+				layerDepth: 1f);
+			// fire right
+			b.Draw(
+				texture: this.CookButton.texture,
+				position: position + new Vector2(x: 4 * Scale, y: 9 * Scale),
+				sourceRectangle: fireSource,
+				color: Color.White * fireAlpha,
+				rotation: 0f,
+				origin: new(x: fireSource.Width / 3, y: fireSource.Height / 3 * 2),
+				scale: fireScale / 2,
+				effects: SpriteEffects.None,
+				layerDepth: 1f);
+
 			// frying pan
 			source.Y -= source.Height;
 			b.Draw(
@@ -507,6 +543,18 @@ namespace LoveOfCooking.Menu
 				rotation: 0f,
 				origin: source.Size.ToVector2() / 2,
 				scale: this.CookButton.scale,
+				effects: SpriteEffects.None,
+				layerDepth: 1f);
+
+			// fire centre
+			b.Draw(
+				texture: this.CookButton.texture,
+				position: position + new Vector2(x: 0, y: 11 * Scale),
+				sourceRectangle: fireSource,
+				color: Color.White * fireAlpha,
+				rotation: 0f,
+				origin: new(x: fireSource.Width / 2, y: fireSource.Height / 3 * 2),
+				scale: fireScale / 5 * 4,
 				effects: SpriteEffects.None,
 				layerDepth: 1f);
 		}
