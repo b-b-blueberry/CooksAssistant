@@ -38,9 +38,10 @@ namespace LoveOfCooking.Menu
         private int _filterBarMiddleSourceWidth;
         private int _resultHeight;
         private bool IsLastRowHidden => this._isFilterBarVisible;
+        private string SearchBarDefaultText => I18n.Get("menu.cooking_recipe.search_label");
 
-        // Search feature
-        private int _resultsIndex;
+		// Search feature
+		private int _resultsIndex;
         private int _resultsPerPage;
         private List<CraftingRecipe> _filteredResults = new();
         private readonly List<CraftingRecipe> _unfilteredResults = new();
@@ -242,7 +243,7 @@ namespace LoveOfCooking.Menu
 				.Where(filter)
 				.ToList();
 
-            if (!string.IsNullOrEmpty(substr) && substr != I18n.Get("menu.cooking_recipe.search_label"))
+            if (!string.IsNullOrEmpty(substr) && substr != this.SearchBarDefaultText)
             {
                 substr = substr.ToLower();
                 recipes = recipes.Where(recipe => recipe.DisplayName.ToLower().Contains(substr)).ToList();
@@ -285,24 +286,25 @@ namespace LoveOfCooking.Menu
             }
         }
 
-        public void CloseTextBox(bool reapplyFilters)
+        public void CloseTextBox(bool isCancelled, bool updateResults = true)
 		{
-			string defaultText = I18n.Get("menu.cooking_recipe.search_label");
+            bool isDeselecting = this.SearchBarTextBox.Selected;
 
-            // Update search box state
 			if (this.SearchBarTextBox.Selected)
 			{
-				this.SearchBarTextBox.Text = defaultText;
+                // Update search box state
 				this.SearchBarTextBox.Selected = false;
 				Game1.keyboardDispatcher.Subscriber = null;
 			}
-			else if (!string.IsNullOrEmpty(this.SearchBarTextBox.Text) && this.SearchBarTextBox.Text != defaultText)
+            
+            if (isCancelled || !isDeselecting)
 			{
-				this.SearchBarTextBox.Text = defaultText;
+				// Reset search box text
+				this.SearchBarTextBox.Text = this.SearchBarDefaultText;
 			}
 
             // Update search results
-            if (reapplyFilters)
+            if (updateResults)
             {
 				this.FilterRecipes(which: this._lastFilterUsed, substr: this.SearchBarTextBox.Text);
 				this.UpdateSearchRecipes();
@@ -363,16 +365,16 @@ namespace LoveOfCooking.Menu
             {
                 textLimit = 32,
                 Selected = false,
-                Text = I18n.Get("menu.cooking_recipe.search_label"),
+                Text = this.SearchBarDefaultText,
             };
-			this.SearchBarTextBox.OnEnterPressed += sender => { this.CloseTextBox(reapplyFilters: true); };
+			this.SearchBarTextBox.OnEnterPressed += sender => { this.CloseTextBox(isCancelled: false); };
 
 			// Search button
 			this.SearchButton = new(
                 name: "search",
                 bounds: new(-1, -1, SearchButtonSource.Width * SmallScale, SearchButtonSource.Height * SmallScale),
                 label: null,
-                hoverText: I18n.Get("menu.cooking_recipe.search_label"),
+                hoverText: this.SearchBarDefaultText,
                 texture: CookingMenu.Texture,
                 sourceRect: SearchButtonSource,
                 scale: SmallScale,
@@ -648,7 +650,7 @@ namespace LoveOfCooking.Menu
                     case Keys.Enter:
                         break;
                     case Keys.Escape:
-						this.CloseTextBox(reapplyFilters: true);
+						this.CloseTextBox(isCancelled: true);
                         break;
                     default:
 						this.FilterRecipes(which: this._lastFilterUsed, substr: this.SearchBarTextBox.Text);
@@ -667,7 +669,7 @@ namespace LoveOfCooking.Menu
 
                 // Close search box
                 if (button is Buttons.Start or Buttons.B or Buttons.Y)
-					this.CloseTextBox(reapplyFilters: true);
+					this.CloseTextBox(isCancelled: true);
             }
             else
             {
@@ -718,8 +720,10 @@ namespace LoveOfCooking.Menu
 					this.SearchBarTextBox.Text = this.SearchBarTextBox.Text.Trim();
                 }
                 if (string.IsNullOrEmpty(this.SearchBarTextBox.Text))
-					this.SearchBarTextBox.Text = I18n.Get("menu.cooking_recipe.search_label");
-				this.CloseTextBox(reapplyFilters: !clickedSearchResult);
+                {
+					this.SearchBarTextBox.Text = this.SearchBarDefaultText;
+                }
+				this.CloseTextBox(isCancelled: false, updateResults: !clickedSearchResult);
             }
             else
             {
@@ -1016,9 +1020,9 @@ namespace LoveOfCooking.Menu
 
         public override bool TryPop()
 		{
-			if (this.SearchBarTextBox.Selected)
+			if (this.SearchBarTextBox.Selected || this.SearchBarTextBox.Text != this.SearchBarDefaultText)
 			{
-				this.CloseTextBox(reapplyFilters: true);
+				this.CloseTextBox(isCancelled: true);
 				return false;
 			}
 			if (this._isFilterBarVisible)
