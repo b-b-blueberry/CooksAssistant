@@ -134,9 +134,10 @@ namespace LoveOfCooking.Menu
         private readonly RecipePage _recipePage;
         private readonly CraftingPage _craftingPage;
 
-        // miscellanea
-        private readonly bool _displayHUD = false;
-        private int _mouseHeldTicks;
+		// miscellanea
+		private bool _isCloseButtonVisible => !Game1.options.SnappyMenus;
+		private readonly bool _displayHUD = false;
+		private int _mouseHeldTicks;
         internal static int LastBurntCount;
         internal readonly IReflectedField<Dictionary<int, double>> _iconShakeTimerField;
         internal const string InvalidRecipeName = "Torch";
@@ -319,7 +320,6 @@ namespace LoveOfCooking.Menu
                     : this._craftingPage.FirstIngredientSlot.myID;
             }
 
-			this._craftingPage.LastIngredientSlot.rightNeighborID = this.upperRightCloseButton.myID;
 			this.upperRightCloseButton.leftNeighborID = this._craftingPage.LastIngredientSlot.myID;
 			this.upperRightCloseButton.downNeighborID = this._craftingPage.LastIngredientSlot.myID;
 
@@ -868,7 +868,10 @@ namespace LoveOfCooking.Menu
 
 			// Menu buttons
 			const float scaleTo = 0.5f;
-			this.upperRightCloseButton.tryHover(x, y, scaleTo);
+            if (this._isCloseButtonVisible)
+            {
+    			this.upperRightCloseButton.tryHover(x, y, scaleTo);
+            }
 			this._searchTabButton.tryHover(x, y, this._searchPage.IsVisible ? 0 : scaleTo);
 
 			// Inventory items
@@ -902,7 +905,7 @@ namespace LoveOfCooking.Menu
                 return;
             State state = this._stack.Peek();
 
-            if (this.upperRightCloseButton.containsPoint(x, y))
+            if (this._isCloseButtonVisible && this.upperRightCloseButton.containsPoint(x, y))
             {
 				this.PopMenuStack(playSound: true, tryToQuit: true);
                 return;
@@ -1377,7 +1380,10 @@ namespace LoveOfCooking.Menu
 			}
 
 			// Upper right buttons
-    		this.upperRightCloseButton.draw(b);
+            if (this._isCloseButtonVisible)
+            {
+        		this.upperRightCloseButton.draw(b);
+            }
 
 			// Hover text
 			if (this.hoverText is not null)
