@@ -243,7 +243,7 @@ namespace LoveOfCooking.Menu
             Utility.drawWithShadow(
 				b: b,
 				texture: CookingMenu.Texture,
-				position: recipeIcon.Location.ToVector2() + recipeIcon.Size.ToVector2() / 7 * 6,
+				position: recipeIcon.Location.ToVector2() + new Vector2(x: 0, y: recipeIcon.Height),
 				sourceRect: FavouriteIconSource,
 				color: favouriteColour,
 				rotation: 0,
