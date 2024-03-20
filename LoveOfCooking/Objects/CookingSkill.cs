@@ -60,6 +60,8 @@ namespace LoveOfCooking.Objects
 			this.Icon = canvas;
 
 			// Populate skill professions
+			this.Professions.Clear();
+			this.ProfessionsForLevels.Clear();
 			const string professionIdTemplate = "menu.cooking_skill.tier{0}_path{1}{2}";
 			const int count = 6;
 			Texture2D[] canvases = new Texture2D[count];
