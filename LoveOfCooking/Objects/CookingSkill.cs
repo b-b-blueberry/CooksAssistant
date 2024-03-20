@@ -76,7 +76,8 @@ namespace LoveOfCooking.Objects
 					this.ProfessionsForLevels.Add(new(
 						level: this.ProfessionsForLevels.Count == 0 ? 5 : 10,
 						first: this.Professions[i - 1],
-						second: this.Professions[i]));
+						second: this.Professions[i],
+						req: this.ProfessionsForLevels.Count == 0 ? null : this.Professions[this.ProfessionsForLevels.Count - 1]));
 			}
 		}
 
