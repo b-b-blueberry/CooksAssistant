@@ -1,19 +1,19 @@
-﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using StardewModdingAPI;
-using StardewModdingAPI.Events;
-using StardewModdingAPI.Utilities;
-using StardewValley;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
+using StardewModdingAPI;
+using StardewModdingAPI.Events;
+using StardewModdingAPI.Utilities;
+using StardewValley;
+using StardewValley.GameData.Characters;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Shops;
 using StardewValley.GameData.Tools;
-using StardewValley.GameData.Characters;
 
 namespace LoveOfCooking
 {
@@ -241,11 +241,18 @@ namespace LoveOfCooking
 
 				// Parse NPC home locations from character data
 				ModEntry.NpcHomeLocations.Clear();
-				foreach (var pair in data)
+				if (Context.IsWorldReady)
 				{
-					if (pair.Value.Home is List<CharacterHomeData> homes && homes.Any())
+					foreach (var pair in data)
 					{
-						ModEntry.NpcHomeLocations[pair.Key] = homes.First().Location;
+						if (pair.Value.Home is List<CharacterHomeData> homes && homes.Any())
+						{
+							string location = homes.FirstOrDefault()?.Location;
+							if (Utils.DoesLocationHaveKitchen(name: location))
+							{
+								ModEntry.NpcHomeLocations[pair.Key] = location;
+							}
+						}
 					}
 				}
 

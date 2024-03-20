@@ -7,9 +7,11 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.SpecialOrders.Objectives;
+using xTile.Layers;
 using xTile.Tiles;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
@@ -578,6 +580,36 @@ namespace LoveOfCooking
 			return !ModEntry.Config.AddCookingMenu || Utils.HasCookbook(who: who);
 		}
 
+		public static bool CanUseCharacterKitchen(Farmer who, string character)
+		{
+			return string.IsNullOrEmpty(character) || who.getFriendshipHeartLevelForNPC(name: character) >= ModEntry.ItemDefinitions.NpcKitchenFriendshipRequired;
+		}
+		
+		public static bool DoesLocationHaveKitchen(string name)
+		{
+			GameLocation location = Game1.getLocationFromName(name);
+
+			// Location must be indoors
+			if (location is null || location.IsOutdoors)
+				return false;
+
+			// Location must have kitchen tiles
+			const string layerId = "Buildings";
+			Layer layer = location.map.RequireLayer(layerId);
+			for (int y = 0; y < layer.LayerHeight; y++)
+			{
+				for (int x = 0; x < layer.LayerWidth; x++)
+				{
+					if (ModEntry.ItemDefinitions.IndoorsTileIndexesOfKitchens.Contains(location.getTileIndexAt(x: x, y: y, layer: layerId)))
+					{
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
 		public static bool IsKitchenTileUnderCursor(GameLocation location, Point point, Farmer who, out string friendshopLockedBy)
 		{
 			friendshopLockedBy = null;
@@ -602,7 +634,7 @@ namespace LoveOfCooking
 				{
 					// Check friendship before using kitchens in NPC homes outside of the farm
 					string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
-					if (!location.IsFarm && who.getFriendshipHeartLevelForNPC(name: npc) < ModEntry.ItemDefinitions.NpcKitchenFriendshipRequired)
+					if (!location.IsFarm && !Utils.CanUseCharacterKitchen(who: who, character: npc))
 					{
 						friendshopLockedBy = npc;
 					}
