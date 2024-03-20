@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using LoveOfCooking.Menu;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
-using StardewValley;
 
 namespace LoveOfCooking.Objects
 {
@@ -37,41 +35,22 @@ namespace LoveOfCooking.Objects
 			this.ExperienceBarColor = ModEntry.ItemDefinitions.CookingSkillValues.ExperienceBarColor;
 			this.ExperienceCurve = ModEntry.ItemDefinitions.CookingSkillValues.ExperienceCurve.ToArray();
 
-			// Create texture instances (canvas) for icons sliced from common spritesheet (texture)
-			Texture2D texture = ModEntry.SpriteSheet;
-			Rectangle slice;
-			Texture2D canvas;
-			Color[] pixels;
-
 			// Set the skills page icon (cookpot)
-			slice = CookingMenu.CookingSkillIconArea;
-			canvas = new(Game1.graphics.GraphicsDevice, slice.Width, slice.Height);
-			pixels = new Color[slice.Width * slice.Height];
-			texture.GetData(0, slice, pixels, 0, pixels.Length);
-			canvas.SetData(pixels);
-			this.SkillsPageIcon = canvas;
+			this.SkillsPageIcon = Utils.Slice(texture: ModEntry.SpriteSheet, area: CookingMenu.CookingSkillIconArea);
 
 			// Set the skill level-up icon (pot on table)
-			slice = CookingMenu.CookingSkillLevelUpIconArea;
-			canvas = new(Game1.graphics.GraphicsDevice, slice.Width, slice.Height);
-			pixels = new Color[slice.Width * slice.Height];
-			texture.GetData(0, slice, pixels, 0, pixels.Length);
-			canvas.SetData(pixels);
-			this.Icon = canvas;
+			this.Icon = Utils.Slice(texture: ModEntry.SpriteSheet, area: CookingMenu.CookingSkillLevelUpIconArea);
 
 			// Populate skill professions
 			this.Professions.Clear();
 			this.ProfessionsForLevels.Clear();
 			const string professionIdTemplate = "menu.cooking_skill.tier{0}_path{1}{2}";
 			const int count = 6;
-			Texture2D[] canvases = new Texture2D[count];
 			for (int i = 0; i < count; ++i)
 			{
-				slice = CookingMenu.CookingSkillProfessionIconArea;
-				slice.X += i * slice.Width; // <-- Which profession icon to use is decided here
-				texture.GetData(0, slice, pixels, 0, pixels.Length); // Pixel data copied from spritesheet
-				canvases[i] = new(Game1.graphics.GraphicsDevice, slice.Width, slice.Height); // Unique texture created, no shared references
-				canvases[i].SetData(pixels); // Texture has pixel data applied
+				// v-- Which profession icon to use is decided here
+				Rectangle area = CookingMenu.CookingSkillProfessionIconArea;
+				area.X += i * area.Width;
 
 				// Set metadata for this profession
 				string id = string.Format(professionIdTemplate,
@@ -79,9 +58,10 @@ namespace LoveOfCooking.Objects
 					i / 2 == 0 ? i + 1 : i / 2, // Path
 					i < 2 ? "" : i % 2 == 0 ? "a" : "b"); // Choice
 				string extra = i == 1 && !ModEntry.Config.FoodHealingTakesTime ? "_alt" : "";
-				SkillProfession profession = new(this, id)
+				SkillProfession profession = new(skill: this, theId: id)
 				{
-					Icon = canvases[i], // <-- Skill profession icon is applied here
+					// v-- Skill profession icon is applied here
+					Icon = Utils.Slice(texture: ModEntry.SpriteSheet, area: area),
 					Name = I18n.Get($"{id}{extra}.name"),
 					Description = I18n.Get($"{id}{extra}.description",
 					new

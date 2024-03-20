@@ -4,13 +4,14 @@ using System.Linq;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
-using StardewValley.Extensions;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using StardewValley.SpecialOrders.Objectives;
 using xTile.Tiles;
+using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace LoveOfCooking
 {
@@ -610,6 +611,25 @@ namespace LoveOfCooking
 			}
 
 			return false;
+		}
+
+		public static Texture2D Slice(Texture2D texture, Rectangle area)
+		{
+			Texture2D output;
+			Color[] data;
+			output = new(
+				graphicsDevice: Game1.graphics.GraphicsDevice,
+				width: area.Width,
+				height: area.Height);
+			data = new Color[area.Width * area.Height];
+			texture.GetData(
+				level: 0,
+				rect: area,
+				data: data,
+				startIndex: 0,
+				elementCount: data.Length);
+			output.SetData(data: data);
+			return output;
 		}
 
 		public static void AddToShopAtItemIndex(ShopMenu menu, StardewValley.Object o, string targetItemName = "", int price = -1, int stock = -1)
