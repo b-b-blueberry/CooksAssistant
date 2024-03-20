@@ -37,7 +37,7 @@
                 "Price": -1,
                 "RequireToolId": null,
                 "TradeItemId": "(O)334",
-                "TradeItemAmount": 5
+                "TradeItemAmount": 3
             }
         ],
         "CanBeLostOnDeath": false,
@@ -64,7 +64,7 @@
                 "Price": -1,
                 "RequireToolId": null,
                 "TradeItemId": "(O)335",
-                "TradeItemAmount": 5
+                "TradeItemAmount": 3
             }
         ],
         "CanBeLostOnDeath": false,
@@ -91,7 +91,7 @@
                 "Price": -1,
                 "RequireToolId": null,
                 "TradeItemId": "(O)336",
-                "TradeItemAmount": 5
+                "TradeItemAmount": 3
             }
         ],
         "CanBeLostOnDeath": false,
@@ -118,7 +118,7 @@
                 "Price": -1,
                 "RequireToolId": null,
                 "TradeItemId": "(O)337",
-                "TradeItemAmount": 5
+                "TradeItemAmount": 3
             }
         ],
         "CanBeLostOnDeath": false,
