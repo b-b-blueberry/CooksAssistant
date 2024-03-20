@@ -262,7 +262,7 @@ namespace LoveOfCooking
 			try
 			{
 				var data = asset.AsDictionary<string, string>().Data;
-				if (ModEntry.Config.AddNewCropsAndStuff && ModEntry.Config.AddCookingSkillAndRecipes)
+				if (ModEntry.Config.AddCookingSkillAndRecipes)
 				{
 					// Add new recipes
 					var recipes = ModEntry.Instance.Helper.ModContent.Load

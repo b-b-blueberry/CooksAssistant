@@ -688,7 +688,7 @@ namespace LoveOfCooking
 			}
 
 			// Add leftovers from viable foods to the inventory, or drop it on the ground if full
-			if (ModEntry.Config.AddRecipeRebalancing && ModEntry.ItemDefinitions.FoodsThatGiveLeftovers.TryGetValue(food.Name, out string leftoversName))
+			if (ModEntry.ItemDefinitions.FoodsThatGiveLeftovers.TryGetValue(food.Name, out string leftoversName))
 			{
 				Item leftovers = ItemRegistry.Create(itemId: leftoversName, amount: 1);
 				Utils.AddOrDropItem(leftovers);
@@ -818,9 +818,6 @@ namespace LoveOfCooking
 					  + $"{Environment.NewLine}New Cooking Menu:   {Config.AddCookingMenu}"
 					  + $"{Environment.NewLine}New Cooking Skill:  {Config.AddCookingSkillAndRecipes}"
 					  + $"{Environment.NewLine}New Cooking Tool:   {Config.AddCookingToolProgression}"
-					  + $"{Environment.NewLine}New Crops & Stuff:  {Config.AddNewCropsAndStuff}"
-					  + $"{Environment.NewLine}New Recipe Scaling: {Config.AddRecipeRebalancing}"
-					  + $"{Environment.NewLine}New Buff Assigning: {Config.AddBuffReassigning}"
 					  + $"{Environment.NewLine}Cooking Animation:  {Config.PlayCookingAnimation}"
 					  + $"{Environment.NewLine}Healing Takes Time: {Config.FoodHealingTakesTime}"
 					  + $"{Environment.NewLine}Hide Food Buffs:    {Config.HideFoodBuffsUntilEaten}"
