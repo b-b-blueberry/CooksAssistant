@@ -105,7 +105,8 @@
 		"blueberry.LoveOfCooking.CookingSkill": 0.01
 	},
 	"EdibleItemsWithNoFoodBehaviour": [
-		"Life Elixir"
+		"Life Elixir",
+		"Energy Tonic"
 	],
 	"IndoorsTileIndexesOfKitchens": [ 498, 499, 631, 632, 633 ],
 	"IndoorsTileIndexesOfFridges": [ 173, 258, 500, 634 ],

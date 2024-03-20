@@ -641,8 +641,8 @@ namespace LoveOfCooking
 
 		private void SpaceEvents_ItemEaten(object sender, EventArgs e)
 		{
+			// Don't consider excluded items for food behaviours, e.g. Food Heals Over Time
 			if (Game1.player.itemToEat is not StardewValley.Object food
-				// Don't consider Life Elixir (ID 773) for food behaviours or Food Heals Over Time
 				|| ModEntry.ItemDefinitions.EdibleItemsWithNoFoodBehaviour.Contains(Game1.player.itemToEat.Name))
 				return;
 
