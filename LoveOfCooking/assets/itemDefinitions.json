@@ -119,9 +119,9 @@
 		"minervamaga.FR.BiggerFarmhouses"
 	],
 	"FoodsThatGiveLeftovers": {
-		"blueberry.cac.seafoodsando": "blueberry.cac.seafoodsando_half",
-		"blueberry.cac.eggsando": "blueberry.cac.eggsando_half",
-		"blueberry.cac.saladsando": "blueberry.cac.saladsando_half"
+		"blueberry.LoveOfCooking_seafoodsando": "blueberry.LoveOfCooking_seafoodsando_half",
+		"blueberry.LoveOfCooking_eggsando": "blueberry.LoveOfCooking_eggsando_half",
+		"blueberry.LoveOfCooking_saladsando": "blueberry.LoveOfCooking_saladsando_half"
 	},
 	"MarmaladeFoods": [
 		"lemon",

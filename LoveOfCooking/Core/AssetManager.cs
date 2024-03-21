@@ -373,7 +373,7 @@ namespace LoveOfCooking
 
 			// Add new mail entries
 			foreach (var pair in newData)
-				data[pair.Key] = Game1.content.LoadString(pair.Value);
+				data[pair.Key] = Game1.content.LoadString(pair.Value).Replace("{{cookbookId}}", $"(O){ModEntry.CookbookItemId}");
 
 			asset.AsDictionary<string, string>().ReplaceWith(data);
 		}

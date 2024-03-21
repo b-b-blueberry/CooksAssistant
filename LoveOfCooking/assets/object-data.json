@@ -1,6 +1,6 @@
 ﻿{
-    "blueberry.cac.admiralpie": {
-        "Name": "blueberry.cac.admiralpie",
+    "blueberry.LoveOfCooking_admiralpie": {
+        "Name": "blueberry.LoveOfCooking_admiralpie",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.admiralpie.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.admiralpie.description]",
         "Type": "Cooking",
@@ -39,8 +39,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.applepie": {
-        "Name": "blueberry.cac.applepie",
+    "blueberry.LoveOfCooking_applepie": {
+        "Name": "blueberry.LoveOfCooking_applepie",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.applepie.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.applepie.description]",
         "Type": "Cooking",
@@ -58,8 +58,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.arancini": {
-        "Name": "blueberry.cac.arancini",
+    "blueberry.LoveOfCooking_arancini": {
+        "Name": "blueberry.LoveOfCooking_arancini",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.arancini.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.arancini.description]",
         "Type": "Cooking",
@@ -75,8 +75,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.bakedpotato": {
-        "Name": "blueberry.cac.bakedpotato",
+    "blueberry.LoveOfCooking_bakedpotato": {
+        "Name": "blueberry.LoveOfCooking_bakedpotato",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.bakedpotato.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.bakedpotato.description]",
         "Type": "Cooking",
@@ -92,8 +92,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.breakfast": {
-        "Name": "blueberry.cac.breakfast",
+    "blueberry.LoveOfCooking_breakfast": {
+        "Name": "blueberry.LoveOfCooking_breakfast",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.breakfast.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.breakfast.description]",
         "Type": "Cooking",
@@ -133,8 +133,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.burger": {
-        "Name": "blueberry.cac.burger",
+    "blueberry.LoveOfCooking_burger": {
+        "Name": "blueberry.LoveOfCooking_burger",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burger.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burger.description]",
         "Type": "Cooking",
@@ -151,8 +151,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.burntfood": {
-        "Name": "blueberry.cac.burntfood",
+    "blueberry.LoveOfCooking_burntfood": {
+        "Name": "blueberry.LoveOfCooking_burntfood",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burntfood.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burntfood.description]",
         "Type": "Junk",
@@ -169,8 +169,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.burrito": {
-        "Name": "blueberry.cac.burrito",
+    "blueberry.LoveOfCooking_burrito": {
+        "Name": "blueberry.LoveOfCooking_burrito",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burrito.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.burrito.description]",
         "Type": "Cooking",
@@ -187,8 +187,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.cherrypie": {
-        "Name": "blueberry.cac.cherrypie",
+    "blueberry.LoveOfCooking_cherrypie": {
+        "Name": "blueberry.LoveOfCooking_cherrypie",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cherrypie.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cherrypie.description]",
         "Type": "Cooking",
@@ -205,8 +205,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.chocoflan": {
-        "Name": "blueberry.cac.chocoflan",
+    "blueberry.LoveOfCooking_chocoflan": {
+        "Name": "blueberry.LoveOfCooking_chocoflan",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocoflan.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocoflan.description]",
         "Type": "Cooking",
@@ -223,8 +223,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.chocolate": {
-        "Name": "blueberry.cac.chocolate",
+    "blueberry.LoveOfCooking_chocolate": {
+        "Name": "blueberry.LoveOfCooking_chocolate",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocolate.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.chocolate.description]",
         "Type": "Junk",
@@ -263,8 +263,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.cocococktail": {
-        "Name": "blueberry.cac.cocococktail",
+    "blueberry.LoveOfCooking_cocococktail": {
+        "Name": "blueberry.LoveOfCooking_cocococktail",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cocococktail.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cocococktail.description]",
         "Type": "Cooking",
@@ -294,8 +294,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.craymornay": {
-        "Name": "blueberry.cac.craymornay",
+    "blueberry.LoveOfCooking_craymornay": {
+        "Name": "blueberry.LoveOfCooking_craymornay",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.craymornay.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.craymornay.description]",
         "Type": "Cooking",
@@ -312,8 +312,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.crepes": {
-        "Name": "blueberry.cac.crepes",
+    "blueberry.LoveOfCooking_crepes": {
+        "Name": "blueberry.LoveOfCooking_crepes",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.crepes.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.crepes.description]",
         "Type": "Cooking",
@@ -344,8 +344,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.mousse": {
-        "Name": "blueberry.cac.mousse",
+    "blueberry.LoveOfCooking_mousse": {
+        "Name": "blueberry.LoveOfCooking_mousse",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mousse.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mousse.description]",
         "Type": "Cooking",
@@ -362,8 +362,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.curry": {
-        "Name": "blueberry.cac.curry",
+    "blueberry.LoveOfCooking_curry": {
+        "Name": "blueberry.LoveOfCooking_curry",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.curry.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.curry.description]",
         "Type": "Cooking",
@@ -404,8 +404,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.eggsando": {
-        "Name": "blueberry.cac.eggsando",
+    "blueberry.LoveOfCooking_eggsando": {
+        "Name": "blueberry.LoveOfCooking_eggsando",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando.description]",
         "Type": "Cooking",
@@ -422,8 +422,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.eggsando_half": {
-        "Name": "blueberry.cac.eggsando_half",
+    "blueberry.LoveOfCooking_eggsando_half": {
+        "Name": "blueberry.LoveOfCooking_eggsando_half",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando_half.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.eggsando_half.description]",
         "Type": "Junk",
@@ -439,8 +439,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.fruity": {
-        "Name": "blueberry.cac.fruity",
+    "blueberry.LoveOfCooking_fruity": {
+        "Name": "blueberry.LoveOfCooking_fruity",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.fruity.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.fruity.description]",
         "Type": "Cooking",
@@ -470,8 +470,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.hotcocoa": {
-        "Name": "blueberry.cac.hotcocoa",
+    "blueberry.LoveOfCooking_hotcocoa": {
+        "Name": "blueberry.LoveOfCooking_hotcocoa",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hotcocoa.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hotcocoa.description]",
         "Type": "Cooking",
@@ -512,8 +512,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.hunters": {
-        "Name": "blueberry.cac.hunters",
+    "blueberry.LoveOfCooking_hunters": {
+        "Name": "blueberry.LoveOfCooking_hunters",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hunters.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.hunters.description]",
         "Type": "Cooking",
@@ -552,8 +552,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.kebab": {
-        "Name": "blueberry.cac.kebab",
+    "blueberry.LoveOfCooking_kebab": {
+        "Name": "blueberry.LoveOfCooking_kebab",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.kebab.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.kebab.description]",
         "Type": "Cooking",
@@ -571,8 +571,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.lasagna": {
-        "Name": "blueberry.cac.lasagna",
+    "blueberry.LoveOfCooking_lasagna": {
+        "Name": "blueberry.LoveOfCooking_lasagna",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lasagna.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lasagna.description]",
         "Type": "Cooking",
@@ -589,8 +589,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.leeks": {
-        "Name": "blueberry.cac.leeks",
+    "blueberry.LoveOfCooking_leeks": {
+        "Name": "blueberry.LoveOfCooking_leeks",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.leeks.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.leeks.description]",
         "Type": "Cooking",
@@ -628,8 +628,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.lobster": {
-        "Name": "blueberry.cac.lobster",
+    "blueberry.LoveOfCooking_lobster": {
+        "Name": "blueberry.LoveOfCooking_lobster",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lobster.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.lobster.description]",
         "Type": "Cooking",
@@ -646,8 +646,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.nigiri": {
-        "Name": "blueberry.cac.nigiri",
+    "blueberry.LoveOfCooking_nigiri": {
+        "Name": "blueberry.LoveOfCooking_nigiri",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.nigiri.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.nigiri.description]",
         "Type": "Cooking",
@@ -664,8 +664,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.oceanplatter": {
-        "Name": "blueberry.cac.oceanplatter",
+    "blueberry.LoveOfCooking_oceanplatter": {
+        "Name": "blueberry.LoveOfCooking_oceanplatter",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.oceanplatter.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.oceanplatter.description]",
         "Type": "Cooking",
@@ -683,8 +683,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.paella": {
-        "Name": "blueberry.cac.paella",
+    "blueberry.LoveOfCooking_paella": {
+        "Name": "blueberry.LoveOfCooking_paella",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.paella.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.paella.description]",
         "Type": "Cooking",
@@ -702,8 +702,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.parfait": {
-        "Name": "blueberry.cac.parfait",
+    "blueberry.LoveOfCooking_parfait": {
+        "Name": "blueberry.LoveOfCooking_parfait",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.parfait.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.parfait.description]",
         "Type": "Cooking",
@@ -720,8 +720,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.pilaf": {
-        "Name": "blueberry.cac.pilaf",
+    "blueberry.LoveOfCooking_pilaf": {
+        "Name": "blueberry.LoveOfCooking_pilaf",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.pilaf.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.pilaf.description]",
         "Type": "Cooking",
@@ -737,8 +737,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.profiteroles": {
-        "Name": "blueberry.cac.profiteroles",
+    "blueberry.LoveOfCooking_profiteroles": {
+        "Name": "blueberry.LoveOfCooking_profiteroles",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.profiteroles.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.profiteroles.description]",
         "Type": "Cooking",
@@ -756,8 +756,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.quiche": {
-        "Name": "blueberry.cac.quiche",
+    "blueberry.LoveOfCooking_quiche": {
+        "Name": "blueberry.LoveOfCooking_quiche",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.quiche.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.quiche.description]",
         "Type": "Cooking",
@@ -774,8 +774,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.roast": {
-        "Name": "blueberry.cac.roast",
+    "blueberry.LoveOfCooking_roast": {
+        "Name": "blueberry.LoveOfCooking_roast",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.roast.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.roast.description]",
         "Type": "Cooking",
@@ -793,8 +793,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.saladsando": {
-        "Name": "blueberry.cac.saladsando",
+    "blueberry.LoveOfCooking_saladsando": {
+        "Name": "blueberry.LoveOfCooking_saladsando",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando.description]",
         "Type": "Cooking",
@@ -812,8 +812,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.saladsando_half": {
-        "Name": "blueberry.cac.saladsando_half",
+    "blueberry.LoveOfCooking_saladsando_half": {
+        "Name": "blueberry.LoveOfCooking_saladsando_half",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando_half.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.saladsando_half.description]",
         "Type": "Junk",
@@ -829,8 +829,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.seafoodsando": {
-        "Name": "blueberry.cac.seafoodsando",
+    "blueberry.LoveOfCooking_seafoodsando": {
+        "Name": "blueberry.LoveOfCooking_seafoodsando",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando.description]",
         "Type": "Cooking",
@@ -848,8 +848,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.seafoodsando_half": {
-        "Name": "blueberry.cac.seafoodsando_half",
+    "blueberry.LoveOfCooking_seafoodsando_half": {
+        "Name": "blueberry.LoveOfCooking_seafoodsando_half",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando_half.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seafoodsando_half.description]",
         "Type": "Junk",
@@ -865,8 +865,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.summersalad": {
-        "Name": "blueberry.cac.summersalad",
+    "blueberry.LoveOfCooking_summersalad": {
+        "Name": "blueberry.LoveOfCooking_summersalad",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.summersalad.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.summersalad.description]",
         "Type": "Cooking",
@@ -883,8 +883,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.unagi": {
-        "Name": "blueberry.cac.unagi",
+    "blueberry.LoveOfCooking_unagi": {
+        "Name": "blueberry.LoveOfCooking_unagi",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.unagi.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.unagi.description]",
         "Type": "Cooking",
@@ -901,8 +901,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.waffles": {
-        "Name": "blueberry.cac.waffles",
+    "blueberry.LoveOfCooking_waffles": {
+        "Name": "blueberry.LoveOfCooking_waffles",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.waffles.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.waffles.description]",
         "Type": "Cooking",
@@ -943,8 +943,8 @@
         ],
         "CustomFields": {}
     },
-    "blueberry.cac.cookbook": {
-        "Name": "blueberry.cac.cookbook",
+    "blueberry.LoveOfCooking_cookbook": {
+        "Name": "blueberry.LoveOfCooking_cookbook",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cookbook.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cookbook.description]",
         "Type": "Junk",

@@ -1,15 +1,15 @@
 ﻿{
     "Saloon": [
         {
-            "Id": "blueberry.cac.chocolate",
-            "ItemId": "blueberry.cac.chocolate",
+            "Id": "blueberry.LoveOfCooking_chocolate",
+            "ItemId": "blueberry.LoveOfCooking_chocolate",
             "Condition": "PLAYER_FARMHOUSE_UPGRADE Current 1, PLAYER_HAS_MAIL Current ccComplete"
         }
     ],
     "Joja": [
         {
-            "Id": "blueberry.cac.chocolate",
-            "ItemId": "blueberry.cac.chocolate",
+            "Id": "blueberry.LoveOfCooking_chocolate",
+            "ItemId": "blueberry.LoveOfCooking_chocolate",
             "Condition": null
         }
     ]

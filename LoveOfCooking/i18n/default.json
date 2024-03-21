@@ -85,7 +85,7 @@
 	"menu.cooking_search.none_label": "No recipes found.",
 
 	// Mail
-	"mail.cookbook_unlocked": "Dear @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom%item id (O)blueberry.cac.cookbook 1 %%[#]Mom's Cookbook",
+	"mail.cookbook_unlocked": "Dear @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom%item id {{cookbookId}} 1 %%[#]Mom's Cookbook",
 	"mail.cookbook_unlocked.after.1": "You received Mom's Cookbook.",
 	"mail.cookbook_unlocked.after.2": "Recipes you learn will be saved here to cook at any kitchens in town.",
 
