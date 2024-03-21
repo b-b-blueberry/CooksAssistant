@@ -542,7 +542,7 @@ namespace LoveOfCooking.Menu
 				color: Color.White,
 				rotation: 0f,
 				origin: source.Size.ToVector2() / 2,
-				scale: this.CookButton.scale,
+				scale: this.CookButton.scale + (float)bounce / 3,
 				effects: SpriteEffects.None,
 				layerDepth: 1f);
 
