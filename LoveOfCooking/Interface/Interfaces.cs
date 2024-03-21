@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace LoveOfCooking.Interface
 {
-    internal static class Interfaces
+	internal static class Interfaces
 	{
 		private static IModHelper Helper => ModEntry.Instance.Helper;
 		private static IManifest ModManifest => ModEntry.Instance.ModManifest;
@@ -126,7 +126,7 @@ namespace LoveOfCooking.Interface
 				ccc.LoadContentPack(absoluteDirectoryPath: Path.Combine(Helper.DirectoryPath, AssetManager.CommunityCentreContentPackPath));
 			}
 			else
-            {
+			{
 				Log.D("Did not register CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
 			}

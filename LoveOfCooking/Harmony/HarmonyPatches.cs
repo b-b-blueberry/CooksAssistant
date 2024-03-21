@@ -77,19 +77,19 @@ namespace LoveOfCooking.HarmonyPatches
 				__instance.exitFunction = () =>
 				{
 					DelayedAction.functionAfterDelay(
-						func: () =>
-						{
-							// Block any item overflow menus created to collect cookbook
-							Game1.activeClickableMenu = null;
-							Game1.nextClickableMenu.Clear();
+					func: () =>
+					{
+						// Block any item overflow menus created to collect cookbook
+						Game1.activeClickableMenu = null;
+						Game1.nextClickableMenu.Clear();
 
-							// Remove dummy cookbook item at all costs
-							Game1.player.removeFirstOfThisItemFromInventory(ModEntry.CookbookItemId);
+						// Remove dummy cookbook item at all costs
+						Game1.player.removeFirstOfThisItemFromInventory(ModEntry.CookbookItemId);
 
-							// Replace usual hold-item-above-head sequence with cookbook animation
-							Utils.PlayCookbookReceivedSequence();
-						},
-						delay: 1);
+						// Replace usual hold-item-above-head sequence with cookbook animation
+						Utils.PlayCookbookReceivedSequence();
+					},
+					delay: 1);
 				};
 			}
 		}
