@@ -48,6 +48,7 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle ToggleFilterButtonSource = new(80, 224, 16, 16);
         internal static readonly Rectangle ToggleOrderButtonSource = new(128, 224, 16, 16);
         internal static readonly Rectangle SearchButtonSource = new(144, 224, 16, 16);
+        internal static readonly Rectangle BuffIconSource = new(103, 209, 10, 10);
         internal static readonly Rectangle FavouriteIconSource = new(139, 209, 10, 10);
 		internal static readonly Rectangle AutofillButtonSource = new(160, 224, 16, 16);
         internal static readonly Rectangle InventoryTabButtonSource = new(240, 80, 16, 21);

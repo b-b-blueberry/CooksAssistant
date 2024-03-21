@@ -29,6 +29,8 @@
 	"config.others_label": "Others",
 
 	// General strings
+
+	// Cooking tool
 	"menu.cooking_equipment.name": "Frying Pan",
 	"menu.cooking_equipment.description.basic": "Can cook recipes with only 1 ingredient.",
 	"menu.cooking_equipment.description.copper": "Can cook recipes with only 1 or 2 ingredients.",
@@ -41,7 +43,7 @@
 	"menu.cooking_station.no_friendship": "You aren't good enough friends with {{name}} to use this kitchen.",
 
 	"menu.cooking_recipe.title_unknown": "???",
-	"menu.cooking_recipe.notes_unknown": "You've not eaten this recipe.",
+	"menu.cooking_recipe.notes_unknown": "You haven't eaten this yet.",
 	"menu.cooking_recipe.ingredients_label": "Ingredients:",
 	"menu.cooking_recipe.notes_label": "Notes:",
 	"menu.cooking_recipe.time_label": "Cooking time:",
@@ -66,6 +68,7 @@
 	"menu.cooking_recipe.buff.11": "Attack",
 	"menu.cooking_recipe.buff.12": "Cooking",
 	"menu.cooking_recipe.buff.daily": "All day",
+	"menu.cooking_recipe.buff.unknown": "???",
 
 	"menu.cooking_search.order_label": "Ascending/descending order",
 	"menu.cooking_search.view.list": "View list",

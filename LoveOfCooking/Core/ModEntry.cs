@@ -58,6 +58,9 @@ namespace LoveOfCooking
 			// Food Heals Over Time
 			public Regeneration Regeneration = new();
 
+			// Hide Food Buffs
+			public bool IsHidingFoodBuffs;
+
 			public State()
 			{
 				this.Reset();
@@ -160,7 +163,6 @@ namespace LoveOfCooking
 
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
-		internal const bool HideBuffIconsOnItems = false;
 
 
 		public override void Entry(IModHelper helper)
@@ -247,7 +249,6 @@ namespace LoveOfCooking
 			this.Helper.Events.GameLoop.Saving += this.GameLoop_Saving;
 			this.Helper.Events.GameLoop.DayStarted += this.GameLoop_DayStarted;
 			this.Helper.Events.GameLoop.ReturnedToTitle += this.GameLoop_ReturnedToTitle;
-			this.Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked;
 			this.Helper.Events.Input.ButtonPressed += this.Input_ButtonPressed;
 			this.Helper.Events.Display.MenuChanged += this.Display_MenuChanged;
 			this.Helper.Events.Multiplayer.PeerContextReceived += this.Multiplayer_PeerContextReceived;
@@ -510,11 +511,6 @@ namespace LoveOfCooking
 		{
 			// Reset session state
 			this.States.Value.Reset();
-		}
-
-		private void GameLoop_UpdateTicked(object sender, UpdateTickedEventArgs e)
-		{
-			AssetManager.IsCurrentHoveredItemHidingBuffs = false;
 		}
 
 		private void Event_LoadLate(object sender, OneSecondUpdateTickedEventArgs e)

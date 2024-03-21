@@ -24,8 +24,6 @@ namespace LoveOfCooking
 		// Regions
 
 		internal static readonly Rectangle RegenBarArea = new(116, 0, 12, 38);
-		internal static bool IsCurrentHoveredItemHidingBuffs;
-		internal const int DummyIndexForHidingBuffs = 49;
 
 		// Assets
 

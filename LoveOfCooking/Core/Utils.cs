@@ -252,6 +252,25 @@ namespace LoveOfCooking
 			});
 		}
 
+		public static void TryDrawHiddenBuffInHoverTooltip(SpriteBatch b, SpriteFont font, Item item, int x, int y)
+		{
+			if (!ModEntry.Instance.States.Value.IsHidingFoodBuffs)
+				return;
+
+			int size = Game1.smallestTileSize;
+			Utility.drawWithShadow(
+				b: b,
+				texture: ModEntry.SpriteSheet,
+				position: new(x: x + size + 4, y: y + size),
+				sourceRect: CookingMenu.BuffIconSource,
+				color: Color.White,
+				rotation: 0f,
+				origin: Vector2.Zero,
+				scale: 3f,
+				flipped: false,
+				layerDepth: 0.95f + 1 / 10000f);
+		}
+
 		public static List<FarmerSprite.AnimationFrame> AnimateForRecipe(CraftingRecipe recipe, int quantity, int burntCount, bool containsFish)
 		{
 			Game1.freezeControls = true;

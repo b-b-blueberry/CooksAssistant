@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using System.Reflection.Emit;
+using System.Text;
 using LoveOfCooking.Harmony;
 using LoveOfCooking.Objects;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
-using HarmonyLib; // el diavolo nuevo
 using Object = StardewValley.Object;
+using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking.HarmonyPatches
 {
@@ -44,21 +48,23 @@ namespace LoveOfCooking.HarmonyPatches
 				postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
 
 			// Hide buffs in cooked foods not yet eaten
-			if (ModEntry.HideBuffIconsOnItems)
-			{
-				parameters = new Type[]
-				{
-					typeof(SpriteBatch), typeof(System.Text.StringBuilder),
-					typeof(SpriteFont), typeof(int), typeof(int), typeof(int),
-					typeof(string), typeof(int), typeof(string[]), typeof(StardewValley.Item), typeof(int), typeof(int),
-					typeof(int), typeof(int), typeof(int), typeof(float), typeof(StardewValley.CraftingRecipe),
-					typeof(IList<StardewValley.Item>)
-				};
-				harmony.Patch(
-					original: AccessTools.Method(typeof(StardewValley.Menus.IClickableMenu), "drawHoverText",
-						parameters: parameters),
-					prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(IClickableMenu_DrawHoverText_Prefix)));
-			}
+			parameters = new[] { typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(string), typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>), typeof(Texture2D), typeof(Rectangle), typeof(Color), typeof(Color), typeof(float), typeof(int), typeof(int) };
+			harmony.Patch(
+				original: AccessTools.Method(
+					type: typeof(IClickableMenu),
+					name: nameof(IClickableMenu.drawHoverText),
+					parameters: parameters),
+				prefix: new(
+					methodType: typeof(HarmonyPatches),
+					methodName: nameof(IClickableMenu_DrawHoverText_Prefix)));
+			harmony.Patch(
+				original: AccessTools.Method(
+					type: typeof(IClickableMenu),
+					name: nameof(IClickableMenu.drawHoverText),
+					parameters: parameters),
+				transpiler: new(
+					methodType: typeof(HarmonyPatches),
+					methodName: nameof(IClickableMenu_DrawHoverText_Transpiler)));
 		}
 
 		/// <summary>
@@ -95,17 +101,46 @@ namespace LoveOfCooking.HarmonyPatches
 			ref string[] buffIconsToDisplay,
 			Item hoveredItem)
 		{
-			if (!Utils.IsItemFoodAndNotYetEaten(hoveredItem))
+			ModEntry.Instance.States.Value.IsHidingFoodBuffs = ModEntry.Config.HideFoodBuffsUntilEaten && Utils.IsItemFoodAndNotYetEaten(hoveredItem);
+			if (!ModEntry.Instance.States.Value.IsHidingFoodBuffs)
 				return;
 
-			string[] dummyBuffIcons = new string[AssetManager.DummyIndexForHidingBuffs + 1];
-			for (int i = 0; i < dummyBuffIcons.Length; ++i)
+			string[] array = new string[13];
+			Array.Fill(array, string.Empty);
+			array[^1] = ModEntry.Instance.I18n.Get("menu.cooking_recipe.buff.unknown");
+			buffIconsToDisplay = array;
+		}
+
+		/// <summary>
+		/// Replaces draw behaviour for hidden buffs.
+		/// </summary>
+		private static IEnumerable<CodeInstruction> IClickableMenu_DrawHoverText_Transpiler(ILGenerator gen, MethodBase original, IEnumerable<CodeInstruction> il)
+		{
+			// Seek to buff list draw behaviour
+			List<CodeInstruction> ilOut = il.ToList();
+			MethodInfo newMethod = AccessTools.Method(
+				type: typeof(Utils),
+				name: nameof(Utils.TryDrawHiddenBuffInHoverTooltip));
+			int i = ilOut.FindLastIndex(match: (CodeInstruction ci) => ci.opcode == OpCodes.Ldc_I4_S && ci.operand is sbyte operand && operand == 39);
+			int j = ilOut.FindIndex(startIndex: i, match: (CodeInstruction ci) => ci.opcode == OpCodes.Add);
+			if (i < 0 || j < 0)
 			{
-				dummyBuffIcons[i] = "0";
+				Log.E($"Failed to add behaviour for {nameof(Config.HideFoodBuffsUntilEaten)} in {nameof(IClickableMenu_DrawHoverText_Transpiler)}.");
+				return il;
 			}
-			dummyBuffIcons[AssetManager.DummyIndexForHidingBuffs] = "1";
-			buffIconsToDisplay = dummyBuffIcons;
-			AssetManager.IsCurrentHoveredItemHidingBuffs = true;
+
+			// Replace draw behaviour for hidden buffs
+			ilOut.InsertRange(index: j + 1, collection: new CodeInstruction[]
+			{
+				new(OpCodes.Ldarg, 0), // SpriteBatch b
+				new(OpCodes.Ldarg, 2), // SpriteFont font
+				new(OpCodes.Ldarg, 9), // Item item
+				new(OpCodes.Ldloc_S, 5), // int x
+				new(OpCodes.Ldloc_S, 6), // int y
+				new(OpCodes.Call, newMethod), // hidden buff draw method call
+			});
+
+			return ilOut;
 		}
 
 		/// <summary>
