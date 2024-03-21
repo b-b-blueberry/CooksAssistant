@@ -651,10 +651,9 @@ namespace LoveOfCooking.Menu
 					return;
 
 				// Buff duration
-				float duration = (float)buff.totalMillisecondsDuration / Game1.realMilliSecondsPerGameMinute;
-				text = buff.totalMillisecondsDuration == Buff.ENDLESS
+				text = buff.millisecondsDuration == Buff.ENDLESS
 					? I18n.Get("menu.cooking_recipe.buff.daily")
-					: $" {(int)(duration / 60)}:{(duration % 60):00}";
+					: Utility.getMinutesSecondsStringFromMilliseconds(buff.millisecondsDuration);
 
 				// Duration icon
 				position.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * 1.1f * this._textScale.Y;
