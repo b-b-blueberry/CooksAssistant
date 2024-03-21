@@ -175,7 +175,7 @@ namespace LoveOfCooking.Menu
                 this.Index = index;
 				this.Recipe = new CraftingRecipe(name: name, isCookingRecipe: true);
 				this.Item = this.Recipe.createItem();
-                this.Buff = Item.GetFoodOrDrinkBuffs().FirstOrDefault();
+				this.Buff = Utils.GetFirstVisibleBuffOnItem(item: this.Item);
 			}
         }
         public RecipeInfoClass RecipeInfo { get; private set; }

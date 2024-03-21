@@ -221,7 +221,7 @@ namespace LoveOfCooking.Menu
                     filter = recipe =>
                         (!ModEntry.Config.HideFoodBuffsUntilEaten
                         || Instance.States.Value.FoodsEaten.Contains(recipe.name))
-                        && recipe.createItem().GetFoodOrDrinkBuffs().Any();
+						&& Utils.GetFirstVisibleBuffOnItem(item: recipe.createItem()) is not null;
                     break;
                 case Filter.New:
                     filter = recipe => !Game1.player.recipesCooked.ContainsKey(recipe.createItem().ItemId);

@@ -571,6 +571,14 @@ namespace LoveOfCooking
 				&& !ModEntry.Instance.States.Value.FoodsEaten.Contains(o.Name);
 		}
 
+		public static Buff GetFirstVisibleBuffOnItem(Item item)
+		{
+			bool isEdible = item is not StardewValley.Object o || o.Edibility != -300;
+			return isEdible
+				? item.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.visible && ((buff.id != "food" && buff.id != "drink") || buff.HasAnyEffects()))
+				: null;
+		}
+
 		/// <summary>
 		/// Checks for if the player meets conditions to open the new cooking menu.
 		/// Always true if using the default cooking menu.
