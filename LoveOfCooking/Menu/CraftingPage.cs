@@ -590,7 +590,7 @@ namespace LoveOfCooking.Menu
 			{
 				// Draw healing and buff information
 
-				const float xOffset = 8.25f * Scale;
+				const float xOffset = 9 * Scale;
 				int stamina = item.staminaRecoveredOnConsumption();
 				int health = item.healthRecoveredOnConsumption();
 				float buffOffsetX = 0;
@@ -771,11 +771,11 @@ namespace LoveOfCooking.Menu
 
 						// Buff amount and attribute
 						buffPosition.X += xOffset;
-						text = value > 0 ? $"+{value}" : $"{value}";
+						text = (value > 0 ? $"+{value}" : $"{value}").PadRight(4);
 
 						// Show attribute name if we're only showing a single column
 						if (numToDisplay <= height)
-							text += " " + I18n.Get($"menu.cooking_recipe.buff.{i}");
+							text += I18n.Get($"menu.cooking_recipe.buff.{i}");
 						this.DrawText(
 							b: b,
 							text: text,
