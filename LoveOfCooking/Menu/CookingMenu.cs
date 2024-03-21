@@ -50,6 +50,9 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle SearchButtonSource = new(144, 224, 16, 16);
         internal static readonly Rectangle BuffIconSource = new(103, 209, 10, 10);
         internal static readonly Rectangle FavouriteIconSource = new(139, 209, 10, 10);
+		internal static readonly Rectangle StarIconSource = new(139, 209, 10, 10);
+        internal static readonly Rectangle CheckIconSource = new(149, 209, 10, 10);
+        internal static readonly Rectangle CrossIconSource = new(159, 209, 10, 10);
 		internal static readonly Rectangle AutofillButtonSource = new(160, 224, 16, 16);
         internal static readonly Rectangle InventoryTabButtonSource = new(240, 80, 16, 21);
         internal static readonly Rectangle InventoryBackpackIconSource = new(244, 102, 12, 14);
@@ -65,6 +68,10 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle EnergyIconSource = new(0, 438, 10, 10);
 		internal static readonly Rectangle UnknownIconSource = new(175, 425, 12, 12);
 		internal static readonly Rectangle DurationIconSource = new(434, 475, 9, 9);
+		internal static readonly Rectangle MoneyIconSource = new(280, 411, 16, 16);
+		internal static readonly Rectangle LockIconSource = new(107, 442, 7, 8);
+		internal static readonly Rectangle HeartFullIconSource = new(211, 427, 7, 7);
+		internal static readonly Rectangle HeartEmptyIconSource = new(218, 427, 7, 7);
 		internal static readonly Rectangle DownButtonSource = new(0, 64, 64, 64);
         internal static readonly Rectangle UpButtonSource = new(64, 64, 64, 64);
         internal static readonly Rectangle RightButtonSource = new(0, 192, 64, 64);
