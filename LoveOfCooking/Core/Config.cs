@@ -11,6 +11,7 @@
 		public bool HideFoodBuffsUntilEaten { get; set; } = false;
 
 		// Changes
+		public bool CanUseTownKitchens { get; set; } = true;
 		public bool FoodHealingTakesTime { get; set; } = false;
 		public bool FoodCanBurn { get; set; } = false;
 

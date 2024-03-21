@@ -578,7 +578,7 @@ namespace LoveOfCooking
 			if (e.Button.IsActionButton())
 			{
 				// Open cooking menus from available kitchen tiles
-				if (Utils.CanUseKitchens(who: Game1.player)
+				if (ModEntry.Config.CanUseTownKitchens && Utils.CanUseKitchens(who: Game1.player)
 					&& Utils.IsKitchenTileUnderCursor(location: Game1.currentLocation, point: e.Cursor.GrabTile.ToPoint(), who: Game1.player, out string friendshipLockedBy))
 				{
 					if (friendshipLockedBy is null)

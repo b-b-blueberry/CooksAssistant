@@ -16,6 +16,8 @@
 	"config.option.foodhealingtakestime_description": "Instead of restoring all health and energy on eating, eating food will gradually restore health over time!\nHealth regenerates faster when your health and stamina are lower.\nRegeneration ticks down slowest when your health bars are full, stretching it for longer.\nHealth regen speed scales with skill levels: Combat, Cooking, and Foraging.\nEating another item adds to the remaining health from the last food you ate.\n\nYou'll be able to make better use of buffs and energy,\nbut you won't be able to instantly restore health when in danger.",
 	"config.option.foodcanburn_name": "Food can burn",
 	"config.option.foodcanburn_description": "You have a chance to ruin your food when cooking!\nBurnt food can still be eaten or sold for a modest refund.\nFoods will burn individually, not as a whole stack.\nBurn chance decreases with your Cooking skill level.\n\nNot recommended unless you enjoy failure.",
+	"config.option.canusetownkitchens_name": "Town kitchens",
+	"config.option.canusetownkitchens_description": "Allows you to interact with any kitchens in town.\nYou need to be friends with someone living there.",
 	"config.option.rememberlastsearchfilter_name": "Remember last search filter",
 	"config.option.rememberlastsearchfilter_description": "With the new cooking menu enabled, you can search for recipes with filters.\nThe menu already saves your last-used search filter,\nbut it resets for when you next play.\nYou can disable this here to always use start with the default filter.",
 	"config.option.showfoodregenbar_name": "Show food healing regen bar",

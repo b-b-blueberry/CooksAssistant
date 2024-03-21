@@ -661,11 +661,14 @@ namespace LoveOfCooking
 				bool isCookingStationTile = ModEntry.ItemDefinitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
 				if (!location.IsOutdoors && isCookingStationTile)
 				{
-					// Check friendship before using kitchens in NPC homes outside of the farm
-					string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
-					if (!location.IsFarm && !Utils.CanUseCharacterKitchen(who: who, character: npc))
+					if (!location.IsFarm)
 					{
-						friendshopLockedBy = npc;
+						// Check friendship before using kitchens in NPC homes outside of the farm
+						string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
+						if (!Utils.CanUseCharacterKitchen(who: who, character: npc))
+						{
+							friendshopLockedBy = npc;
+						}
 					}
 					return true;
 				}
