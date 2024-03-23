@@ -1,5 +1,6 @@
 ﻿using StardewValley;
 using StardewValley.Menus;
+using System.Collections.Generic;
 using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking.HarmonyPatches
@@ -16,6 +17,10 @@ namespace LoveOfCooking.HarmonyPatches
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CraftingPage), "clickCraftingRecipe"),
 				postfix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Postfix)));
+			// Correctly sort recipes by display name
+			harmony.Patch(
+				original: AccessTools.Method(type: typeof(CraftingPage), name: "layoutRecipes"),
+				prefix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(LayoutRecipes_Prefix)));
 		}
 
         public static void CraftItem_Prefix()
@@ -84,6 +89,20 @@ namespace LoveOfCooking.HarmonyPatches
 					ModEntry.Instance.States.Value.FoodCookedToday[item.Name] = 0;
 				ModEntry.Instance.States.Value.FoodCookedToday[item.Name] += item.Stack;
 			}
+		}
+
+		/// <summary>
+		/// Force cooking recipe sorting by display name in game menus.
+		/// </summary>
+		public static void LayoutRecipes_Prefix(
+			bool ___cooking,
+			List<string> playerRecipes)
+		{
+			if (!___cooking)
+				return;
+			var sorted = Utils.SortRecipesByKnownAndDisplayName(playerRecipes);
+			playerRecipes.Clear();
+			playerRecipes.AddRange(sorted);
 		}
 	}
 }

@@ -803,5 +803,16 @@ namespace LoveOfCooking
 			}
 			menu.forSale = itemList;
 		}
+
+		public static List<string> SortRecipesByKnownAndDisplayName(List<string> recipeIds)
+		{
+			var recipes = recipeIds.ToDictionary(
+				keySelector: s => s,
+				elementSelector: s => new CraftingRecipe(name: s));
+			return recipeIds
+				.OrderBy(id => recipes[id].DisplayName)
+				.OrderByDescending(id => Game1.player.cookingRecipes.ContainsKey(id))
+				.ToList();
+		}
 	}
 }
