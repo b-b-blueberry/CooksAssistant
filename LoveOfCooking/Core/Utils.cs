@@ -8,7 +8,9 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Extensions;
+using StardewValley.Inventories;
 using StardewValley.Menus;
+using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.SpecialOrders.Objectives;
 using xTile.Layers;
@@ -176,6 +178,56 @@ namespace LoveOfCooking
 				Game1.drawDialogueNoTyping(ModEntry.Instance.I18n.Get("menu.cooking_station.no_cookbook"));
 				Game1.displayHUD = true;
 			}
+		}
+
+		internal static void CreateNewCookingMenu(GameLocation location)
+		{
+			// Rebuild mutexes because the IL is unreadable
+			Chest fridge = location.GetFridge();
+			List<Chest> minifridges = new();
+			List<NetMutex> mutexes = new();
+			foreach (Chest chest in location.Objects.Values.Where(Utils.IsFridgeOrMinifridge))
+			{
+				minifridges.Add(chest);
+				mutexes.Add(chest.mutex);
+			}
+			if (fridge is not null)
+			{
+				mutexes.Add(fridge.mutex);
+			}
+
+			// Create mutex request for all containers
+			new MultipleMutexRequest(
+				mutexes: mutexes,
+				success_callback: delegate (MultipleMutexRequest request)
+				{
+					// Map containers with inventories to preserve object references
+					Dictionary<IInventory, Chest> containers = new();
+					if (fridge != null)
+						containers[fridge.Items] = fridge;
+					foreach (Chest chest in minifridges)
+						containers[chest.Items] = chest;
+
+					// Reduce to known recipes
+					List<CraftingRecipe> recipes = CraftingRecipe.cookingRecipes.Keys
+						.Where(Game1.player.cookingRecipes.ContainsKey)
+						.Select(key => new CraftingRecipe(name: key, isCookingRecipe: true))
+						.ToList();
+
+					// Create new cooking menu
+					CookingMenu menu = new(recipes: recipes, materialContainers: containers)
+					{
+						exitFunction = delegate
+						{
+							request.ReleaseLocks();
+						}
+					};
+					Utils.TryOpenNewCookingMenu(menu: menu, mutex: request);
+				},
+				failure_callback: delegate
+				{
+					Game1.showRedMessage(Game1.content.LoadString("Strings\\UI:Kitchen_InUse"));
+				});
 		}
 
 		internal static void PlayCookbookReceivedSequence()
