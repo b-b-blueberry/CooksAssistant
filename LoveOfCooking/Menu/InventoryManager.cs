@@ -51,10 +51,7 @@ namespace LoveOfCooking.Menu
 		public InventoryManager(CookingMenu menu, Dictionary<IInventory, Chest> inventoryAndChestMap) : base(menu)
 		{
 			// Set initial material containers for additional inventories
-			if (inventoryAndChestMap is not null)
-			{
-				this._inventoryAndChestList = inventoryAndChestMap.Select(pair => (pair.Key, pair.Value)).ToList();
-			}
+			this._inventoryAndChestList = inventoryAndChestMap?.Select(pair => (pair.Key, pair.Value)).ToList() ?? new();
 		}
 
 		public void ChangeInventory(bool selectNext, bool loop)
