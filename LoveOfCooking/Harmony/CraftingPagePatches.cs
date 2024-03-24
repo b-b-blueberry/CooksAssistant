@@ -35,6 +35,12 @@ namespace LoveOfCooking.HarmonyPatches
 			MethodInfo seasoningMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryApplySeasonings));
+			MethodInfo burnMethod = AccessTools.Method(
+				type: typeof(Utils),
+				name: nameof(Utils.TryBurnFood));
+			MethodInfo skillMethod = AccessTools.Method(
+				type: typeof(Utils),
+				name: nameof(Utils.TryCookingSkillBehavioursOnCooked));
 
 			// Seek to new seasonings list creation
 			/*
@@ -71,6 +77,36 @@ namespace LoveOfCooking.HarmonyPatches
 				new(OpCodes.Ldloca_S, 1), // ref item: crafted
 				new(OpCodes.Ldloc, 2), // seasoning: seasoning
 				new(OpCodes.Call, seasoningMethod)
+			});
+
+			// Update index to just-added seasoning method
+			/*
+				No IL
+			*/
+			int k = ilOut.FindIndex(
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Call && (MethodInfo)ci.operand == seasoningMethod);
+
+			if (k < 0)
+			{
+				Log.E($"Failed to add cooking behaviours for default crafting page in {nameof(CraftItem_Transpiler)}.");
+				return il;
+			}
+
+			// Insert unique behaviours on cooked immediately after seasoning method
+			ilOut.InsertRange(index: k + 1, collection: new CodeInstruction[]
+			{
+				// Experience and profession behaviours for Cooking Skill
+				new(OpCodes.Ldloc, 0), // recipe: recipe
+				new(OpCodes.Ldloca_S, 1), // ref item: crafted
+				new(OpCodes.Call, skillMethod),
+				// Burnt item for Food Can Burn
+				new(OpCodes.Ldarg_0), // menu: this
+				new(OpCodes.Ldloc, 0), // recipe: recipe
+				new(OpCodes.Ldloc, 1), // item: crafted
+				new(OpCodes.Ldarg, 2), // playSound: playSound
+				new(OpCodes.Call, burnMethod),
+				// Assign burnt/unchanged item as crafted item
+				new(OpCodes.Stloc, 1) // crafted
 			});
 
 			return ilOut;

@@ -48,7 +48,6 @@ namespace LoveOfCooking
 			// Add Cooking Menu
 			public CookingMenu.Filter LastFilterThisSession;
 			public bool LastFilterReversed;
-			public uint ItemsCooked;
 			public CookbookAnimation CookbookAnimation = new();
 			public MultipleMutexRequest MenuMutex;
 
@@ -81,7 +80,6 @@ namespace LoveOfCooking
 				// Add Cooking Menu
 				this.LastFilterThisSession = CookingMenu.Filter.None;
 				this.LastFilterReversed = false;
-				this.ItemsCooked = 0;
 				this.CookbookAnimation.Reset();
 				this.MenuMutex?.ReleaseLocks();
 

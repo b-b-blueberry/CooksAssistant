@@ -271,7 +271,7 @@ namespace LoveOfCooking.Menu
             return ingredientsToConsume;
         }
 
-        internal List<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity)
+        internal List<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
         {
             {
                 string msg1 = $"Cooking {recipe.name} x{quantity}";
@@ -334,8 +334,7 @@ namespace LoveOfCooking.Menu
                 qualityStacks[0] += numPerCraft;
 
                 // Apply extra portion bonuses to the amount cooked
-                if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
-                    && ModEntry.CookingSkillApi.RollForExtraPortion())
+                if (Utils.TryApplyCookingQuantityBonus())
                 {
                     qualityStacks[0] += numPerCraft;
                 }
@@ -373,16 +372,16 @@ namespace LoveOfCooking.Menu
 			}
 
 			// Apply burn chance to destroy cooked food at random
-			burntCount = 0;
+			burntQuantity = 0;
             List<int> qualities = qualityStacks.Keys.ToList();
             foreach (int quality in qualities)
             {
                 for (int i = qualityStacks[quality] - 1; i >= 0; i -= numPerCraft)
                 {
-                    if (GetBurnChance(recipe) > Game1.random.NextDouble())
+                    if (Utils.CheckBurntFood(recipe))
                     {
                         qualityStacks[quality] -= numPerCraft;
-                        ++burntCount;
+                        ++burntQuantity;
                     }
                 }
             }
@@ -396,16 +395,14 @@ namespace LoveOfCooking.Menu
                 item.Stack = pair.Value;
                 itemsCooked.Add(item);
             }
-
-            CookingMenu.LastBurntCount = burntCount;
             return itemsCooked;
         }
 
-        internal int CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity)
+        internal int CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
         {
             // Craft items to be cooked from recipe
-            List<StardewValley.Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity);
-            int quantityCooked = Math.Max(0, itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft - CookingMenu.LastBurntCount);
+            List<StardewValley.Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity, out burntQuantity);
+            int quantityCooked = Math.Max(0, itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft - burntQuantity);
             Item item = recipe.createItem();
 
             // Track experience for items cooked
@@ -437,16 +434,13 @@ namespace LoveOfCooking.Menu
                 Utils.AddOrDropItem(cookedItem);
             }
 
-            // Add burnt items
-            if (CookingMenu.LastBurntCount > 0)
-            {
-                Item burntItem = ItemRegistry.Create<StardewValley.Object>(
-                    itemId: ModEntry.ObjectPrefix + "burntfood",
-                    amount: CookingMenu.LastBurntCount);
-                Utils.AddOrDropItem(burntItem);
+			// Add burnt items
+            for (int i = 0; i < burntQuantity; ++i)
+			{
+				Utils.AddOrDropItem(Utils.CreateBurntFood());
             }
 
-            return CookingMenu.LastBurntCount;
+            return quantityCooked;
         }
 
         internal bool AddToIngredients(int whichInventory, int whichItem, string itemId)

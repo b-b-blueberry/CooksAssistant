@@ -28,9 +28,6 @@ namespace LoveOfCooking
 		public int BuffDurationValue;
 		public float BurnChanceReduction;
 		public float BurnChanceModifier;
-		public string BurntItemCreated;
-		public List<string> BurntItemAlternatives;
-		public float BurntItemAlternativeChance;
 	}
 
 	public class Definitions
@@ -59,6 +56,9 @@ namespace LoveOfCooking
 		public int[] IndoorsTileIndexesOfFridges;
 		public float BurnChanceBase;
 		public float BurnChancePerIngredient;
+		public string BurntItemCreated;
+		public List<string> BurntItemAlternatives;
+		public float BurntItemAlternativeChance;
 		public string[] FarmhouseKitchenStartModIDs;
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
 		public string DefaultSeasoning;

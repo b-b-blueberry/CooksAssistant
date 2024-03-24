@@ -113,6 +113,11 @@
 	"IndoorsTileIndexesOfFridges": [ 173, 258, 500, 634 ],
 	"BurnChanceBase": 0.22,
 	"BurnChancePerIngredient": 0.0035,
+	"BurntItemCreated": "168",
+	"BurntItemAlternatives": [
+		"blueberry.LoveOfCooking_burntfood"
+	],
+	"BurntItemAlternativeChance": 0.333,
 	"FarmhouseKitchenStartModIDs": [
 		"Allayna.Kitchen",
 		"burakmese.products",

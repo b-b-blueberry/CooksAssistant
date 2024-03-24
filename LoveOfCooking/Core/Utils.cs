@@ -15,7 +15,9 @@ using StardewValley.Objects;
 using StardewValley.SpecialOrders.Objectives;
 using xTile.Layers;
 using xTile.Tiles;
+using CraftingPage = StardewValley.Menus.CraftingPage;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking
 {
@@ -323,7 +325,7 @@ namespace LoveOfCooking
 				layerDepth: 0.95f + 1 / 10000f);
 		}
 
-		public static List<FarmerSprite.AnimationFrame> AnimateForRecipe(CraftingRecipe recipe, int quantity, int burntCount, bool containsFish)
+		public static List<FarmerSprite.AnimationFrame> AnimateForRecipe(CraftingRecipe recipe, int quantity, int burntQuantity, bool containsFish)
 		{
 			Game1.freezeControls = true;
 
@@ -505,43 +507,17 @@ namespace LoveOfCooking
 				frames = frames.Concat(newFrames).ToList();
 			}
 
-			// Burn the whole entire house down
-			// TODO: FIX: How do i do this
-			burntCount = 0;
-			if (burntCount > 0)
-			{
-				int frameCount = 4, loopCount = 8;
-				spritePosition = new(x: Game1.player.Position.X, y: Game1.player.Position.Y - 40 * spriteScale);
-				sprite = new(
-					textureName: Game1.animationsName,
-					//sourceRect: new(x: 0, y: 1856, width: 64, height: 64), // Smoke
-					sourceRect: new(x: 0, y: 1916, width: 64, height: 64), // Fire
-					animationInterval: ms,
-					animationLength: frameCount,
-					numberOfLoops: loopCount,
-					position: spritePosition,
-					flicker: false,
-					flipped: false);
-
-				frames[^1] = new(frames[^1].frame, frames[^1].milliseconds + (ms * frameCount * loopCount))
-				{
-					frameEndBehavior = delegate
-					{
-						Game1.player.FacingDirection = 2;
-						Game1.player.jitterStrength = 0.2f;
-						Game1.player.jump();
-						Game1.Multiplayer.broadcastSprites(Game1.currentLocation, sprite);
-					}
-				};
-			}
-
 			// Avoid animation problems?
 			frames.Insert(0, new(44, 0));
 
-			// Face forwards after animation
+			// Add end of animation behaviours
 			frames[^1] = new(frames[^1].frame, frames[^1].milliseconds)
 			{
 				frameEndBehavior = delegate {
+					// Add effects for ruined food from Food Can Burn
+					Utils.PlayFoodBurnEffects(burntQuantity: burntQuantity);
+
+					// Face forwards after animation
 					Game1.player.jitterStrength = 0f;
 					Game1.player.stopJittering();
 					Game1.freezeControls = false;
@@ -554,6 +530,28 @@ namespace LoveOfCooking
 			Game1.player.FarmerSprite.animateOnce(frames.ToArray());
 
 			return frames;
+		}
+
+		public static void PlayFoodBurnEffects(int burntQuantity)
+		{
+			if (burntQuantity > 0)
+			{
+				float scale = burntQuantity / 5f;
+				int count = Math.Min(5, 1 + (int)Math.Round(scale));
+				for (int i = 0; i < count; ++i)
+				{
+					DelayedAction.functionAfterDelay(
+						func: () =>
+						{
+							Utility.addSmokePuff(
+								l: Game1.currentLocation,
+								v: Game1.player.lastGrabTile * Game1.tileSize + new Vector2(x: 0, y: -0.75f) * Game1.tileSize,
+								baseScale: Math.Min(3, 2f + 1f * scale),
+								alpha: Math.Min(1, 0.75f + 0.25f * scale));
+						},
+						delay: 550 * i);
+				}
+			}
 		}
 
 		/// <summary>
@@ -704,6 +702,93 @@ namespace LoveOfCooking
 			{
 				item.Quality = quality;
 			}
+		}
+
+		public static bool CheckExtraPortion()
+		{
+			return ModEntry.Config.AddCookingSkillAndRecipes
+				&& ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
+				&& ModEntry.CookingSkillApi.RollForExtraPortion();
+		}
+
+		public static bool IsProbablyBurntFood(Item item)
+		{
+			return item is not null
+				&& (ModEntry.ItemDefinitions.BurntItemCreated == item.ItemId
+					|| ModEntry.ItemDefinitions.BurntItemAlternatives.Contains(item.ItemId));
+		}
+
+		public static bool CheckBurntFood(CraftingRecipe recipe)
+		{
+			return CookingManager.GetBurnChance(recipe) > Game1.random.NextDouble();
+		}
+
+		public static Item CreateBurntFood()
+		{
+			string itemId = ModEntry.ItemDefinitions.BurntItemAlternativeChance > Game1.random.NextDouble()
+				? ModEntry.ItemDefinitions.BurntItemAlternatives[(int)Math.Round(Game1.random.NextDouble() * (ModEntry.ItemDefinitions.BurntItemAlternatives.Count - 1))]
+				: ModEntry.ItemDefinitions.BurntItemCreated;
+			return ItemRegistry.Create(itemId: itemId);
+		}
+
+		public static Item TryBurnFood(CraftingPage menu, CraftingRecipe recipe, Item input, bool playSound)
+		{
+			bool isBurnt = Utils.CheckBurntFood(recipe: recipe);
+			Item output = isBurnt ? Utils.CreateBurntFood() : input;
+			if (isBurnt)
+			{
+				Utils.PlayFoodBurnEffects(burntQuantity: output.Stack);
+				if (menu.heldItem is not null && !output.canStackWith(menu.heldItem))
+				{
+					Utils.AddOrDropItem(item: output);
+					recipe.consumeIngredients(additionalMaterials: menu._materialContainers);
+					if (playSound)
+					{
+						Game1.playSound("coin");
+					}
+				}
+			}
+			return output;
+		}
+
+		public static bool TryApplyCookingQuantityBonus(Item item = null)
+		{
+			if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
+				&& ModEntry.CookingSkillApi.RollForExtraPortion())
+			{
+				if (item is not null && item.Stack < item.maximumStackSize())
+				{
+					++item.Stack;
+					return true;
+				}
+			}
+			return false;
+		}
+
+		public static void TryCookingSkillBehavioursOnCooked(CraftingRecipe recipe, ref Item item)
+		{
+			if (!ModEntry.Config.AddCookingSkillAndRecipes)
+				return;
+
+			// Apply extra portion bonuses to the amount cooked
+			if (Utils.CheckExtraPortion())
+			{
+				++item.Stack;
+			}
+
+			// Add cooking skill experience
+			ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
+				item: item,
+				numIngredients: recipe.getNumberOfIngredients(),
+				numCooked: item.Stack,
+				applyExperience: true);
+
+			// Update tracked stats
+			if (!ModEntry.Instance.States.Value.FoodCookedToday.ContainsKey(item.Name))
+			{
+				ModEntry.Instance.States.Value.FoodCookedToday[item.Name] = 0;
+			}
+			ModEntry.Instance.States.Value.FoodCookedToday[item.Name] += item.Stack;
 		}
 
 		/// <summary>

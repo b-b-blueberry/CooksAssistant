@@ -148,7 +148,6 @@ namespace LoveOfCooking.Menu
 		private bool _isCloseButtonVisible => !Game1.options.SnappyMenus;
 		private readonly bool _displayHUD = false;
 		private int _mouseHeldTicks;
-        internal static int LastBurntCount;
         internal readonly IReflectedField<Dictionary<int, double>> _iconShakeTimerField;
         internal const string InvalidRecipeName = "Torch";
 
@@ -684,13 +683,13 @@ namespace LoveOfCooking.Menu
             if (craftableCount < 1)
                 return false;
 
-			int burntCount = this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: craftableCount);
+			this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: craftableCount, out int burntQuantity);
             if (Config.PlayCookingAnimation)
             {
                 if (Game1.activeClickableMenu is CookingMenu cookingMenu)
                 {
                     Game1.displayHUD = true;
-                    Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntCount: burntCount,
+                    Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntQuantity: burntQuantity,
                         containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == -4));
                     cookingMenu.PopMenuStack(playSound: false, tryToQuit: true);
                 }
