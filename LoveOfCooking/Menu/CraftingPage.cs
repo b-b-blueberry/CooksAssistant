@@ -285,10 +285,24 @@ namespace LoveOfCooking.Menu
         public override void OnPrimaryClickHeld(int x, int y, bool playSound = true)
         {
             if (this.Menu.ReadyToCook)
-            {
+			{
+				// Quantity up/down buttons
 				this.TryClickQuantityButton(x: x, y: y);
-            }
-        }
+
+				// Cook! button
+				if (this.CookButton.bounds.Contains(x, y))
+				{
+					if (this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity))
+					{
+						this.TryPop();
+					}
+					else
+					{
+						Game1.playSound(CancelCue);
+					}
+				}
+			}
+		}
 
         public override void OnSecondaryClick(int x, int y, bool playSound = true)
         {
