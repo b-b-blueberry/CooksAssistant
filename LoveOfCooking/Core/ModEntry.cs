@@ -45,14 +45,17 @@ namespace LoveOfCooking
 			public List<string> FoodsEaten = new();
 			public List<string> FavouriteRecipes = new();
 
-			// Add Cooking Menu
+			// Cooking Menu
 			public CookingMenu.Filter LastFilterThisSession;
 			public bool LastFilterReversed;
 			public CookbookAnimation CookbookAnimation = new();
 			public MultipleMutexRequest MenuMutex;
 
-			// Add Cooking Skill
+			// Cooking Skill
 			public readonly Dictionary<string, int> FoodCookedToday = new();
+
+			// Cooking Tool
+			// ...
 
 			// Food Heals Over Time
 			public Regeneration Regeneration = new();
@@ -77,14 +80,17 @@ namespace LoveOfCooking
 				this.FoodsEaten.Clear();
 				this.FavouriteRecipes.Clear();
 
-				// Add Cooking Menu
+				// Cooking Menu
 				this.LastFilterThisSession = CookingMenu.Filter.None;
 				this.LastFilterReversed = false;
 				this.CookbookAnimation.Reset();
 				this.MenuMutex?.ReleaseLocks();
 
-				// Add Cooking Skill
+				// Cooking Skill
 				this.FoodCookedToday.Clear();
+
+				// Cooking Tool
+				// ...
 
 				// Food Heals Over Time
 				this.Regeneration.Reset();
@@ -815,17 +821,21 @@ namespace LoveOfCooking
 			try
 			{
 				Log.D($"{Environment.NewLine}== CONFIG SUMMARY =={Environment.NewLine}"
-					  + $"{Environment.NewLine}New Cooking Menu:   {Config.AddCookingMenu}"
-					  + $"{Environment.NewLine}New Cooking Skill:  {Config.AddCookingSkillAndRecipes}"
-					  + $"{Environment.NewLine}New Cooking Tool:   {Config.AddCookingToolProgression}"
-					  + $"{Environment.NewLine}Cooking Animation:  {Config.PlayCookingAnimation}"
+					  + $"{Environment.NewLine}Cooking Menu:   {Config.AddCookingMenu}"
+					  + $"{Environment.NewLine}Cooking Skill:  {Config.AddCookingSkillAndRecipes}"
+					  + $"{Environment.NewLine}Cooking Tool:   {Config.AddCookingToolProgression}"
+					  + $"{Environment.NewLine}-------------"
+					  + $"{Environment.NewLine}Add Seasonings:     {Config.AddSeasonings}"
+					  + $"{Environment.NewLine}Town Kitchens:      {Config.CanUseTownKitchens}"
 					  + $"{Environment.NewLine}Healing Takes Time: {Config.FoodHealingTakesTime}"
 					  + $"{Environment.NewLine}Hide Food Buffs:    {Config.HideFoodBuffsUntilEaten}"
 					  + $"{Environment.NewLine}Food Can Burn:      {Config.FoodCanBurn}"
 					  + $"{Environment.NewLine}-------------"
-					  + $"{Environment.NewLine}ShowFoodRegenBar:         {Config.ShowFoodRegenBar}"
-					  + $"{Environment.NewLine}RememberLastSearchFilter: {Config.RememberLastSearchFilter}"
-					  + $"{Environment.NewLine}DefaultSearchFilter:      {Config.DefaultSearchFilter}"
+					  + $"{Environment.NewLine}Menu Animation:     {Config.PlayMenuAnimation}"
+					  + $"{Environment.NewLine}Cooking Animation:  {Config.PlayCookingAnimation}"
+					  + $"{Environment.NewLine}Show Healing Bar:   {Config.ShowFoodRegenBar}"
+					  + $"{Environment.NewLine}Remember Filter:    {Config.RememberLastSearchFilter}"
+					  + $"{Environment.NewLine}Default Filter:     {Config.DefaultSearchFilter}"
 					  + $"{Environment.NewLine}-------------"
 					  + $"{Environment.NewLine}Debugging:      {Config.DebugMode}"
 					  + $"{Environment.NewLine}Resize Korean:  {Config.ResizeKoreanFonts}{Environment.NewLine}",

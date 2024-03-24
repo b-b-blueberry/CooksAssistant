@@ -269,23 +269,13 @@ namespace LoveOfCooking.Menu
 
 				if (i >= InventoryColumns || !this.InventoryMenu.playerInventory)
 					continue;
-
-				string text;
-				switch (i)
+				string text = i switch
 				{
-					case 9:
-						text = "0";
-						break;
-					case 10:
-						text = "-";
-						break;
-					case 11:
-						text = "=";
-						break;
-					default:
-						text = string.Concat(i + 1);
-						break;
-				}
+					9 => "0",
+					10 => "-",
+					11 => "=",
+					_ => string.Concat(i + 1),
+				};
 				Vector2 textSize = Game1.tinyFont.MeasureString(text);
 				b.DrawString(
 					spriteFont: Game1.tinyFont,
