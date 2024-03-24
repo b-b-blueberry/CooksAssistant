@@ -753,7 +753,8 @@ namespace LoveOfCooking
 
 		public static bool TryApplyCookingQuantityBonus(Item item = null)
 		{
-			if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
+			if (ModEntry.Config.AddCookingSkillAndRecipes
+				&& ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ExtraPortion)
 				&& ModEntry.CookingSkillApi.RollForExtraPortion())
 			{
 				if (item is not null && item.Stack < item.maximumStackSize())
