@@ -32,18 +32,20 @@ namespace LoveOfCooking.Objects
 		private float _scale;
 		private Point _offset;
 		private Action _onComplete;
-		private static Texture2D _texture;
 
 		// Definitions
-		private uint FirstFrame => 0;
-		private uint LastFrame => (uint)(CookbookAnimation._texture.Width / CookbookAnimation.Size.X);
+		public static uint FirstFrame => 0;
+		public static uint LastFrame => (uint)(CookbookAnimation.Texture.Width / CookbookAnimation.Size.X);
+
 		private static uint FrameTime => 4;
 		private static uint FastFrameTime => 3;
 		private static uint DropTime => 60;
 		private static uint BounceTime => 20;
 		private static uint FadeTime => 5;
 		private static float FadeTo => 0.5f;
-		private static readonly Point Size = new(x: 256, y: 256);
+
+		public static readonly Point Size = new(x: 256, y: 256);
+		public static Texture2D Texture { get; private set; }
 
 		public CookbookAnimation()
 		{
@@ -52,7 +54,7 @@ namespace LoveOfCooking.Objects
 
 		public static void Reload(IModHelper helper)
 		{
-			CookbookAnimation._texture = Game1.content.Load
+			CookbookAnimation.Texture = Game1.content.Load
 				<Texture2D>
 				(AssetManager.GameContentCookbookSpriteSheetPath);
 		}
@@ -126,11 +128,11 @@ namespace LoveOfCooking.Objects
 				this._start = e.Ticks;
 				this._frame = this._animation switch
 				{
-					Animation.Open => this.LastFrame - 1,
-					Animation.Close => this.FirstFrame,
-					Animation.Dropdown => this.LastFrame - 1,
-					Animation.Bounce => this.LastFrame - 1,
-					_ => this.FirstFrame
+					Animation.Open => CookbookAnimation.LastFrame - 1,
+					Animation.Close => CookbookAnimation.FirstFrame,
+					Animation.Dropdown => CookbookAnimation.LastFrame - 1,
+					Animation.Bounce => CookbookAnimation.LastFrame - 1,
+					_ => CookbookAnimation.FirstFrame
 				};
 			}
 
@@ -146,22 +148,22 @@ namespace LoveOfCooking.Objects
 				case Animation.Open:
 				{
 					// End animation on first frame
-					if (this._frame <= this.FirstFrame)
+					if (this._frame <= CookbookAnimation.FirstFrame)
 					{
 						end();
 						return;
 					}
 
-					ratio = elapsed / ((float)CookbookAnimation.FrameTime * (this.LastFrame - 1));
+					ratio = elapsed / ((float)CookbookAnimation.FrameTime * (CookbookAnimation.LastFrame - 1));
 					inverse = 1 - ratio;
 
 					// Update frame based on frame time and elapsed time
-					this._frame = this.LastFrame - 1 - (elapsed / CookbookAnimation.FrameTime);
+					this._frame = CookbookAnimation.LastFrame - 1 - (elapsed / CookbookAnimation.FrameTime);
 
 					// Skip animation per config value
-					if (!ModEntry.Config.PlayCookbookAnimation)
+					if (!ModEntry.Config.PlayMenuAnimation)
 					{
-						this._frame = this.FirstFrame;
+						this._frame = CookbookAnimation.FirstFrame;
 						ratio = 1;
 					}
 
@@ -175,23 +177,23 @@ namespace LoveOfCooking.Objects
 				case Animation.Close:
 				{
 					// End animation on last frame
-					if (this._frame >= this.LastFrame - 1)
+					if (this._frame >= CookbookAnimation.LastFrame - 1)
 					{
 						end();
 						this.Hide();
 						return;
 					}
 
-					ratio = elapsed / (float)(CookbookAnimation.FastFrameTime * (this.LastFrame - 1));
+					ratio = elapsed / (float)(CookbookAnimation.FastFrameTime * (CookbookAnimation.LastFrame - 1));
 					inverse = 1 - ratio;
 
 					// Update frame based on frame time and elapsed time
 					this._frame = elapsed / CookbookAnimation.FastFrameTime;
 
 					// Skip animation per config value
-					if (!ModEntry.Config.PlayCookbookAnimation)
+					if (!ModEntry.Config.PlayMenuAnimation)
 					{
-						this._frame = this.LastFrame;
+						this._frame = CookbookAnimation.LastFrame;
 						inverse = 1;
 					}
 
@@ -254,7 +256,7 @@ namespace LoveOfCooking.Objects
 
 		private void Draw(object sender, RenderedHudEventArgs e)
 		{
-			if (this._fade <= 0 || CookbookAnimation._texture is null)
+			if (this._fade <= 0 || CookbookAnimation.Texture is null)
 				return;
 
 			Rectangle area = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
@@ -267,7 +269,7 @@ namespace LoveOfCooking.Objects
 
 			// Animation
 			e.SpriteBatch.Draw(
-				texture: CookbookAnimation._texture,
+				texture: CookbookAnimation.Texture,
 				position: area.Center.ToVector2() + this._offset.ToVector2() * this._scale,
 				sourceRectangle: new(
 					x: CookbookAnimation.Size.X * (int)this._frame,
