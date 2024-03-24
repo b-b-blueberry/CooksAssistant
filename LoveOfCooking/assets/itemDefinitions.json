@@ -131,6 +131,8 @@
 	},
 	"DefaultSeasoning": "917",
 	"Seasonings": {
+		"blueberry.LoveOfCooking_seasoning_1": 1,
+		"blueberry.LoveOfCooking_seasoning_2": 2,
 		"917": 4
 	},
 	"MarmaladeFoods": [

@@ -957,5 +957,35 @@
         "Buffs": null,
         "ContextTags": [],
         "CustomFields": {}
+    },
+    "blueberry.LoveOfCooking_seasoning_1": {
+        "Name": "blueberry.LoveOfCooking_seasoning_1",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seasoning_1.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seasoning_1.description]",
+        "Type": "Basic",
+        "Category": -999,
+        "Price": 50,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 41,
+        "Edibility": -300,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [],
+        "CustomFields": {}
+    },
+    "blueberry.LoveOfCooking_seasoning_2": {
+        "Name": "blueberry.LoveOfCooking_seasoning_2",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seasoning_2.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.seasoning_2.description]",
+        "Type": "Basic",
+        "Category": -999,
+        "Price": 100,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 42,
+        "Edibility": -300,
+        "IsDrink": false,
+        "Buffs": null,
+        "ContextTags": [],
+        "CustomFields": {}
     }
 }

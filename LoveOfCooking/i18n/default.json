@@ -182,6 +182,8 @@
 	"item.burntfood.name": "Burnt Food",
 	"item.chocolate.name": "Cooking Chocolate",
 	"item.cookbook.name": "Mom's Cookbook",
+	"item.seasoning_1.name": "Simple Seasoning",
+	"item.seasoning_2.name": "Super Seasoning",
 
 	// Object descriptions
 	// recipes
@@ -226,5 +228,7 @@
 	// objects
 	"item.burntfood.description": "Can be sold. It didn't turn out so good...",
 	"item.chocolate.description": "Mmmmm... chocolate.",
-	"item.cookbook.description": "It's a tattered old cookbook. Better find some new recipes!"
+	"item.cookbook.description": "It's a tattered old cookbook. Better find some new recipes!",
+	"item.seasoning_1.description": "A little spice slightly improves the quality of a dish. Automatically applied when cooking.",
+	"item.seasoning_2.description": "A potent mix of seasonings to enrich any dish. Automatically applied when cooking."
 }
