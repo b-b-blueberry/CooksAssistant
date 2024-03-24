@@ -219,7 +219,7 @@ namespace LoveOfCooking.Menu
                     break;
                 case Filter.Buffs:
                     filter = recipe =>
-                        (!ModEntry.Config.HideFoodBuffsUntilEaten
+                        (!ModEntry.Config.FoodBuffsStartHidden
                         || Instance.States.Value.FoodsEaten.Contains(recipe.name))
 						&& Utils.GetFirstVisibleBuffOnItem(item: recipe.createItem()) is not null;
                     break;
@@ -423,7 +423,7 @@ namespace LoveOfCooking.Menu
                     name: $"filter{i}",
                     bounds: new(-1, -1, FilterIconSource.Width * SmallScale, FilterIconSource.Height * SmallScale),
                     label: null,
-                    hoverText: I18n.Get($"menu.cooking_search.filter.{i}" + (ModEntry.Config.HideFoodBuffsUntilEaten && i == 4 ? "_alt" : "")),
+                    hoverText: I18n.Get($"menu.cooking_search.filter.{i}" + (ModEntry.Config.FoodBuffsStartHidden && i == 4 ? "_alt" : "")),
                     texture: CookingMenu.Texture,
                     sourceRect: new(
                         FilterIconSource.X + (i - 1) * FilterIconSource.Width, FilterIconSource.Y,

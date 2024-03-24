@@ -60,7 +60,7 @@ namespace LoveOfCooking
 			// Food Heals Over Time
 			public Regeneration Regeneration = new();
 
-			// Hide Food Buffs
+			// Food Buffs Start Hidden
 			public bool IsHidingFoodBuffs;
 
 			public State()
@@ -828,7 +828,7 @@ namespace LoveOfCooking
 					  + $"{Environment.NewLine}Add Seasonings:     {Config.AddSeasonings}"
 					  + $"{Environment.NewLine}Town Kitchens:      {Config.CanUseTownKitchens}"
 					  + $"{Environment.NewLine}Healing Takes Time: {Config.FoodHealingTakesTime}"
-					  + $"{Environment.NewLine}Hide Food Buffs:    {Config.HideFoodBuffsUntilEaten}"
+					  + $"{Environment.NewLine}Hide Food Buffs:    {Config.FoodBuffsStartHidden}"
 					  + $"{Environment.NewLine}Food Can Burn:      {Config.FoodCanBurn}"
 					  + $"{Environment.NewLine}-------------"
 					  + $"{Environment.NewLine}Menu Animation:     {Config.PlayMenuAnimation}"

@@ -47,7 +47,7 @@ namespace LoveOfCooking.HarmonyPatches
 				original: AccessTools.Method(typeof(StardewValley.Object), "getPriceAfterMultipliers"),
 				postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
 
-			// Hide buffs in cooked foods not yet eaten
+			// Food Buffs Start Hidden
 			parameters = new[] { typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(string), typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>), typeof(Texture2D), typeof(Rectangle), typeof(Color), typeof(Color), typeof(float), typeof(int), typeof(int) };
 			harmony.Patch(
 				original: AccessTools.Method(
@@ -101,7 +101,7 @@ namespace LoveOfCooking.HarmonyPatches
 			ref string[] buffIconsToDisplay,
 			Item hoveredItem)
 		{
-			ModEntry.Instance.States.Value.IsHidingFoodBuffs = ModEntry.Config.HideFoodBuffsUntilEaten && Utils.IsItemFoodAndNotYetEaten(hoveredItem);
+			ModEntry.Instance.States.Value.IsHidingFoodBuffs = ModEntry.Config.FoodBuffsStartHidden && Utils.IsItemFoodAndNotYetEaten(hoveredItem);
 			if (!ModEntry.Instance.States.Value.IsHidingFoodBuffs)
 				return;
 
@@ -125,7 +125,7 @@ namespace LoveOfCooking.HarmonyPatches
 			int j = ilOut.FindIndex(startIndex: i, match: (CodeInstruction ci) => ci.opcode == OpCodes.Add);
 			if (i < 0 || j < 0)
 			{
-				Log.E($"Failed to add behaviour for {nameof(Config.HideFoodBuffsUntilEaten)} in {nameof(IClickableMenu_DrawHoverText_Transpiler)}.");
+				Log.E($"Failed to add behaviour for {nameof(Config.FoodBuffsStartHidden)} in {nameof(IClickableMenu_DrawHoverText_Transpiler)}.");
 				return il;
 			}
 

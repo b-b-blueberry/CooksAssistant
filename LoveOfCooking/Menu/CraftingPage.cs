@@ -573,7 +573,7 @@ namespace LoveOfCooking.Menu
 
 			position = this.DrawSubheading(b: b, position: Vector2.Zero, textWidth: textWidth, text: I18n.Get("menu.cooking_recipe.notes_label"));
 
-			if (ModEntry.Config.HideFoodBuffsUntilEaten && !ModEntry.Instance.States.Value.FoodsEaten.Contains(item.Name))
+			if (ModEntry.Config.FoodBuffsStartHidden && !ModEntry.Instance.States.Value.FoodsEaten.Contains(item.Name))
 			{
 				// Draw unknown information text
 
