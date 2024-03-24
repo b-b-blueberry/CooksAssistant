@@ -270,7 +270,6 @@ namespace LoveOfCooking.Menu
 				// Cook! button
 				if (this.CookButton.bounds.Contains(x, y))
 				{
-					Game1.playSound(CookCue);
 					if (this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity))
 					{
 						this.TryPop();

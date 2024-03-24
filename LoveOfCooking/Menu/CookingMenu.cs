@@ -117,7 +117,6 @@ namespace LoveOfCooking.Menu
         // Sounds
         internal const string ClickCue = "coin";
         internal const string CancelCue = "cancel";
-        internal const string SuccessCue = "reward";
         internal const string HoverInCue = "breathin";
         internal const string HoverOutCue = "breathout";
         internal const string PageChangeCue = "shwip";
@@ -686,20 +685,18 @@ namespace LoveOfCooking.Menu
 			this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: craftableCount, out int burntQuantity);
             if (Config.PlayCookingAnimation)
             {
-                if (Game1.activeClickableMenu is CookingMenu cookingMenu)
-                {
-                    Game1.displayHUD = true;
-                    Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntQuantity: burntQuantity,
-                        containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == -4));
-                    cookingMenu.PopMenuStack(playSound: false, tryToQuit: true);
-                }
-            }
-            else
-            {
-                Game1.playSound(SuccessCue);
-            }
+                Game1.displayHUD = true;
+                Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntQuantity: burntQuantity,
+                    containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == -4));
+				Game1.playSound(CookCue);
+				this.PopMenuStack(playSound: false, tryToQuit: true);
+			}
+			else
+			{
+				Game1.playSound(ClickCue);
+			}
 
-            return true;
+			return true;
         }
 
         internal void GoToState(State to)
