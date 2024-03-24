@@ -21,6 +21,8 @@ namespace LoveOfCooking.Objects
 			public override string GetDescription() { return this.Description; }
 		}
 
+		public override bool ShouldShowOnSkillsPage => ModEntry.Config.AddCookingSkillAndRecipes;
+
 		public CookingSkill() : base(InternalName)
 		{
 			Log.D($"Registering skill {InternalName}",

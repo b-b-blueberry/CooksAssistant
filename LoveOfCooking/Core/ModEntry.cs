@@ -539,12 +539,9 @@ namespace LoveOfCooking
 					// APIs and custom content
 					Interface.Interfaces.Load();
 
-					// Cooking Skill API
+					// Cooking skill
 					ModEntry.CookingSkillApi = new CookingSkillAPI(this.Helper.Reflection);
-					if (ModEntry.Config.AddCookingSkillAndRecipes)
-					{
-						SpaceCore.Skills.RegisterSkill(new CookingSkill());
-					}
+					SpaceCore.Skills.RegisterSkill(new CookingSkill());
 
 					isLoaded = true;
 				}
@@ -782,11 +779,7 @@ namespace LoveOfCooking
 			}
 
 			this.PrintModData();
-
-			if (ModEntry.Config.AddCookingSkillAndRecipes)
-			{
-				this.PrintCookingSkill();
-			}
+			this.PrintCookingSkill();
 
 			// Invalidate and reload assets
 			Log.D("Invalidating assets on save loaded.",

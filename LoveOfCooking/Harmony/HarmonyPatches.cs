@@ -194,7 +194,7 @@ namespace LoveOfCooking.HarmonyPatches
 			float startPrice,
 			long specificPlayerID = -1L)
 		{
-			if (!ModEntry.CookingSkillApi.IsEnabled())
+			if (!ModEntry.Config.AddCookingSkillAndRecipes)
 				return;
 			
 			float multiplier = 1f;
