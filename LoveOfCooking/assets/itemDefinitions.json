@@ -123,6 +123,10 @@
 		"blueberry.LoveOfCooking_eggsando": "blueberry.LoveOfCooking_eggsando_half",
 		"blueberry.LoveOfCooking_saladsando": "blueberry.LoveOfCooking_saladsando_half"
 	},
+	"DefaultSeasoning": "917",
+	"Seasonings": {
+		"917": 4
+	},
 	"MarmaladeFoods": [
 		"lemon",
 		"lime",

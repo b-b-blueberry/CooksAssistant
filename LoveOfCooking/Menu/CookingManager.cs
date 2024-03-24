@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using LoveOfCooking.Objects;
 using StardewValley;
+using StardewValley.Inventories;
 using StardewValley.Objects;
 
 namespace LoveOfCooking.Menu
@@ -343,67 +344,36 @@ namespace LoveOfCooking.Menu
                 ingredientsToConsume = this.ChooseIngredientsForCrafting(recipe: recipe, sourceItems: sourceItems);
             }
 
-            // Apply oil quality bonuses to the stack choices
-            bool isImprovedSeasoning = ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ImprovedSeasoning);
+			// Apply seasoning quality bonuses to the stack choices
 
-            // Gather seasonings as ingredients to use for improving cooked item qualities
-            List<Ingredient> ingredientsForSeasonings = this.CurrentIngredients
-                .Where(i => i.HasValue)
-                .Select(i => i.Value)
-                .Where(i => IsSeasoning(item: sourceItems[i.WhichInventory][i.WhichItem]))
-                .ToList();
+			// Consume seasoning items to improve the recipe output item qualities, rebalancing the stack numbers per quality item
+			List<Item> items = sourceItems.SelectMany(list => list).ToList();
+            List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories.Select(pair => pair.Inventory).ToList();
+			List<KeyValuePair<string, int>> seasoning = new();
+			while (qualityStacks[0] > 0) // Stop iterating when we've run out of standard quality ingredients
+			{
+				int quality = Utils.GetOneSeasoningFromInventory(expandedInventory: items, seasoning: seasoning);
+                if (quality > 0)
+				{
+					// Reduce the base quality stack
+					qualityStacks[0] -= numPerCraft;
 
-            // Consume best seasonings first, assuming seasonings follow the trend of higher-index = higher-quality
-            ingredientsForSeasonings = ingredientsForSeasonings
-                .OrderByDescending(i => sourceItems[i.WhichInventory][i.WhichItem].ParentSheetIndex)
-                .ToList();
+					// Increase higher quality stacks
+					qualityStacks[quality] += numPerCraft;
+				}
+			}
+			// Remove consumed seasonings
+			if (seasoning is not null)
+			{
+				CraftingRecipe.ConsumeAdditionalIngredients(seasoning, inventories);
+				if (!CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(seasoning, items))
+				{
+					Game1.showGlobalMessage(Game1.content.LoadString("Strings\\StringsFromCSFiles:Seasoning_UsedLast"));
+				}
+			}
 
-            // Consume seasoning items from ingredients to improve the recipe output item qualities, rebalancing the stack numbers per quality item
-            foreach (Ingredient ingredient in ingredientsForSeasonings)
-            {
-                while (qualityStacks[0] > 0) // Stop iterating when we've run out of standard quality ingredients
-                {
-                    // Reduce the base quality stack
-                    qualityStacks[0] -= numPerCraft;
-
-                    // Increase higher quality stacks
-                    switch (sourceItems[ingredient.WhichInventory][ingredient.WhichItem].ParentSheetIndex)
-                    {
-                        case 917: // Qi Seasoning
-                            qualityStacks[2] += numPerCraft;
-                            break;
-                        case 432: // Truffle Oil
-                            qualityStacks[isImprovedSeasoning ? 4 : 2] += numPerCraft;
-                            break;
-                        case 247: // Oil
-                            qualityStacks[isImprovedSeasoning ? 2 : 1] += numPerCraft;
-                            break;
-                        default: // Seasonings not yet discovered by science
-                            qualityStacks[isImprovedSeasoning ? 4 : 2] += numPerCraft;
-                            break;
-                    }
-
-                    // Remove consumed seasonings
-                    if (--sourceItems[ingredient.WhichInventory][ingredient.WhichItem].Stack < 1)
-                    {
-                        if (ingredient.WhichInventory == InventoryManager.BackpackInventoryId)
-                        {
-                            // Clear item slot in player's inventory
-                            sourceItems[ingredient.WhichInventory][ingredient.WhichItem] = null;
-                        }
-                        else
-                        {
-                            // Clear item and ensure no gaps are left in inventory for fridges and chests
-                            sourceItems[ingredient.WhichInventory].RemoveAt(ingredient.WhichItem);
-                        }
-                        // Stop iterating when we've run out of this seasoning item
-                        break;
-                    }
-                }
-            }
-
-            // Apply burn chance to destroy cooked food at random
-            int burntCount = 0;
+			// Apply burn chance to destroy cooked food at random
+			burntCount = 0;
             List<int> qualities = qualityStacks.Keys.ToList();
             foreach (int quality in qualities)
             {

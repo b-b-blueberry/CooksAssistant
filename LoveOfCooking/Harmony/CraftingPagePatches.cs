@@ -1,6 +1,8 @@
-﻿using StardewValley;
-using StardewValley.Menus;
+﻿using StardewValley.Menus;
 using System.Collections.Generic;
+using System.Reflection.Emit;
+using System.Reflection;
+using System.Linq;
 using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking.HarmonyPatches
@@ -11,9 +13,10 @@ namespace LoveOfCooking.HarmonyPatches
 		{
 			Log.D($"Applying patches to CraftingPage.clickCraftingRecipe",
 				ModEntry.Config.DebugMode);
+			// Unique behaviours on items cooked
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CraftingPage), "clickCraftingRecipe"),
-				prefix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Prefix)));
+				transpiler: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Transpiler)));
 			harmony.Patch(
 				original: AccessTools.Method(typeof(CraftingPage), "clickCraftingRecipe"),
 				postfix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(CraftItem_Postfix)));
@@ -23,71 +26,64 @@ namespace LoveOfCooking.HarmonyPatches
 				prefix: new HarmonyMethod(typeof(CraftingPagePatches), nameof(LayoutRecipes_Prefix)));
 		}
 
-        public static void CraftItem_Prefix()
+		private static IEnumerable<CodeInstruction> CraftItem_Transpiler(ILGenerator gen, MethodBase original, IEnumerable<CodeInstruction> il)
 		{
-			ModEntry.Instance.States.Value.ItemsCooked = Game1.stats.ItemsCooked;
+			List<CodeInstruction> ilOut = il.ToList();
+
+			ConstructorInfo targetMethod = AccessTools.Constructor(
+				type: typeof(List<KeyValuePair<string, int>>));
+			MethodInfo seasoningMethod = AccessTools.Method(
+				type: typeof(Utils),
+				name: nameof(Utils.TryApplySeasonings));
+
+			// Seek to new seasonings list creation
+			/*
+				IL_0031: newobj instance void class
+			[System.Collections]System.Collections.Generic.List`1<valuetype [System.Runtime]System.Collections.Generic.KeyValuePair`2<string, int32>>::.ctor()
+				IL_0036: stloc.2
+			*/
+			int i = ilOut.FindIndex(
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Newobj
+					&& ((ConstructorInfo)ci.operand).DeclaringType.FullName == targetMethod.DeclaringType.FullName);
+			/*
+				IL_005d: br.s IL_0061
+				IL_005f: ldnull
+				IL_0060: stloc.2
+			*/
+			int j = ilOut.FindIndex(
+				startIndex: i,
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Ldnull);
+
+			if (i < 0 || j < 0)
+			{
+				Log.E($"Failed to add seasoning behaviours for default crafting page in {nameof(CraftItem_Transpiler)}.");
+				return il;
+			}
+
+			// Skip seasonings list assignment; we need the empty list for later
+			i = ilOut.FindIndex(startIndex: i, match: (CodeInstruction ci) => ci.opcode == OpCodes.Stloc_2);
+
+			// Replace default seasonings behaviour with override method call signature
+			ilOut.RemoveRange(index: i + 1, count: j - i + 1);
+			ilOut.InsertRange(index: i + 1, collection: new CodeInstruction[]
+			{
+				new(OpCodes.Ldarg_0), // menu: this
+				new(OpCodes.Ldloca_S, 1), // ref item: crafted
+				new(OpCodes.Ldloc, 2), // seasoning: seasoning
+				new(OpCodes.Call, seasoningMethod)
+			});
+
+			return ilOut;
 		}
 
-		/// <summary>
-		/// Unique crafting behaviours for when the Cooking Menu is disabled.
-		/// </summary>
-		public static void CraftItem_Postfix(CraftingPage __instance,
-			Item ___lastCookingHover,
-			ClickableTextureComponent c)
+		public static void CraftItem_Postfix(ref CraftingPage __instance)
 		{
-			// Do nothing if the Cooking Menu is enabled
-			if (ModEntry.Config.AddCookingMenu)
-				return;
-
-			if (Game1.stats.ItemsCooked <= ModEntry.Instance.States.Value.ItemsCooked)
-				return;
-
-			Item item = ___lastCookingHover;
-			CraftingRecipe recipe = new(name: item.Name, isCookingRecipe: true);
-
-			// Apply burn chance to destroy cooked food at random
-			/*
-			if (GameObjects.CookingMenu.GetBurnChance(recipe) > Game1.random.NextDouble())
+			// Ensure burnt food is never attached to the cursor after cooking,
+			// allowing repeat crafts to continue even if first item is burnt
+			if (Utils.IsProbablyBurntFood(item: __instance.heldItem))
 			{
-				// Add burnt food to inventory if possible
-				var burntItem = new ItemRegistry.Create<StardewValley.Object>(Interface.Interfaces.JsonAssets.GetObjectId(ModEntry.ObjectPrefix + "burntfood"), 1);
-				ModEntry.AddOrDropItem(burntItem);
-
-				// Hunt down the usual food to be incinerated
-				if (Game1.player.hasItemInInventoryNamed(item.Name))
-				{
-					var items = Game1.player.Items.Where(i => i.Name == item.Name).ToArray();
-					var index = Game1.player.Items.IndexOf(items[Game1.random.Next(items.Length)]);
-					--Game1.player.Items[index].Stack;
-					if (Game1.player.Items[index].Stack < 1)
-						Game1.player.removeItemFromInventory(index);
-				}
-				else if (Game1.player.isInventoryFull())
-				{
-					var items = Game1.currentLocation.debris.Where(d => d.item.Name == item.Name).ToArray();
-					// . . .
-				}
-			}
-			*/
-
-			if (ModEntry.Config.AddCookingSkillAndRecipes)
-			{
-				// TODO: SYSTEM: Finish integrating cooking skill profession bonuses into cooking minus new menu
-
-				// Apply extra portion bonuses to the amount cooked
-				if (ModEntry.CookingSkillApi.HasProfession(Objects.ICookingSkillAPI.Profession.ExtraPortion) && ModEntry.CookingSkillApi.RollForExtraPortion())
-				{
-					//qualityStacks[0] += numPerCraft;
-				}
-
-				// Add cooking skill experience
-				ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
-					item, numIngredients: recipe.getNumberOfIngredients(), item.Stack, applyExperience: true);
-
-				// Update tracked stats
-				if (!ModEntry.Instance.States.Value.FoodCookedToday.ContainsKey(item.Name))
-					ModEntry.Instance.States.Value.FoodCookedToday[item.Name] = 0;
-				ModEntry.Instance.States.Value.FoodCookedToday[item.Name] += item.Stack;
+				Utils.AddOrDropItem(item: __instance.heldItem);
+				__instance.heldItem = null;
 			}
 		}
 

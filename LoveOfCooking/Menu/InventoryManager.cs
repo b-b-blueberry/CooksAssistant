@@ -18,6 +18,7 @@ namespace LoveOfCooking.Menu
 		public InventoryMenu InventoryMenu => this.Menu.inventory;
 		public int Index => this._inventoryId;
 		public List<IList<Item>> Items => this._inventoryList;
+		public List<(IInventory Inventory, Chest Chest)> Inventories => this._inventoryAndChestList;
 		public bool ShowInventoriesPopup { get; set; }
 
 		// Layout

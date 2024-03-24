@@ -61,6 +61,8 @@ namespace LoveOfCooking
 		public float BurnChancePerIngredient;
 		public string[] FarmhouseKitchenStartModIDs;
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
+		public string DefaultSeasoning;
+		public Dictionary<string, int> Seasonings;
 		public string[] MarmaladeyFoods;
 		public string[] PizzayFoods;
 		public string[] PancakeyFoods;

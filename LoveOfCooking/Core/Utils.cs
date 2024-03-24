@@ -652,6 +652,60 @@ namespace LoveOfCooking
 				: null;
 		}
 
+		public static int GetOneSeasoningFromInventory(IList<Item> expandedInventory, List<KeyValuePair<string, int>> seasoning)
+		{
+			// Check for Cooking Skill professions
+			bool isImprovedSeasoning = ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.ImprovedSeasoning);
+
+			// Check for seasoning items in inventories
+			int check(string itemId, int quality)
+			{
+				List<KeyValuePair<string, int>> newSeasoning = new() { new(itemId, 1) };
+				if (CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(newSeasoning, expandedInventory))
+				{
+					seasoning.AddRange(newSeasoning);
+					return Math.Min(StardewValley.Object.bestQuality, quality * (isImprovedSeasoning ? 2 : 1));
+				}
+				return StardewValley.Object.lowQuality;
+			}
+
+			// Choose seasoning item
+			if (ModEntry.Config.AddSeasonings)
+			{
+				// Find first available seasoning item of any possible seasoning items
+				foreach (var pair in ModEntry.ItemDefinitions.Seasonings)
+				{
+					if (check(itemId: pair.Key, quality: pair.Value) is int quality and > StardewValley.Object.lowQuality)
+					{
+						return quality;
+					}
+				}
+			}
+			else
+			{
+				// Use Qi Seasoning as default if added seasonings are disabled in config
+				return check(itemId: ModEntry.ItemDefinitions.DefaultSeasoning, quality: StardewValley.Object.bestQuality);
+			}
+			return StardewValley.Object.lowQuality;
+		}
+
+		public static IList<Item> GetContainerContents(CraftingPage menu)
+		{
+			return AccessTools
+				.Method(type: typeof(CraftingPage), name: "getContainerContents")
+				.Invoke(obj: menu, parameters: null)
+				as IList<Item>;
+		}
+
+		public static void TryApplySeasonings(CraftingPage menu, ref Item item, List<KeyValuePair<string, int>> seasoning)
+		{
+			IList<Item> expandedInventory = Utils.GetContainerContents(menu: menu);
+			if (Utils.GetOneSeasoningFromInventory(expandedInventory: expandedInventory, seasoning: seasoning) is int quality && quality > 0)
+			{
+				item.Quality = quality;
+			}
+		}
+
 		/// <summary>
 		/// Checks for if the player meets conditions to open the new cooking menu.
 		/// Always true if using the default cooking menu.

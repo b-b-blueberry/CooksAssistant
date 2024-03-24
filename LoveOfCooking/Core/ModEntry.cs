@@ -803,6 +803,12 @@ namespace LoveOfCooking
 				<Texture2D>
 				(AssetManager.GameContentToolSpriteSheetPath);
 			CookbookAnimation.Reload(this.Helper);
+
+			// Order custom seasonings by descending quality, ensuring best seasonings are consumed first
+			ModEntry.ItemDefinitions.Seasonings = ModEntry.ItemDefinitions.Seasonings
+				.OrderByDescending(pair => pair.Value)
+				.ToDictionary(pair => pair.Key, pair => pair.Value);
+
 			ModEntry.CookingSkillApi?.GetSkill()?.ReloadAssets();
 		}
 
