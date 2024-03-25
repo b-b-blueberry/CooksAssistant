@@ -345,31 +345,37 @@ namespace LoveOfCooking.Menu
             }
 
 			// Apply seasoning quality bonuses to the stack choices
-
-			// Consume seasoning items to improve the recipe output item qualities, rebalancing the stack numbers per quality item
-			List<Item> items = sourceItems.SelectMany(list => list).ToList();
-            List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories.Select(pair => pair.Inventory).ToList();
-			List<KeyValuePair<string, int>> seasoning = new();
-			while (qualityStacks[0] > 0) // Stop iterating when we've run out of standard quality ingredients
 			{
-				int quality = Utils.GetOneSeasoningFromInventory(expandedInventory: items, seasoning: seasoning);
-                if (quality > 0)
+			    // Consume seasoning items to improve the recipe output item qualities, rebalancing the stack numbers per quality item
+				// Stop iterating when we've run out of standard quality ingredients or no more seasonings can be found
+				List<Item> items = sourceItems.SelectMany(list => list).ToList();
+				List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories.Select(pair => pair.Inventory).ToList();
+				List<KeyValuePair<string, int>> seasoning = new();
+				int quality = 0;
+				do
 				{
-					// Reduce the base quality stack
-					qualityStacks[0] -= numPerCraft;
+                    seasoning.Clear();
+					quality = Utils.GetOneSeasoningFromInventory(expandedInventory: items, seasoning: seasoning);
+					if (quality > 0)
+					{
+						// Reduce the base quality stack
+						qualityStacks[0] -= numPerCraft;
 
-					// Increase higher quality stacks
-					qualityStacks[quality] += numPerCraft;
+						// Increase higher quality stacks
+						qualityStacks[quality] += numPerCraft;
+
+						// Remove consumed seasonings
+						if (seasoning.Any())
+						{
+							CraftingRecipe.ConsumeAdditionalIngredients(seasoning, inventories);
+							if (!CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(seasoning, items))
+							{
+								Game1.showGlobalMessage(Game1.content.LoadString("Strings\\StringsFromCSFiles:Seasoning_UsedLast"));
+							}
+						}
+					}
 				}
-			}
-			// Remove consumed seasonings
-			if (seasoning is not null)
-			{
-				CraftingRecipe.ConsumeAdditionalIngredients(seasoning, inventories);
-				if (!CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(seasoning, items))
-				{
-					Game1.showGlobalMessage(Game1.content.LoadString("Strings\\StringsFromCSFiles:Seasoning_UsedLast"));
-				}
+				while (qualityStacks[0] > 0 && quality > 0);
 			}
 
 			// Apply burn chance to destroy cooked food at random
