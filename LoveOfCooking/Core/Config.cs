@@ -20,7 +20,7 @@
 		public bool ShowFoodRegenBar { get; set; } = true;
 		public bool RememberSearchFilter { get; set; } = true;
 		public string DefaultSearchFilter { get; set; } = "None";
-		public bool DebugMode { get; set; } = false;
 		public bool ResizeKoreanFonts { get; set; } = true;
+		public bool DebugMode { get; set; } = false;
 	}
 }

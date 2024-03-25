@@ -395,23 +395,16 @@ namespace LoveOfCooking
 
 		private static void EditObjects(IAssetData asset)
 		{
-			try
-			{
-				var data = asset.AsDictionary<string, ObjectData>().Data;
-				var newData = Game1.content.Load
-					<Dictionary<string, ObjectData>>
-					(AssetManager.GameContentObjectDataPath);
+			var data = asset.AsDictionary<string, ObjectData>().Data;
+			var newData = Game1.content.Load
+				<Dictionary<string, ObjectData>>
+				(AssetManager.GameContentObjectDataPath);
 
-				// Add new object definitions
-				foreach (var pair in newData)
-					data[pair.Key] = pair.Value;
+			// Add new object definitions
+			foreach (var pair in newData)
+				data[pair.Key] = pair.Value;
 
-				asset.AsDictionary<string, ObjectData>().ReplaceWith(data);
-			}
-			catch (Exception e) when(e is ArgumentException or NullReferenceException or KeyNotFoundException)
-			{
-				Log.E($"Did not patch {asset.Name}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
-			}
+			asset.AsDictionary<string, ObjectData>().ReplaceWith(data);
 		}
 
 		private static void EditPowers(IAssetData asset)
