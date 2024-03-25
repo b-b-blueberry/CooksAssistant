@@ -43,7 +43,7 @@
 		},
 		"ExperienceCurve": [ 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 ],
 		"GlobalExperienceRate": 1.0,
-		"MaxFoodStackPerDayForExperienceGains": 20,
+		"MaxFoodStackPerDayForExperienceGains": 50,
 		"ExperienceGlobalScaling": 1.0,
 		"ExperienceNewRecipeBonus": 34,
 		"ExperienceDailyBonus": 12,
