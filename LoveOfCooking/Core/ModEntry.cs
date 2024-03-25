@@ -269,7 +269,7 @@ namespace LoveOfCooking
 			this.States.Value.Regeneration.RegisterEvents(helper: this.Helper);
 
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
-			SpaceEvents.BeforeGiftGiven += this.SpaceEvents_BeforeGiftGiven;
+			SpaceEvents.AfterGiftGiven += this.SpaceEvents_AfterGiftGiven;
 			SpaceEvents.AddWalletItems += this.SpaceEvents_AddWalletItems;
 		}
 
@@ -692,20 +692,13 @@ namespace LoveOfCooking
 				Utils.AddOrDropItem(leftovers);
 			}
 		}
-		
-		private void SpaceEvents_BeforeGiftGiven(object sender, EventArgsBeforeReceiveObject e)
-		{
-			// Ignore gifts that aren't going to be accepted
-			if (!Game1.player.friendshipData.ContainsKey(e.Npc.Name)
-			    || !e.Npc.tryToReceiveActiveObject(who: Game1.player, probe: true))
-			{
-				return;
-			}
 
+		private void SpaceEvents_AfterGiftGiven(object sender, EventArgsGiftGiven e)
+		{
 			// Cooking skill professions influence gift value of Cooking objects
 			if (CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.GiftBoost) && e.Gift.Category == StardewValley.Object.CookingCategory)
 			{
-				Game1.player.changeFriendship(ModEntry.ItemDefinitions.CookingSkillValues.GiftBoostValue, e.Npc);
+				Game1.player.changeFriendship(amount: ModEntry.ItemDefinitions.CookingSkillValues.GiftBoostValue, n: e.Npc);
 			}
 		}
 
