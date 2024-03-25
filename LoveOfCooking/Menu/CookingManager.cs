@@ -108,7 +108,8 @@ namespace LoveOfCooking.Menu
         {
             return !(item is null or Tool or Furniture or Ring or Clothing or Boots or Hat or Wallpaper
                 || item.Category < -90 || item.isLostItem || !item.canBeTrashed()
-                || item is StardewValley.Object o && (o.bigCraftable.Value || o.specialItem));
+                || item is StardewValley.Object o && (o.bigCraftable.Value || o.specialItem)
+                || IsSeasoning(item));
         }
 
         /// <summary>
@@ -116,7 +117,7 @@ namespace LoveOfCooking.Menu
         /// </summary>
         public static bool IsSeasoning(Item item)
         {
-            return item is not null && item.ItemId == "917";
+            return item is not null && (item.ItemId == ModEntry.ItemDefinitions.DefaultSeasoning || ModEntry.ItemDefinitions.Seasonings.ContainsKey(item.ItemId));
         }
 
         /// <summary>
