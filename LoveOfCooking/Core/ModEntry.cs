@@ -31,6 +31,7 @@ namespace LoveOfCooking
 		internal const string MailPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
 		internal const string QueryPrefix = "BLUEBERRY_LOC_"; // DO NOT EDIT
 		internal const string CookbookItemId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
+		internal const string CookbookWalletId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal static int SpriteId => (int)Game1.player.UniqueMultiplayerID + 5050505;
 		internal static int NexusId { get; private set; }
 

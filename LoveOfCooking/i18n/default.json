@@ -93,6 +93,10 @@
 	"mail.cookbook_unlocked.after.1": "You received Mom's Cookbook.",
 	"mail.cookbook_unlocked.after.2": "Recipes you learn will be saved here to cook at any kitchens in town.",
 
+	// Special items
+	"menu.special_items.cookbook.name": "Mom's Cookbook",
+	"menu.special_items.cookbook.description": "Holds your cooking recipes.",
+
 	// Cooking skill
 	"menu.cooking_skill.name": "Cooking",
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Newtonsoft.Json;
@@ -12,6 +13,7 @@ using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.GameData.Characters;
 using StardewValley.GameData.Objects;
+using StardewValley.GameData.Powers;
 using StardewValley.GameData.Shops;
 using StardewValley.GameData.Tools;
 
@@ -39,6 +41,7 @@ namespace LoveOfCooking
 		public static string GameContentObjectDataPath { get; private set; } = "ObjectData";
 		public static string GameContentShopDataPath { get; private set; } = "ShopData";
 		public static string GameContentToolDataPath { get; private set; } = "ToolData";
+		public static string GameContentWalletDataPath { get; private set; } = "WalletData";
 		public static string GameContentDefinitionsPath { get; private set; } = "ItemDefinitions";
 
 		// Local paths: filepaths without extension passed to Load()
@@ -54,6 +57,7 @@ namespace LoveOfCooking
 		public static string LocalRecipeDataPath { get; private set; } = "recipe-data";
 		public static string LocalShopDataPath { get; private set; } = "shop-data";
 		public static string LocalToolDataPath { get; private set; } = "tool-data";
+		public static string LocalWalletDataPath { get; private set; } = "wallet-data";
 		public static string LocalDefinitionsPath { get; private set; } = "itemDefinitions";
 
 		// Content pack paths: relative directories for additional content packs.
@@ -68,6 +72,7 @@ namespace LoveOfCooking
 			@"Data/mail",
 			@"Data/NPCGiftTastes",
 			@"Data/Objects",
+			@"Data/Powers",
 			@"Data/Shops",
 			@"Data/Tools"
 		};
@@ -163,6 +168,12 @@ namespace LoveOfCooking
 					relativePath: $"{AssetManager.LocalToolSpriteSheetPath}.png",
 					priority: AssetLoadPriority.Exclusive);
 			}
+			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentWalletDataPath))
+			{
+				e.LoadFromModFile<Dictionary<string, PowersData>>(
+					relativePath: $"{AssetManager.LocalWalletDataPath}.json",
+					priority: AssetLoadPriority.Exclusive);
+			}
 			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentToolDataPath))
 			{
 				e.LoadFromModFile<Dictionary<string, ToolData>>(
@@ -220,6 +231,10 @@ namespace LoveOfCooking
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Objects"))
 			{
 				AssetManager.EditObjects(asset: asset);
+			}
+			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Powers"))
+			{
+				AssetManager.EditPowers(asset: asset);
 			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Shops"))
 			{
@@ -397,6 +412,26 @@ namespace LoveOfCooking
 			{
 				Log.E($"Did not patch {asset.Name}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
 			}
+		}
+
+		private static void EditPowers(IAssetData asset)
+		{
+			var data = asset.AsDictionary<string, PowersData>().Data;
+			var newData = ModEntry.Instance.Helper.ModContent.Load
+				<Dictionary<string, PowersData>>
+				(AssetManager.LocalWalletDataPath + ".json");
+			var output = new Dictionary<string, PowersData>();
+
+			// Add new wallet definitions
+			string toolId = CookingTool.WalletID(level: CookingTool.GetEffectiveGlobalLevel());
+			output[ModEntry.CookbookWalletId] = newData[ModEntry.CookbookWalletId];
+			output[toolId] = newData[toolId];
+
+			// Add original wallet definitions
+			foreach (var pair in data)
+				output[pair.Key] = pair.Value;
+
+			asset.AsDictionary<string, PowersData>().ReplaceWith(output);
 		}
 
 		private static void EditShops(IAssetData asset)

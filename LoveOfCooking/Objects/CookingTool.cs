@@ -41,6 +41,9 @@ namespace LoveOfCooking.Objects
 		public static void ActionWhenClaimed(Tool tool)
 		{
 			ModEntry.Instance.States.Value.CookingToolLevel = tool.UpgradeLevel;
+
+			// Ensure wallet items list is updated for latest tool level
+			AssetManager.InvalidateAssets();
 		}
 
 		/// <summary>
@@ -116,6 +119,11 @@ namespace LoveOfCooking.Objects
 			int size = Game1.smallestTileSize;
 			Rectangle source = new(size * level, 0, size, size);
 			return source;
+		}
+
+		public static string WalletID(int level)
+		{
+			return $"{ModEntry.ObjectPrefix}cookingtool.level{level}";
 		}
 	}
 }
