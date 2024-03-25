@@ -1,19 +1,15 @@
-﻿using LoveOfCooking.Menu;
+﻿using System;
+using System.IO;
+using System.Linq;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 
 namespace LoveOfCooking.Interface
 {
 	internal static class Interfaces
 	{
 		private static IModHelper Helper => ModEntry.Instance.Helper;
-		private static IManifest ModManifest => ModEntry.Instance.ModManifest;
-		private static ITranslationHelper i18n => Helper.Translation;
 
 		private static bool IsLoaded;
 		private static double TotalSecondsOnLoaded;
@@ -59,7 +55,7 @@ namespace LoveOfCooking.Interface
 					IdentifyLoadedOptionalMods();
 					LoadCustomCommunityCentreContent();
 					IsLoaded = LoadSpaceCoreAPI()
-						&& LoadModConfigMenuElements()
+						&& LoadModConfigMenu()
 						&& LoadLevelExtenderApi();
 				}
 				return IsLoaded;
@@ -132,7 +128,7 @@ namespace LoveOfCooking.Interface
 			}
 		}
 
-		private static bool LoadModConfigMenuElements()
+		private static bool LoadModConfigMenu()
 		{
 			IGenericModConfigMenuAPI gmcm = Helper.ModRegistry
 				.GetApi<IGenericModConfigMenuAPI>
@@ -142,74 +138,7 @@ namespace LoveOfCooking.Interface
 				return true;
 			}
 
-			gmcm.Register(
-				mod: ModEntry.Instance.ModManifest,
-				reset: () => ModEntry.Config = new Config(),
-				save: () => Helper.WriteConfig(ModEntry.Config));
-
-			string[] entries = new[]
-			{
-				"features",
-
-				"AddCookingMenu",
-				"AddCookingSkillAndRecipes",
-				"AddCookingToolProgression",
-
-				"changes",
-
-				"PlayCookingAnimation",
-				"PlayCookbookAnimation",
-				"HideFoodBuffsUntilEaten",
-				"FoodHealingTakesTime",
-				"FoodCanBurn",
-
-				"others",
-
-				"ShowFoodRegenBar",
-				"RememberLastSearchFilter",
-				"DefaultSearchFilter",
-				"ResizeKoreanFonts",
-			};
-			foreach (string entry in entries)
-			{
-				BindingFlags flags = BindingFlags.Public | BindingFlags.Instance;
-				PropertyInfo property = typeof(Config).GetProperty(entry, flags);
-				if (property is not null)
-				{
-					string i18nKey = $"config.option.{entry.ToLower()}_";
-					if (property.PropertyType == typeof(bool))
-					{
-						gmcm.AddBoolOption(
-							mod: ModManifest,
-							name: () => i18n.Get(i18nKey + "name"),
-							tooltip: () => i18n.Get(i18nKey + "description"),
-							getValue: () => (bool)property.GetValue(ModEntry.Config),
-							setValue: (bool value) =>
-							{
-								Log.D($"Config edit: {property.Name} - {property.GetValue(ModEntry.Config)} => {value}",
-									ModEntry.Config.DebugMode);
-								property.SetValue(ModEntry.Config, value);
-							});
-					}
-					else if (property.Name == "DefaultSearchFilter")
-					{
-						gmcm.AddTextOption(
-							mod: ModManifest,
-							name: () => i18n.Get(i18nKey + "name"),
-							tooltip: () => i18n.Get(i18nKey + "description"),
-							getValue: () => (string)property.GetValue(ModEntry.Config),
-							setValue: (string value) => property.SetValue(ModEntry.Config, value),
-							allowedValues: Enum.GetNames(typeof(CookingMenu.Filter)));
-					}
-				}
-				else
-				{
-					string i18nKey = $"config.{entry}_";
-					gmcm.AddSectionTitle(
-						mod: ModManifest,
-						text: () => i18n.Get(i18nKey + "label"));
-				}
-			}
+			ModConfigMenu.Generate(gmcm: gmcm);
 			return true;
 		}
 
