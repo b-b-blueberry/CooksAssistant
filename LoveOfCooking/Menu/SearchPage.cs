@@ -743,7 +743,7 @@ namespace LoveOfCooking.Menu
 							this.FilterRecipes(which: which, substr: this.SearchBarTextBox.Text);
                         }
                         Game1.playSound(ClickCue);
-                        if (ModEntry.Config.RememberLastSearchFilter)
+                        if (ModEntry.Config.RememberSearchFilter)
                         {
                             Instance.States.Value.LastFilterThisSession = which;
                         }

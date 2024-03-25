@@ -828,8 +828,8 @@ namespace LoveOfCooking
 					  + $"{Environment.NewLine}Menu Animation:     {Config.PlayMenuAnimation}"
 					  + $"{Environment.NewLine}Cooking Animation:  {Config.PlayCookingAnimation}"
 					  + $"{Environment.NewLine}Show Healing Bar:   {Config.ShowFoodRegenBar}"
-					  + $"{Environment.NewLine}Remember Filter:    {Config.RememberLastSearchFilter}"
-					  + $"{Environment.NewLine}Default Filter:     {Config.DefaultSearchFilter}"
+					  + $"{Environment.NewLine}Remember Filter:      {Config.RememberSearchFilter}"
+					  + $"{Environment.NewLine}Default Filter:       {Config.DefaultSearchFilter}"
 					  + $"{Environment.NewLine}-------------"
 					  + $"{Environment.NewLine}Debugging:      {Config.DebugMode}"
 					  + $"{Environment.NewLine}Resize Korean:  {Config.ResizeKoreanFonts}{Environment.NewLine}",

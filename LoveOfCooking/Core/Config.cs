@@ -18,7 +18,7 @@
 		public bool PlayMenuAnimation { get; set; } = true;
 		public bool PlayCookingAnimation { get; set; } = true;
 		public bool ShowFoodRegenBar { get; set; } = true;
-		public bool RememberLastSearchFilter { get; set; } = true;
+		public bool RememberSearchFilter { get; set; } = true;
 		public string DefaultSearchFilter { get; set; } = "None";
 		public bool DebugMode { get; set; } = false;
 		public bool ResizeKoreanFonts { get; set; } = true;
