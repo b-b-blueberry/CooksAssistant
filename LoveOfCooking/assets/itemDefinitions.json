@@ -29,9 +29,9 @@
 			"4": [ "carrotcake", "chocoflan", "parfait", "profiteroles" ],
 			"5": [],
 			"6": [ "cocococktail", "kebab", "nigiri", "unagi", "fruity" ],
-			"7": [ "cherrypie", "eggsando", "lasagna", "summersalad", "burger" ],
-			"8": [ "applepie", "saladsando", "pilaf", "roast", "hunters" ],
-			"9": [ "admiralpie", "seafoodsando", "curry", "paella", "oceanplatter" ],
+			"7": [ "cherrypie", "eggsando", "summersalad", "lasagna", "burger" ],
+			"8": [ "applepie", "saladsando", "hunters", "curry", "roast" ],
+			"9": [ "admiralpie", "seafoodsando", "pilaf", "paella", "oceanplatter" ],
 			"10": []
 		},
 		// Experience gains
