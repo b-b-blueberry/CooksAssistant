@@ -784,7 +784,7 @@ namespace LoveOfCooking.Menu
 
 						// Buff amount and attribute
 						buffPosition.X += xOffset;
-						text = (value > 0 ? $"+{value}" : $"{value}").PadRight(4);
+						text = (value > 0 ? $"+{value} " : $"{value} ").PadRight(3);
 
 						// Show attribute name if we're only showing a single column
 						if (numToDisplay <= height)
