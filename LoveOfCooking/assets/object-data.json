@@ -187,6 +187,47 @@
         ],
         "CustomFields": {}
     },
+    "blueberry.LoveOfCooking_carrotcake": {
+        "Name": "blueberry.LoveOfCooking_carrotcake",
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.carrotcake.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.carrotcake.description]",
+        "Type": "Cooking",
+        "Category": -7,
+        "Price": 125,
+        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+        "SpriteIndex": 8,
+        "Edibility": 44,
+        "IsDrink": false,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 144,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 0,
+                    "Speed": 0.5,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
+        "ContextTags": [
+            "color_orange",
+            "food_bakery",
+            "food_sweet"
+        ],
+        "CustomFields": {}
+    },
     "blueberry.LoveOfCooking_cherrypie": {
         "Name": "blueberry.LoveOfCooking_cherrypie",
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.cherrypie.name]",
@@ -195,7 +236,7 @@
         "Category": -7,
         "Price": 180,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 8,
+        "SpriteIndex": 9,
         "Edibility": 58,
         "IsDrink": false,
         "Buffs": null,
@@ -213,7 +254,7 @@
         "Category": -7,
         "Price": 90,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 9,
+        "SpriteIndex": 10,
         "Edibility": 46,
         "IsDrink": false,
         "Buffs": null,
@@ -231,7 +272,7 @@
         "Category": -999,
         "Price": 280,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 10,
+        "SpriteIndex": 11,
         "Edibility": 10,
         "IsDrink": false,
         "Buffs": [
@@ -271,7 +312,7 @@
         "Category": -7,
         "Price": 80,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 11,
+        "SpriteIndex": 12,
         "Edibility": 34,
         "IsDrink": true,
         "Buffs": [
@@ -302,7 +343,7 @@
         "Category": -7,
         "Price": 180,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 12,
+        "SpriteIndex": 13,
         "Edibility": 52,
         "IsDrink": false,
         "Buffs": null,
@@ -320,7 +361,7 @@
         "Category": -7,
         "Price": 95,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 13,
+        "SpriteIndex": 14,
         "Edibility": 58,
         "IsDrink": false,
         "Buffs": [
@@ -340,24 +381,6 @@
             "alcohol_item",
             "color_orange",
             "food_bakery",
-            "food_sweet"
-        ],
-        "CustomFields": {}
-    },
-    "blueberry.LoveOfCooking_mousse": {
-        "Name": "blueberry.LoveOfCooking_mousse",
-        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mousse.name]",
-        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:item.mousse.description]",
-        "Type": "Cooking",
-        "Category": -7,
-        "Price": 40,
-        "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
-        "SpriteIndex": 14,
-        "Edibility": 24,
-        "IsDrink": false,
-        "Buffs": null,
-        "ContextTags": [
-            "color_brown",
             "food_sweet"
         ],
         "CustomFields": {}
