@@ -31,8 +31,8 @@ namespace LoveOfCooking.Menu
 		// Spritesheet source areas
 		// Love of Cooking sheet
 		internal static readonly Rectangle CookingSkillIconArea = new(56, 209, 10, 10);
-		internal static readonly Rectangle CookingSkillLevelUpIconArea = new(0, 272, 16, 16);
-		internal static readonly Rectangle CookingSkillProfessionIconArea = new(16, 272, 16, 16);
+		internal static readonly Rectangle CookingSkillLevelUpIconArea = new(0, 256, 16, 16);
+		internal static readonly Rectangle CookingSkillProfessionIconArea = new(0, 272, 16, 16);
 		internal static readonly Rectangle CookbookSource = new(0, 80, 240, 128);
         internal static readonly Rectangle CookingSlotOpenSource = new(0, 208, 28, 28);
         internal static readonly Rectangle CookingSlotLockedSource = new(28, 208, 28, 28);
