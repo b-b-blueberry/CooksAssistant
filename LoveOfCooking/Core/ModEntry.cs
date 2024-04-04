@@ -9,10 +9,8 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
-using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
 using StardewValley.Mods;
-using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
 namespace LoveOfCooking
 {
