@@ -11,6 +11,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.GameData.Buffs;
 using StardewValley.GameData.Characters;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Powers;
@@ -51,6 +52,7 @@ namespace LoveOfCooking
 		public static string LocalCookbookSpriteSheetPath { get; private set; } = "cookbook-sprites";
 		public static string LocalObjectSpriteSheetPath { get; private set; } = "object-sprites";
 		public static string LocalToolSpriteSheetPath { get; private set; } = "tool-sprites";
+		public static string LocalBuffDataPath { get; private set; } = "buff-data";
 		public static string LocalGiftDataPath { get; private set; } = "gift-data";
 		public static string LocalMailDataPath { get; private set; } = "mail-data";
 		public static string LocalObjectDataPath { get; private set; } = "object-data";
@@ -67,6 +69,7 @@ namespace LoveOfCooking
 		// Assets to edit: asset keys passed to Edit()
 		private static readonly List<string> AssetsToEdit = new()
 		{
+			@"Data/Buffs",
 			@"Data/Characters",
 			@"Data/CookingRecipes",
 			@"Data/mail",
@@ -212,6 +215,10 @@ namespace LoveOfCooking
 				// Update cached mod definitions
 				ModEntry.Instance.States.Value.Regeneration.UpdateDefinitions();
 			}
+			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Buffs"))
+			{
+				AssetManager.EditBuffs(asset: asset);
+			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Characters"))
 			{
 				AssetManager.EditCharacters(asset: asset);
@@ -244,6 +251,20 @@ namespace LoveOfCooking
 			{
 				AssetManager.EditTools(asset: asset);
 			}
+		}
+
+		private static void EditBuffs(IAssetData asset)
+		{
+			var data = asset.AsDictionary<string, BuffData>().Data;
+			var newData = ModEntry.Instance.Helper.ModContent.Load
+				<Dictionary<string, BuffData>>
+				(AssetManager.LocalBuffDataPath + ".json");
+
+			// Add new buff entries
+			foreach (var pair in newData)
+				data.Add(pair);
+
+			asset.AsDictionary<string, BuffData>().ReplaceWith(data);
 		}
 
 		private static void EditCharacters(IAssetData asset)

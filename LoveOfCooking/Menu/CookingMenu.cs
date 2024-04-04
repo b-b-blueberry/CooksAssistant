@@ -62,6 +62,7 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle UpperRightHelpIconSource = new(244, 202, 11, 11);
         internal static readonly Rectangle UpperRightCloseIconSource = new(244, 214, 11, 11);
         internal static readonly Rectangle FireSmallSource = new(0, 148, 12, 12);
+        internal static readonly Rectangle CoinSmallSource = new(48, 152, 8, 8);
 
 		// Cursors sheet
 		internal static readonly Rectangle HealthIconSource = new(0, 428, 10, 10);

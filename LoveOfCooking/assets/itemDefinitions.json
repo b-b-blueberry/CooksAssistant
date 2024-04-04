@@ -135,6 +135,20 @@
 		"blueberry.LoveOfCooking_seasoning_2": 2,
 		"917": 4
 	},
+	"CurryBuffDamage": {
+		"X": 1,
+		"Y": 3
+	},
+	"CurryBuffArea": {
+		"X": 192,
+		"Y": 192
+	},
+	"CurryBuffKnockbackMultiplier": 1,
+	"PaellaBuffCoinValue": 5,
+	"PaellaBuffCoinCount": {
+		"X": 3,
+		"Y": 8
+	},
 	"MarmaladeFoods": [
 		"lemon",
 		"lime",

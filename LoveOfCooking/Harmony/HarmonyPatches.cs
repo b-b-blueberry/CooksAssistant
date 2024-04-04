@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
+using StardewValley.Monsters;
 using Object = StardewValley.Object;
 using HarmonyLib; // el diavolo nuevo
 
@@ -65,6 +66,22 @@ namespace LoveOfCooking.HarmonyPatches
 				transpiler: new(
 					methodType: typeof(HarmonyPatches),
 					methodName: nameof(IClickableMenu_DrawHoverText_Transpiler)));
+
+			// Paella buff
+			harmony.Patch(
+				original: AccessTools.Method(
+					type: typeof(GameLocation),
+					name: nameof(GameLocation.monsterDrop)),
+				postfix: new(
+					methodType: typeof(HarmonyPatches),
+					methodName: nameof(GameLocation_MonsterDrop_Postfix)));
+			harmony.Patch(
+				original: AccessTools.Method(
+					type: typeof(GameLocation),
+					name: "drawDebris"),
+				postfix: new(
+					methodType: typeof(HarmonyPatches),
+					methodName: nameof(GameLocation_DrawDebris_Postfix)));
 		}
 
 		/// <summary>
@@ -227,6 +244,33 @@ namespace LoveOfCooking.HarmonyPatches
 				}
 			}
 			__result *= multiplier;
+		}
+
+		/// <summary>
+		/// Custom monster loot behaviours.
+		/// </summary>
+		public static void GameLocation_MonsterDrop_Postfix(GameLocation __instance, Monster monster, int x, int y, Farmer who)
+		{
+			if (who.hasBuff(ModEntry.PaellaBuffId))
+			{
+				Game1.playSound("purchase");
+				CoinDebris debris = Utils.CreateCoinDebris(location: __instance, who: who, x: x, y: y);
+				monster.ModifyMonsterLoot(debris);
+			}
+		}
+
+		/// <summary>
+		/// Custom debris draw behaviours.
+		/// </summary>
+		public static void GameLocation_DrawDebris_Postfix(GameLocation __instance, SpriteBatch b)
+		{
+			foreach (Debris debris in __instance.debris)
+			{
+				if (debris is CoinDebris coin)
+				{
+					coin.Draw(b: b, location: __instance);
+				}
+			}
 		}
 
 		private static void OnException(Exception e)

@@ -1,0 +1,32 @@
+{
+    "blueberry.LoveOfCooking_curry": {
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.curry.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.curry.description]",
+        "IsDebuff": false,
+        "GlowColor": "Orange",
+        "Duration": 100000,
+        "MaxDuration": -1,
+        "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+        "IconSpriteIndex": 257,
+        "Effects": {
+            "Speed": 1,
+            "Defense": -3,
+            "Attack": 2
+        },
+        "ActionsOnApply": null,
+        "CustomFields": null
+    },
+    "blueberry.LoveOfCooking_paella": {
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.paella.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.paella.description]",
+        "IsDebuff": false,
+        "GlowColor": null,
+        "Duration": 120000,
+        "MaxDuration": -1,
+        "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+        "IconSpriteIndex": 258,
+        "Effects": null,
+        "ActionsOnApply": null,
+        "CustomFields": null
+    }
+}

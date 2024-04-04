@@ -515,7 +515,7 @@ namespace LoveOfCooking
 			{
 				frameEndBehavior = delegate {
 					// Add effects for ruined food from Food Can Burn
-					Utils.PlayFoodBurnEffects(burntQuantity: burntQuantity);
+					Utils.PlayFoodBurnEffects(burntQuantity: burntQuantity, position: Utils.GuessKitchenGrabTilePosition());
 
 					// Face forwards after animation
 					Game1.player.jitterStrength = 0f;
@@ -532,7 +532,12 @@ namespace LoveOfCooking
 			return frames;
 		}
 
-		public static void PlayFoodBurnEffects(int burntQuantity)
+		public static Vector2 GuessKitchenGrabTilePosition()
+		{
+			return Game1.player.lastGrabTile * Game1.tileSize + new Vector2(x: 0, y: -0.75f) * Game1.tileSize;
+		}
+
+		public static void PlayFoodBurnEffects(int burntQuantity, Vector2? position = null)
 		{
 			if (burntQuantity > 0)
 			{
@@ -545,11 +550,11 @@ namespace LoveOfCooking
 						{
 							Utility.addSmokePuff(
 								l: Game1.currentLocation,
-								v: Game1.player.lastGrabTile * Game1.tileSize + new Vector2(x: 0, y: -0.75f) * Game1.tileSize,
+								v: position ?? Game1.player.StandingPixel.ToVector2() - new Vector2(x: 4, y: 16) * Game1.pixelZoom,
 								baseScale: Math.Min(3, 2f + 1f * scale),
 								alpha: Math.Min(1, 0.75f + 0.25f * scale));
 						},
-						delay: 550 * i);
+						delay: 1000 * i);
 				}
 			}
 		}
@@ -737,7 +742,7 @@ namespace LoveOfCooking
 			Item output = isBurnt ? Utils.CreateBurntFood() : input;
 			if (isBurnt)
 			{
-				Utils.PlayFoodBurnEffects(burntQuantity: output.Stack);
+				Utils.PlayFoodBurnEffects(burntQuantity: output.Stack, position: Utils.GuessKitchenGrabTilePosition());
 				if (menu.heldItem is not null && !output.canStackWith(menu.heldItem))
 				{
 					Utils.AddOrDropItem(item: output);
@@ -867,6 +872,17 @@ namespace LoveOfCooking
 			}
 
 			return false;
+		}
+
+		public static CoinDebris CreateCoinDebris(GameLocation location, Farmer who, int x, int y)
+		{
+			CoinDebris debris = new(
+				value: ModEntry.ItemDefinitions.PaellaBuffCoinValue,
+				count: Game1.random.Next(ModEntry.ItemDefinitions.PaellaBuffCoinCount.X, ModEntry.ItemDefinitions.PaellaBuffCoinCount.Y),
+				position: new(x, y),
+				farmer: who);
+			location.debris.Add(debris);
+			return debris;
 		}
 
 		public static Texture2D Slice(Texture2D texture, Rectangle area)

@@ -318,14 +318,7 @@
         "Buffs": [
             {
                 "Id": "Tipsy",
-                "BuffId": "17",
-                "IconTexture": null,
-                "IconSpriteIndex": 0,
-                "Duration": 0,
-                "IsDebuff": false,
-                "GlowColor": null,
-                "CustomAttributes": null,
-                "CustomFields": null
+                "BuffId": "17"
             }
         ],
         "ContextTags": [
@@ -367,14 +360,7 @@
         "Buffs": [
             {
                 "Id": "Tipsy",
-                "BuffId": "17",
-                "IconTexture": null,
-                "IconSpriteIndex": 0,
-                "Duration": 0,
-                "IsDebuff": false,
-                "GlowColor": null,
-                "CustomAttributes": null,
-                "CustomFields": null
+                "BuffId": "17"
             }
         ],
         "ContextTags": [
@@ -394,29 +380,12 @@
         "Price": 220,
         "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
         "SpriteIndex": 15,
-        "Edibility": 80,
+        "Edibility": 35,
         "IsDrink": true,
         "Buffs": [
             {
-                "Id": "Food",
-                "BuffId": null,
-                "IconTexture": null,
-                "IconSpriteIndex": 0,
-                "Duration": 77,
-                "IsDebuff": false,
-                "CustomAttributes": {
-                    "FarmingLevel": 0,
-                    "FishingLevel": 0,
-                    "MiningLevel": 0,
-                    "LuckLevel": 0,
-                    "ForagingLevel": 0,
-                    "MaxStamina": 0,
-                    "MagneticRadius": 0,
-                    "Speed": 1,
-                    "Defense": -3,
-                    "Attack": 2
-                },
-                "CustomFields": {}
+                "Id": "Drink",
+                "BuffId": "blueberry.LoveOfCooking_curry"
             }
         ],
         "ContextTags": [
@@ -476,14 +445,7 @@
         "Buffs": [
             {
                 "Id": "Tipsy",
-                "BuffId": "17",
-                "IconTexture": null,
-                "IconSpriteIndex": 0,
-                "Duration": 0,
-                "IsDebuff": false,
-                "GlowColor": null,
-                "CustomAttributes": null,
-                "CustomFields": null
+                "BuffId": "17"
             }
         ],
         "ContextTags": [
@@ -717,7 +679,12 @@
         "SpriteIndex": 27,
         "Edibility": 74,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": "blueberry.LoveOfCooking_paella"
+            }
+        ],
         "ContextTags": [
             "color_gold",
             "dye_medium",

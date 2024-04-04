@@ -63,6 +63,11 @@ namespace LoveOfCooking
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
 		public string DefaultSeasoning;
 		public Dictionary<string, int> Seasonings;
+		public Point CurryBuffDamage;
+		public Point CurryBuffArea;
+		public int CurryBuffKnockbackMultiplier;
+		public int PaellaBuffCoinValue;
+		public Point PaellaBuffCoinCount;
 		public string[] MarmaladeyFoods;
 		public string[] PizzayFoods;
 		public string[] PancakeyFoods;

@@ -135,6 +135,12 @@
 	"menu.special_items.cookbook.name": "Mom's Cookbook",
 	"menu.special_items.cookbook.description": "Holds your cooking recipes.",
 
+	// Buffs
+	"buff.curry.name": "Curry Breath",
+	"buff.curry.description": "Hot, hot, hot, hot, hot, hot!",
+	"buff.paella.name": "Gold Pile",
+	"buff.paella.description": "Gold coins scatter everywhere when slaying monsters.",
+
 	// Cooking skill
 	"menu.cooking_skill.name": "Cooking",
 	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",

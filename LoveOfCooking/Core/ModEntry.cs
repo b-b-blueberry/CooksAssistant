@@ -30,6 +30,8 @@ namespace LoveOfCooking
 		internal const string QueryPrefix = "BLUEBERRY_LOC_"; // DO NOT EDIT
 		internal const string CookbookItemId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal const string CookbookWalletId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
+		internal const string CurryBuffId = ModEntry.ObjectPrefix + "curry"; // DO NOT EDIT
+		internal const string PaellaBuffId = ModEntry.ObjectPrefix + "paella"; // DO NOT EDIT
 		internal static int SpriteId => (int)Game1.player.UniqueMultiplayerID + 5050505;
 		internal static int NexusId { get; private set; }
 
@@ -674,6 +676,13 @@ namespace LoveOfCooking
 					duration += (int) Math.Floor(ModEntry.ItemDefinitions.CookingSkillValues.BuffDurationValue * 1000 * rate);
 					foodBuff.millisecondsDuration = duration;
 				}
+			}
+
+			// Check for unique buffs
+			if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.CurryBuffId) is Buff buff)
+			{
+				Game1.player.buffs.Remove(buff.id);
+				Game1.player.buffs.Apply(new CurryBuff(buff: buff));
 			}
 
 			// Track foods eaten
