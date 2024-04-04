@@ -138,6 +138,8 @@
 	// Buffs
 	"buff.curry.name": "Curry Breath",
 	"buff.curry.description": "Hot, hot, hot, hot, hot, hot!",
+	"buff.lasagna.name": "Fullness Aura",
+	"buff.lasagna.description": "Nearby enemies walk more slowly.",
 	"buff.paella.name": "Gold Pile",
 	"buff.paella.description": "Gold coins scatter everywhere when slaying monsters.",
 

@@ -144,6 +144,8 @@
 		"Y": 192
 	},
 	"CurryBuffKnockbackMultiplier": 1,
+	"LasagnaBuffMaxSlow": 3,
+	"LasagnaBuffMinSpeed": 1,
 	"PaellaBuffCoinValue": 5,
 	"PaellaBuffCoinCount": {
 		"X": 3,

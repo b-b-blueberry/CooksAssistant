@@ -66,6 +66,8 @@ namespace LoveOfCooking
 		public Point CurryBuffDamage;
 		public Point CurryBuffArea;
 		public int CurryBuffKnockbackMultiplier;
+		public int LasagnaBuffMaxSlow;
+		public int LasagnaBuffMinSpeed;
 		public int PaellaBuffCoinValue;
 		public Point PaellaBuffCoinCount;
 		public string[] MarmaladeyFoods;

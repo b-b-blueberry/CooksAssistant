@@ -567,7 +567,12 @@
         "SpriteIndex": 22,
         "Edibility": 62,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": "blueberry.LoveOfCooking_lasagna"
+            }
+        ],
         "ContextTags": [
             "color_sand",
             "food_bakery"

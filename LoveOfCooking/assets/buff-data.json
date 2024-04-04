@@ -16,6 +16,19 @@
         "ActionsOnApply": null,
         "CustomFields": null
     },
+    "blueberry.LoveOfCooking_lasagna": {
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.lasagna.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.lasagna.description]",
+        "IsDebuff": false,
+        "GlowColor": null,
+        "Duration": 100000,
+        "MaxDuration": -1,
+        "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+        "IconSpriteIndex": 258,
+        "Effects": null,
+        "ActionsOnApply": null,
+        "CustomFields": null
+    },
     "blueberry.LoveOfCooking_paella": {
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.paella.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.paella.description]",
@@ -24,7 +37,7 @@
         "Duration": 120000,
         "MaxDuration": -1,
         "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
-        "IconSpriteIndex": 258,
+        "IconSpriteIndex": 259,
         "Effects": null,
         "ActionsOnApply": null,
         "CustomFields": null

@@ -31,6 +31,7 @@ namespace LoveOfCooking
 		internal const string CookbookItemId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal const string CookbookWalletId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal const string CurryBuffId = ModEntry.ObjectPrefix + "curry"; // DO NOT EDIT
+		internal const string LasagnaBuffId = ModEntry.ObjectPrefix + "lasagna"; // DO NOT EDIT
 		internal const string PaellaBuffId = ModEntry.ObjectPrefix + "paella"; // DO NOT EDIT
 		internal static int SpriteId => (int)Game1.player.UniqueMultiplayerID + 5050505;
 		internal static int NexusId { get; private set; }
@@ -679,10 +680,17 @@ namespace LoveOfCooking
 			}
 
 			// Check for unique buffs
-			if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.CurryBuffId) is Buff buff)
+			if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.CurryBuffId) is Buff curry)
 			{
-				Game1.player.buffs.Remove(buff.id);
-				Game1.player.buffs.Apply(new CurryBuff(buff: buff));
+				// curry
+				Game1.player.buffs.Remove(curry.id);
+				Game1.player.buffs.Apply(new CurryBuff(buff: curry));
+			}
+			else if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.LasagnaBuffId) is Buff lasagna)
+			{
+				// lasagna
+				Game1.player.buffs.Remove(lasagna.id);
+				Game1.player.buffs.Apply(new LasagnaBuff(buff: lasagna));
 			}
 
 			// Track foods eaten
