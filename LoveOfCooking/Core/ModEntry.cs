@@ -270,7 +270,6 @@ namespace LoveOfCooking
 
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
 			SpaceEvents.AfterGiftGiven += this.SpaceEvents_AfterGiftGiven;
-			SpaceEvents.AddWalletItems += this.SpaceEvents_AddWalletItems;
 		}
 
 		private void AddConsoleCommands()
@@ -702,54 +701,6 @@ namespace LoveOfCooking
 			}
 		}
 
-		/// <summary>
-		/// Add our custom wallet items to the SpaceCore wallet UI.
-		/// Invoked when instantiating <see cref="SpaceCore.Interface.NewSkillsPage"/>.
-		/// </summary>
-		private void SpaceEvents_AddWalletItems(object sender, EventArgs e)
-		{
-			SpaceCore.Interface.NewSkillsPage menu = sender as SpaceCore.Interface.NewSkillsPage;
-
-			if (Utils.HasCookbook(Game1.player))
-			{
-				// Cookbook
-				ParsedItemData data = ItemRegistry.GetDataOrErrorItem(itemId: ModEntry.CookbookItemId);
-				Rectangle sourceRect = data.GetSourceRect();
-				menu.specialItems.Add(new(
-					name: string.Empty,
-					bounds: new(
-						x: -1,
-						y: -1,
-						width: sourceRect.Width * Game1.pixelZoom,
-						height: sourceRect.Height * Game1.pixelZoom),
-					label: null,
-					hoverText: data.DisplayName,
-					texture: data.GetTexture(),
-					sourceRect: data.GetSourceRect(),
-					scale: Game1.pixelZoom,
-					drawShadow: true));
-
-				// Frying Pan
-				if (ModEntry.Config.AddCookingToolProgression)
-				{
-					int level = this.States.Value.CookingToolLevel;
-					sourceRect = CookingTool.CookingToolSourceRectangle(level: level);
-					menu.specialItems.Add(new(
-						name: string.Empty,
-						bounds: new(
-							x: -1,
-							y: -1,
-							width: sourceRect.Width * Game1.pixelZoom,
-							height: sourceRect.Height * Game1.pixelZoom),
-						label: null,
-						hoverText: CookingTool.DisplayName(level: level),
-						texture: CookingTool.Texture,
-						sourceRect: sourceRect,
-						scale: Game1.pixelZoom,
-						drawShadow: true));
-				}
-			}
-		}
 
 		private void SaveLoadedBehaviours()
 		{
