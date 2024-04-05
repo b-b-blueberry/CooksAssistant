@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Xna.Framework;
+using StardewValley.GameData.Buffs;
 
 namespace LoveOfCooking
 {
@@ -66,6 +67,8 @@ namespace LoveOfCooking
 		public Point CurryBuffDamage;
 		public Point CurryBuffArea;
 		public int CurryBuffKnockbackMultiplier;
+		public int KebabBuffUpgradeIconIndex;
+		public BuffAttributesData KebabBuffUpgradeEffects;
 		public int LasagnaBuffMaxSlow;
 		public int LasagnaBuffMinSpeed;
 		public int PaellaBuffCoinValue;
