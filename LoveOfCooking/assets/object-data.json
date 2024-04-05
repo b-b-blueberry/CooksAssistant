@@ -539,7 +539,7 @@
                 "Duration": 210,
                 "IsDebuff": false,
                 "CustomAttributes": {
-                    "FarmingLevel": 0,
+                    "FarmingLevel": 1,
                     "FishingLevel": 0,
                     "MiningLevel": 0,
                     "LuckLevel": 0,
@@ -617,29 +617,7 @@
         "SpriteIndex": 23,
         "Edibility": 28,
         "IsDrink": false,
-        "Buffs": [
-            {
-                "Id": "Food",
-                "BuffId": null,
-                "IconTexture": null,
-                "IconSpriteIndex": 0,
-                "Duration": 160,
-                "IsDebuff": false,
-                "CustomAttributes": {
-                    "FarmingLevel": 1,
-                    "FishingLevel": 0,
-                    "MiningLevel": 0,
-                    "LuckLevel": 0,
-                    "ForagingLevel": 1,
-                    "MaxStamina": 0,
-                    "MagneticRadius": 0,
-                    "Speed": 0,
-                    "Defense": 0,
-                    "Attack": 0
-                },
-                "CustomFields": {}
-            }
-        ],
+        "Buffs": null,
         "ContextTags": [
             "color_sand"
         ],
@@ -753,7 +731,29 @@
         "SpriteIndex": 29,
         "Edibility": 28,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 160,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 2,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 2,
+                    "MaxStamina": 0,
+                    "MagneticRadius": 32,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
         "ContextTags": [
             "color_sand"
         ],
