@@ -548,7 +548,12 @@
         "SpriteIndex": 21,
         "Edibility": 48,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": "blueberry.LoveOfCooking_kebab"
+            }
+        ],
         "ContextTags": [
             "color_red",
             "food_sandwich",

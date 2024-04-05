@@ -31,6 +31,7 @@ namespace LoveOfCooking
 		internal const string CookbookItemId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal const string CookbookWalletId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal const string CurryBuffId = ModEntry.ObjectPrefix + "curry"; // DO NOT EDIT
+		internal const string KebabBuffId = ModEntry.ObjectPrefix + "kebab"; // DO NOT EDIT
 		internal const string LasagnaBuffId = ModEntry.ObjectPrefix + "lasagna"; // DO NOT EDIT
 		internal const string PaellaBuffId = ModEntry.ObjectPrefix + "paella"; // DO NOT EDIT
 		internal static int SpriteId => (int)Game1.player.UniqueMultiplayerID + 5050505;
@@ -639,16 +640,18 @@ namespace LoveOfCooking
 
 		private void SpaceEvents_ItemEaten(object sender, EventArgs e)
 		{
+			Farmer who = Game1.player;
+
 			// Don't consider excluded items for food behaviours, e.g. Food Heals Over Time
-			if (Game1.player.itemToEat is not StardewValley.Object food
-				|| ModEntry.ItemDefinitions.EdibleItemsWithNoFoodBehaviour.Contains(Game1.player.itemToEat.Name))
+			if (who.itemToEat is not StardewValley.Object food
+				|| ModEntry.ItemDefinitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.Name))
 				return;
 
 			if (food.Name == ModEntry.CookbookItemId)
 			{
 				// Whoops
 				// Yes, it's come up before
-				Utils.AddCookbook(who: Game1.player);
+				Utils.AddCookbook(who: who);
 				Game1.addHUDMessage(new HUDMessage($"You ate the cookbook, gaining its knowledge."));
 			}
 
@@ -660,20 +663,20 @@ namespace LoveOfCooking
 			else if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.Restoration))
 			{
 				// Add additional health
-				Game1.player.health = (int) Math.Min(Game1.player.maxHealth,
-					Game1.player.health + food.healthRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
-				Game1.player.Stamina = (int) Math.Min(Game1.player.MaxStamina,
-					Game1.player.Stamina + food.staminaRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
+				who.health = (int) Math.Min(who.maxHealth,
+					who.health + food.healthRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
+				who.Stamina = (int) Math.Min(who.MaxStamina,
+					who.Stamina + food.staminaRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
 			}
 
 			// Check to boost buff duration
 			if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.BuffDuration)
-			    && Game1.player.buffs.AppliedBuffs.TryGetValue(food.Name, out Buff foodBuff))
+			    && who.buffs.AppliedBuffs.TryGetValue(food.Name, out Buff foodBuff))
 			{
 				int duration = foodBuff.millisecondsDuration;
 				if (duration > 0)
 				{
-					float rate = (Game1.player.health + Game1.player.Stamina) / (Game1.player.maxHealth + Game1.player.MaxStamina);
+					float rate = (who.health + who.Stamina) / (who.maxHealth + who.MaxStamina);
 					duration += (int) Math.Floor(ModEntry.ItemDefinitions.CookingSkillValues.BuffDurationValue * 1000 * rate);
 					foodBuff.millisecondsDuration = duration;
 				}
@@ -683,14 +686,27 @@ namespace LoveOfCooking
 			if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.CurryBuffId) is Buff curry)
 			{
 				// curry
-				Game1.player.buffs.Remove(curry.id);
-				Game1.player.buffs.Apply(new CurryBuff(buff: curry));
+				who.buffs.Remove(curry.id);
+				who.buffs.Apply(new CurryBuff(buff: curry));
 			}
 			else if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.LasagnaBuffId) is Buff lasagna)
 			{
 				// lasagna
-				Game1.player.buffs.Remove(lasagna.id);
-				Game1.player.buffs.Apply(new LasagnaBuff(buff: lasagna));
+				who.buffs.Remove(lasagna.id);
+				who.buffs.Apply(new LasagnaBuff(buff: lasagna));
+			}
+			else if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.KebabBuffId) is Buff kebab1
+				&& who.buffs.AppliedBuffs.TryGetValue(Buff.tipsy, out Buff tipsy1))
+			{
+				// kebab (tipsy already active)
+				Utils.ApplyKebabBuffUpgrade(who: who, buff: kebab1);
+				who.buffs.Apply(kebab1); // Required to upgrade initial buff
+			}
+			else if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == Buff.tipsy) is Buff tipsy2
+				&& who.buffs.AppliedBuffs.TryGetValue(ModEntry.KebabBuffId, out Buff kebab2))
+			{
+				// tipsy (kebab already active)
+				Utils.ApplyKebabBuffUpgrade(who: who, buff: kebab2);
 			}
 
 			// Track foods eaten

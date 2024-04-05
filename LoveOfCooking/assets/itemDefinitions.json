@@ -28,7 +28,7 @@
 			"3": [ "arancini", "craymornay", "leeks", "lobster" ],
 			"4": [ "carrotcake", "chocoflan", "parfait", "profiteroles" ],
 			"5": [],
-			"6": [ "cocococktail", "kebab", "nigiri", "unagi", "fruity" ],
+			"6": [ "cocococktail", "nigiri", "unagi", "kebab", "fruity" ],
 			"7": [ "cherrypie", "eggsando", "summersalad", "lasagna", "burger" ],
 			"8": [ "applepie", "saladsando", "hunters", "curry", "roast" ],
 			"9": [ "admiralpie", "seafoodsando", "pilaf", "paella", "oceanplatter" ],
@@ -144,6 +144,11 @@
 		"Y": 192
 	},
 	"CurryBuffKnockbackMultiplier": 1,
+	"KebabBuffUpgradeIconIndex": 259,
+	"KebabBuffUpgradeEffects": {
+		"AttacK": 2,
+		"Defense": 2
+	},
 	"LasagnaBuffMaxSlow": 3,
 	"LasagnaBuffMinSpeed": 1,
 	"PaellaBuffCoinValue": 5,

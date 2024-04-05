@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Buffs;
 using StardewValley.Extensions;
 using StardewValley.Inventories;
 using StardewValley.Menus;
@@ -883,6 +884,40 @@ namespace LoveOfCooking
 				farmer: who);
 			location.debris.Add(debris);
 			return debris;
+		}
+
+		public static void ApplyKebabBuffUpgrade(Farmer who, Buff buff)
+		{
+			// Upgrade buff effects
+			buff.effects.Add(new BuffEffects(data: ModEntry.ItemDefinitions.KebabBuffUpgradeEffects));
+
+			// Upgrade buff icon
+			buff.iconSheetIndex = ModEntry.ItemDefinitions.KebabBuffUpgradeIconIndex;
+			Game1.buffsDisplay.updatedIDs.Add(buff.id);
+
+			// Add visual effects to player
+			Game1.playSound("bubbles");
+			TemporaryAnimatedSprite sprite = new(
+				textureName: "TileSheets/animations",
+				sourceRect: new(256, 1856, 64, 128),
+				animationInterval: 80,
+				animationLength: 6,
+				numberOfLoops: 999999,
+				position: new Vector2(0, -2) * Game1.tileSize,
+				flicker: false,
+				flipped: false,
+				layerDepth: (who.Tile.Y + 1) * Game1.tileSize / 10000f + 0.0001f,
+				alphaFade: 0.0025f,
+				color: Color.Yellow * 0.75f,
+				scale: 1,
+				scaleChange: 0,
+				rotation: 0,
+				rotationChange: 0)
+			{
+				attachedCharacter = who,
+				positionFollowsAttachedCharacter = true
+			};
+			Game1.Multiplayer.broadcastSprites(location: who.currentLocation, sprites: sprite);
 		}
 
 		public static Texture2D Slice(Texture2D texture, Rectangle area)

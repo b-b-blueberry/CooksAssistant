@@ -16,6 +16,22 @@
         "ActionsOnApply": null,
         "CustomFields": null
     },
+    "blueberry.LoveOfCooking_kebab": {
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.kebab.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.kebab.description]",
+        "IsDebuff": false,
+        "GlowColor": null,
+        "Duration": 80000,
+        "MaxDuration": -1,
+        "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+        "IconSpriteIndex": 258, // Upgrade: 259 // Set in definitions data
+        "Effects": {
+            "Attack": 2,
+            "Defense": 2
+        },
+        "ActionsOnApply": null,
+        "CustomFields": null
+    },
     "blueberry.LoveOfCooking_lasagna": {
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.lasagna.name]",
         "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.lasagna.description]",
@@ -24,7 +40,7 @@
         "Duration": 100000,
         "MaxDuration": -1,
         "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
-        "IconSpriteIndex": 258,
+        "IconSpriteIndex": 260,
         "Effects": null,
         "ActionsOnApply": null,
         "CustomFields": null
@@ -37,7 +53,7 @@
         "Duration": 120000,
         "MaxDuration": -1,
         "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
-        "IconSpriteIndex": 259,
+        "IconSpriteIndex": 261,
         "Effects": null,
         "ActionsOnApply": null,
         "CustomFields": null
