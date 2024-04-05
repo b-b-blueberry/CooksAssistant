@@ -35,7 +35,7 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		private readonly Rectangle _fireTextureRegion = new(x: 32, y: 16, width: 16, height: 16);
 
-		public CurryBuff(Buff buff) : base(id: buff.id) {}
+		public CurryBuff(Buff buff) : base(id: buff.id, source: buff.source, displaySource: buff.displaySource) {}
 
 		public override bool update(GameTime time)
 		{

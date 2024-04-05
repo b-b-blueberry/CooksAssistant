@@ -25,7 +25,7 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		private int _spriteCountdown;
 
-		public LasagnaBuff(Buff buff) : base(id: buff.id) {}
+		public LasagnaBuff(Buff buff) : base(id: buff.id, source: buff.source, displaySource: buff.displaySource) {}
 
 		public override bool update(GameTime time)
 		{
