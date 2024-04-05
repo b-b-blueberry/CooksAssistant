@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Xna.Framework;
 using StardewValley;
@@ -27,6 +28,19 @@ namespace LoveOfCooking.Objects
 
 		public LasagnaBuff(Buff buff) : base(id: buff.id, source: buff.source, displaySource: buff.displaySource) {}
 
+		public List<Monster> GetTargets()
+		{
+			return Game1.currentLocation.characters.Where(npc =>
+				npc is Monster monster
+				&& npc is not (GreenSlime or BigSlime or LavaLurk or Duggy)
+				&& monster.IsMonster
+				&& monster.Health > 0
+				&& !monster.IsInvisible
+				&& !monster.isInvincible()
+				&& !monster.isGlider.Value
+				&& monster.IsWalkingTowardPlayer)?.Cast<Monster>()?.ToList() ?? new();
+		}
+
 		public override bool update(GameTime time)
 		{
 			this._countdown -= time.ElapsedGameTime.Milliseconds;
@@ -45,17 +59,12 @@ namespace LoveOfCooking.Objects
 				// Due to how bouncing and flying enemies work, this effect only applies to walking enemies
 				int maxSlow = ModEntry.ItemDefinitions.LasagnaBuffMaxSlow;
 				int minSpeed = ModEntry.ItemDefinitions.LasagnaBuffMinSpeed;
-				var monsters = Game1.currentLocation.characters.Where(npc =>
-					npc is Monster monster
-					&& npc is not GreenSlime
-					&& monster.IsMonster
-					&& monster.Health > 0
-					&& !monster.IsInvisible
-					&& !monster.isInvincible() 
-					&& !monster.isGlider.Value
-					&& monster.IsWalkingTowardPlayer);
-                foreach (Monster monster in monsters)
+				var monsters = this.GetTargets();
+				foreach (Monster monster in monsters)
 				{
+					if (monster is null || monster.currentLocation is null)
+						continue;
+
 					// Reduce speed by up to some maximum value, and to a minimum of 1
 					for (int i = 0; i <= maxSlow && monster.Speed - i >= minSpeed; ++i)
 					{
@@ -102,6 +111,16 @@ namespace LoveOfCooking.Objects
 
 		public override void OnRemoved()
 		{
+			// Reset enemy speed on buff lost
+			var monsters = this.GetTargets();
+			foreach (Monster monster in monsters)
+			{
+				if (monster is null || monster.currentLocation is null)
+					continue;
+
+				monster.addedSpeed = 0;
+			}
+
 			base.OnRemoved();
 		}
 	}
