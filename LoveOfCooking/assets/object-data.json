@@ -319,29 +319,7 @@
         "SpriteIndex": 11,
         "Edibility": 10,
         "IsDrink": false,
-        "Buffs": [
-            {
-                "Id": "Food",
-                "BuffId": null,
-                "IconTexture": null,
-                "IconSpriteIndex": 0,
-                "Duration": 144,
-                "IsDebuff": false,
-                "CustomAttributes": {
-                    "FarmingLevel": 0,
-                    "FishingLevel": 0,
-                    "MiningLevel": 0,
-                    "LuckLevel": 0,
-                    "ForagingLevel": 0,
-                    "MaxStamina": 50,
-                    "MagneticRadius": 0,
-                    "Speed": 0,
-                    "Defense": 0,
-                    "Attack": 0
-                },
-                "CustomFields": {}
-            }
-        ],
+        "Buffs": null,
         "ContextTags": [
             "color_dark_brown",
             "food_sweet"
