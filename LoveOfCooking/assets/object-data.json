@@ -20,11 +20,11 @@
                 "IsDebuff": false,
                 "CustomAttributes": {
                     "FarmingLevel": 0,
-                    "FishingLevel": 1,
+                    "FishingLevel": 2,
                     "MiningLevel": 0,
                     "LuckLevel": 0,
                     "ForagingLevel": 0,
-                    "MaxStamina": 18,
+                    "MaxStamina": 30,
                     "MagneticRadius": 0,
                     "Speed": 0,
                     "Defense": 0,
@@ -50,7 +50,29 @@
         "SpriteIndex": 1,
         "Edibility": 88,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 103,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 0,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 2,
+                    "MaxStamina": 20,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
         "ContextTags": [
             "color_sand",
             "food_bakery",
@@ -239,7 +261,29 @@
         "SpriteIndex": 9,
         "Edibility": 58,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": null,
+                "IconTexture": null,
+                "IconSpriteIndex": 0,
+                "Duration": 103,
+                "IsDebuff": false,
+                "CustomAttributes": {
+                    "FarmingLevel": 0,
+                    "FishingLevel": 0,
+                    "MiningLevel": 2,
+                    "LuckLevel": 0,
+                    "ForagingLevel": 0,
+                    "MaxStamina": 10,
+                    "MagneticRadius": 0,
+                    "Speed": 0,
+                    "Defense": 0,
+                    "Attack": 0
+                },
+                "CustomFields": {}
+            }
+        ],
         "ContextTags": [
             "color_red",
             "food_bakery"
