@@ -236,7 +236,7 @@
                     "ForagingLevel": 0,
                     "MaxStamina": 0,
                     "MagneticRadius": 0,
-                    "Speed": 0.5,
+                    "Speed": 1,
                     "Defense": 0,
                     "Attack": 0
                 },
