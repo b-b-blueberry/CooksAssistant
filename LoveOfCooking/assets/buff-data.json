@@ -57,5 +57,18 @@
         "Effects": null,
         "ActionsOnApply": null,
         "CustomFields": null
+    },
+    "blueberry.LoveOfCooking_profiteroles": {
+        "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.profiteroles.name]",
+        "Description": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:buff.profiteroles.description]",
+        "IsDebuff": false,
+        "GlowColor": null,
+        "Duration": 60000,
+        "MaxDuration": -1,
+        "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+        "IconSpriteIndex": 262,
+        "Effects": null,
+        "ActionsOnApply": null,
+        "CustomFields": null
     }
 }

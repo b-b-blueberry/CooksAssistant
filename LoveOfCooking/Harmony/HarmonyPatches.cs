@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 using StardewValley.Menus;
 using StardewValley.Monsters;
+using StardewValley.Projectiles;
+using StardewValley.Tools;
 using Object = StardewValley.Object;
 using HarmonyLib; // el diavolo nuevo
 
@@ -82,6 +84,15 @@ namespace LoveOfCooking.HarmonyPatches
 				postfix: new(
 					methodType: typeof(HarmonyPatches),
 					methodName: nameof(GameLocation_DrawDebris_Postfix)));
+
+			// Profiteroles buff
+			harmony.Patch(
+				original: AccessTools.Method(
+					type: typeof(Slingshot),
+					name: nameof(Slingshot.PerformFire)),
+				transpiler: new(
+					methodType: typeof(HarmonyPatches),
+					methodName: nameof(Slingshot_PerformFire_Transpiler)));
 		}
 
 		/// <summary>
@@ -271,6 +282,39 @@ namespace LoveOfCooking.HarmonyPatches
 					coin.Draw(b: b, location: __instance);
 				}
 			}
+		}
+
+		/// <summary>
+		/// Replaces draw behaviour for hidden buffs.
+		/// </summary>
+		private static IEnumerable<CodeInstruction> Slingshot_PerformFire_Transpiler(ILGenerator gen, MethodBase original, IEnumerable<CodeInstruction> il)
+		{
+			// Seek to projectile create behaviour
+			List<CodeInstruction> ilOut = il.ToList();
+			ConstructorInfo targetMethod = AccessTools.Constructor(
+				type: typeof(BasicProjectile),
+				parameters: new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(float), typeof(float), typeof(float), typeof(Vector2), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(GameLocation), typeof(Character), typeof(BasicProjectile.onCollisionBehavior), typeof(string) });
+			MethodInfo newMethod = AccessTools.Method(
+				type: typeof(Utils),
+				name: nameof(Utils.TryProliferateLastProjectile));
+			int i = ilOut.FindIndex(
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Newobj
+					&& ((ConstructorInfo)ci.operand).DeclaringType.FullName == targetMethod.DeclaringType.FullName);
+			int j = ilOut.FindIndex(startIndex: i, match: (CodeInstruction ci) => ci.opcode == OpCodes.Dup);
+			if (i < 0 || j < 0)
+			{
+				Log.E($"Failed to add behaviour for {nameof(Utils.TryProliferateLastProjectile)} in {nameof(Slingshot_PerformFire_Transpiler)}.");
+				return il;
+			}
+
+			// Add projectile proliferate behaviour
+			ilOut.InsertRange(index: j + 1, collection: new CodeInstruction[]
+			{
+				new(OpCodes.Ldarg, 1), // GameLocation location
+				new(OpCodes.Call, newMethod), // Utils TryProliferateLastProjectile
+			});
+
+			return ilOut;
 		}
 
 		private static void OnException(Exception e)

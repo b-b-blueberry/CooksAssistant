@@ -13,6 +13,7 @@ using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Network;
 using StardewValley.Objects;
+using StardewValley.Projectiles;
 using StardewValley.SpecialOrders.Objectives;
 using xTile.Layers;
 using xTile.Tiles;
@@ -918,6 +919,62 @@ namespace LoveOfCooking
 				positionFollowsAttachedCharacter = true
 			};
 			Game1.Multiplayer.broadcastSprites(location: who.currentLocation, sprites: sprite);
+		}
+
+		public static void TryProliferateLastProjectile(GameLocation location)
+		{
+			// Require Profiteroles buff
+			if (!Game1.player.hasBuff(ModEntry.ProfiterolesBuffId))
+				return;
+
+			// Avoid proliferating projectiles in fairground minigames
+			if (Game1.currentLocation.currentEvent is not null || Game1.currentMinigame is not null)
+				return;
+
+			// Delay until projectiles collection updated
+			DelayedAction.functionAfterDelay(
+				func: () =>
+				{
+					if (location.projectiles.LastOrDefault() is BasicProjectile p)
+					{
+						for (int i = 0; i < 2; ++i)
+						{
+							// How to rotate 2d vector???????
+							// https://stackoverflow.com/a/28730480
+							// Johan Larsson - Feb 25, 2015
+							float degrees = 10;
+							double radians = (-degrees + (i * 2 * degrees)) * Math.PI / 180;
+							var ca = Math.Cos(radians);
+							var sa = Math.Sin(radians);
+							Vector2 v = new(x: p.xVelocity.Value, y: p.yVelocity.Value);
+							v = new Vector2(
+								x: (float)(ca * v.X - sa * v.Y),
+								y: (float)(sa * v.X + ca * v.Y));
+
+							// Copy main projectile with velocity offsets
+							BasicProjectile copy = new(
+								damageToFarmer: p.damageToFarmer.Value,
+								spriteIndex: p.currentTileSheetIndex.Value,
+								bouncesTillDestruct: p.bouncesLeft.Value,
+								tailLength: p.tailLength.Value,
+								rotationVelocity: p.rotationVelocity.Value,
+								xVelocity: v.X,
+								yVelocity: v.Y,
+								startingPosition: p.position.Value,
+								collisionSound: p.collisionSound.Value,
+								bounceSound: p.bounceSound.Value,
+								firingSound: null,
+								explode: p.explode.Value,
+								damagesMonsters: p.damagesMonsters.Value,
+								location: location,
+								firer: p.theOneWhoFiredMe.Get(location),
+								collisionBehavior: p.collisionBehavior,
+								shotItemId: p.itemId.Value);
+							location.projectiles.Add(copy);
+						}
+					}
+				},
+				delay: 0);
 		}
 
 		public static Texture2D Slice(Texture2D texture, Rectangle area)

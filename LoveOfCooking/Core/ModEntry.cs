@@ -34,6 +34,7 @@ namespace LoveOfCooking
 		internal const string KebabBuffId = ModEntry.ObjectPrefix + "kebab"; // DO NOT EDIT
 		internal const string LasagnaBuffId = ModEntry.ObjectPrefix + "lasagna"; // DO NOT EDIT
 		internal const string PaellaBuffId = ModEntry.ObjectPrefix + "paella"; // DO NOT EDIT
+		internal const string ProfiterolesBuffId = ModEntry.ObjectPrefix + "profiteroles"; // DO NOT EDIT
 		internal static int SpriteId => (int)Game1.player.UniqueMultiplayerID + 5050505;
 		internal static int NexusId { get; private set; }
 

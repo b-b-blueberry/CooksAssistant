@@ -770,7 +770,12 @@
         "SpriteIndex": 30,
         "Edibility": 26,
         "IsDrink": false,
-        "Buffs": null,
+        "Buffs": [
+            {
+                "Id": "Food",
+                "BuffId": "blueberry.LoveOfCooking_profiteroles"
+            }
+        ],
         "ContextTags": [
             "color_brown",
             "food_sweet",
