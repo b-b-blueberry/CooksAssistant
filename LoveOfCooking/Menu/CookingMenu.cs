@@ -497,7 +497,8 @@ namespace LoveOfCooking.Menu
                 if (this._stack.Any() && this.RecipeInfo.Index >= 0 && this.Recipes.Count >= this.RecipeInfo.Index - 1)
                 {
 					this.CookingManager.AutoFillIngredients(recipe: this.RecipeInfo.Recipe, sourceItems: this.Items);
-                }
+					this._craftingPage.OnReadyToCookChanged(playSound: false);
+				}
             }
 
 			this.UpdateCraftableCounts(recipe: this.RecipeInfo.Recipe);
