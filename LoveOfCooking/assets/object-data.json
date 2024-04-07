@@ -16,7 +16,7 @@
                 "BuffId": null,
                 "IconTexture": null,
                 "IconSpriteIndex": 0,
-                "Duration": 103,
+                "Duration": 500,
                 "IsDebuff": false,
                 "CustomAttributes": {
                     "FarmingLevel": 0,
@@ -56,7 +56,7 @@
                 "BuffId": null,
                 "IconTexture": null,
                 "IconSpriteIndex": 0,
-                "Duration": 103,
+                "Duration": 500,
                 "IsDebuff": false,
                 "CustomAttributes": {
                     "FarmingLevel": 0,
@@ -267,7 +267,7 @@
                 "BuffId": null,
                 "IconTexture": null,
                 "IconSpriteIndex": 0,
-                "Duration": 103,
+                "Duration": 500,
                 "IsDebuff": false,
                 "CustomAttributes": {
                     "FarmingLevel": 0,
