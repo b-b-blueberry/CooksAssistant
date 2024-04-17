@@ -56,7 +56,6 @@ namespace LoveOfCooking.Menu
 		public ClickableTextureComponent ToggleOrderButton { get; private set; }
 		public ClickableTextureComponent ToggleFilterButton { get; private set; }
 		public ClickableTextureComponent ToggleViewButton { get; private set; }
-		public ClickableTextureComponent ToggleAutofillButton { get; private set; }
 		public ClickableTextureComponent SearchButton { get; private set; }
 		public ClickableTextureComponent DownButton { get; private set; }
 		public ClickableTextureComponent UpButton { get; private set; }
@@ -408,15 +407,6 @@ namespace LoveOfCooking.Menu
                 sourceRect: ToggleViewButtonSource,
                 scale: SmallScale,
                 drawShadow: true);
-			this.ToggleAutofillButton = new(
-                name: "autofill",
-                bounds: new(-1, -1, AutofillButtonSource.Width * SmallScale, AutofillButtonSource.Height * SmallScale),
-                label: null,
-                hoverText: I18n.Get("menu.cooking_recipe.autofill_label"),
-                texture: CookingMenu.Texture,
-                sourceRect: AutofillButtonSource,
-                scale: SmallScale,
-                drawShadow: true);
             for (int i = (int)Filter.Alphabetical; i < Enum.GetNames(typeof(Filter)).Length; ++i)
             {
 				this.FilterButtons.Add(new(
@@ -436,8 +426,7 @@ namespace LoveOfCooking.Menu
             {
 				this.ToggleFilterButton,
 				this.ToggleOrderButton,
-				this.ToggleViewButton,
-				this.ToggleAutofillButton
+				this.ToggleViewButton
             });
 
             // Search results
@@ -542,14 +531,11 @@ namespace LoveOfCooking.Menu
 			this.ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (this.IsGridView
                 ? ToggleViewButtonSource.Width
                 : 0);
-			this.ToggleAutofillButton.sourceRect.X = Instance.States.Value.IsUsingAutofill
-                ? AutofillButtonSource.X + AutofillButtonSource.Width
-                : AutofillButtonSource.X;
 
 			this.SearchButton.bounds = this.ToggleButtons.Last().bounds;
 			this._searchBarTextBoxMaxWidth = this.SearchButton.bounds.X - this.SearchBarTextBox.X - 6 * Scale;
 
-			int minWidth = 33 * Scale;
+			int minWidth = 48 * Scale;
 			this._searchBarTextBoxMinWidth = Math.Min(this.ToggleButtons.First().bounds.X - this._searchArea.X,
                 Math.Max(minWidth, 6 * Scale + (int)Math.Ceiling(Game1.smallFont.MeasureString(this.SearchBarTextBox.Text).X)));
 			this.SearchBarTextBox.Width = this._searchBarTextBoxMinWidth;
@@ -772,15 +758,6 @@ namespace LoveOfCooking.Menu
 
                     Game1.playSound(PageChangeCue);
 					this.ToggleViewButton.hoverText = I18n.Get($"menu.cooking_search.view.{(this.IsGridView ? "grid" : "list")}");
-                }
-                // Autofill button
-                else if (this.ToggleAutofillButton.containsPoint(x, y))
-                {
-                    Game1.playSound(ClickCue);
-                    Instance.States.Value.IsUsingAutofill = !Instance.States.Value.IsUsingAutofill;
-					this.ToggleAutofillButton.sourceRect.X = Instance.States.Value.IsUsingAutofill // Update toggled button appearance
-                        ? AutofillButtonSource.X + AutofillButtonSource.Width
-                        : AutofillButtonSource.X;
                 }
             }
         }

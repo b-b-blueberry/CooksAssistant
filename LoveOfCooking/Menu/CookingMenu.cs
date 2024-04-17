@@ -51,10 +51,11 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle BuffIconSource = new(103, 209, 10, 10);
         internal static readonly Rectangle FavouriteIconSource = new(139, 209, 10, 10);
 		internal static readonly Rectangle StarIconSource = new(139, 209, 10, 10);
-        internal static readonly Rectangle CheckIconSource = new(149, 209, 10, 10);
-        internal static readonly Rectangle CrossIconSource = new(159, 209, 10, 10);
-		internal static readonly Rectangle AutofillButtonSource = new(160, 224, 16, 16);
-        internal static readonly Rectangle InventoryTabButtonSource = new(240, 157, 16, 21);
+        internal static readonly Rectangle CheckIconSource = new(150, 209, 10, 10);
+        internal static readonly Rectangle CrossIconSource = new(160, 209, 10, 10);
+		internal static readonly Rectangle AutofillDisabledButtonSource = new(112, 134, 14, 14);
+		internal static readonly Rectangle AutofillEnabledButtonSource = new(126, 134, 14, 14);
+		internal static readonly Rectangle InventoryTabButtonSource = new(240, 157, 16, 21);
         internal static readonly Rectangle InventoryBackpack1IconSource = new(0, 134, 14, 14);
         internal static readonly Rectangle InventoryBackpack2IconSource = new(14, 134, 14, 14);
         internal static readonly Rectangle InventoryBackpack3IconSource = new(28, 134, 14, 14);
@@ -461,7 +462,7 @@ namespace LoveOfCooking.Menu
 			this._searchPage.GoToRecipe(index: index);
             if (this._recipePage.IsVisible)
             {
-				this.TryAutoFillIngredients();
+				this.TryAutoFillIngredients(isClearedIfDisabled: false);
             }
 
             return true;
@@ -488,22 +489,25 @@ namespace LoveOfCooking.Menu
 			this.RecipeInfo.NumReadyToCraft = this.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Items, limitToCurrentIngredients: true);
         }
 
-        private void TryAutoFillIngredients()
+        public void TryAutoFillIngredients(bool isClearedIfDisabled)
         {
-            if (ModEntry.Instance.States.Value.IsUsingAutofill)
-            {
+            if (ModEntry.Instance.States.Value.IsUsingAutofill || isClearedIfDisabled)
+			{
 				// Remove all items from ingredients slots
 				this.CookingManager.ClearCurrentIngredients();
-
+			}
+			if (ModEntry.Instance.States.Value.IsUsingAutofill)
+            {
                 // Don't fill slots if the player can't cook the recipe
-                if (this._stack.Any() && this.RecipeInfo.Index >= 0 && this.Recipes.Count >= this.RecipeInfo.Index - 1)
+                if (this._stack.Any() && this.RecipeInfo is not null && this.RecipeInfo.Index >= 0 && this.Recipes.Count >= this.RecipeInfo.Index - 1)
                 {
 					this.CookingManager.AutoFillIngredients(recipe: this.RecipeInfo.Recipe, sourceItems: this.Items);
-					this._craftingPage.OnReadyToCookChanged(playSound: false);
+					this._craftingPage.OnReadyToCookChanged();
 				}
             }
 
-			this.UpdateCraftableCounts(recipe: this.RecipeInfo.Recipe);
+            if (this.RecipeInfo?.Recipe is not null)
+				this.UpdateCraftableCounts(recipe: this.RecipeInfo.Recipe);
         }
 
         /// <summary>
@@ -624,7 +628,7 @@ namespace LoveOfCooking.Menu
 
 			// Setup new page
 			this._recipePage.IsVisible = true;
-			this.TryAutoFillIngredients();
+			this.TryAutoFillIngredients(isClearedIfDisabled: false);
 
 			// Snap to default component
 			if (Game1.options.SnappyMenus)
@@ -1134,9 +1138,11 @@ namespace LoveOfCooking.Menu
                 if (Game1.options.doesInputListContain(Game1.options.moveLeftButton, key))
                 {
                     if (cur < this.inventory.inventory.Count && cur % this.GetColumnCount() == 0)
-                        next = this.InventoryManager.InventorySelectButtons.Any()
+                        next = this.InventoryManager.ShouldShowInventoryElements
                             ? this.InventoryManager.TabButton.myID
                             : cur;
+                    else if (cur == this.InventoryManager.ToggleAutofillButton.myID)
+                        next = this.GetColumnCount() * 2 - 1;
                     else if (cur == this._recipePage.RecipeIconButton.myID)
                         next = this._recipePage.CanScrollLeft ? this._recipePage.LeftButton.myID : this._searchTabButton.myID;
                     else if (cur == this._craftingPage.FirstIngredientSlot.myID && this._recipePage.IsVisible)
@@ -1150,8 +1156,10 @@ namespace LoveOfCooking.Menu
                             : this._searchPage.ResultsListClickables.First().myID;
                 }
                 if (Game1.options.doesInputListContain(Game1.options.moveRightButton, key))
-                {
-                    if (cur == this._searchTabButton.myID)
+				{
+					if (cur < this.inventory.inventory.Count && (cur % this.GetColumnCount()) == this.GetColumnCount() - 1)
+						next = this.InventoryManager.ToggleAutofillButton.myID;
+					else if (cur == this._searchTabButton.myID)
                         next = this._recipePage.CanScrollLeft ? this._recipePage.LeftButton.myID : this._recipePage.RecipeIconButton.myID;
                     else if (cur == this._recipePage.RecipeIconButton.myID)
                         next = this._recipePage.CanScrollRight ? this._recipePage.RightButton.myID : this._craftingPage.FirstIngredientSlot.myID;

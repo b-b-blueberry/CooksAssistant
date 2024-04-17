@@ -35,6 +35,7 @@ namespace LoveOfCooking.Menu
 		private Rectangle _inventoriesPopupArea;
 		private Rectangle _inventoryCardArea;
 		public ClickableTextureComponent TabButton { get; private set; }
+		public ClickableTextureComponent ToggleAutofillButton { get; private set; }
 		public List<ClickableTextureComponent> InventorySelectButtons { get; private set; } = new();
 
 		// Inventory management
@@ -156,27 +157,39 @@ namespace LoveOfCooking.Menu
 			}
 		}
 
-
 		private void DrawInventoryMenu(SpriteBatch b)
 		{
-			if (!this.InventorySelectButtons.Any())
-				return;
+			if (this.InventorySelectButtons.Any())
+			{
+				// Actual inventory card
+				Game1.DrawBox(
+					x: this._inventoryCardArea.X,
+					y: this._inventoryCardArea.Y,
+					width: this._inventoryCardArea.Width,
+					height: this._inventoryCardArea.Height);
 
-			// Actual inventory card
-			Game1.DrawBox(
-				x: this._inventoryCardArea.X,
-				y: this._inventoryCardArea.Y,
-				width: this._inventoryCardArea.Width,
-				height: this._inventoryCardArea.Height);
+				// Inventory select tab
+				this.TabButton.draw(b);
+				this.DrawInventorySlot(b,
+					which: this._inventoryId,
+					position: new(
+						x: this.TabButton.bounds.X + 2 * this.TabButton.baseScale,
+						y: this.TabButton.bounds.Y + 2 * this.TabButton.baseScale),
+					scale: this.TabButton.scale);
+			}
 
-			// Inventory select tab
-			this.TabButton.draw(b);
-			this.DrawInventorySlot(b,
-				which: this._inventoryId,
-				position: new(
-					x: this.TabButton.bounds.X + 2 * this.TabButton.baseScale,
-					y: this.TabButton.bounds.Y + 2 * this.TabButton.baseScale),
-				scale: this.TabButton.scale);
+			// Autofill button
+			b.Draw(
+				texture: CookingMenu.Texture,
+				position: this.ToggleAutofillButton.bounds.Center.ToVector2(),
+				sourceRectangle: InventoryTabButtonSource,
+				color: Color.White,
+				rotation: 0,
+				origin: InventoryTabButtonSource.Size.ToVector2() / 2,
+				scale: this.ToggleAutofillButton.scale,
+				effects: SpriteEffects.FlipHorizontally,
+				layerDepth: 1);
+			this.ToggleAutofillButton.draw(b);
 
 			// Items
 			if (this.ShowInventoriesPopup)
@@ -404,6 +417,15 @@ namespace LoveOfCooking.Menu
 				sourceRect: InventoryTabButtonSource,
 				scale: Scale);
 
+			this.ToggleAutofillButton = new(
+				name: "autofill",
+				bounds: new(-1, -1, AutofillDisabledButtonSource.Width * Scale, AutofillDisabledButtonSource.Height * Scale),
+				label: null,
+				hoverText: I18n.Get("menu.cooking_recipe.autofill_label"),
+				texture: CookingMenu.Texture,
+				sourceRect: AutofillDisabledButtonSource,
+				scale: Scale);
+
 			// inventory buttons and ingredients slots
 			for (int i = 0; i < this.InventorySelectButtons.Count; ++i)
 			{
@@ -424,7 +446,8 @@ namespace LoveOfCooking.Menu
 			}
 
 			List<ClickableComponent> components = new() {
-				this.TabButton
+				this.TabButton,
+				this.ToggleAutofillButton
 			};
 			components.AddRange(this.InventorySelectButtons);
 
@@ -488,8 +511,9 @@ namespace LoveOfCooking.Menu
 			// inventory buttons flow vertically in a solo-screen game, and horizontally in split-screen
 			offset.X = 4 * Scale;
 			offset.Y = 1 * Scale;
-			this.TabButton.bounds.X = this._inventoryCardArea.X - this.TabButton.bounds.Width + 1 * Scale;
-			this.TabButton.bounds.Y = this._inventoryCardArea.Y + (this._inventoryCardArea.Height - InventoryTabButtonSource.Height * Scale) / 2;
+			this.TabButton.bounds.X = this._inventoryCardArea.Left - this.TabButton.bounds.Width + 2 * Scale;
+			this.TabButton.bounds.Y = this._inventoryCardArea.Top + (this._inventoryCardArea.Height - InventoryTabButtonSource.Height * Scale) / 2;
+
 			if (this.ShouldShowInventoryElements)
 			{
 				const int areaPadding = 3 * Scale;
@@ -563,6 +587,13 @@ namespace LoveOfCooking.Menu
 					width: this.InventoryMenu.xPositionOnScreen + this.InventoryMenu.width - this.TabButton.bounds.X,
 					height: this._inventoryCardArea.Height);
 			}
+
+			// Autofill button
+			this.ToggleAutofillButton.bounds.X = this._inventoryCardArea.Right - 2 * Scale;
+			this.ToggleAutofillButton.bounds.Y = this.TabButton.bounds.Top + 4 * Scale;
+			this.ToggleAutofillButton.sourceRect = Instance.States.Value.IsUsingAutofill
+				? AutofillEnabledButtonSource
+				: AutofillDisabledButtonSource;
 		}
 
 		public override void OnKeyPressed(Keys key)
@@ -577,15 +608,28 @@ namespace LoveOfCooking.Menu
 
 		public override void OnPrimaryClick(int x, int y, bool playSound = true)
 		{
+			if (this.ToggleAutofillButton.containsPoint(x, y))
+			{
+				// Autofill button
+				Game1.playSound(ClickCue);
+				Instance.States.Value.IsUsingAutofill = !Instance.States.Value.IsUsingAutofill;
+				this.Menu.TryAutoFillIngredients(isClearedIfDisabled: true);
+				this.ToggleAutofillButton.sourceRect = Instance.States.Value.IsUsingAutofill
+					? AutofillEnabledButtonSource
+					: AutofillDisabledButtonSource;
+			}
+
 			// Inventory nav buttons
 			if (this.ShouldShowInventoryElements)
 			{
 				if (this.TabButton.containsPoint(x, y))
 				{
+					// Inventory tab
 					this.ToggleInventoriesPopup(playSound: true);
 				}
 				else if (this.ShowInventoriesPopup)
 				{
+					// Inventories popup
 					foreach (ClickableTextureComponent clickable in this.InventorySelectButtons)
 					{
 						if (clickable.bounds.Contains(x, y))
@@ -627,6 +671,10 @@ namespace LoveOfCooking.Menu
 
 		public override void OnHovered(int x, int y, ref string hoverText)
 		{
+			this.ToggleAutofillButton.tryHover(x, y, 0.5f);
+			if (this.ToggleAutofillButton.containsPoint(x, y))
+				hoverText = this.ToggleAutofillButton.hoverText;
+
 			// Inventory select buttons
 			if (this.ShouldShowInventoryElements)
 			{
