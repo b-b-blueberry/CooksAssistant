@@ -107,11 +107,10 @@ namespace LoveOfCooking.Menu
                 return;
 
             // Update search result index for up/down direction
-            int min = 0;
+            int min = this._visibleResults.Count / 2;
 			int max = this._filteredResults.Count - 1;
             if (this.IsGridView)
             {
-                min = this._visibleResults.Count / 2;
 				max = GridColumns * (max / GridColumns) + GridColumns;
             }
 			int delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, new[] { new InputButton(Keys.LeftShift) })
