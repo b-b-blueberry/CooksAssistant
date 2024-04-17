@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
@@ -15,7 +14,6 @@ using StardewValley.BellsAndWhistles;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Tools;
 using StardewValley.ItemTypeDefinitions;
-using static System.Net.Mime.MediaTypeNames;
 using static SpaceCore.Skills.Skill;
 
 namespace LoveOfCooking.Interface
@@ -870,12 +868,13 @@ namespace LoveOfCooking.Interface
 					offset.X -= width / 2;
 					foreach (var pair in seasoningsMap)
 					{
+						bool isUnlocked = Game1.player.knowsRecipe(pair.Key) || (pair.Key == ModEntry.ItemDefinitions.DefaultSeasoning && Game1.MasterPlayer.mailReceived.Contains("qiChallengeComplete"));
 						// item
 						b.Draw(
 							texture: pair.Value.Texture,
 							sourceRectangle: pair.Value.Source,
 							position: v + offset,
-							color: Color.White,
+							color: isUnlocked ? Color.White : LockedColour,
 							rotation: 0,
 							origin: Vector2.Zero,
 							scale: Scale,

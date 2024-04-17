@@ -53,6 +53,7 @@ namespace LoveOfCooking
 		public static string LocalObjectSpriteSheetPath { get; private set; } = "object-sprites";
 		public static string LocalToolSpriteSheetPath { get; private set; } = "tool-sprites";
 		public static string LocalBuffDataPath { get; private set; } = "buff-data";
+		public static string LocalCraftingDataPath { get; private set; } = "crafting-data";
 		public static string LocalGiftDataPath { get; private set; } = "gift-data";
 		public static string LocalMailDataPath { get; private set; } = "mail-data";
 		public static string LocalObjectDataPath { get; private set; } = "object-data";
@@ -72,6 +73,7 @@ namespace LoveOfCooking
 			@"Data/Buffs",
 			@"Data/Characters",
 			@"Data/CookingRecipes",
+			@"Data/CraftingRecipes",
 			@"Data/mail",
 			@"Data/NPCGiftTastes",
 			@"Data/Objects",
@@ -223,6 +225,10 @@ namespace LoveOfCooking
 			{
 				AssetManager.EditCharacters(asset: asset);
 			}
+			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/CraftingRecipes"))
+			{
+				AssetManager.EditCraftingRecipes(asset: asset);
+			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/CookingRecipes"))
 			{
 				AssetManager.EditCookingRecipes(asset: asset);
@@ -298,6 +304,24 @@ namespace LoveOfCooking
 			}
 		}
 
+		private static void EditCraftingRecipes(IAssetData asset)
+		{
+			// Skip recipes to avoid blocking perfection
+			if (!ModEntry.Config.AddSeasonings)
+				return;
+
+			var data = asset.AsDictionary<string, string>().Data;
+			var newData = ModEntry.Instance.Helper.ModContent.Load
+				<Dictionary<string, string>>
+				(AssetManager.LocalCraftingDataPath + ".json");
+
+			// Add new crafting recipes
+			foreach (var pair in newData)
+				data.Add(pair);
+
+			asset.AsDictionary<string, string>().ReplaceWith(data);
+		}
+
 		private static void EditCookingRecipes(IAssetData asset)
 		{
 			try
@@ -305,7 +329,7 @@ namespace LoveOfCooking
 				var data = asset.AsDictionary<string, string>().Data;
 				if (ModEntry.Config.AddCookingSkillAndRecipes)
 				{
-					// Add new recipes
+					// Add new cooking recipes
 					var recipes = ModEntry.Instance.Helper.ModContent.Load
 						<Dictionary<string, string>>
 						(AssetManager.LocalRecipeDataPath + ".json");
@@ -409,7 +433,10 @@ namespace LoveOfCooking
 
 			// Add new mail entries
 			foreach (var pair in newData)
-				data[pair.Key] = Game1.content.LoadString(pair.Value).Replace("{{cookbookId}}", $"(O){ModEntry.CookbookItemId}");
+				data[pair.Key] = Game1.content.LoadString(pair.Value)
+					.Replace("{{cookbookId}}", $"(O){ModEntry.CookbookItemId}")
+					.Replace("{{seasoning1}}", $"{ModEntry.Seasoning1ItemId}")
+					.Replace("{{seasoning2}}", $"{ModEntry.Seasoning2ItemId}");
 
 			asset.AsDictionary<string, string>().ReplaceWith(data);
 		}

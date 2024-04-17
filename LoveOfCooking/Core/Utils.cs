@@ -95,6 +95,32 @@ namespace LoveOfCooking
 			return false;
 		}
 
+		public static void CheckSeasoningMailRequirementsMet(Farmer who, out bool seasoning1, out bool seasoning2)
+		{
+			seasoning1 = who.achievements.Contains(15); // Cook - Cook 10 recipes
+			seasoning2 = who.achievements.Contains(16); // Sous Chef - Cook 25 recipes
+			// 17 // Gourmet Chef - Cook every recipe
+		}
+
+		public static void TrySendSeasoningRecipes(Farmer who)
+		{
+			if (!ModEntry.Config.AddSeasonings)
+				return;
+
+			CheckSeasoningMailRequirementsMet(who, out bool seasoning1, out bool seasoning2);
+
+			// Low quality seasoning
+			if (seasoning1 && !who.hasOrWillReceiveMail(ModEntry.MailSeasoning1))
+			{
+				who.mailbox.Add(ModEntry.MailSeasoning1);
+			}
+			// High quality seasoning
+			if (seasoning2 && !who.hasOrWillReceiveMail(ModEntry.MailSeasoning2))
+			{
+				who.mailbox.Add(ModEntry.MailSeasoning2);
+			}
+		}
+
 		public static bool IsCookingMenu(IClickableMenu menu)
 		{
 			return menu is not null && ModEntry.Instance.Helper.Reflection.GetField<bool>(obj: menu, name: "cooking", required: false)?.GetValue() is true;

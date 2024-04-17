@@ -29,6 +29,8 @@ namespace LoveOfCooking
 		internal const string MailPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
 		internal const string QueryPrefix = "BLUEBERRY_LOC_"; // DO NOT EDIT
 		internal const string CookbookItemId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
+		internal const string Seasoning1ItemId = ModEntry.ObjectPrefix + "seasoning_1"; // DO NOT EDIT
+		internal const string Seasoning2ItemId = ModEntry.ObjectPrefix + "seasoning_2"; // DO NOT EDIT
 		internal const string CookbookWalletId = ModEntry.ObjectPrefix + "cookbook"; // DO NOT EDIT
 		internal const string CurryBuffId = ModEntry.ObjectPrefix + "curry"; // DO NOT EDIT
 		internal const string KebabBuffId = ModEntry.ObjectPrefix + "kebab"; // DO NOT EDIT
@@ -168,6 +170,8 @@ namespace LoveOfCooking
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
+		internal static readonly string MailSeasoning1 = MailPrefix + "seasoning_1"; // DO NOT EDIT
+		internal static readonly string MailSeasoning2 = MailPrefix + "seasoning_2"; // DO NOT EDIT
 
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
@@ -510,8 +514,11 @@ namespace LoveOfCooking
 			// Food Heals Over Time
 			this.States.Value.Regeneration.UpdateDefinitions();
 
-			// Send cookbook mail if conditions met
+			// Cooking Menu
 			Utils.TryAddCookbook(who: Game1.player);
+
+			// Add Seasonings
+			Utils.TrySendSeasoningRecipes(who: Game1.player);
 		}
 
 		private void GameLoop_ReturnedToTitle(object sender, ReturnedToTitleEventArgs e)
