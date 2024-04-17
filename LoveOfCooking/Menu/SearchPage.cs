@@ -106,16 +106,18 @@ namespace LoveOfCooking.Menu
             if (!this._visibleResults.Any())
                 return;
 
-			// Update search result index for up/down direction
+            // Update search result index for up/down direction
+            int min = 0;
 			int max = this._filteredResults.Count - 1;
             if (this.IsGridView)
             {
-                max = GridColumns * (max / GridColumns) + GridColumns;
+                min = this._visibleResults.Count / 2;
+				max = GridColumns * (max / GridColumns) + GridColumns;
             }
 			int delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, new[] { new InputButton(Keys.LeftShift) })
                 ? this._resultsPerPage
                 : this.IsGridView ? this._resultsArea.Width / this._resultHeight : 1;
-			int index = Math.Max(0, Math.Min(max - this._visibleResults.Count / 2, this._resultsIndex + delta * (isDownwards ? 1 : -1)));
+			int index = Math.Max(min, Math.Min(max - this._visibleResults.Count / 2, this._resultsIndex + delta * (isDownwards ? 1 : -1)));
 
             // Ignore if index did not change
             if (this._resultsIndex == index)
