@@ -78,18 +78,10 @@ namespace LoveOfCooking.Menu
 			}
         }
 
-        public void OnReadyToCookChanged(bool playSound)
+        public void OnReadyToCookChanged()
 		{
             // Reset quantity to cook
 			this._quantity = 1;
-
-			// Snap to best component
-            if (Game1.options.SnappyMenus)
-            {
-				this.Menu.setCurrentlySnappedComponentTo(this.Menu.ReadyToCook
-                    ? this.CookButton.myID
-                    : this.IngredientSlotButtons.First().myID);
-            }
         }
 
 		internal void CreateIngredientSlotButtons(int buttonsToDisplay, int usableButtons)
@@ -809,7 +801,7 @@ namespace LoveOfCooking.Menu
         {
             if (this.Menu.ReadyToCook)
             {
-				this.OnReadyToCookChanged(playSound: true);
+				this.OnReadyToCookChanged();
                 return false;
             }
             return true;

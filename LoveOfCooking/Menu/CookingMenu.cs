@@ -549,7 +549,7 @@ namespace LoveOfCooking.Menu
 				if (this.ReadyToCook)
                 {
                     // Snap to cook button
-					this._craftingPage.OnReadyToCookChanged(playSound: false);
+					this._craftingPage.OnReadyToCookChanged();
                 }
             }
 
