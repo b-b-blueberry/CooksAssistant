@@ -271,8 +271,6 @@ namespace LoveOfCooking.Menu
             {
                 this.snapToDefaultClickableComponent();
 			}
-
-            ModEntry.Instance.States.Value.HasOpenedCookingMenuEver = true;
         }
 
         private void CreateClickableComponents()

@@ -115,7 +115,6 @@ namespace LoveOfCooking
 			public void Save(ModDataDictionary data)
 			{
 				string prefix = ModEntry.ModDataPrefix;
-				data[$"{prefix}has_opened_cooking_menu_ever"] = this.HasOpenedCookingMenuEver.ToString();
 				data[$"{prefix}autofill"] = this.IsUsingAutofill.ToString();
 				data[$"{prefix}grid_view"] = this.IsUsingRecipeGridView.ToString();
 				data[$"{prefix}tool_level"] = this.CookingToolLevel.ToString();
