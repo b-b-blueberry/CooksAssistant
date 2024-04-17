@@ -424,6 +424,7 @@ namespace LoveOfCooking.Menu
 							w: 72,
 							colour: drawColour);
                     }
+                    ++i;
                 }
             }
             else
