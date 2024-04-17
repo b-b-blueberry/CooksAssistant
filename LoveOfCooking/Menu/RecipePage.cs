@@ -407,10 +407,15 @@ namespace LoveOfCooking.Menu
                             x: (int)(this._lineWidth - 16 * Scale * this._textScale.X),
                             y: (int)(textPosition.Y + 0.5f * Scale));
                         b.Draw(
-                            texture: Game1.mouseCursors,
-                            destinationRectangle: new Rectangle(this.ContentArea.X + position.X, position.Y, 22, 26),
-                            sourceRectangle: new Rectangle(268, 1436, 11, 13),
-                            color: Color.White);
+                            texture: CookingMenu.Texture,
+                            position: new(this.ContentArea.X + position.X, position.Y),
+                            sourceRectangle: InventoryBackpack1IconSource,
+							color: Color.White,
+                            rotation: 0,
+                            origin: Vector2.Zero,
+                            scale: 2,
+                            effects: SpriteEffects.None,
+                            layerDepth: 1);
 						this.DrawText(
 							b: b,
 							text: this.Menu.RecipeInfo.IngredientQuantitiesHeld[i].ToString(),

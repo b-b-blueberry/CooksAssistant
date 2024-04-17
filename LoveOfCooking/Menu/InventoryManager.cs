@@ -110,6 +110,17 @@ namespace LoveOfCooking.Menu
 			}
 		}
 
+		public Rectangle GetBackpackIconForPlayer(Farmer who)
+		{
+			return who.MaxItems switch
+			{
+				<= InventoryColumns * 1 => InventoryBackpack1IconSource,
+				<= InventoryColumns * 2 => InventoryBackpack2IconSource,
+				<= InventoryColumns * 3 => InventoryBackpack3IconSource,
+				_ => InventoryBackpack4IconSource
+			};
+		}
+
 		private void DrawInventorySlot(SpriteBatch b, int which, Vector2 position, float scale)
 		{
 			Rectangle destRect = new(
@@ -123,9 +134,7 @@ namespace LoveOfCooking.Menu
 				sourceRectangle: this.InventorySelectButtons[which].sourceRect,
 				color: Color.White,
 				rotation: 0f,
-				origin: new Vector2(
-					this.InventorySelectButtons[which].sourceRect.Width,
-					this.InventorySelectButtons[which].sourceRect.Height) / 2,
+				origin: this.InventorySelectButtons[which].sourceRect.Size.ToVector2() / 2,
 				effects: SpriteEffects.None,
 				layerDepth: 1f);
 			if (which >= this._inventoryIdsBeforeChests)
@@ -137,16 +146,10 @@ namespace LoveOfCooking.Menu
 					b.Draw(
 						texture: CookingMenu.Texture,
 						destinationRectangle: destRect,
-						sourceRectangle: new Rectangle(
-							this.InventorySelectButtons[which].sourceRect.X,
-							this.InventorySelectButtons[which].sourceRect.Y + this.InventorySelectButtons[which].sourceRect.Height,
-							this.InventorySelectButtons[which].sourceRect.Width,
-							this.InventorySelectButtons[which].sourceRect.Height),
+						sourceRectangle: this.InventorySelectButtons[which].sourceRect,
 						color: tintAndEnabled.Key,
 						rotation: 0f,
-						origin: new Vector2(
-							this.InventorySelectButtons[which].sourceRect.Width,
-							this.InventorySelectButtons[which].sourceRect.Height) / 2,
+						origin: this.InventorySelectButtons[which].sourceRect.Size.ToVector2() / 2,
 						effects: SpriteEffects.None,
 						layerDepth: 1f);
 				}
@@ -355,7 +358,8 @@ namespace LoveOfCooking.Menu
 
 			// Populate clickable inventories list
 			{
-				Rectangle sourceRect = InventoryBackpackIconSource;
+				// Use backpack icon based on player inventory capacity
+				Rectangle sourceRect = this.GetBackpackIconForPlayer(Game1.player);
 				Rectangle destRect = new(
 					x: -1,
 					y: -1,
@@ -376,7 +380,9 @@ namespace LoveOfCooking.Menu
 						? Utils.IsMinifridge(this._inventoryAndChestList[i].Chest)
 							? InventoryMinifridgeIconSource
 							: InventoryFridgeIconSource
-						: InventoryChestIconSource;
+						: this._chestColours[i].Value
+							? InventoryChestColourableIconSource
+							: InventoryChestIconSource;
 					this.InventorySelectButtons.Add(new(
 						name: $"inventorySelectContainer{i}",
 						bounds: destRect,
