@@ -9,7 +9,7 @@ namespace LoveOfCooking.Objects
 	public static class CookingTool
 	{
 		public static Texture2D Texture { get; set; }
-		public const string InternalName = ModEntry.AssetPrefix + "cookingtool"; // DO NOT EDIT
+		public const string InternalName = ModEntry.ObjectPrefix + "cookingtool"; // DO NOT EDIT
 		public const int DaysToUpgrade = 2;
 		public const int MaxUpgradeLevel = 4;
 		public const int MinIngredients = 1;
@@ -124,6 +124,11 @@ namespace LoveOfCooking.Objects
 		public static string WalletID(int level)
 		{
 			return $"{ModEntry.ObjectPrefix}cookingtool.level{level}";
+		}
+
+		public static string ToolID(int level)
+		{
+			return $"{CookingTool.InternalName}.level{level}";
 		}
 	}
 }

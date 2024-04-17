@@ -1,7 +1,7 @@
 {
-    "blueberry.LoveOfCooking.cookingtool.level0": {
+    "blueberry.LoveOfCooking_cookingtool.level0": {
         "ClassName": "GenericTool",
-        "Name": "blueberry.LoveOfCooking.cookingtool.level0",
+        "Name": "blueberry.LoveOfCooking_cookingtool.level0",
         "AttachmentSlots": -1,
         "SalePrice": -1,
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
@@ -18,9 +18,9 @@
         "ModData": null,
         "CustomFields": {}
     },
-    "blueberry.LoveOfCooking.cookingtool.level1": {
+    "blueberry.LoveOfCooking_cookingtool.level1": {
         "ClassName": "GenericTool",
-        "Name": "blueberry.LoveOfCooking.cookingtool.level1",
+        "Name": "blueberry.LoveOfCooking_cookingtool.level1",
         "AttachmentSlots": -1,
         "SalePrice": 1000,
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
@@ -45,9 +45,9 @@
         "ModData": null,
         "CustomFields": {}
     },
-    "blueberry.LoveOfCooking.cookingtool.level2": {
+    "blueberry.LoveOfCooking_cookingtool.level2": {
         "ClassName": "GenericTool",
-        "Name": "blueberry.LoveOfCooking.cookingtool.level2",
+        "Name": "blueberry.LoveOfCooking_cookingtool.level2",
         "AttachmentSlots": -1,
         "SalePrice": 2500,
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
@@ -72,9 +72,9 @@
         "ModData": null,
         "CustomFields": {}
     },
-    "blueberry.LoveOfCooking.cookingtool.level3": {
+    "blueberry.LoveOfCooking_cookingtool.level3": {
         "ClassName": "GenericTool",
-        "Name": "blueberry.LoveOfCooking.cookingtool.level3",
+        "Name": "blueberry.LoveOfCooking_cookingtool.level3",
         "AttachmentSlots": -1,
         "SalePrice": 5000,
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
@@ -99,9 +99,9 @@
         "ModData": null,
         "CustomFields": {}
     },
-    "blueberry.LoveOfCooking.cookingtool.level4": {
+    "blueberry.LoveOfCooking_cookingtool.level4": {
         "ClassName": "GenericTool",
-        "Name": "blueberry.LoveOfCooking.cookingtool.level4",
+        "Name": "blueberry.LoveOfCooking_cookingtool.level4",
         "AttachmentSlots": -1,
         "SalePrice": 12500,
         "DisplayName": "[LocalizedText Mods/blueberry.LoveOfCooking.Assets/Strings:menu.cooking_equipment.name]",
