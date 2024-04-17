@@ -121,23 +121,23 @@ namespace LoveOfCooking.Menu
 
 		public string GetInventoryTitle()
 		{
-			string key = null;
+			string text = null;
 			if (this._inventoryId >= this._inventoryIdsBeforeChests)
 			{
 				if (this._inventoryAndChestList[this._inventoryId - this._inventoryIdsBeforeChests].Chest is Chest chest)
 				{
-					key = Utils.IsMinifridge(chest)
-						? "menu.inventory.minifridge"
+					text = Utils.IsMinifridge(chest)
+						? I18n.Get("menu.inventory.minifridge")
 						: Utils.IsFridgeOrMinifridge(chest)
-							? "menu.inventory.fridge"
+							? I18n.Get("menu.inventory.fridge")
 							: chest.DisplayName;
 				}
 			}
 			else
 			{
-				key = "menu.inventory.backpack";
+				text = I18n.Get("menu.inventory.backpack");
 			}
-			return key is null ? string.Empty : I18n.Get(key);
+			return text;
 		}
 
 		public Rectangle GetBackpackIconForPlayer(Farmer who)
