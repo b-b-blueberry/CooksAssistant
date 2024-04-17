@@ -800,8 +800,9 @@ namespace LoveOfCooking.Menu
 		public override bool TryPop()
         {
             if (this.Menu.ReadyToCook)
-            {
-				this.OnReadyToCookChanged();
+			{
+				// Remove ingredients from slots
+				this.Menu.TryAutoFillIngredients(isClearedIfDisabled: true, forceTo: false);
                 return false;
             }
             return true;

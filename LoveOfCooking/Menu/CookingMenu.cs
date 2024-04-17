@@ -489,14 +489,14 @@ namespace LoveOfCooking.Menu
 			this.RecipeInfo.NumReadyToCraft = this.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Items, limitToCurrentIngredients: true);
         }
 
-        public void TryAutoFillIngredients(bool isClearedIfDisabled)
+        public void TryAutoFillIngredients(bool isClearedIfDisabled, bool? forceTo = null)
         {
-            if (ModEntry.Instance.States.Value.IsUsingAutofill || isClearedIfDisabled)
+            if (ModEntry.Instance.States.Value.IsUsingAutofill || isClearedIfDisabled || forceTo == false)
 			{
 				// Remove all items from ingredients slots
 				this.CookingManager.ClearCurrentIngredients();
 			}
-			if (ModEntry.Instance.States.Value.IsUsingAutofill)
+			if (ModEntry.Instance.States.Value.IsUsingAutofill && forceTo != false)
             {
                 // Don't fill slots if the player can't cook the recipe
                 if (this._stack.Any() && this.RecipeInfo is not null && this.RecipeInfo.Index >= 0 && this.Recipes.Count >= this.RecipeInfo.Index - 1)
