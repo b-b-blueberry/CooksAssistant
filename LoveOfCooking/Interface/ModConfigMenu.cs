@@ -1228,6 +1228,13 @@ namespace LoveOfCooking.Interface
 					getValue: () => ModEntry.Config.DefaultSearchFilter,
 					setValue: (string value) => ModEntry.Config.DefaultSearchFilter = value,
 					allowedValues: Enum.GetNames(typeof(CookingMenu.Filter)));
+				gmcm.AddTextOption(
+					mod: mod,
+					name: () => I18n.Get("config.option.defaultsearchsorter_name"),
+					tooltip: () => I18n.Get("config.option.defaultsearchsorter_description"),
+					getValue: () => ModEntry.Config.DefaultSearchSorter,
+					setValue: (string value) => ModEntry.Config.DefaultSearchSorter = value,
+					allowedValues: Enum.GetNames(typeof(CookingMenu.Sorter)));
 				gmcm.AddBoolOption(
 					mod: mod,
 					name: () => I18n.Get("config.option.resizekoreanfonts_name"),

@@ -52,8 +52,9 @@ namespace LoveOfCooking
 			public List<string> FavouriteRecipes = new();
 
 			// Cooking Menu
-			public CookingMenu.Filter LastFilterThisSession;
-			public bool LastFilterReversed;
+			public CookingMenu.Filter LastRecipeFilterThisSession;
+			public CookingMenu.Sorter LastRecipeSorterThisSession;
+			public bool IsLastRecipeSearchReversed;
 			public CookbookAnimation CookbookAnimation = new();
 			public MultipleMutexRequest MenuMutex;
 
@@ -92,8 +93,9 @@ namespace LoveOfCooking
 				this.FavouriteRecipes.Clear();
 
 				// Cooking Menu
-				this.LastFilterThisSession = CookingMenu.Filter.None;
-				this.LastFilterReversed = false;
+				this.LastRecipeFilterThisSession = CookingMenu.Filter.None;
+				this.LastRecipeSorterThisSession = CookingMenu.Sorter.Name;
+				this.IsLastRecipeSearchReversed = false;
 				this.CookbookAnimation.Reset();
 				this.MenuMutex?.ReleaseLocks();
 
@@ -841,6 +843,7 @@ namespace LoveOfCooking
 					  + $"{Environment.NewLine}Show Healing Bar:     {Config.ShowFoodRegenBar}"
 					  + $"{Environment.NewLine}Remember Filter:      {Config.RememberSearchFilter}"
 					  + $"{Environment.NewLine}Default Filter:       {Config.DefaultSearchFilter}"
+					  + $"{Environment.NewLine}Default Sorter:       {Config.DefaultSearchSorter}"
 					  + $"{Environment.NewLine}-------------"
 					  + $"{Environment.NewLine}Debugging:      {Config.DebugMode}"
 					  + $"{Environment.NewLine}Resize Korean:  {Config.ResizeKoreanFonts}{Environment.NewLine}",

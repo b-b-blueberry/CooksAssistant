@@ -32,12 +32,10 @@ namespace LoveOfCooking.Menu
         private const int GridColumns = 4;
         private const int ListItemHeight = 16 * Scale;
         private const int GridItemHeight = 18 * Scale;
-        private const int FilterBarSideSourceWidth = 4;
+        private const int FilterBarSideSourceWidth = 6;
         private int _searchBarTextBoxMaxWidth;
         private int _searchBarTextBoxMinWidth;
-        private int _filterBarMiddleSourceWidth;
         private int _resultHeight;
-        private bool IsLastRowHidden => this._isFilterBarVisible;
         private string SearchBarDefaultText => I18n.Get("menu.cooking_recipe.search_label");
 
 		// Search feature
@@ -53,7 +51,7 @@ namespace LoveOfCooking.Menu
 		private Rectangle _searchArea;
 		public TextBox SearchBarTextBox { get; private set; }
 		public ClickableComponent SearchBarClickable { get; private set; }
-		public ClickableTextureComponent ToggleOrderButton { get; private set; }
+		public ClickableTextureComponent ToggleSorterButton { get; private set; }
 		public ClickableTextureComponent ToggleFilterButton { get; private set; }
 		public ClickableTextureComponent ToggleViewButton { get; private set; }
 		public ClickableTextureComponent SearchButton { get; private set; }
@@ -62,13 +60,16 @@ namespace LoveOfCooking.Menu
 		public List<ClickableComponent> ResultsListClickables { get; private set; } = new();
 		public List<ClickableComponent> ResultsGridClickables { get; private set; } = new();
 		public List<ClickableTextureComponent> FilterButtons { get; private set; } = new();
+		public List<ClickableTextureComponent> SorterButtons { get; private set; } = new();
 		public List<ClickableTextureComponent> ToggleButtons { get; private set; } = new();
 
         // Filters
         private bool _isFilterBarVisible;
-        private Filter _lastFilterUsed;
+        private bool _isSorterBarVisible;
+		private Filter _lastFilterUsed;
+        private Sorter _lastSorterUsed;
 
-        public SearchPage(CookingMenu menu, List<CraftingRecipe> values) : base(menu: menu)
+		public SearchPage(CookingMenu menu, List<CraftingRecipe> values) : base(menu: menu)
         {
 			this.IsLeftSide = true;
 			this._unfilteredResults = values;
@@ -77,19 +78,22 @@ namespace LoveOfCooking.Menu
         public void FirstTimeSetup()
 		{
 			// Apply filters
-			if (Instance.States.Value.LastFilterThisSession is not Filter.None)
+			if (Instance.States.Value.LastRecipeFilterThisSession is not Filter.None || Instance.States.Value.LastRecipeSorterThisSession is not Sorter.Name)
 			{
-				// Apply previously-used filter
-				this.FilterRecipes(Instance.States.Value.LastFilterThisSession);
+				// Apply previously-used filter and sorter
+				this.FilterRecipes(
+                    filter: Instance.States.Value.LastRecipeFilterThisSession,
+                    sorter: Instance.States.Value.LastRecipeSorterThisSession);
 			}
 			else
 			{
-				// Apply default filter if no other filter was used this session
-				this.FilterRecipes((Filter)Enum.Parse(typeof(Filter), ModEntry.Config.DefaultSearchFilter));
+                // Apply defaults if no others were used this session
+				this.FilterRecipes(
+					filter: (Filter)(Enum.TryParse(typeof(Filter), ModEntry.Config.DefaultSearchFilter, false, out object filter) ? filter : Filter.None),
+					sorter: (Sorter)(Enum.TryParse(typeof(Sorter), ModEntry.Config.DefaultSearchSorter, false, out object sorter) ? sorter : Sorter.Name));
 			}
-			if (Instance.States.Value.LastFilterReversed)
+			if (Instance.States.Value.IsLastRecipeSearchReversed)
 			{
-				// Reverse the filter if required
 				this.ReverseSearchResults();
 			}
 			this.UpdateSearchRecipes();
@@ -175,7 +179,7 @@ namespace LoveOfCooking.Menu
 
         public void ReverseSearchResults()
         {
-            Instance.States.Value.LastFilterReversed = !Instance.States.Value.LastFilterReversed;
+            Instance.States.Value.IsLastRecipeSearchReversed = !Instance.States.Value.IsLastRecipeSearchReversed;
 			this._filteredResults.Reverse();
 			this._resultsIndex = this._visibleResults.Count / 2;
         }
@@ -201,46 +205,55 @@ namespace LoveOfCooking.Menu
 				this._visibleResults.Add(null);
         }
 
-        public void FilterRecipes(Filter which = Filter.Alphabetical, string substr = null)
+        public void FilterRecipes(Filter filter = Filter.None, Sorter sorter = Sorter.Name, string substr = null)
         {
             bool isReversedToStart = false;
-            Instance.States.Value.LastFilterReversed = false;
-            Func<CraftingRecipe, object> order = recipe => recipe.DisplayName;
-            Func<CraftingRecipe, bool> filter = recipe => true;
-			switch (which)
+            Instance.States.Value.IsLastRecipeSearchReversed = false;
+            Func<CraftingRecipe, object> sorterFunc = recipe => recipe.DisplayName;
+            Func<CraftingRecipe, bool> filterFunc = recipe => true;
+			switch (sorter)
+			{
+				case Sorter.Name:
+					sorterFunc = recipe => recipe.DisplayName;
+					isReversedToStart = false;
+					break;
+				case Sorter.Healing:
+					sorterFunc = recipe => recipe.createItem().staminaRecoveredOnConsumption();
+					isReversedToStart = true;
+					break;
+				case Sorter.Price:
+					sorterFunc = recipe => recipe.createItem().salePrice();
+					isReversedToStart = true;
+					break;
+				default:
+					break;
+			}
+			switch (filter)
             {
-                case Filter.Energy:
-                    order = recipe => recipe.createItem().staminaRecoveredOnConsumption();
-                    isReversedToStart = true;
-                    break;
-                case Filter.Gold:
-                    order = recipe => recipe.createItem().salePrice();
-                    isReversedToStart = true;
-                    break;
                 case Filter.Buffs:
-                    filter = recipe =>
+                    filterFunc = recipe =>
                         (!ModEntry.Config.FoodBuffsStartHidden
                         || Instance.States.Value.FoodsEaten.Contains(recipe.name))
 						&& Utils.GetFirstVisibleBuffOnItem(item: recipe.createItem()) is not null;
                     break;
                 case Filter.New:
-                    filter = recipe => !Game1.player.recipesCooked.ContainsKey(recipe.createItem().ItemId);
+                    filterFunc = recipe => !Game1.player.recipesCooked.ContainsKey(recipe.createItem().ItemId);
                     break;
                 case Filter.Ready:
-                    filter = recipe => recipe.recipeList.Count <= this.Menu.CookingManager.MaxIngredients
+                    filterFunc = recipe => recipe.recipeList.Count <= this.Menu.CookingManager.MaxIngredients
                         && 0 < this.Menu.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Menu.Items, limitToCurrentIngredients: false);
                     break;
                 case Filter.Favourite:
-                    filter = recipe => Instance.States.Value.FavouriteRecipes.Contains(recipe.name);
+                    filterFunc = recipe => Instance.States.Value.FavouriteRecipes.Contains(recipe.name);
                     break;
                 default:
                     break;
             }
 
             List<CraftingRecipe> recipes = (isReversedToStart
-                ? this._unfilteredResults.OrderByDescending(order)
-                : this._unfilteredResults.OrderBy(order))
-				.Where(filter)
+                    ? this._unfilteredResults.OrderByDescending(sorterFunc)
+                    : this._unfilteredResults.OrderBy(sorterFunc))
+				.Where(filterFunc)
 				.ToList();
 
             if (!string.IsNullOrEmpty(substr) && substr != this.SearchBarDefaultText)
@@ -260,14 +273,28 @@ namespace LoveOfCooking.Menu
 				this._resultsIndex = this._visibleResults.Count / 2;
             }
 
-			this._lastFilterUsed = which;
+			if (this.ToggleFilterButton is not null)
+			{
+				this.ToggleFilterButton.hoverText = $"{I18n.Get("menu.cooking_search.filter_label")}\n{I18n.Get($"menu.cooking_search.filter.{(int)filter}")}";
+			}
+			if (this.ToggleSorterButton is not null)
+			{
+				this.ToggleSorterButton.hoverText = $"{I18n.Get("menu.cooking_search.sorter_label")}\n{I18n.Get($"menu.cooking_search.sorter.{(int)sorter}")}";
+			}
 
-            // Change toggle filter button icon
-            if (this.ToggleFilterButton is not null)
-				this.ToggleFilterButton.sourceRect.X = this._lastFilterUsed == Filter.None ? ToggleFilterButtonSource.X : ToggleFilterButtonSource.X - ToggleFilterButtonSource.Width;
-
+			this._lastFilterUsed = filter;
+			this._lastSorterUsed = sorter;
 			this._filteredResults = recipes;
         }
+
+        public void UpdateViewButton()
+        {
+            // Show grid view style when grid view enabled, and vice versa
+			this.ToggleViewButton.sourceRect = this.IsGridView ? TileButtonGridSource : TileButtonListSource;
+			this.ToggleViewButton.hoverText = this.IsGridView
+				? $"{I18n.Get("menu.cooking_search.view_label")}\n{I18n.Get($"menu.cooking_search.view.grid")}"
+				: $"{I18n.Get("menu.cooking_search.view_label")}\n{I18n.Get($"menu.cooking_search.view.list")}";
+		}
 
         public void ToggleFilterPopup(bool playSound, bool? forceToggleTo = null)
         {
@@ -275,6 +302,8 @@ namespace LoveOfCooking.Menu
                 return;
 
 			this._isFilterBarVisible = forceToggleTo ?? !this._isFilterBarVisible;
+            if (!this._isFilterBarVisible)
+                this._isSorterBarVisible = false;
             if (playSound)
                 Game1.playSound(PageChangeCue);
 
@@ -282,7 +311,12 @@ namespace LoveOfCooking.Menu
 
             if (Game1.options.SnappyMenus)
             {
-				this.Menu.setCurrentlySnappedComponentTo(this._isFilterBarVisible ? this.FilterButtons.First().myID : this.ToggleFilterButton.myID);
+                var button = this._isFilterBarVisible
+                    ? this.FilterButtons.First()
+                    : this._isSorterBarVisible
+                        ? this.SorterButtons.First()
+                        : this.ToggleFilterButton;
+				this.Menu.setCurrentlySnappedComponentTo(button.myID);
             }
         }
 
@@ -306,7 +340,10 @@ namespace LoveOfCooking.Menu
             // Update search results
             if (updateResults)
             {
-				this.FilterRecipes(which: this._lastFilterUsed, substr: this.SearchBarTextBox.Text);
+				this.FilterRecipes(
+					filter: this._lastFilterUsed,
+					sorter: this._lastSorterUsed,
+					substr: this.SearchBarTextBox.Text);
 				this.UpdateSearchRecipes();
             }
         }
@@ -372,61 +409,74 @@ namespace LoveOfCooking.Menu
 			// Search button
 			this.SearchButton = new(
                 name: "search",
-                bounds: new(-1, -1, SearchButtonSource.Width * SmallScale, SearchButtonSource.Height * SmallScale),
+                bounds: new(-1, -1, TileButtonSearchSource.Width * SmallScale, TileButtonSearchSource.Height * SmallScale),
                 label: null,
                 hoverText: this.SearchBarDefaultText,
                 texture: CookingMenu.Texture,
-                sourceRect: SearchButtonSource,
+                sourceRect: TileButtonSearchSource,
                 scale: SmallScale,
                 drawShadow: true);
 
 			// Filter buttons
 			this.ToggleFilterButton = new(
                 name: "toggleFilter",
-                bounds: new(-1, -1, ToggleFilterButtonSource.Width * SmallScale, ToggleFilterButtonSource.Height * SmallScale),
+                bounds: new(-1, -1, TileButtonBlankSource.Width * SmallScale, TileButtonBlankSource.Height * SmallScale),
                 label: null,
                 hoverText: I18n.Get("menu.cooking_search.filter_label"),
                 texture: CookingMenu.Texture,
-                sourceRect: ToggleFilterButtonSource,
+                sourceRect: TileButtonBlankSource,
                 scale: SmallScale,
                 drawShadow: true);
-			this.ToggleOrderButton = new(
-                name: "toggleOrder",
-                bounds: new(-1, -1, ToggleOrderButtonSource.Width * SmallScale, ToggleOrderButtonSource.Height * SmallScale),
+			this.ToggleSorterButton = new(
+                name: "toggleSorter",
+                bounds: new(-1, -1, TileButtonBlankSource.Width * SmallScale, TileButtonBlankSource.Height * SmallScale),
                 label: null,
-                hoverText: I18n.Get("menu.cooking_search.order_label"),
+                hoverText: I18n.Get("menu.cooking_search.sorter_label"),
                 texture: CookingMenu.Texture,
-                sourceRect: ToggleOrderButtonSource,
+                sourceRect: TileButtonBlankSource,
                 scale: SmallScale,
                 drawShadow: true);
 			this.ToggleViewButton = new(
                 name: "toggleView",
-                bounds: new(-1, -1, ToggleViewButtonSource.Width * SmallScale, ToggleViewButtonSource.Height * SmallScale),
+                bounds: new(-1, -1, TileButtonListSource.Width * SmallScale, TileButtonListSource.Height * SmallScale),
                 label: null,
-                hoverText: I18n.Get("menu.cooking_search.view." + (this.IsGridView ? "grid" : "list")),
+                hoverText: null,
                 texture: CookingMenu.Texture,
-                sourceRect: ToggleViewButtonSource,
+                sourceRect: TileButtonListSource,
                 scale: SmallScale,
                 drawShadow: true);
-            for (int i = (int)Filter.Alphabetical; i < Enum.GetNames(typeof(Filter)).Length; ++i)
-            {
+			for (int i = 0; i < Enum.GetNames(typeof(Filter)).Length; ++i)
+			{
 				this.FilterButtons.Add(new(
-                    name: $"filter{i}",
-                    bounds: new(-1, -1, FilterIconSource.Width * SmallScale, FilterIconSource.Height * SmallScale),
-                    label: null,
-                    hoverText: I18n.Get($"menu.cooking_search.filter.{i}" + (ModEntry.Config.FoodBuffsStartHidden && i == 4 ? "_alt" : "")),
-                    texture: CookingMenu.Texture,
-                    sourceRect: new(
-                        FilterIconSource.X + (i - 1) * FilterIconSource.Width, FilterIconSource.Y,
-                        FilterIconSource.Width, FilterIconSource.Height),
-                    scale: SmallScale));
-            }
+					name: $"filter{i}",
+					bounds: new(-1, -1, FilterIconSource.Width * SmallScale, FilterIconSource.Height * SmallScale),
+					label: null,
+					hoverText: I18n.Get($"menu.cooking_search.filter.{i}"),
+					texture: CookingMenu.Texture,
+					sourceRect: new(
+						FilterIconSource.X + i * FilterIconSource.Width, FilterIconSource.Y,
+						FilterIconSource.Width, FilterIconSource.Height),
+					scale: SmallScale));
+			}
+			for (int i = 0; i < Enum.GetNames(typeof(Sorter)).Length; ++i)
+			{
+				this.SorterButtons.Add(new(
+					name: $"sorter{i}",
+					bounds: new(-1, -1, SorterIconSource.Width * SmallScale, SorterIconSource.Height * SmallScale),
+					label: null,
+					hoverText: I18n.Get($"menu.cooking_search.sorter.{i}"),
+					texture: CookingMenu.Texture,
+					sourceRect: new(
+						SorterIconSource.X + i * SorterIconSource.Width, SorterIconSource.Y,
+						SorterIconSource.Width, SorterIconSource.Height),
+					scale: SmallScale));
+			}
 
 			// Toggle buttons
 			this.ToggleButtons.AddRange(new[]
             {
 				this.ToggleFilterButton,
-				this.ToggleOrderButton,
+				this.ToggleSorterButton,
 				this.ToggleViewButton
             });
 
@@ -454,7 +504,8 @@ namespace LoveOfCooking.Menu
 
             components.AddRange(this.ToggleButtons);
             components.AddRange(this.FilterButtons);
-            components.AddRange(this.ResultsListClickables);
+            components.AddRange(this.SorterButtons);
+			components.AddRange(this.ResultsListClickables);
             components.AddRange(this.ResultsGridClickables);
 
             return components;
@@ -466,17 +517,26 @@ namespace LoveOfCooking.Menu
 			this.UpButton.upNeighborID = this.ToggleButtons.Last().myID;
 			this.DownButton.downNeighborID = 0;
 
-            // Filter buttons
-            for (int i = 0; i < this.FilterButtons.Count; ++i)
-            {
-                if (i > 0)
+			// Filter buttons
+			for (int i = 0; i < this.FilterButtons.Count; ++i)
+			{
+				if (i > 0)
 					this.FilterButtons[i].leftNeighborID = this.FilterButtons[i - 1].myID;
-                if (i < this.FilterButtons.Count - 1)
+				if (i < this.FilterButtons.Count - 1)
 					this.FilterButtons[i].rightNeighborID = this.FilterButtons[i + 1].myID;
-            }
+			}
 
-            // Search results
-            for (int i = 0; i < this.ResultsListClickables.Count; ++i)
+			// Sorter buttons
+			for (int i = 0; i < this.SorterButtons.Count; ++i)
+			{
+				if (i > 0)
+					this.SorterButtons[i].leftNeighborID = this.SorterButtons[i - 1].myID;
+				if (i < this.SorterButtons.Count - 1)
+					this.SorterButtons[i].rightNeighborID = this.SorterButtons[i + 1].myID;
+			}
+
+			// Search results
+			for (int i = 0; i < this.ResultsListClickables.Count; ++i)
             {
                 if (i > 0)
 					this.ResultsListClickables[i].upNeighborID = this.ResultsListClickables[i - 1].myID;
@@ -528,14 +588,15 @@ namespace LoveOfCooking.Menu
                 if (i > 0)
 					this.ToggleButtons[i].bounds.X = this.ToggleButtons[i - 1].bounds.X + this.ToggleButtons[i - 1].bounds.Width + extraOffset;
             }
-			// contextual icons
-			this.ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (this.IsGridView
-                ? ToggleViewButtonSource.Width
-                : 0);
 
+			// contextual icons
+            // view button
+			this.UpdateViewButton();
+            // search button
 			this.SearchButton.bounds = this.ToggleButtons.Last().bounds;
 			this._searchBarTextBoxMaxWidth = this.SearchButton.bounds.X - this.SearchBarTextBox.X - 6 * Scale;
 
+            // back to the search bar
 			int minWidth = 48 * Scale;
 			this._searchBarTextBoxMinWidth = Math.Min(this.ToggleButtons.First().bounds.X - this._searchArea.X,
                 Math.Max(minWidth, 6 * Scale + (int)Math.Ceiling(Game1.smallFont.MeasureString(this.SearchBarTextBox.Text).X)));
@@ -543,34 +604,39 @@ namespace LoveOfCooking.Menu
 			this.SearchBarClickable.bounds = this._searchArea;
 			this._searchArea.Width = this.SearchBarTextBox.Width;
 
+            // navigation buttons
 			this.UpButton.bounds.X = this.DownButton.bounds.X = this.SearchButton.bounds.X + 1 * Scale;
 			this.UpButton.bounds.Y = this.SearchButton.bounds.Y + this.SearchButton.bounds.Height + 4 * Scale;
 			this.DownButton.bounds.Y = this.ContentArea.Bottom - 32 * Scale;
 
+			// Filter and sorter buttons
 			{
-				float buttonScale = this.FilterButtons.First().baseScale;
-                offset.Y = 7 * Scale;
-
-                for (int i = 0; i < this.FilterButtons.Count; ++i)
-                {
-					this.FilterButtons[i].bounds.Y = this.ToggleFilterButton.bounds.Y + this.ToggleFilterButton.bounds.Height + offset.Y;
-
-					// Aligned to right-side:
-					//_filterButtons[i].bounds.X = _cookbookRightRect.X - xOffset - ((_filterButtons.Count - i) * _filterButtons[i].bounds.Width);
-					// Aligned to left-side:
-					this.FilterButtons[i].bounds.X = (int)(this._searchArea.X + 7 * buttonScale + i * this.FilterButtons[i].bounds.Width);
-                }
-
-                Rectangle bounds = this.FilterButtons.First().bounds;
-				this._filterBarMiddleSourceWidth = this.FilterButtons.Count * FilterIconSource.Width;
 				this._filterArea = new(
-					//(int)(bounds.X - (FilterContainerSideWidth * buttonScale) - (1 * buttonScale)),
-					x: (int)(bounds.X - FilterBarSideSourceWidth * buttonScale - 1 * buttonScale),
-					y: (int)(bounds.Y - (FilterContainerSource.Height * buttonScale - FilterIconSource.Height * buttonScale) / 2),
-					width: (int)(FilterBarSideSourceWidth * 2 * buttonScale + this._filterBarMiddleSourceWidth * buttonScale),
-					height: (int)(FilterContainerSource.Height * buttonScale));
+                    x: this._searchArea.Left,
+                    y: this.ToggleFilterButton.bounds.Top + (this.ToggleFilterButton.bounds.Height - FilterContainerSource.Height * SmallScale) / 2,
+                    width: this._searchArea.Width,
+                    height: FilterContainerSource.Height * SmallScale);
 
-				int y = this._filterArea.Y + (this._isFilterBarVisible ? this._filterArea.Height + 3 * Scale : 0);
+				offset.Y = 2 * Scale;
+
+                int width = this.FilterButtons.Sum(b => b.bounds.Width);
+                int x = (this._filterArea.Width - width) / 2;
+				for (int i = 0; i < this.FilterButtons.Count; ++i)
+				{
+					this.FilterButtons[i].bounds.X = this._filterArea.Left + x;
+					this.FilterButtons[i].bounds.Y = this._filterArea.Top + offset.Y;
+					x += this.FilterButtons[i].bounds.Width;
+				}
+                width = this.SorterButtons.Sum(b => b.bounds.Width);
+				x = (this._filterArea.Width - width) / 2;
+				for (int i = 0; i < this.SorterButtons.Count; ++i)
+				{
+					this.SorterButtons[i].bounds.X = this._filterArea.Left + x;
+					this.SorterButtons[i].bounds.Y = this._filterArea.Top + offset.Y;
+					x += this.SorterButtons[i].bounds.Width;
+				}
+
+				int y = this._searchArea.Bottom;
 				this._resultsArea = new(
 					x: this.SearchBarTextBox.X,
 					y: y,
@@ -613,8 +679,6 @@ namespace LoveOfCooking.Menu
                     clickable.bounds.Height = this.ResultsListClickables[this.ResultsListClickables.Count - 1].bounds.Y
                         - this.ResultsListClickables[this.ResultsListClickables.Count - 2].bounds.Y;
                 }
-
-				this.ResultsListClickables.Last().visible = !this.IsLastRowHidden;
             }
         }
 
@@ -640,7 +704,10 @@ namespace LoveOfCooking.Menu
 						this.CloseTextBox(isCancelled: true);
                         break;
                     default:
-						this.FilterRecipes(which: this._lastFilterUsed, substr: this.SearchBarTextBox.Text);
+						this.FilterRecipes(
+							filter: this._lastFilterUsed,
+							sorter: this._lastSorterUsed,
+							substr: this.SearchBarTextBox.Text);
                         break;
                 }
             }
@@ -670,98 +737,119 @@ namespace LoveOfCooking.Menu
 
         public override void OnPrimaryClick(int x, int y, bool playSound = true)
         {
-			// Search result clicks
 			int index = this.TryGetIndexForSearchResult(x: x, y: y);
             bool clickedSearchResult = index >= 0
                 && index < this._visibleResults.Count
                 && this._visibleResults[index] is not null
                 && this._visibleResults[index].name != InvalidRecipeName;
             if (clickedSearchResult)
-            {
+			{
+				// Search results clicked
 				this.Menu.ClickedSearchResult(recipeName: this._visibleResults[index].name);
             }
-
-            // Navigation buttons
-            if (this.UpButton.containsPoint(x, y))
-            {
-				this.TryClickNavButton(isDownwards: false, playSound: playSound);
-            }
-            else if (this.DownButton.containsPoint(x, y))
-            {
-				this.TryClickNavButton(isDownwards: true, playSound: playSound);
-            }
-
-            // Search text box
-            if (this._searchArea.Contains(x, y))
-            {
-				this.SearchBarTextBox.Text = "";
-                Game1.keyboardDispatcher.Subscriber = this.SearchBarTextBox;
-				this.SearchBarTextBox.SelectMe();
-				this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
-            }
-            else if (this.SearchBarTextBox.Selected)
-            {
-                if (this.SearchButton.containsPoint(x, y))
-                {
-                    Game1.playSound(ClickCue);
-					this.SearchBarTextBox.Text = this.SearchBarTextBox.Text.Trim();
-                }
-                if (string.IsNullOrEmpty(this.SearchBarTextBox.Text))
-                {
-					this.SearchBarTextBox.Text = this.SearchBarDefaultText;
-                }
-				this.CloseTextBox(isCancelled: false, updateResults: !clickedSearchResult);
-            }
-            else
-            {
+			else if (this._filterArea.Contains(x, y) && this._isFilterBarVisible)
+			{
                 // Search filter buttons
-                if (this._isFilterBarVisible)
-                {
-                    ClickableTextureComponent clickable = this.FilterButtons.FirstOrDefault(c => c.containsPoint(x, y));
-                    if (clickable is not null)
+				var buttons = this._isSorterBarVisible ? this.SorterButtons : this.FilterButtons;
+				ClickableTextureComponent clickable = buttons.FirstOrDefault(c => c.containsPoint(x, y));
+                if (clickable is not null)
+				{
+					Game1.playSound(ClickCue);
+					int which = int.Parse(clickable.name[^1].ToString());
+                    if (this._isSorterBarVisible && (Sorter)which == this._lastSorterUsed)
                     {
-						Filter which = (Filter)int.Parse(clickable.name[^1].ToString());
-                        if (which == this._lastFilterUsed)
-                        {
-							this.ReverseSearchResults();
-                        }
-                        else
-                        {
-							this.FilterRecipes(which: which, substr: this.SearchBarTextBox.Text);
-                        }
-                        Game1.playSound(ClickCue);
-                        if (ModEntry.Config.RememberSearchFilter)
-                        {
-                            Instance.States.Value.LastFilterThisSession = which;
-                        }
+						this.ReverseSearchResults();
                     }
-                }
-
-                // Search filter toggles
-                if (this.ToggleFilterButton.containsPoint(x, y))
-                {
-					this.ToggleFilterPopup(playSound);
-                }
-                // Search results order reverse button
-                else if (this.ToggleOrderButton.containsPoint(x, y))
-                {
-					this.ReverseSearchResults();
-                    Game1.playSound(PageChangeCue);
-                }
-                // Search results grid/list view button
-                else if (this.ToggleViewButton.containsPoint(x, y))
-                {
-					this.ToggleViewButton.sourceRect.X = ToggleViewButtonSource.X + (this.IsGridView ? 0 : ToggleViewButtonSource.Width);
-
+                    else
+                    {
+						this.FilterRecipes(
+							filter: this._isSorterBarVisible ? this._lastFilterUsed : (Filter)which,
+							sorter: this._isSorterBarVisible ? (Sorter)which : this._lastSorterUsed,
+							substr: this.SearchBarTextBox.Text);
+                    }
+                    if (ModEntry.Config.RememberSearchFilter)
+                    {
+                        Instance.States.Value.LastRecipeFilterThisSession = this._lastFilterUsed;
+                        Instance.States.Value.LastRecipeSorterThisSession = this._lastSorterUsed;
+					}
+				}
+			}
+            else if (this._searchArea.Contains(x, y))
+			{
+				if (!this.SearchBarTextBox.Selected)
+				{
+					// Search text box activated
+					this.SearchBarTextBox.Text = "";
+					Game1.keyboardDispatcher.Subscriber = this.SearchBarTextBox;
+					this.SearchBarTextBox.SelectMe();
+					this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
+				}
+				else
+				{
+					if (this.SearchButton.containsPoint(x, y))
+					{
+						// Search confirmed
+						Game1.playSound(ClickCue);
+						this.SearchBarTextBox.Text = this.SearchBarTextBox.Text.Trim();
+					}
+					if (string.IsNullOrEmpty(this.SearchBarTextBox.Text))
+					{
+						// Search deselected
+						this.SearchBarTextBox.Text = this.SearchBarDefaultText;
+					}
+					this.CloseTextBox(isCancelled: false, updateResults: !clickedSearchResult);
+				}
+			}
+            else
+			{
+				if (this.UpButton.containsPoint(x, y))
+				{
+					// Navigation buttons
+					this.TryClickNavButton(isDownwards: false, playSound: playSound);
+				}
+				else if (this.DownButton.containsPoint(x, y))
+				{
+					// Navigation buttons
+					this.TryClickNavButton(isDownwards: true, playSound: playSound);
+				}
+				else if (this.ToggleFilterButton.containsPoint(x, y))
+				{
+					// Search filter toggles
+					if (playSound)
+						Game1.playSound(PageChangeCue);
+					if (!this._isSorterBarVisible || !this._isFilterBarVisible)
+					{
+						this.ToggleFilterPopup(playSound: false);
+					}
+                    if (this._isFilterBarVisible)
+                    {
+    					this._isSorterBarVisible = false;
+                    }
+				}
+				else if (this.ToggleSorterButton.containsPoint(x, y))
+				{
+					// Search results order reverse button
+					if (playSound)
+						Game1.playSound(PageChangeCue);
+					if (this._isSorterBarVisible == this._isFilterBarVisible)
+					{
+						this.ToggleFilterPopup(playSound: false);
+					}
+					if (this._isFilterBarVisible)
+					{
+						this._isSorterBarVisible = true;
+					}
+				}
+				else if (this.ToggleViewButton.containsPoint(x, y))
+				{
+					// Search results grid/list view button
 					this.IsGridView = !this.IsGridView;
-
 					this.ClampSearchIndex();
-
-                    Game1.playSound(PageChangeCue);
-					this.ToggleViewButton.hoverText = I18n.Get($"menu.cooking_search.view.{(this.IsGridView ? "grid" : "list")}");
-                }
-            }
-        }
+					this.UpdateViewButton();
+					Game1.playSound(PageChangeCue);
+				}
+			}
+		}
 
         public override void OnPrimaryClickHeld(int x, int y, bool playSound = true)
         {
@@ -813,17 +901,20 @@ namespace LoveOfCooking.Menu
                         hoverText = clickable.hoverText;
                 }
 
-                // Search filter buttons
-                if (this._isFilterBarVisible)
-                {
-                    foreach (ClickableTextureComponent clickable in this.FilterButtons)
-                    {
-                        clickable.tryHover(x, y, 0.4f);
-                        if (clickable.containsPoint(x, y))
-                            hoverText = clickable.hoverText;
-                    }
-                }
-            }
+				// Search filter buttons
+				if (this._isFilterBarVisible)
+				{
+                    // Search sorter buttons
+                    var buttons = this._isSorterBarVisible ? this.SorterButtons : this.FilterButtons;
+					foreach (ClickableTextureComponent clickable in buttons)
+					{
+						clickable.tryHover(x, y, 0.4f);
+						if (clickable.containsPoint(x, y))
+							hoverText = clickable.hoverText;
+					}
+				}
+
+			}
 
             if (this.IsGridView)
             {
@@ -914,100 +1005,130 @@ namespace LoveOfCooking.Menu
             }
 
 			// Search bar
-			this.SearchBarTextBox.Draw(b);
-            if (this.SearchBarTextBox.Selected)
-            {
-				this.SearchButton.draw(b);
-                return;
-            }
+            if (!this._isFilterBarVisible && !this._isSorterBarVisible)
+			{
+				this.SearchBarTextBox.Draw(b);
+				if (this.SearchBarTextBox.Selected)
+				{
+					this.SearchButton.draw(b);
+					return;
+				}
+			}
 
-            // Search filter toggles
+            // Search filter buttons
             foreach (ClickableTextureComponent clickable in this.ToggleButtons)
 			{
 				if (this.SearchBarTextBox.X + this.SearchBarTextBox.Width < clickable.bounds.X)
+				{
 					clickable.draw(b);
+                    if (clickable.myID == this.ToggleFilterButton.myID)
+					{
+						// Filter button icon
+						Rectangle source = FilterIconSource;
+						Vector2 origin = source.Size.ToVector2() / 2;
+						b.Draw(
+							texture: CookingMenu.Texture,
+							destinationRectangle: new(
+								x: (int)(clickable.bounds.X + (clickable.sourceRect.Width - source.Width) * clickable.baseScale / 2 + origin.X * clickable.scale),
+								y: (int)(clickable.bounds.Y + (clickable.sourceRect.Height - source.Height) * clickable.baseScale / 2 + origin.Y * clickable.scale),
+								width: (int)(source.Width * clickable.scale),
+								height: (int)(source.Height * clickable.scale)),
+							sourceRectangle: this.FilterButtons[(int)this._lastFilterUsed].sourceRect,
+							color: Color.White,
+							rotation: 0f,
+							origin: origin,
+							effects: SpriteEffects.None,
+							layerDepth: 1f);
+					}
+                    else if (clickable.myID == this.ToggleSorterButton.myID)
+					{
+						// Sort button icon
+						Rectangle source = SorterIconSource;
+						Vector2 origin = source.Size.ToVector2() / 2;
+						b.Draw(
+							texture: CookingMenu.Texture,
+							destinationRectangle: new(
+								x: (int)(clickable.bounds.X + (clickable.sourceRect.Width - source.Width) * clickable.baseScale / 2 + origin.X * clickable.scale),
+								y: (int)(clickable.bounds.Y + (clickable.sourceRect.Height - source.Height) * clickable.baseScale / 2 + origin.Y * clickable.scale),
+								width: (int)(source.Width * clickable.scale),
+								height: (int)(source.Height * clickable.scale)),
+							sourceRectangle: this.SorterButtons[(int)this._lastSorterUsed].sourceRect,
+							color: Color.White,
+							rotation: 0f,
+							origin: origin,
+							effects: SpriteEffects.None,
+							layerDepth: 1f);
+					}
+				}
 			}
-            if (this._lastFilterUsed is not Filter.None && this.SearchBarTextBox.X + this.SearchBarTextBox.Width < this.ToggleFilterButton.bounds.X)
-            {
-				Vector2 origin = new(FilterIconSource.Width / 2, FilterIconSource.Height / 2);
-                b.Draw(
-                    texture: CookingMenu.Texture,
-                    destinationRectangle: new(
-						x: (int)(this.ToggleFilterButton.bounds.X + (this.ToggleFilterButton.sourceRect.Width - FilterIconSource.Width) * this.ToggleFilterButton.baseScale / 2 + origin.X * this.ToggleFilterButton.scale),
-						y: (int)(this.ToggleFilterButton.bounds.Y + (this.ToggleFilterButton.sourceRect.Height - FilterIconSource.Height) * this.ToggleFilterButton.baseScale / 2 + origin.Y * this.ToggleFilterButton.scale),
-						width: (int)(FilterIconSource.Width * this.ToggleFilterButton.scale),
-						height: (int)(FilterIconSource.Height * this.ToggleFilterButton.scale)),
-                    sourceRectangle: this.FilterButtons[(int)this._lastFilterUsed - 1].sourceRect,
-                    color: Color.White,
-                    rotation: 0f,
-                    origin: origin,
-                    effects: SpriteEffects.None,
-                    layerDepth: 1f);
-            }
 
-            if (this._isFilterBarVisible)
+			if (this._isFilterBarVisible)
             {
-                float buttonScale = this.FilterButtons.First().baseScale;
                 // Filter clickable icons container
+                Rectangle source = FilterContainerSource;
+                Rectangle dest = this._filterArea;
+				int sourceWidth = FilterBarSideSourceWidth;
+				int destWidth = (int)((float)dest.Height / source.Height * sourceWidth);
+
                 // left
-                b.Draw(
+				b.Draw(
 					texture: CookingMenu.Texture,
 					destinationRectangle: new(
-						x: this._filterArea.X,
-						y: this._filterArea.Y,
-						width: (int)(FilterBarSideSourceWidth * buttonScale),
-						height: this._filterArea.Height),
+						x: dest.Left - destWidth,
+						y: dest.Top,
+						width: destWidth,
+						height: dest.Height),
 					sourceRectangle: new(
-						x: FilterContainerSource.X,
-						y: FilterContainerSource.Y,
-						width: FilterBarSideSourceWidth,
-						height: FilterContainerSource.Height),
+						x: source.X,
+						y: source.Y,
+						width: sourceWidth,
+						height: source.Height),
 					color: Color.White);
                 // middle
                 b.Draw(
 					texture: CookingMenu.Texture,
-					destinationRectangle: new(
-						x: (int)(this._filterArea.X + FilterBarSideSourceWidth * buttonScale),
-						y: this._filterArea.Y,
-						width: (int)(this._filterBarMiddleSourceWidth * buttonScale),
-						height: this._filterArea.Height),
+					destinationRectangle: dest,
 					sourceRectangle: new(
-                        FilterContainerSource.X + FilterBarSideSourceWidth, FilterContainerSource.Y,
-                        1, FilterContainerSource.Height),
+						x: source.X + sourceWidth,
+						y: source.Y,
+						width: 1,
+						height: source.Height),
 					color: Color.White);
-                // right
-                b.Draw(
+				// right
+				b.Draw(
 					texture: CookingMenu.Texture,
 					destinationRectangle: new(
-						x: (int)(this._filterArea.X + FilterBarSideSourceWidth * buttonScale + this._filterBarMiddleSourceWidth * buttonScale),
-						y: this._filterArea.Y,
-						width: (int)(FilterBarSideSourceWidth * buttonScale),
-						height: this._filterArea.Height),
+						x: dest.Right,
+						y: dest.Top,
+						width: destWidth,
+						height: dest.Height),
 					sourceRectangle: new(
-						x: FilterContainerSource.X + FilterBarSideSourceWidth + 1,
-						y: FilterContainerSource.Y,
-						width: FilterBarSideSourceWidth,
-						height: FilterContainerSource.Height),
+						x: source.X + sourceWidth + 1,
+						y: source.Y,
+						width: sourceWidth,
+						height: source.Height),
 					color: Color.White);
 
-                // Filter clickable icons
-                foreach (ClickableTextureComponent clickable in this.FilterButtons)
+				// Buttons
+                var buttons = this._isSorterBarVisible ? this.SorterButtons : this.FilterButtons; 
+                foreach (ClickableTextureComponent clickable in buttons)
                     clickable.draw(b);
-            }
+			}
         }
 
         public override bool TryPop()
 		{
+			if (this._isFilterBarVisible)
+			{
+				this.ToggleFilterPopup(playSound: true);
+				this.CloseTextBox(isCancelled: true); // Prevent clickthrough
+				return false;
+			}
 			if (this.SearchBarTextBox.Selected || this.SearchBarTextBox.Text != this.SearchBarDefaultText)
 			{
 				this.CloseTextBox(isCancelled: true);
 				return false;
 			}
-			if (this._isFilterBarVisible)
-            {
-				this.ToggleFilterPopup(playSound: true);
-                return false;
-            }
 			return true;
         }
     }
