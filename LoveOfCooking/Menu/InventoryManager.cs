@@ -108,10 +108,10 @@ namespace LoveOfCooking.Menu
 			if (forceToggleTo.HasValue && forceToggleTo.Value == this.ShowInventoriesPopup)
 				return;
 
+			this.ShowInventoriesPopup = forceToggleTo ?? !this.ShowInventoriesPopup;
+
 			if (playSound)
 				Game1.playSound(this.ShowInventoriesPopup ? MenuChangeCue : MenuCloseCue);
-
-			this.ShowInventoriesPopup = forceToggleTo ?? !this.ShowInventoriesPopup;
 
 			if (Game1.options.SnappyMenus)
 			{
