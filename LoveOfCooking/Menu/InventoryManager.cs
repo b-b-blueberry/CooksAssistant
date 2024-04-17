@@ -10,6 +10,7 @@ using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Objects;
 using static LoveOfCooking.Menu.CookingMenu;
+using static LoveOfCooking.ModEntry;
 
 namespace LoveOfCooking.Menu
 {
@@ -20,6 +21,7 @@ namespace LoveOfCooking.Menu
 		public List<IList<Item>> Items => this._inventoryList;
 		public List<(IInventory Inventory, Chest Chest)> Inventories => this._inventoryAndChestList;
 		public bool ShowInventoriesPopup { get; set; }
+		public string InventoryDisplayName { get; private set; }
 
 		// Layout
 		public const int InventoryRows = 3;
@@ -75,7 +77,7 @@ namespace LoveOfCooking.Menu
 			this.ChangeInventory(index);
 		}
 
-		public void ChangeInventory(int index)
+		public void ChangeInventory(int index, bool playSound = true)
 		{
 			if (this._inventoryId == index)
 				return;
@@ -84,7 +86,13 @@ namespace LoveOfCooking.Menu
 			this.Menu.inventory.actualInventory = this._inventoryList[this._inventoryId];
 			this.Menu.inventory.showGrayedOutSlots = this._inventoryId == BackpackInventoryId;
 
-			Game1.playSound(RecipeCue);
+			// Update inventory title
+			this.InventoryDisplayName = this.GetInventoryTitle();
+
+			if (playSound)
+			{
+				Game1.playSound(RecipeCue);
+			}
 
 			if (Interface.Interfaces.UsingBigBackpack)
 			{
@@ -109,6 +117,27 @@ namespace LoveOfCooking.Menu
 			{
 				this.Menu.setCurrentlySnappedComponentTo(this.ShowInventoriesPopup ? this.InventorySelectButtons.First().myID : this.TabButton.myID);
 			}
+		}
+
+		public string GetInventoryTitle()
+		{
+			string key = null;
+			if (this._inventoryId >= this._inventoryIdsBeforeChests)
+			{
+				if (this._inventoryAndChestList[this._inventoryId - this._inventoryIdsBeforeChests].Chest is Chest chest)
+				{
+					key = Utils.IsMinifridge(chest)
+						? "menu.inventory.minifridge"
+						: Utils.IsFridgeOrMinifridge(chest)
+							? "menu.inventory.fridge"
+							: chest.DisplayName;
+				}
+			}
+			else
+			{
+				key = "menu.inventory.backpack";
+			}
+			return key is null ? string.Empty : I18n.Get(key);
 		}
 
 		public Rectangle GetBackpackIconForPlayer(Farmer who)
@@ -467,6 +496,9 @@ namespace LoveOfCooking.Menu
 
 			Point offset = Point.Zero;
 
+			// Update inventory title
+			this.InventoryDisplayName = this.GetInventoryTitle();
+
 			// Inventory
 			{
 				int padding = IClickableMenu.spaceToClearSideBorder;
@@ -679,6 +711,9 @@ namespace LoveOfCooking.Menu
 			if (this.ShouldShowInventoryElements)
 			{
 				this.TabButton.tryHover(x, y, 0.5f);
+				if (this.TabButton.containsPoint(x, y))
+					hoverText = this.InventoryDisplayName;
+
 				foreach (ClickableTextureComponent clickable in this.InventorySelectButtons)
 				{
 					clickable.tryHover(x, y, 0.5f);
