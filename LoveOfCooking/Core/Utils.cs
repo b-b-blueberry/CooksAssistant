@@ -15,6 +15,7 @@ using StardewValley.Network;
 using StardewValley.Objects;
 using StardewValley.Projectiles;
 using StardewValley.SpecialOrders.Objectives;
+using StardewValley.TerrainFeatures;
 using xTile.Layers;
 using xTile.Tiles;
 using CraftingPage = StardewValley.Menus.CraftingPage;
@@ -43,7 +44,196 @@ namespace LoveOfCooking
 
 		public static void CleanUpSaveFiles()
 		{
-			Utils.PopulateMissingRecipes();
+			string oldModVersion = ModEntry.Instance.States.Value.ModVersion ?? "untracked";
+			string oldGameVersion = ModEntry.Instance.States.Value.GameVersion ?? "untracked";
+			string modVersion = ModEntry.Instance.ModManifest.Version.ToString();
+			string gameVersion = Game1.version;
+			string targetVersion;
+
+			bool isModUpdated = Utility.CompareGameVersions(oldModVersion, modVersion) < 0;
+			bool isGameUpdated = Utility.CompareGameVersions(oldGameVersion, gameVersion) < 0;
+
+			// Log version changes
+			if (isModUpdated)
+				Log.D($"Mod updated: {oldModVersion} -> {modVersion}",
+					ModEntry.Config.DebugMode);
+			if (isGameUpdated)
+				Log.D($"Game updated: {oldGameVersion} -> {gameVersion}",
+					ModEntry.Config.DebugMode);
+
+			// Mod update migration
+			targetVersion = "2.0.0";
+			if (Utility.CompareGameVersions(oldModVersion, targetVersion) < 0)
+			{
+				Log.D($"Applying mod changes: {oldModVersion} -> {targetVersion}");
+				Utils.PopulateMissingRecipes();
+			}
+
+			// Game update migration
+			targetVersion = "1.6.0";
+			if (Utility.CompareGameVersions(oldGameVersion, targetVersion) < 0)
+			{
+				Log.D($"Applying game changes: {oldGameVersion} -> {targetVersion}");
+				Utils.PerformSDV16Migrations();
+			}
+
+			// Save version history
+			ModEntry.Instance.States.Value.ModVersion = modVersion;
+			ModEntry.Instance.States.Value.GameVersion = gameVersion;
+		}
+
+		public static void PerformSDV16Migrations()
+		{
+			// Replace cookbook mail
+			{
+				const string legacyMail = "blueberry.cac.mail.cookbook_unlocked";
+				if (Game1.player.mailReceived.Remove(legacyMail))
+				{
+					Game1.player.mailReceived.Add(ModEntry.MailCookbookUnlocked);
+					Log.D("Updated cookbook mail in MailReceived.",
+						ModEntry.Config.DebugMode);
+				}
+				if (Game1.player.mailbox.Remove(legacyMail))
+				{
+					Game1.player.mailbox.Add(ModEntry.MailCookbookUnlocked);
+					Log.D("Updated cookbook mail in Mailbox.",
+						ModEntry.Config.DebugMode);
+				}
+				if (Game1.player.mailForTomorrow.Remove(legacyMail))
+				{
+					Game1.player.mailForTomorrow.Add(ModEntry.MailCookbookUnlocked);
+					Log.D("Updated cookbook mail in MailForTomorrow.",
+						ModEntry.Config.DebugMode);
+				}
+			}
+
+			// Replace cooking tool
+			{
+				if (Game1.player.toolBeingUpgraded.Name == "blueberry.LoveOfCooking.cookingtool")
+				{
+					Tool oldTool = Game1.player.toolBeingUpgraded.Value;
+					int level = oldTool?.UpgradeLevel ?? ModEntry.Instance.States.Value.CookingToolLevel;
+					Tool newTool = ItemRegistry.Create<Tool>(CookingTool.ToolID(level: level));
+					newTool.UpgradeLevel = level;
+					Game1.player.toolBeingUpgraded.Set(newTool);
+					Log.D($"Updated cooking tool in ToolBeingUpgraded (level {level}), {Game1.player.daysLeftForToolUpgrade} days remaining).",
+						ModEntry.Config.DebugMode);
+				}
+			}
+
+			// Replace identifiable items and refund player their value
+			{
+				int count = 0;
+				int refund = 0;
+				Dictionary<int, int> values = new();
+				Dictionary<int, (int Price, int Quantity)> crops = new();
+				Dictionary<int, (Item Item, int Quantity)> items = new();
+
+				bool TryRemoveItem(Item item)
+				{
+					++count;
+					int index = item.ParentSheetIndex;
+					int value = item.sellToStorePrice();
+					int quantity = item.Stack;
+
+					// Add refund value
+					if (value > 0)
+						refund += value * item.Stack;
+
+					// Update logs
+					values[index] = value;
+					items[index] = (item, items.ContainsKey(index) ? items[index].Quantity + quantity : quantity);
+
+					// No destroy behaviour
+
+					return true;
+				}
+
+				bool TryRemoveCrop(HoeDirt dirt)
+				{
+					int index;
+					int value;
+					int quantity = 1;
+
+					if (int.TryParse(dirt.crop.indexOfHarvest.Value, out index) && values.TryGetValue(index, out value)
+						|| int.TryParse(dirt.crop.netSeedIndex.Value, out index) && values.TryGetValue(index, out value))
+					{
+						// Add refund value
+						if (value > 0)
+							refund += value;
+
+						// Update logs
+						crops[index] = (value, crops.ContainsKey(index) ? crops[index].Quantity + quantity : quantity);
+
+						// Destroy crop
+						dirt.crop = new Crop(
+							seedId: "472",
+							tileX: (int)dirt.crop.tilePosition.X,
+							tileY: (int)dirt.crop.tilePosition.Y,
+							location: dirt.crop.currentLocation);
+						dirt.crop.Kill();
+
+						return true;
+					}
+
+					return false;
+				}
+
+				Utility.ForEachItem((Item item, Action remove, Action<Item> replaceWith) =>
+				{
+					if (item.Name.StartsWith("blueberry.cac") && TryRemoveItem(item))
+					{
+						remove();
+					}
+					else if (item is IndoorPot pot && pot.hoeDirt.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
+					{
+						// Don't remove indoor pots
+					}
+					return true;
+				});
+
+				Utility.ForEachLocation((GameLocation l) =>
+				{
+					foreach (var pair in l.terrainFeatures.Pairs)
+					{
+						if (pair.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
+						{
+							// Do nothing
+						}
+					}
+					return true;
+				});
+
+				foreach (var pair in items)
+				{
+					int index = pair.Value.Item.ParentSheetIndex;
+					int quantity = pair.Value.Quantity;
+					int price = pair.Value.Item.sellToStorePrice();
+					Log.D($"Removing legacy item ({index}) x{quantity} ({price * quantity}g) [{pair.Value.Item.Name}]",
+						ModEntry.Config.DebugMode);
+				}
+				foreach (var pair in crops)
+				{
+					int index = pair.Key;
+					int quantity = pair.Value.Quantity;
+					int price = pair.Value.Price;
+					Log.D($"Removing legacy crop ({index}) x{quantity} ({price * quantity}g)",
+						ModEntry.Config.DebugMode);
+				}
+
+				if (refund > 0)
+				{
+					Log.D($"Refunding player for lost assets worth {refund}g.");
+					Log.D($"Sending mail with refunded money.");
+					ModEntry.Instance.States.Value.MigrateRefund = refund;
+					Game1.player.mailbox.Add(ModEntry.MailMigrateRefund16);
+				}
+				else
+				{
+					Log.D($"No legacy assets found to refund.",
+						ModEntry.Config.DebugMode);
+				}
+			}
 		}
 
 		public static bool HasCookbook(Farmer who)
@@ -139,9 +329,6 @@ namespace LoveOfCooking
 
 			if (ModEntry.Config.AddCookingSkillAndRecipes)
 			{
-				// Clear daily cooking to free up Cooking experience gains
-				ModEntry.Instance.States.Value.FoodCookedToday.Clear();
-
 				// Add any missing recipes from the level-up recipe table
 				int level = ModEntry.CookingSkillApi.GetLevel();
 				IReadOnlyDictionary<int, IList<string>> recipes = ModEntry.CookingSkillApi.GetAllLevelUpRecipes();

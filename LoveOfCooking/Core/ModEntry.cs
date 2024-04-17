@@ -69,6 +69,11 @@ namespace LoveOfCooking
 			// Food Buffs Start Hidden
 			public bool IsHidingFoodBuffs;
 
+			// Migration
+			public string ModVersion;
+			public string GameVersion;
+			public int MigrateRefund;
+
 			public State()
 			{
 				this.Reset();
@@ -100,6 +105,11 @@ namespace LoveOfCooking
 
 				// Food Heals Over Time
 				this.Regeneration.Reset();
+
+				// Migration
+				this.ModVersion = null;
+				this.GameVersion = null;
+				this.MigrateRefund = 0;
 			}
 
 			public void Save(ModDataDictionary data)
@@ -111,6 +121,8 @@ namespace LoveOfCooking
 				data[$"{prefix}tool_level"] = this.CookingToolLevel.ToString();
 				data[$"{prefix}foods_eaten"] = string.Join(",", this.FoodsEaten);
 				data[$"{prefix}favourite_recipes"] = string.Join(",", this.FavouriteRecipes);
+				data[$"{prefix}mod_version"] = this.ModVersion;
+				data[$"{prefix}game_version"] = this.GameVersion;
 			}
 
 			public void Load(ModDataDictionary data)
@@ -147,6 +159,18 @@ namespace LoveOfCooking
 					this.FavouriteRecipes = value.Split(',').ToList();
 				else
 					Log.D($"No data found for {nameof(this.FavouriteRecipes)}", ModEntry.Config.DebugMode);
+
+				// Migration: Mod update
+				if (data.TryGetValue($"{prefix}mod_version", out value))
+					this.ModVersion = value;
+				else
+					Log.D($"No data found for {nameof(this.ModVersion)}", ModEntry.Config.DebugMode);
+
+				// Migration: Game update
+				if (data.TryGetValue($"{prefix}game_version", out value))
+					this.GameVersion = value;
+				else
+					Log.D($"No data found for {nameof(this.GameVersion)}", ModEntry.Config.DebugMode);
 			}
 		}
 
@@ -170,6 +194,7 @@ namespace LoveOfCooking
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
+		internal static readonly string MailMigrateRefund16 = MailPrefix + "migrate_refund_1_6"; // DO NOT EDIT
 		internal static readonly string MailSeasoning1 = MailPrefix + "seasoning_1"; // DO NOT EDIT
 		internal static readonly string MailSeasoning2 = MailPrefix + "seasoning_2"; // DO NOT EDIT
 
@@ -508,7 +533,11 @@ namespace LoveOfCooking
 				this.SaveLoadedBehaviours();
 			}
 
-			// God damn it
+			// Cooking Skill
+			// Clear daily cooking to free up experience gains
+			ModEntry.Instance.States.Value.FoodCookedToday.Clear();
+
+			// Migration
 			Utils.CleanUpSaveFiles();
 
 			// Food Heals Over Time

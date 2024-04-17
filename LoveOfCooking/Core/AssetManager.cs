@@ -436,7 +436,8 @@ namespace LoveOfCooking
 				data[pair.Key] = Game1.content.LoadString(pair.Value)
 					.Replace("{{cookbookId}}", $"(O){ModEntry.CookbookItemId}")
 					.Replace("{{seasoning1}}", $"{ModEntry.Seasoning1ItemId}")
-					.Replace("{{seasoning2}}", $"{ModEntry.Seasoning2ItemId}");
+					.Replace("{{seasoning2}}", $"{ModEntry.Seasoning2ItemId}"
+					.Replace("{{migrateRefund}}", ModEntry.Instance.States.Value.MigrateRefund.ToString()));
 
 			asset.AsDictionary<string, string>().ReplaceWith(data);
 		}
