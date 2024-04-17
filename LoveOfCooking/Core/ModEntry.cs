@@ -894,13 +894,13 @@ namespace LoveOfCooking
 					int remaining = ModEntry.CookingSkillApi.GetExperienceRemainingUntilLevel(level + 1);
 					int required = ModEntry.CookingSkillApi.GetExperienceRequiredForLevel(level + 1);
 					string professions = string.Join(Environment.NewLine,
-						ModEntry.CookingSkillApi.GetCurrentProfessions().Select(pair => $"{pair.Key}: {pair.Value}"));
+						ModEntry.CookingSkillApi.GetCurrentProfessions().Select(pair => $"\t{pair.Key}: {pair.Value}"));
 					Log.D($"{Environment.NewLine}== COOKING SKILL =={Environment.NewLine}"
 						+ $"{Environment.NewLine}ID: {CookingSkillApi.GetSkill().GetName()}"
 						+ $"{Environment.NewLine}Cooking level: {level}"
 						+ $"{Environment.NewLine}Experience until next level: ({required - remaining}/{required})"
 						+ $"{Environment.NewLine}Total experience: ({current}/{total})"
-						+ $"{Environment.NewLine}Current professions: {professions}{Environment.NewLine}",
+						+ $"{Environment.NewLine}Current professions:{Environment.NewLine}{professions}{Environment.NewLine}",
 						ModEntry.Config.DebugMode);
 				}
 				catch (Exception e)
