@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LoveOfCooking.Interface;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -97,6 +98,7 @@ namespace LoveOfCooking.Menu
         // Clickables
         public readonly List<ClickableComponent> CookingMenuClickableComponents = new(); // Required on PopulateClickableComponentList
 		internal ClickableTextureComponent _searchTabButton;
+		internal ClickableTextureComponent _upperRightInfoButton;
 
 		// Layout dimensions (variable with screen size)
 		internal Rectangle _cookbookLeftRect = new(-1, -1, CookbookSource.Width * Scale / 2, CookbookSource.Height * Scale);
@@ -150,8 +152,8 @@ namespace LoveOfCooking.Menu
         private readonly RecipePage _recipePage;
         private readonly CraftingPage _craftingPage;
 
-		// miscellanea
-		private bool _isCloseButtonVisible => !Game1.options.SnappyMenus;
+        // miscellanea
+        private bool _isCloseButtonVisible => !Game1.options.SnappyMenus;
 		private readonly bool _displayHUD = false;
 		private int _mouseHeldTicks;
         internal readonly IReflectedField<Dictionary<int, double>> _iconShakeTimerField;
@@ -294,11 +296,21 @@ namespace LoveOfCooking.Menu
 				sourceRect: SearchTabButtonSource,
 				scale: Scale,
 				drawShadow: true);
+			this._upperRightInfoButton = new(
+				name: "upperRightInfoButton",
+				bounds: new(-1, -1, UpperRightHelpIconSource.Width * Scale, UpperRightHelpIconSource.Height * Scale),
+				label: null,
+				hoverText: null,
+				texture: Texture,
+				sourceRect: UpperRightHelpIconSource,
+				scale: Scale,
+				drawShadow: true);
 
 			components.AddRange(new List<ClickableComponent>
             {
-				this._searchTabButton
-            });
+				this._searchTabButton,
+				this._upperRightInfoButton
+			});
 
             // Create components on all pages
             foreach (GenericPage page in this._pages)
@@ -338,8 +350,15 @@ namespace LoveOfCooking.Menu
                     : this._craftingPage.FirstIngredientSlot.myID;
             }
 
+            this._searchPage.UpButton.rightNeighborID = this._craftingPage.FirstIngredientSlot.myID;
+            this._searchPage.DownButton.rightNeighborID = this._craftingPage.FirstIngredientSlot.myID;
+
 			this.upperRightCloseButton.leftNeighborID = this._craftingPage.LastIngredientSlot.myID;
 			this.upperRightCloseButton.downNeighborID = this._craftingPage.LastIngredientSlot.myID;
+			this.upperRightCloseButton.downNeighborID = this._upperRightInfoButton.myID;
+			this._upperRightInfoButton.upNeighborID = this.upperRightCloseButton.myID;
+			this._upperRightInfoButton.downNeighborID = this._craftingPage.LastIngredientSlot.myID;
+			this._upperRightInfoButton.leftNeighborID = this._craftingPage.LastIngredientSlot.myID;
 
 			this._recipePage.RecipeIconButton.downNeighborID = this._recipePage.LeftButton.downNeighborID = this._recipePage.RightButton.downNeighborID = 0;
 			this._recipePage.LeftButton.leftNeighborID = this._searchTabButton.myID;
@@ -354,6 +373,8 @@ namespace LoveOfCooking.Menu
 			this._craftingPage.QuantityUpButton.rightNeighborID = this._craftingPage.QuantityDownButton.rightNeighborID = this._craftingPage.CookButton.myID;
 			this._craftingPage.QuantityUpButton.downNeighborID = this._craftingPage.QuantityDownButton.myID;
 			this._craftingPage.QuantityDownButton.upNeighborID = this._craftingPage.QuantityUpButton.myID;
+
+            this._craftingPage.LastIngredientSlot.rightNeighborID = this._upperRightInfoButton.myID;
 
 			// Child component navigation
 
@@ -403,7 +424,10 @@ namespace LoveOfCooking.Menu
 				float scale = Game1.options.uiScale;
 				float diff = (pos - bound) * scale;
 				this.upperRightCloseButton.bounds.X -= (int)Math.Max(0, diff / 2);
-            }
+			}
+
+			this._upperRightInfoButton.bounds.X = this.upperRightCloseButton.bounds.X;
+			this._upperRightInfoButton.bounds.Y = this.upperRightCloseButton.bounds.Bottom + 2 * Scale;
 
 			// Tab buttons
 			this._searchTabButton.bounds.X = this._cookbookLeftRect.X - 12 * Scale;
@@ -892,6 +916,13 @@ namespace LoveOfCooking.Menu
             if (this._isCloseButtonVisible)
             {
     			this.upperRightCloseButton.tryHover(x, y, scaleTo);
+			}
+			this._upperRightInfoButton.tryHover(x, y, scaleTo);
+            if (this._upperRightInfoButton.containsPoint(x, y))
+            {
+                hoverText = Interfaces.GenericModConfigMenu is not null
+                    ? I18n.Get("menu.config.enabled")
+                    : I18n.Get("menu.config.disabled");
             }
 			this._searchTabButton.tryHover(x, y, this._searchPage.IsVisible ? 0 : scaleTo);
 
@@ -932,6 +963,25 @@ namespace LoveOfCooking.Menu
                 return;
             }
 
+            if (this._upperRightInfoButton.containsPoint(x, y))
+            {
+                if (Interfaces.GenericModConfigMenu is not null)
+                {
+                    this.exitFunction += () =>
+                    {
+                        Log.D("Opening mod config menu.", Config.DebugMode);
+                        DelayedAction.functionAfterDelay(
+                            func: () => Interfaces.GenericModConfigMenu.OpenModMenu(mod: ModEntry.Instance.ModManifest),
+                            delay: 33);
+                    };
+					this.exitThisMenuNoSound();
+				}
+                else
+                {
+                    Game1.playSound(CancelCue);
+                }
+            }
+
 			// Menu root components
 			if (state is not State.Search && this._searchTabButton.containsPoint(x, y))
             {
@@ -962,6 +1012,10 @@ namespace LoveOfCooking.Menu
         public override void receiveRightClick(int x, int y, bool playSound = true)
         {
             if (!this.IsGoodState())
+                return;
+
+            // Ignore Buttons.X input
+            if (Game1.options.gamepadControls)
                 return;
 
             base.receiveRightClick(x, y, playSound);
@@ -1092,6 +1146,10 @@ namespace LoveOfCooking.Menu
 				else
 					this.ChangeRecipe(selectNext: true);
 			}
+            else if (b is Buttons.X)
+            {
+                this.InventoryManager.ToggleAutofill();
+            }
 
             // Don't you dare
             //base.receiveGamePadButton(b);
@@ -1411,7 +1469,8 @@ namespace LoveOfCooking.Menu
             if (this._isCloseButtonVisible)
             {
         		this.upperRightCloseButton.draw(b);
-            }
+			}
+			this._upperRightInfoButton.draw(b);
 
 			// Hover text
 			if (this.hoverText is not null)

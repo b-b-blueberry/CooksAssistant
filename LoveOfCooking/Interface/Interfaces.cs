@@ -15,6 +15,7 @@ namespace LoveOfCooking.Interface
 		private static double TotalSecondsOnLoaded;
 
 		// Loaded APIs
+		internal static IGenericModConfigMenuAPI GenericModConfigMenu;
 		internal static ILevelExtenderAPI LevelExtender;
 
 		// Loaded mods
@@ -138,6 +139,7 @@ namespace LoveOfCooking.Interface
 				return true;
 			}
 
+			Interfaces.GenericModConfigMenu = gmcm;
 			ModConfigMenu.Generate(gmcm: gmcm);
 			return true;
 		}

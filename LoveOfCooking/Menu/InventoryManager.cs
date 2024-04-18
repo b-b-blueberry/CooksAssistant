@@ -119,6 +119,16 @@ namespace LoveOfCooking.Menu
 			}
 		}
 
+		public void ToggleAutofill()
+		{
+			Game1.playSound(ClickCue);
+			Instance.States.Value.IsUsingAutofill = !Instance.States.Value.IsUsingAutofill;
+			this.Menu.TryAutoFillIngredients(isClearedIfDisabled: true);
+			this.ToggleAutofillButton.sourceRect = Instance.States.Value.IsUsingAutofill
+				? AutofillEnabledButtonSource
+				: AutofillDisabledButtonSource;
+		}
+
 		public string GetInventoryTitle()
 		{
 			string text = null;
@@ -643,12 +653,7 @@ namespace LoveOfCooking.Menu
 			if (this.ToggleAutofillButton.containsPoint(x, y))
 			{
 				// Autofill button
-				Game1.playSound(ClickCue);
-				Instance.States.Value.IsUsingAutofill = !Instance.States.Value.IsUsingAutofill;
-				this.Menu.TryAutoFillIngredients(isClearedIfDisabled: true);
-				this.ToggleAutofillButton.sourceRect = Instance.States.Value.IsUsingAutofill
-					? AutofillEnabledButtonSource
-					: AutofillDisabledButtonSource;
+				this.ToggleAutofill();
 			}
 
 			// Inventory nav buttons
