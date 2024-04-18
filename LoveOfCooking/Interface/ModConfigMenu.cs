@@ -207,6 +207,77 @@ namespace LoveOfCooking.Interface
 				},
 				height: () => cookingMenuPageHeight);
 
+			// Gamepad controls and mappings
+			int controllerMapHeight = 0;
+			List<(Rectangle Source, string Text)> controllerMap = new();
+			gmcm.AddComplexOption(
+				mod: mod,
+				name: () => string.Empty,
+				beforeMenuOpened: () =>
+				{
+					controllerMap = new()
+					{
+						(CookingMenu.AButtonSource, I18n.Get("config.info.controllermap.button.a")),
+						(CookingMenu.BButtonSource, I18n.Get("config.info.controllermap.button.b")),
+						(CookingMenu.XButtonSource, I18n.Get("config.info.controllermap.button.x")),
+						(CookingMenu.YButtonSource, I18n.Get("config.info.controllermap.button.y")),
+						(Rectangle.Empty, I18n.Get("config.info.controllermap.shoulders")),
+						(Rectangle.Empty, I18n.Get("config.info.controllermap.triggers")),
+					};
+				},
+				draw: (SpriteBatch b, Vector2 v) =>
+				{
+					SpriteFont font = Game1.smallFont;
+					Vector2 offset = Vector2.Zero;
+
+					// Draw gamepad controls
+					//v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.controllermap.title")).Y;
+
+					controllerMapHeight = (int)v.Y;
+
+					int spacing = 1 * Scale;
+					int width = (int)controllerMap.Max(entry => entry.Source.Width + font.MeasureString(entry.Text).X);
+					int outerSpacing = width / 2;
+					v.X -= width * 1.5f;
+
+					for (int i = 0; i < controllerMap.Count; ++i)
+					{
+						Vector2 textSize = font.MeasureString(controllerMap[i].Text);
+
+						// Arrange controls into 2 columns
+						if (i > 0 && i % 2 == 0)
+						{
+							offset.X -= width + outerSpacing;
+							offset.Y += textSize.Y;
+						}
+						if (i % 2 == 1)
+						{
+							offset.X += width + outerSpacing;
+						}
+
+						// button
+						b.Draw(
+							texture: Game1.controllerMaps,
+							sourceRectangle: controllerMap[i].Source,
+							position: v + offset,
+							color: Color.White,
+							rotation: 0,
+							origin: Vector2.Zero,
+							scale: 1,
+							effects: SpriteEffects.None,
+							layerDepth: 1);
+
+						// label
+						b.DrawString(
+							spriteFont: Game1.smallFont,
+							text: controllerMap[i].Text,
+							position: v + offset + new Vector2(x: controllerMap[i].Source.Width + spacing, y: 0),
+							color: Game1.textColor);
+					}
+					controllerMapHeight = (int)offset.Y + 24 * Scale;
+				},
+				height: () => controllerMapHeight);
+
 			// Cooking skill
 			CookingSkill skill = null;
 			IList<Profession> professions = null;

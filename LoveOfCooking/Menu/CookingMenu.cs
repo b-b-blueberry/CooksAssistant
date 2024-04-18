@@ -91,8 +91,14 @@ namespace LoveOfCooking.Menu
         internal static readonly Rectangle UpSmallButtonSource = new(56, 224, 8, 8);
         internal static readonly Rectangle DownSmallButtonSource = new(56, 232, 8, 8);
 
-        // Other values
-        internal const int Scale = 4;
+		// Gamepad controls sheet
+		internal static readonly Rectangle AButtonSource = new(542, 260, 26, 26);
+		internal static readonly Rectangle BButtonSource = new(570, 260, 26, 26);
+		internal static readonly Rectangle XButtonSource = new(514, 260, 26, 26);
+		internal static readonly Rectangle YButtonSource = new(598, 260, 26, 26);
+
+		// Other values
+		internal const int Scale = 4;
         internal const int SmallScale = 3;
 
         // Clickables
