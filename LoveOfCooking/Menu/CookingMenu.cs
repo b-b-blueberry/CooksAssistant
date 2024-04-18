@@ -462,6 +462,9 @@ namespace LoveOfCooking.Menu
 
         internal bool ChangeRecipe(bool selectNext)
         {
+            if (this.RecipeInfo is null)
+                return false;
+
 			// Update search result index for left/right direction
 			int delta = 1;
 			int index = this.RecipeInfo.Index + delta * (selectNext ? 1 : -1);
