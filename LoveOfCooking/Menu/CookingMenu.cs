@@ -50,9 +50,10 @@ namespace LoveOfCooking.Menu
 		internal static readonly Rectangle TileButtonGridSource = new(16, 240, 16, 16);
 		internal static readonly Rectangle TileButtonListSource = new(32, 240, 16, 16);
         internal static readonly Rectangle TileButtonSearchSource = new(48, 240, 16, 16);
-        internal static readonly Rectangle BuffIconSource = new(103, 209, 10, 10);
-        internal static readonly Rectangle FavouriteIconSource = new(139, 209, 10, 10);
-		internal static readonly Rectangle StarIconSource = new(139, 209, 10, 10);
+        internal static readonly Rectangle ReadyIconSource = new(12, 122, 10, 12);
+        internal static readonly Rectangle FavouriteIconSource = new(24, 122, 10, 12);
+		internal static readonly Rectangle StarIconSource = new(36, 122, 10, 12);
+        internal static readonly Rectangle BuffIconSource = new(48, 122, 10, 12);
         internal static readonly Rectangle CheckIconSource = new(10, 100, 10, 10);
         internal static readonly Rectangle CrossIconSource = new(20, 100, 10, 10);
 		internal static readonly Rectangle AutofillDisabledButtonSource = new(112, 134, 14, 14);
