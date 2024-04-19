@@ -297,7 +297,7 @@ namespace LoveOfCooking.Menu
 				: $"{I18n.Get("menu.cooking_search.view_label")}\n{I18n.Get($"menu.cooking_search.view.list")}";
 		}
 
-        public void ToggleFilterPopup(bool playSound, bool? forceToggleTo = null)
+        public void ToggleFilterPopup(bool playSound, bool? forceToggleTo = null, List<ClickableTextureComponent> buttons = null)
         {
             if (forceToggleTo.HasValue && forceToggleTo.Value == this._isFilterBarVisible)
                 return;
@@ -313,10 +313,8 @@ namespace LoveOfCooking.Menu
             if (Game1.options.SnappyMenus)
             {
                 var button = this._isFilterBarVisible
-                    ? this.FilterButtons.First()
-                    : this._isSorterBarVisible
-                        ? this.SorterButtons.First()
-                        : this.ToggleFilterButton;
+					? (buttons ?? this.FilterButtons).First()
+                    : this.ToggleFilterButton;
 				this.Menu.setCurrentlySnappedComponentTo(button.myID);
             }
         }
@@ -844,7 +842,7 @@ namespace LoveOfCooking.Menu
 						Game1.playSound(PageChangeCue);
 					if (this._isSorterBarVisible == this._isFilterBarVisible)
 					{
-						this.ToggleFilterPopup(playSound: false);
+						this.ToggleFilterPopup(playSound: false, buttons: this.SorterButtons);
 					}
 					if (this._isFilterBarVisible)
 					{
@@ -1137,7 +1135,7 @@ namespace LoveOfCooking.Menu
 		{
 			if (this._isFilterBarVisible)
 			{
-				this.ToggleFilterPopup(playSound: true);
+				this.ToggleFilterPopup(playSound: true, forceToggleTo: false);
 				this.CloseTextBox(isCancelled: true); // Prevent clickthrough
 				return false;
 			}
