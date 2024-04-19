@@ -96,6 +96,8 @@ namespace LoveOfCooking.Menu
 		internal static readonly Rectangle BButtonSource = new(570, 260, 26, 26);
 		internal static readonly Rectangle XButtonSource = new(514, 260, 26, 26);
 		internal static readonly Rectangle YButtonSource = new(598, 260, 26, 26);
+		internal static readonly Rectangle SelectButtonSource = new(626, 260, 26, 26);
+		internal static readonly Rectangle StartButtonSource = new(654, 260, 26, 26);
 
 		// Other values
 		internal const int Scale = 4;
@@ -1090,8 +1092,9 @@ namespace LoveOfCooking.Menu
         {
             if (!this.IsGoodState())
                 return;
+			State state = this._stack.Peek();
 
-            int id = this.currentlySnappedComponent is not null ? this.currentlySnappedComponent.myID : -1;
+			int id = this.currentlySnappedComponent is not null ? this.currentlySnappedComponent.myID : -1;
 
             if (Config.DebugMode)
                 Log.D(this.currentlySnappedComponent is not null
@@ -1156,6 +1159,18 @@ namespace LoveOfCooking.Menu
             {
                 this.InventoryManager.ToggleAutofill();
             }
+            else if (b is Buttons.Back)
+            {
+				// Search shortcut
+				if (state is not State.Search)
+				{
+					this.GoToState(State.Search);
+					Game1.playSound(MenuChangeCue);
+				}
+				this.setCurrentlySnappedComponentTo(this._searchPage.SearchBarClickable.myID);
+				this._searchPage.OpenTextBox();
+				Game1.showTextEntry(text_box: this._searchPage.SearchBarTextBox);
+			}
 
             // Don't you dare
             //base.receiveGamePadButton(b);

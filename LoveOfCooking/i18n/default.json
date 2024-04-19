@@ -35,10 +35,12 @@
 	"config.option.resizekoreanfonts_description": "If playing in Korean with the default font, keep this enabled.\nIf using FixFontOption or others to resize your font, you may want this disabled.",
 
 	"config.info.controllermap.title": "Gamepad controls",
-	"config.info.controllermap.button.a": "   Use",
+	"config.info.controllermap.button.a": "   Select",
 	"config.info.controllermap.button.b": "   Cancel",
 	"config.info.controllermap.button.x": "   Auto-add ingredients",
-	"config.info.controllermap.button.y": "   Close",
+	"config.info.controllermap.button.y": "   Cancel",
+	"config.info.controllermap.button.select": "   Search",
+	"config.info.controllermap.button.start": "   Cancel",
 	"config.info.controllermap.shoulders": "LB/RB   Change region",
 	"config.info.controllermap.triggers": "LT/RT   Change recipe",
 

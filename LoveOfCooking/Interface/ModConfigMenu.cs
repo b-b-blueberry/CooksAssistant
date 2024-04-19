@@ -202,7 +202,7 @@ namespace LoveOfCooking.Interface
 							layerDepth: 1);
 					}
 
-					offset.Y += 16 * Scale;
+					offset.Y += 12 * Scale;
 					cookingMenuPageHeight = (int)subheadingOffset + (int)offset.Y;
 				},
 				height: () => cookingMenuPageHeight);
@@ -221,6 +221,8 @@ namespace LoveOfCooking.Interface
 						(CookingMenu.BButtonSource, I18n.Get("config.info.controllermap.button.b")),
 						(CookingMenu.XButtonSource, I18n.Get("config.info.controllermap.button.x")),
 						(CookingMenu.YButtonSource, I18n.Get("config.info.controllermap.button.y")),
+						(CookingMenu.SelectButtonSource, I18n.Get("config.info.controllermap.button.select")),
+						(CookingMenu.StartButtonSource, I18n.Get("config.info.controllermap.button.start")),
 						(Rectangle.Empty, I18n.Get("config.info.controllermap.shoulders")),
 						(Rectangle.Empty, I18n.Get("config.info.controllermap.triggers")),
 					};

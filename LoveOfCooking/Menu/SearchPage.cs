@@ -320,6 +320,14 @@ namespace LoveOfCooking.Menu
             }
         }
 
+		public void OpenTextBox()
+		{
+			this.SearchBarTextBox.Text = "";
+			Game1.keyboardDispatcher.Subscriber = this.SearchBarTextBox;
+			this.SearchBarTextBox.SelectMe();
+			this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
+		}
+
         public void CloseTextBox(bool isCancelled, bool updateResults = true)
 		{
             bool isDeselecting = this.SearchBarTextBox.Selected;
@@ -715,7 +723,7 @@ namespace LoveOfCooking.Menu
 
         public override void OnButtonPressed(Buttons button)
         {
-            if (this.SearchBarTextBox.Selected)
+			if (this.SearchBarTextBox.Selected)
             {
                 // Open onscreen keyboard for search bar textbox
                 if (button is Buttons.A)
@@ -775,10 +783,7 @@ namespace LoveOfCooking.Menu
 				if (!this.SearchBarTextBox.Selected)
 				{
 					// Search text box opened
-					this.SearchBarTextBox.Text = "";
-					Game1.keyboardDispatcher.Subscriber = this.SearchBarTextBox;
-					this.SearchBarTextBox.SelectMe();
-					this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
+					this.OpenTextBox();
 				}
 			}
             else
