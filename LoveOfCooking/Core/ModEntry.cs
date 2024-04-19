@@ -55,6 +55,7 @@ namespace LoveOfCooking
 			public CookingMenu.Filter LastRecipeFilterThisSession;
 			public CookingMenu.Sorter LastRecipeSorterThisSession;
 			public bool IsLastRecipeSearchReversed;
+			public bool IsModConfigMenuTransition;
 			public CookbookAnimation CookbookAnimation = new();
 			public MultipleMutexRequest MenuMutex;
 
@@ -96,6 +97,7 @@ namespace LoveOfCooking
 				this.LastRecipeFilterThisSession = CookingMenu.Filter.None;
 				this.LastRecipeSorterThisSession = CookingMenu.Sorter.Name;
 				this.IsLastRecipeSearchReversed = false;
+				this.IsModConfigMenuTransition = false;
 				this.CookbookAnimation.Reset();
 				this.MenuMutex?.ReleaseLocks();
 

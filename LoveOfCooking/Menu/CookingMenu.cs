@@ -222,6 +222,7 @@ namespace LoveOfCooking.Menu
 			this.trashCan = null;
 			this._iconShakeTimerField = Helper.Reflection.GetField<Dictionary<int, double>>(this.inventory, "_iconShakeTimer");
             Game1.displayHUD = true; // Prevents hidden HUD on crash when initialising menu, set to false at the end of this method
+			ModEntry.Instance.States.Value.IsModConfigMenuTransition = false;
 
 			// Populate recipe lists
 			recipes = recipes is not null
@@ -979,6 +980,7 @@ namespace LoveOfCooking.Menu
             {
                 if (Interfaces.GenericModConfigMenu is not null)
                 {
+                    ModEntry.Instance.States.Value.IsModConfigMenuTransition = true;
                     this.exitFunction += () =>
                     {
                         Log.D("Opening mod config menu.", Config.DebugMode);
@@ -986,7 +988,7 @@ namespace LoveOfCooking.Menu
                             func: () => Interfaces.GenericModConfigMenu.OpenModMenu(mod: ModEntry.Instance.ModManifest),
                             delay: 33);
                     };
-					this.exitThisMenuNoSound();
+					this.exitThisMenu();
 				}
                 else
                 {

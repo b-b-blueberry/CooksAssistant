@@ -1,4 +1,5 @@
 ﻿using System;
+using LoveOfCooking.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -191,7 +192,7 @@ namespace LoveOfCooking.Objects
 					this._frame = elapsed / CookbookAnimation.FastFrameTime;
 
 					// Skip animation per config value
-					if (!ModEntry.Config.PlayMenuAnimation)
+					if (!ModEntry.Config.PlayMenuAnimation || ModEntry.Instance.States.Value.IsModConfigMenuTransition)
 					{
 						this._frame = CookbookAnimation.LastFrame;
 						inverse = 1;
