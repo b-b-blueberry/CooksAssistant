@@ -1136,7 +1136,7 @@ namespace LoveOfCooking.Menu
 			if (this._isFilterBarVisible)
 			{
 				this.ToggleFilterPopup(playSound: true, forceToggleTo: false);
-				this.CloseTextBox(isCancelled: true); // Prevent clickthrough
+				this.CloseTextBox(isCancelled: true, updateResults: false); // Prevent clickthrough
 				return false;
 			}
 			if (this.SearchBarTextBox.Selected || this.SearchBarTextBox.Text != this.SearchBarDefaultText)
