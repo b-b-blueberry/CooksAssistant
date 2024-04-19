@@ -645,7 +645,13 @@ namespace LoveOfCooking.Menu
 
 		public override void OnButtonPressed(Buttons button)
 		{
-			// ...
+			if (button is Buttons.Start or Buttons.B or Buttons.Y)
+			{
+				if (this.ShowInventoriesPopup && this.PopUpArea.Contains(Game1.getOldMouseX(), Game1.getOldMouseY()))
+				{
+					this.ToggleInventoriesPopup(playSound: true, forceToggleTo: false);
+				}
+			}
 		}
 
 		public override void OnPrimaryClick(int x, int y, bool playSound = true)

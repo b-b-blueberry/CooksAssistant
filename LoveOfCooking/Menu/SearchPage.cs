@@ -720,10 +720,6 @@ namespace LoveOfCooking.Menu
                 // Open onscreen keyboard for search bar textbox
                 if (button is Buttons.A)
                     Game1.showTextEntry(text_box: this.SearchBarTextBox);
-
-                // Close search box
-                if (button is Buttons.Start or Buttons.B or Buttons.Y)
-					this.CloseTextBox(isCancelled: true);
             }
             else
             {
@@ -778,13 +774,17 @@ namespace LoveOfCooking.Menu
 			{
 				if (!this.SearchBarTextBox.Selected)
 				{
-					// Search text box activated
+					// Search text box opened
 					this.SearchBarTextBox.Text = "";
 					Game1.keyboardDispatcher.Subscriber = this.SearchBarTextBox;
 					this.SearchBarTextBox.SelectMe();
 					this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
 				}
-				else
+			}
+            else
+			{
+				// Search text box closed
+				if (this.SearchBarTextBox.Selected)
 				{
 					if (this.SearchButton.containsPoint(x, y))
 					{
@@ -799,10 +799,7 @@ namespace LoveOfCooking.Menu
 					}
 					this.CloseTextBox(isCancelled: false, updateResults: !clickedSearchResult);
 				}
-			}
-            else
-			{
-				if (this.UpButton.containsPoint(x, y))
+				else if (this.UpButton.containsPoint(x, y))
 				{
 					// Navigation buttons
 					this.TryClickNavButton(isDownwards: false, playSound: playSound);
@@ -913,7 +910,6 @@ namespace LoveOfCooking.Menu
 							hoverText = clickable.hoverText;
 					}
 				}
-
 			}
 
             if (this.IsGridView)

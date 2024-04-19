@@ -1048,9 +1048,6 @@ namespace LoveOfCooking.Menu
 			{
 				this.PopMenuStack(playSound);
 			}
-
-            //this._searchPage.ClampSearchIndex();
-			//this._searchPage.UpdateSearchRecipes();
         }
 
         public override void leftClickHeld(int x, int y)
@@ -1378,27 +1375,13 @@ namespace LoveOfCooking.Menu
 			// Inventory interactions
 			this.InventoryManager.OnKeyPressed(key: key);
 
-            // ????????????
-			if (!this._searchPage.IsSearchBarSelected)
-            {
-                if (Game1.options.doesInputListContain(Game1.options.menuButton, key)
-                    || Game1.options.doesInputListContain(Game1.options.journalButton, key))
+            // Try quit menu
+            if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
+			{
+				this.PopMenuStack(playSound: true);
+                if (Game1.currentLocation.currentEvent is not null && Game1.currentLocation.currentEvent.CurrentCommand > 0)
                 {
-                    if (Game1.options.SnappyMenus
-                        && this.InventoryManager.ShowInventoriesPopup
-                        && this.InventoryManager.PopUpArea.Contains(Game1.getOldMouseX(), Game1.getOldMouseY()))
-						this.InventoryManager.ToggleInventoriesPopup(playSound: true, forceToggleTo: false);
-                    else
-						this.PopMenuStack(playSound: true);
-                }
-
-                if (Game1.options.doesInputListContain(Game1.options.menuButton, key) && this.canExitOnKey)
-				{
-					this.PopMenuStack(playSound: true);
-                    if (Game1.currentLocation.currentEvent is not null && Game1.currentLocation.currentEvent.CurrentCommand > 0)
-                    {
-                        Game1.currentLocation.currentEvent.CurrentCommand++;
-                    }
+                    Game1.currentLocation.currentEvent.CurrentCommand++;
                 }
             }
 
