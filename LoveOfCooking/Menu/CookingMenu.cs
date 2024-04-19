@@ -1392,7 +1392,7 @@ namespace LoveOfCooking.Menu
 			this.InventoryManager.OnKeyPressed(key: key);
 
             // Try quit menu
-            if (Game1.options.doesInputListContain(Game1.options.menuButton, key))
+            if (Game1.keyboardDispatcher.Subscriber is null && Game1.options.doesInputListContain(Game1.options.menuButton, key))
 			{
 				this.PopMenuStack(playSound: true);
                 if (Game1.currentLocation.currentEvent is not null && Game1.currentLocation.currentEvent.CurrentCommand > 0)
