@@ -1170,7 +1170,6 @@ namespace LoveOfCooking.Menu
 				}
 				this.setCurrentlySnappedComponentTo(this._searchPage.SearchBarClickable.myID);
 				this._searchPage.OpenTextBox();
-				Game1.showTextEntry(text_box: this._searchPage.SearchBarTextBox);
 			}
 
             // Don't you dare

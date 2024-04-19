@@ -35,6 +35,7 @@ namespace LoveOfCooking.Menu
         private const int FilterBarSideSourceWidth = 6;
         private int _searchBarTextBoxMaxWidth;
         private int _searchBarTextBoxMinWidth;
+		private int _searchBarWidth;
         private int _resultHeight;
         private string SearchBarDefaultText => I18n.Get("menu.cooking_recipe.search_label");
 
@@ -326,6 +327,10 @@ namespace LoveOfCooking.Menu
 			Game1.keyboardDispatcher.Subscriber = this.SearchBarTextBox;
 			this.SearchBarTextBox.SelectMe();
 			this.ToggleFilterPopup(playSound: false, forceToggleTo: false);
+			if (Game1.options.SnappyMenus)
+			{
+				Game1.showTextEntry(text_box: this.SearchBarTextBox);
+			}
 		}
 
         public void CloseTextBox(bool isCancelled, bool updateResults = true)
@@ -412,7 +417,9 @@ namespace LoveOfCooking.Menu
                 Selected = false,
                 Text = this.SearchBarDefaultText,
             };
-			this.SearchBarTextBox.OnEnterPressed += sender => { this.CloseTextBox(isCancelled: false); };
+			this.SearchBarTextBox.OnEnterPressed += sender => {
+				this.CloseTextBox(isCancelled: false);
+			};
 
 			// Search button
 			this.SearchButton = new(
@@ -582,9 +589,11 @@ namespace LoveOfCooking.Menu
 			this.SearchBarTextBox.X = this.ContentArea.X;
 			this.SearchBarTextBox.Y = this.ContentArea.Y + offset.Y + 1 * Scale;
 			this.SearchBarTextBox.Selected = false;
-			this.SearchBarTextBox.Update();
-			this._searchArea = new Rectangle(
-				this.SearchBarTextBox.X, this.SearchBarTextBox.Y, -1, this.SearchBarTextBox.Height);
+			this.SearchBarClickable.bounds = this._searchArea = new(
+				x: this.SearchBarTextBox.X,
+				y: this.SearchBarTextBox.Y,
+				width: -1,
+				height: this.SearchBarTextBox.Height);
 
 			// toggle button group
 			this.ToggleButtons.First().bounds.X = this.ContentArea.X + this.ContentArea.Width
@@ -608,11 +617,9 @@ namespace LoveOfCooking.Menu
 			int minWidth = 48 * Scale;
 			this._searchBarTextBoxMinWidth = Math.Min(this.ToggleButtons.First().bounds.X - this._searchArea.X,
                 Math.Max(minWidth, 6 * Scale + (int)Math.Ceiling(Game1.smallFont.MeasureString(this.SearchBarTextBox.Text).X)));
-			this.SearchBarTextBox.Width = this._searchBarTextBoxMinWidth;
-			this.SearchBarClickable.bounds = this._searchArea;
-			this._searchArea.Width = this.SearchBarTextBox.Width;
+			this._searchBarWidth = this._searchBarTextBoxMinWidth;
 
-            // navigation buttons
+			// navigation buttons
 			this.UpButton.bounds.X = this.DownButton.bounds.X = this.SearchButton.bounds.X + 1 * Scale;
 			this.UpButton.bounds.Y = this.SearchButton.bounds.Y + this.SearchButton.bounds.Height + 4 * Scale;
 			this.DownButton.bounds.Y = this.ContentArea.Bottom - 32 * Scale;
@@ -622,7 +629,7 @@ namespace LoveOfCooking.Menu
 				this._filterArea = new(
                     x: this._searchArea.Left,
                     y: this.ToggleFilterButton.bounds.Top + (this.ToggleFilterButton.bounds.Height - FilterContainerSource.Height * SmallScale) / 2,
-                    width: this._searchArea.Width,
+                    width: this._searchBarTextBoxMinWidth,
                     height: FilterContainerSource.Height * SmallScale);
 
 				offset.Y = 2 * Scale;
@@ -646,9 +653,9 @@ namespace LoveOfCooking.Menu
 
 				int y = this._searchArea.Bottom;
 				this._resultsArea = new(
-					x: this.SearchBarTextBox.X,
+					x: this._searchArea.X,
 					y: y,
-					width: this.UpButton.bounds.X - this.SearchBarTextBox.X - 8 * Scale,
+					width: this.UpButton.bounds.X - this._searchArea.X - 8 * Scale,
 					height: this.DownButton.bounds.Y + this.DownButton.bounds.Height - y - 2 * Scale);
             }
 
@@ -725,17 +732,19 @@ namespace LoveOfCooking.Menu
         {
 			if (this.SearchBarTextBox.Selected)
             {
-                // Open onscreen keyboard for search bar textbox
-                if (button is Buttons.A)
-                    Game1.showTextEntry(text_box: this.SearchBarTextBox);
+                // ...
             }
             else
             {
-                // Right thumbstick mimics scroll behaviour
-                if (button is Buttons.RightThumbstickLeft && this.CanScrollUp)
+				// Right thumbstick mimics scroll behaviour
+				if (button is Buttons.RightThumbstickLeft && this.CanScrollUp)
+				{
 					this.TryClickNavButton(isDownwards: false, playSound: true);
+				}
                 else if (button is Buttons.RightThumbstickRight && this.CanScrollDown)
+				{
 					this.TryClickNavButton(isDownwards: true, playSound: true);
+				}
             }
         }
 
@@ -932,12 +941,19 @@ namespace LoveOfCooking.Menu
         {
             // Expand search bar on selected, contract on deselected
             float delta = 256f / time.ElapsedGameTime.Milliseconds;
-            if (this.SearchBarTextBox.Selected && this.SearchBarTextBox.Width < this._searchBarTextBoxMaxWidth)
-				this.SearchBarTextBox.Width = (int)Math.Min(this._searchBarTextBoxMaxWidth, this.SearchBarTextBox.Width + delta);
-            else if (!this.SearchBarTextBox.Selected && this.SearchBarTextBox.Width > this._searchBarTextBoxMinWidth)
-				this.SearchBarTextBox.Width = (int)Math.Max(this._searchBarTextBoxMinWidth, this.SearchBarTextBox.Width - delta);
-			this._searchArea.Width = this.SearchBarTextBox.Width;
-			this.SearchBarClickable.bounds.Width = this._searchArea.Width;
+
+            if (this.SearchBarTextBox.Selected && this._searchBarWidth < this._searchBarTextBoxMaxWidth)
+				this._searchBarWidth = (int)Math.Min(this._searchBarTextBoxMaxWidth, this._searchBarWidth + delta);
+            else if (!this.SearchBarTextBox.Selected && this._searchBarWidth > this._searchBarTextBoxMinWidth)
+				this._searchBarWidth = (int)Math.Max(this._searchBarTextBoxMinWidth, this._searchBarWidth - delta);
+
+			this._searchArea.Width = this.SearchBarClickable.bounds.Width = this.SearchBarTextBox.Width = this._searchBarWidth;
+
+			// Fix textbox handling after text entry cancelled for gamepad
+			if (Game1.options.SnappyMenus && this.SearchBarTextBox.Selected && Game1.textEntry is null)
+			{
+				this.CloseTextBox(isCancelled: true);
+			}
         }
 
         public override void Draw(SpriteBatch b)
@@ -1019,7 +1035,7 @@ namespace LoveOfCooking.Menu
             // Search filter buttons
             foreach (ClickableTextureComponent clickable in this.ToggleButtons)
 			{
-				if (this.SearchBarTextBox.X + this.SearchBarTextBox.Width < clickable.bounds.X)
+				if (this.SearchBarTextBox.X + this._searchBarWidth < clickable.bounds.X)
 				{
 					clickable.draw(b);
                     if (clickable.myID == this.ToggleFilterButton.myID)
