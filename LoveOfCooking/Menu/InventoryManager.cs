@@ -465,6 +465,17 @@ namespace LoveOfCooking.Menu
 				sourceRect: AutofillDisabledButtonSource,
 				scale: Scale);
 
+			List<ClickableComponent> components = new() {
+				this.TabButton,
+				this.ToggleAutofillButton
+			};
+			components.AddRange(this.InventorySelectButtons);
+
+			return components;
+		}
+
+		public override void AssignNestedComponentIds(ref int id)
+		{
 			// inventory buttons and ingredients slots
 			for (int i = 0; i < this.InventorySelectButtons.Count; ++i)
 			{
@@ -483,19 +494,6 @@ namespace LoveOfCooking.Menu
 						this.InventorySelectButtons[i].rightNeighborID = this.InventorySelectButtons[i + 1].myID;
 				}
 			}
-
-			List<ClickableComponent> components = new() {
-				this.TabButton,
-				this.ToggleAutofillButton
-			};
-			components.AddRange(this.InventorySelectButtons);
-
-			return components;
-		}
-
-		public override void AssignNestedComponentIds(ref int id)
-		{
-			// ...
 		}
 
 		public override void LayoutComponents(Rectangle area)
