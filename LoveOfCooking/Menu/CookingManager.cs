@@ -91,11 +91,11 @@ namespace LoveOfCooking.Menu
                 return minimumChance;
 
             int cookingLevel = ModEntry.CookingSkillApi.GetLevel();
-			float baseRate = ModEntry.ItemDefinitions.BurnChanceBase;
-			float addedRate = ModEntry.ItemDefinitions.BurnChancePerIngredient;
+			float baseRate = ModEntry.Definitions.BurnChanceBase;
+			float addedRate = ModEntry.Definitions.BurnChancePerIngredient;
             float chance = Math.Max(minimumChance, baseRate + addedRate * recipe.getNumberOfIngredients()
-                - cookingLevel * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceModifier * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceReduction
-                - CookingTool.GetEffectiveGlobalLevel() / 2f * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceModifier * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceReduction);
+                - cookingLevel * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction
+                - CookingTool.GetEffectiveGlobalLevel() / 2f * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction);
 
             return chance;
         }
@@ -117,7 +117,7 @@ namespace LoveOfCooking.Menu
         /// </summary>
         public static bool IsSeasoning(Item item)
         {
-            return item is not null && (item.ItemId == ModEntry.ItemDefinitions.DefaultSeasoning || ModEntry.ItemDefinitions.Seasonings.ContainsKey(item.ItemId));
+            return item is not null && (item.ItemId == ModEntry.Definitions.DefaultSeasoning || ModEntry.Definitions.Seasonings.ContainsKey(item.ItemId));
         }
 
         /// <summary>

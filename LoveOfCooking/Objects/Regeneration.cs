@@ -160,7 +160,7 @@ namespace LoveOfCooking
 			const int maxLevel = 10;
 			float scalingCurrent = 0;
 			float scalingMax = 0;
-			foreach (var pair in ModEntry.ItemDefinitions.RegenSkillModifiers)
+			foreach (var pair in ModEntry.Definitions.RegenSkillModifiers)
 			{
 				string name = pair.Key;
 				bool isDefined = Enum.TryParse(name, out ModEntry.SkillIndex skillIndex);
@@ -178,10 +178,10 @@ namespace LoveOfCooking
 
 			// Set values
 			this.SkillModifierRate = scalingCurrent / scalingMax;
-			this.BaseRate = ModEntry.ItemDefinitions.RegenBaseRate;
-			this.HealthRate = ModEntry.ItemDefinitions.RegenHealthRate;
-			this.EnergyRate = ModEntry.ItemDefinitions.RegenEnergyRate;
-			this.FinalRate = ModEntry.ItemDefinitions.RegenFinalRate;
+			this.BaseRate = ModEntry.Definitions.RegenBaseRate;
+			this.HealthRate = ModEntry.Definitions.RegenHealthRate;
+			this.EnergyRate = ModEntry.Definitions.RegenEnergyRate;
+			this.FinalRate = ModEntry.Definitions.RegenFinalRate;
 		}
 
 		/// <summary>

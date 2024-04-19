@@ -73,7 +73,7 @@ namespace LoveOfCooking.Interface
 			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingLevelExtender = Helper.ModRegistry.IsLoaded("Devin_Lematty.Level_Extender");
 			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-			UsingFarmhouseKitchenStart = ModEntry.ItemDefinitions.FarmhouseKitchenStartModIDs.Any(Helper.ModRegistry.IsLoaded);
+			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Helper.ModRegistry.IsLoaded);
 		}
 
 		internal static void SaveLoadedBehaviours()
@@ -175,7 +175,7 @@ namespace LoveOfCooking.Interface
 			LevelExtender.initializeSkill(
 				name: Objects.CookingSkill.InternalName,
 				xp: ModEntry.CookingSkillApi.GetTotalCurrentExperience(),
-				xp_mod: ModEntry.ItemDefinitions.CookingSkillValues.ExperienceGlobalScaling,
+				xp_mod: ModEntry.Definitions.CookingSkillValues.ExperienceGlobalScaling,
 				xp_table: ModEntry.CookingSkillApi.GetSkill().ExperienceCurve.ToList(),
 				cats: null);
 		}

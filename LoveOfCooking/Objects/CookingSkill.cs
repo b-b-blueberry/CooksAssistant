@@ -34,8 +34,8 @@ namespace LoveOfCooking.Objects
 		public void ReloadAssets()
 		{
 			// Set experience values
-			this.ExperienceBarColor = ModEntry.ItemDefinitions.CookingSkillValues.ExperienceBarColor;
-			this.ExperienceCurve = ModEntry.ItemDefinitions.CookingSkillValues.ExperienceCurve.ToArray();
+			this.ExperienceBarColor = ModEntry.Definitions.CookingSkillValues.ExperienceBarColor;
+			this.ExperienceCurve = ModEntry.Definitions.CookingSkillValues.ExperienceCurve.ToArray();
 
 			// Set the skills page icon (cookpot)
 			this.SkillsPageIcon = Utils.Slice(texture: ModEntry.SpriteSheet, area: CookingMenu.CookingSkillIconArea);
@@ -68,8 +68,8 @@ namespace LoveOfCooking.Objects
 					Description = I18n.Get($"{id}{extra}.description",
 					new
 					{ // v-- Skill profession description values are tokenised here
-						SaleValue = $"{((ModEntry.ItemDefinitions.CookingSkillValues.SalePriceModifier - 1) * 100):0}",
-						RestorationAltValue = $"{(ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue):0}",
+						SaleValue = $"{((ModEntry.Definitions.CookingSkillValues.SalePriceModifier - 1) * 100):0}",
+						RestorationAltValue = $"{(ModEntry.Definitions.CookingSkillValues.RestorationAltValue):0}",
 					})
 				};
 				// Skill professions are paired and applied
@@ -95,7 +95,7 @@ namespace LoveOfCooking.Objects
 			{
 				list.Add(I18n.Get("menu.cooking_skill.levelup_burn", new
 					{
-						Number = $"{(level * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceModifier * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceReduction):0.00}"
+						Number = $"{(level * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction):0.00}"
 					}));
 			}
 
@@ -114,7 +114,7 @@ namespace LoveOfCooking.Objects
 
 			if (ModEntry.Config.FoodCanBurn)
 			{
-				float value = level * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceModifier * ModEntry.ItemDefinitions.CookingSkillValues.BurnChanceReduction;
+				float value = level * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction;
 				hoverText += Environment.NewLine + I18n.Get(
 					key: "menu.cooking_skill.levelup_burn",
 					tokens: new

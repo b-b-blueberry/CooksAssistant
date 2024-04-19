@@ -253,9 +253,9 @@ namespace LoveOfCooking
 
 		public static bool IsCookbookMailDateMet()
 		{
-			int day = ModEntry.ItemDefinitions.CookbookMailDate[0] - 1;
-			int month = ModEntry.ItemDefinitions.CookbookMailDate[1] - 1;
-			int year = ModEntry.ItemDefinitions.CookbookMailDate[2];
+			int day = ModEntry.Definitions.CookbookMailDate[0] - 1;
+			int month = ModEntry.Definitions.CookbookMailDate[1] - 1;
+			int year = ModEntry.Definitions.CookbookMailDate[2];
 			int gameMonth = Utility.getSeasonNumber(Game1.currentSeason);
 			bool reachedNextYear = (Game1.year > year);
 			bool reachedNextMonth = (Game1.year == year && gameMonth > month);
@@ -319,7 +319,7 @@ namespace LoveOfCooking
 		public static void PopulateMissingRecipes()
 		{
 			// Add any missing starting recipes
-			foreach (string recipe in ModEntry.ItemDefinitions.StartingRecipes)
+			foreach (string recipe in ModEntry.Definitions.StartingRecipes)
 			{
 				if (!Game1.player.cookingRecipes.ContainsKey(recipe))
 				{
@@ -349,7 +349,7 @@ namespace LoveOfCooking
 		{
 			// Show category-specific information for general category ingredient rules
 			// Icons are furnished with some recognisable stereotypes of items from each category
-			if (ModEntry.ItemDefinitions.CategoryDisplayInformation.TryGetValue(id, out string[] value)) {
+			if (ModEntry.Definitions.CategoryDisplayInformation.TryGetValue(id, out string[] value)) {
 				displayId = value[0];
 				displayName = Game1.content.LoadString(value[1]);
 				return true;
@@ -545,23 +545,23 @@ namespace LoveOfCooking
 			Game1.freezeControls = true;
 
 			string name = recipe.name.ToLower();
-			bool isBaked = ModEntry.ItemDefinitions.BakeyFoods.Any(name.StartsWith) || ModEntry.ItemDefinitions.CakeyFoods.Any(name.EndsWith);
+			bool isBaked = ModEntry.Definitions.BakeyFoods.Any(name.StartsWith) || ModEntry.Definitions.CakeyFoods.Any(name.EndsWith);
 			string startSound, sound, endSound;
 
 			// Generic sounds
-			if (ModEntry.ItemDefinitions.SoupyFoods.Any(name.EndsWith))
+			if (ModEntry.Definitions.SoupyFoods.Any(name.EndsWith))
 			{
 				startSound = "dropItemInWater";
 				sound = "dropItemInWater";
 				endSound = "bubbles";
 			}
-			else if (ModEntry.ItemDefinitions.DrinkyFoods.Any(name.EndsWith))
+			else if (ModEntry.Definitions.DrinkyFoods.Any(name.EndsWith))
 			{
 				startSound = "Milking";
 				sound = "dropItemInWater";
 				endSound = "bubbles";
 			}
-			else if (ModEntry.ItemDefinitions.SaladyFoods.Any(name.EndsWith))
+			else if (ModEntry.Definitions.SaladyFoods.Any(name.EndsWith))
 			{
 				startSound = "daggerswipe";
 				sound = "daggerswipe";
@@ -615,7 +615,7 @@ namespace LoveOfCooking
 				};
 
 			// Oven-baked foods
-			if (isBaked && !ModEntry.ItemDefinitions.PancakeyFoods.Any(name.Contains))
+			if (isBaked && !ModEntry.Definitions.PancakeyFoods.Any(name.Contains))
 			{
 				frames[^1] = new(58, ms * 2);
 				frames.Add(new(44, ms * 8)
@@ -631,7 +631,7 @@ namespace LoveOfCooking
 			}
 
 			// Dough-tossing foods
-			if (ModEntry.ItemDefinitions.PizzayFoods.Any(name.Contains))
+			if (ModEntry.Definitions.PizzayFoods.Any(name.Contains))
 			{
 				Game1.player.faceDirection(2);
 
@@ -672,7 +672,7 @@ namespace LoveOfCooking
 			}
 
 			// Pan-flipping foods
-			else if (ModEntry.ItemDefinitions.PancakeyFoods.Any(name.Contains))
+			else if (ModEntry.Definitions.PancakeyFoods.Any(name.Contains))
 			{
 				ms = 100;
 
@@ -789,7 +789,7 @@ namespace LoveOfCooking
 				rate *= 1.3f;
 			// cooking skill professions are unlocked
 			if (ModEntry.CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.Restoration))
-				rate += rate / ModEntry.ItemDefinitions.CookingSkillValues.RestorationValue;
+				rate += rate / ModEntry.Definitions.CookingSkillValues.RestorationValue;
 			// sitting or lying down
 			if (Game1.player.IsSitting() || Game1.player.isInBed.Value)
 				rate *= 1.4f;
@@ -891,7 +891,7 @@ namespace LoveOfCooking
 			if (ModEntry.Config.AddSeasonings)
 			{
 				// Find first available seasoning item of any possible seasoning items
-				foreach (var pair in ModEntry.ItemDefinitions.Seasonings)
+				foreach (var pair in ModEntry.Definitions.Seasonings)
 				{
 					if (check(itemId: pair.Key, quality: pair.Value) is int quality and > StardewValley.Object.lowQuality)
 					{
@@ -902,7 +902,7 @@ namespace LoveOfCooking
 			else
 			{
 				// Use Qi Seasoning as default if added seasonings are disabled in config
-				return check(itemId: ModEntry.ItemDefinitions.DefaultSeasoning, quality: StardewValley.Object.bestQuality);
+				return check(itemId: ModEntry.Definitions.DefaultSeasoning, quality: StardewValley.Object.bestQuality);
 			}
 			return StardewValley.Object.lowQuality;
 		}
@@ -934,8 +934,8 @@ namespace LoveOfCooking
 		public static bool IsProbablyBurntFood(Item item)
 		{
 			return item is not null
-				&& (ModEntry.ItemDefinitions.BurntItemCreated == item.ItemId
-					|| ModEntry.ItemDefinitions.BurntItemAlternatives.Contains(item.ItemId));
+				&& (ModEntry.Definitions.BurntItemCreated == item.ItemId
+					|| ModEntry.Definitions.BurntItemAlternatives.Contains(item.ItemId));
 		}
 
 		public static bool CheckBurntFood(CraftingRecipe recipe)
@@ -945,9 +945,9 @@ namespace LoveOfCooking
 
 		public static Item CreateBurntFood()
 		{
-			string itemId = ModEntry.ItemDefinitions.BurntItemAlternativeChance > Game1.random.NextDouble()
-				? ModEntry.ItemDefinitions.BurntItemAlternatives[(int)Math.Round(Game1.random.NextDouble() * (ModEntry.ItemDefinitions.BurntItemAlternatives.Count - 1))]
-				: ModEntry.ItemDefinitions.BurntItemCreated;
+			string itemId = ModEntry.Definitions.BurntItemAlternativeChance > Game1.random.NextDouble()
+				? ModEntry.Definitions.BurntItemAlternatives[(int)Math.Round(Game1.random.NextDouble() * (ModEntry.Definitions.BurntItemAlternatives.Count - 1))]
+				: ModEntry.Definitions.BurntItemCreated;
 			return ItemRegistry.Create(itemId: itemId);
 		}
 
@@ -1023,7 +1023,7 @@ namespace LoveOfCooking
 
 		public static bool CanUseCharacterKitchen(Farmer who, string character)
 		{
-			return string.IsNullOrEmpty(character) || who.getFriendshipHeartLevelForNPC(name: character) >= ModEntry.ItemDefinitions.NpcKitchenFriendshipRequired;
+			return string.IsNullOrEmpty(character) || who.getFriendshipHeartLevelForNPC(name: character) >= ModEntry.Definitions.NpcKitchenFriendshipRequired;
 		}
 		
 		public static bool DoesLocationHaveKitchen(string name)
@@ -1041,7 +1041,7 @@ namespace LoveOfCooking
 			{
 				for (int x = 0; x < layer.LayerWidth; x++)
 				{
-					if (ModEntry.ItemDefinitions.IndoorsTileIndexesOfKitchens.Contains(location.getTileIndexAt(x: x, y: y, layer: layerId)))
+					if (ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(location.getTileIndexAt(x: x, y: y, layer: layerId)))
 					{
 						return true;
 					}
@@ -1070,7 +1070,7 @@ namespace LoveOfCooking
 			// Check for indoors kitchen tiles
 			if (tile is not null)
 			{
-				bool isCookingStationTile = ModEntry.ItemDefinitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
+				bool isCookingStationTile = ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
 				if (!location.IsOutdoors && isCookingStationTile)
 				{
 					if (!location.IsFarm)
@@ -1092,8 +1092,8 @@ namespace LoveOfCooking
 		public static CoinDebris CreateCoinDebris(GameLocation location, Farmer who, int x, int y)
 		{
 			CoinDebris debris = new(
-				value: ModEntry.ItemDefinitions.PaellaBuffCoinValue,
-				count: Game1.random.Next(ModEntry.ItemDefinitions.PaellaBuffCoinCount.X, ModEntry.ItemDefinitions.PaellaBuffCoinCount.Y),
+				value: ModEntry.Definitions.PaellaBuffCoinValue,
+				count: Game1.random.Next(ModEntry.Definitions.PaellaBuffCoinCount.X, ModEntry.Definitions.PaellaBuffCoinCount.Y),
 				position: new(x, y),
 				farmer: who);
 			location.debris.Add(debris);
@@ -1103,10 +1103,10 @@ namespace LoveOfCooking
 		public static void ApplyKebabBuffUpgrade(Farmer who, Buff buff)
 		{
 			// Upgrade buff effects
-			buff.effects.Add(new BuffEffects(data: ModEntry.ItemDefinitions.KebabBuffUpgradeEffects));
+			buff.effects.Add(new BuffEffects(data: ModEntry.Definitions.KebabBuffUpgradeEffects));
 
 			// Upgrade buff icon
-			buff.iconSheetIndex = ModEntry.ItemDefinitions.KebabBuffUpgradeIconIndex;
+			buff.iconSheetIndex = ModEntry.Definitions.KebabBuffUpgradeIconIndex;
 			Game1.buffsDisplay.updatedIDs.Add(buff.id);
 
 			// Add visual effects to player

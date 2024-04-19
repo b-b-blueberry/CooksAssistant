@@ -118,7 +118,7 @@ namespace LoveOfCooking.Menu
         internal const int TextDividerGap = 1 * Scale;
         internal const int TextSpacingFromIcons = 20 * Scale;
 
-        internal static Color TextColour => ModEntry.ItemDefinitions.CookingMenuTextColour;
+        internal static Color TextColour => ModEntry.Definitions.CookingMenuTextColour;
 		internal static Color SubtextColour => TextColour * 0.75f;
         internal static Color BlockedColour => TextColour * 0.325f;
 

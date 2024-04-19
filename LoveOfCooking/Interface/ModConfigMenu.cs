@@ -138,9 +138,9 @@ namespace LoveOfCooking.Interface
 				name: () => string.Empty,
 				beforeMenuOpened: () =>
 				{
-					int day = ModEntry.ItemDefinitions.CookbookMailDate[0];
-					int season = ModEntry.ItemDefinitions.CookbookMailDate[1];
-					int year = ModEntry.ItemDefinitions.CookbookMailDate[2];
+					int day = ModEntry.Definitions.CookbookMailDate[0];
+					int season = ModEntry.Definitions.CookbookMailDate[1];
+					int year = ModEntry.Definitions.CookbookMailDate[2];
 					cookbookDeliveryDate = Utility.getDateStringFor(day: day, season: season, year: year);
 
 					objectData = Game1.content.Load
@@ -399,7 +399,7 @@ namespace LoveOfCooking.Interface
 					b.Draw(
 						texture: Game1.staminaRect,
 						destinationRectangle: toArea,
-						color: isMaxLevel ? Color.Orange : ModEntry.ItemDefinitions.CookingSkillValues.ExperienceBarColor);
+						color: isMaxLevel ? Color.Orange : ModEntry.Definitions.CookingSkillValues.ExperienceBarColor);
 					v.Y += toArea.Height;
 
 					// Draw friendship requirements
@@ -418,7 +418,7 @@ namespace LoveOfCooking.Interface
 				name: () => string.Empty,
 				beforeMenuOpened: () =>
 				{
-					recipeTable = ModEntry.ItemDefinitions.CookingSkillValues.LevelUpRecipes;
+					recipeTable = ModEntry.Definitions.CookingSkillValues.LevelUpRecipes;
 					recipeTableSize = new(
 						x: recipeTable.Values.MaxBy(list => list.Count).Count,
 						y: recipeTable.Values.Count);
@@ -910,7 +910,7 @@ namespace LoveOfCooking.Interface
 				beforeMenuOpened: () =>
 				{
 					seasoningsHeight = 0;
-					seasoningsMap = ModEntry.ItemDefinitions.Seasonings
+					seasoningsMap = ModEntry.Definitions.Seasonings
 						.OrderBy(pair => pair.Value)
 						.ToDictionary(
 							pair => pair.Key,
@@ -939,7 +939,7 @@ namespace LoveOfCooking.Interface
 					offset.X -= width / 2;
 					foreach (var pair in seasoningsMap)
 					{
-						bool isUnlocked = Game1.player.knowsRecipe(pair.Key) || (pair.Key == ModEntry.ItemDefinitions.DefaultSeasoning && Game1.MasterPlayer.mailReceived.Contains("qiChallengeComplete"));
+						bool isUnlocked = Game1.player.knowsRecipe(pair.Key) || (pair.Key == ModEntry.Definitions.DefaultSeasoning && Game1.MasterPlayer.mailReceived.Contains("qiChallengeComplete"));
 						// item
 						b.Draw(
 							texture: pair.Value.Texture,
@@ -1059,7 +1059,7 @@ namespace LoveOfCooking.Interface
 					offset.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.townkitchens.subheading.2"), font: Game1.smallFont).Y;
 
 					int spacing = 1 * Scale;
-					int hearts = (int)ModEntry.ItemDefinitions.NpcKitchenFriendshipRequired;
+					int hearts = (int)ModEntry.Definitions.NpcKitchenFriendshipRequired;
 					int max = 10;
 					int width = max * CookingMenu.HeartFullIconSource.Width * Scale + (max - 1) * spacing;
 					offset.X -= width / 2;

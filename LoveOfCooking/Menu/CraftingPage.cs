@@ -66,7 +66,7 @@ namespace LoveOfCooking.Menu
             else
                 return;
 
-			value = Math.Clamp(value: value, min: 1, max: Math.Min((int)ModEntry.ItemDefinitions.MaxCookingQuantity, this.Menu.RecipeInfo.NumReadyToCraft));
+			value = Math.Clamp(value: value, min: 1, max: Math.Min((int)ModEntry.Definitions.MaxCookingQuantity, this.Menu.RecipeInfo.NumReadyToCraft));
             if (this._quantity != value)
 			{
 				this._quantity = value;
@@ -86,7 +86,7 @@ namespace LoveOfCooking.Menu
 
 		internal void CreateIngredientSlotButtons(int buttonsToDisplay, int usableButtons)
 		{
-            if (!ModEntry.ItemDefinitions.ShowLockedIngredientsSlots)
+            if (!ModEntry.Definitions.ShowLockedIngredientsSlots)
             {
                 buttonsToDisplay = usableButtons;
             }

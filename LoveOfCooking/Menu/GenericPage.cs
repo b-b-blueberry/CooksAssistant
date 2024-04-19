@@ -47,7 +47,7 @@ namespace LoveOfCooking.Menu
 			this._lineWidth = this.ContentArea.Width - 12 * Scale;
 			this._textWidth = this._lineWidth + TextMuffinTopOverDivider * 2;
             this._textScale = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts
-                ? ModEntry.ItemDefinitions.KoreanFontScale
+                ? ModEntry.Definitions.KoreanFontScale
                 : Vector2.One;
 		}
 
@@ -61,7 +61,7 @@ namespace LoveOfCooking.Menu
             w = w > 0 ? w : font.MeasureString(text).X + (CurrentLanguageCode is LanguageCode.ja or LanguageCode.zh ? 20 : 0);
             position.X -= (int)(font.MeasureString(text).X * ((int)justify * 0.5f));
             if (CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts)
-                scale *= ModEntry.ItemDefinitions.KoreanFontScale.Y;
+                scale *= ModEntry.Definitions.KoreanFontScale.Y;
 
             // Draw text
             Utility.drawTextWithShadow(b,
@@ -87,7 +87,7 @@ namespace LoveOfCooking.Menu
                 x2: (int)(position.X + x) + w + TextMuffinTopOverDivider,
                 y2: (int)(position.Y + y),
                 b: b,
-                color1: ModEntry.ItemDefinitions.CookingMenuDividerColour);
+                color1: ModEntry.Definitions.CookingMenuDividerColour);
         }
     }
 }

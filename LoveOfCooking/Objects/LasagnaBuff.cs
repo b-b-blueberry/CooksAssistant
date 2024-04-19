@@ -57,8 +57,8 @@ namespace LoveOfCooking.Objects
 
 				// Apply slow effect to monsters
 				// Due to how bouncing and flying enemies work, this effect only applies to walking enemies
-				int maxSlow = ModEntry.ItemDefinitions.LasagnaBuffMaxSlow;
-				int minSpeed = ModEntry.ItemDefinitions.LasagnaBuffMinSpeed;
+				int maxSlow = ModEntry.Definitions.LasagnaBuffMaxSlow;
+				int minSpeed = ModEntry.Definitions.LasagnaBuffMinSpeed;
 				var monsters = this.GetTargets();
 				foreach (Monster monster in monsters)
 				{

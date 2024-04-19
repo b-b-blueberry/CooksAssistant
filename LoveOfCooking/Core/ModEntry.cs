@@ -176,7 +176,7 @@ namespace LoveOfCooking
 		}
 
 		// Mod data definitions
-		internal static Definitions ItemDefinitions;
+		internal static Definitions Definitions;
 		internal static Dictionary<string, string> Strings = new();
 
 		// Others:
@@ -307,10 +307,10 @@ namespace LoveOfCooking
 
 		private void AddConsoleCommands()
 		{
-			string cmd = ModEntry.ItemDefinitions.ConsoleCommandPrefix;
+			string cmd = ModEntry.Definitions.ConsoleCommandPrefix;
 
 			IEnumerable<string> forgetLoveOfCookingRecipes() {
-				IEnumerable<string> recipes = ModEntry.ItemDefinitions.CookingSkillValues.LevelUpRecipes.Values
+				IEnumerable<string> recipes = ModEntry.Definitions.CookingSkillValues.LevelUpRecipes.Values
 					.SelectMany(s => s);
 				foreach (string recipe in recipes)
 				{
@@ -682,7 +682,7 @@ namespace LoveOfCooking
 
 			// Don't consider excluded items for food behaviours, e.g. Food Heals Over Time
 			if (who.itemToEat is not StardewValley.Object food
-				|| ModEntry.ItemDefinitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.Name))
+				|| ModEntry.Definitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.Name))
 				return;
 
 			if (food.Name == ModEntry.CookbookItemId)
@@ -702,9 +702,9 @@ namespace LoveOfCooking
 			{
 				// Add additional health
 				who.health = (int) Math.Min(who.maxHealth,
-					who.health + food.healthRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
+					who.health + food.healthRecoveredOnConsumption() * (ModEntry.Definitions.CookingSkillValues.RestorationAltValue / 100f));
 				who.Stamina = (int) Math.Min(who.MaxStamina,
-					who.Stamina + food.staminaRecoveredOnConsumption() * (ModEntry.ItemDefinitions.CookingSkillValues.RestorationAltValue / 100f));
+					who.Stamina + food.staminaRecoveredOnConsumption() * (ModEntry.Definitions.CookingSkillValues.RestorationAltValue / 100f));
 			}
 
 			// Check to boost buff duration
@@ -715,7 +715,7 @@ namespace LoveOfCooking
 				if (duration > 0)
 				{
 					float rate = (who.health + who.Stamina) / (who.maxHealth + who.MaxStamina);
-					duration += (int) Math.Floor(ModEntry.ItemDefinitions.CookingSkillValues.BuffDurationValue * 1000 * rate);
+					duration += (int) Math.Floor(ModEntry.Definitions.CookingSkillValues.BuffDurationValue * 1000 * rate);
 					foodBuff.millisecondsDuration = duration;
 				}
 			}
@@ -754,7 +754,7 @@ namespace LoveOfCooking
 			}
 
 			// Add leftovers from viable foods to the inventory, or drop it on the ground if full
-			if (ModEntry.ItemDefinitions.FoodsThatGiveLeftovers.TryGetValue(food.Name, out string leftoversName))
+			if (ModEntry.Definitions.FoodsThatGiveLeftovers.TryGetValue(food.Name, out string leftoversName))
 			{
 				Item leftovers = ItemRegistry.Create(itemId: leftoversName, amount: 1);
 				Utils.AddOrDropItem(leftovers);
@@ -766,7 +766,7 @@ namespace LoveOfCooking
 			// Cooking skill professions influence gift value of Cooking objects
 			if (CookingSkillApi.HasProfession(ICookingSkillAPI.Profession.GiftBoost) && e.Gift.Category == StardewValley.Object.CookingCategory)
 			{
-				Game1.player.changeFriendship(amount: ModEntry.ItemDefinitions.CookingSkillValues.GiftBoostValue, n: e.Npc);
+				Game1.player.changeFriendship(amount: ModEntry.Definitions.CookingSkillValues.GiftBoostValue, n: e.Npc);
 			}
 		}
 
@@ -804,7 +804,7 @@ namespace LoveOfCooking
 
 		public void ReloadAssets()
 		{
-			ModEntry.ItemDefinitions = Game1.content.Load
+			ModEntry.Definitions = Game1.content.Load
 				<Definitions>
 				(AssetManager.GameContentDefinitionsPath);
 			ModEntry.SpriteSheet = Game1.content.Load
@@ -816,7 +816,7 @@ namespace LoveOfCooking
 			CookbookAnimation.Reload(this.Helper);
 
 			// Order custom seasonings by descending quality, ensuring best seasonings are consumed first
-			ModEntry.ItemDefinitions.Seasonings = ModEntry.ItemDefinitions.Seasonings
+			ModEntry.Definitions.Seasonings = ModEntry.Definitions.Seasonings
 				.OrderByDescending(pair => pair.Value)
 				.ToDictionary(pair => pair.Key, pair => pair.Value);
 

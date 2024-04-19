@@ -102,7 +102,7 @@ namespace LoveOfCooking.Objects
 						Game1.left => new Vector2(x: -1, y: 0),
 						_ => Vector2.Zero
 					};
-					Point size = ModEntry.ItemDefinitions.CurryBuffArea;
+					Point size = ModEntry.Definitions.CurryBuffArea;
 					Point centre = Game1.player.getStandingPosition().ToPoint();
 					centre.Y -= Game1.tileSize / 4 * 3;
 					Point distance = new Point(
@@ -115,10 +115,10 @@ namespace LoveOfCooking.Objects
 					// Damage monsters
 					Game1.currentLocation.damageMonster(
 						areaOfEffect: this.DamageArea,
-						minDamage: ModEntry.ItemDefinitions.CurryBuffDamage.X,
-						maxDamage: ModEntry.ItemDefinitions.CurryBuffDamage.Y,
+						minDamage: ModEntry.Definitions.CurryBuffDamage.X,
+						maxDamage: ModEntry.Definitions.CurryBuffDamage.Y,
 						isBomb: false,
-						knockBackModifier: ModEntry.ItemDefinitions.CurryBuffKnockbackMultiplier,
+						knockBackModifier: ModEntry.Definitions.CurryBuffKnockbackMultiplier,
 						addedPrecision: 0,
 						critChance: 0f,
 						critMultiplier: 0f,

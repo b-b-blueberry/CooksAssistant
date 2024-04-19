@@ -43,7 +43,7 @@ namespace LoveOfCooking
 		public static string GameContentShopDataPath { get; private set; } = "ShopData";
 		public static string GameContentToolDataPath { get; private set; } = "ToolData";
 		public static string GameContentWalletDataPath { get; private set; } = "WalletData";
-		public static string GameContentDefinitionsPath { get; private set; } = "ItemDefinitions";
+		public static string GameContentDefinitionsPath { get; private set; } = "Definitions";
 
 		// Local paths: filepaths without extension passed to Load()
 		// These are the paths for our default data files bundled with the mod in our assets folder.
@@ -61,7 +61,7 @@ namespace LoveOfCooking
 		public static string LocalShopDataPath { get; private set; } = "shop-data";
 		public static string LocalToolDataPath { get; private set; } = "tool-data";
 		public static string LocalWalletDataPath { get; private set; } = "wallet-data";
-		public static string LocalDefinitionsPath { get; private set; } = "itemDefinitions";
+		public static string LocalDefinitionsPath { get; private set; } = "definitions";
 
 		// Content pack paths: relative directories for additional content packs.
 		public static readonly string RootContentPackPath = "assets";
