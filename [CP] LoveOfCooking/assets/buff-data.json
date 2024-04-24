@@ -1,0 +1,82 @@
+{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/Buffs",
+            "Entries": {
+                "blueberry.LoveOfCooking_curry": {
+                    "DisplayName": "{{i18n:buff.curry.name}}",
+                    "Description": "{{i18n:buff.curry.description}}",
+                    "IsDebuff": false,
+                    "GlowColor": "Orange",
+                    "Duration": 100000,
+                    "MaxDuration": -1,
+                    "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSpriteIndex": 257,
+                    "Effects": {
+                        "Speed": 1,
+                        "Defense": -3,
+                        "Attack": 2
+                    },
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "blueberry.LoveOfCooking_kebab": {
+                    "DisplayName": "{{i18n:buff.kebab.name}}",
+                    "Description": "{{i18n:buff.kebab.description}}",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 80000,
+                    "MaxDuration": -1,
+                    "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSpriteIndex": 258, // Upgrade: 259 // Set in definitions data
+                    "Effects": {
+                        "Attack": 2,
+                        "Defense": 2
+                    },
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "blueberry.LoveOfCooking_lasagna": {
+                    "DisplayName": "{{i18n:buff.lasagna.name}}",
+                    "Description": "{{i18n:buff.lasagna.description}}",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 120000,
+                    "MaxDuration": -1,
+                    "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSpriteIndex": 260,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "blueberry.LoveOfCooking_paella": {
+                    "DisplayName": "{{i18n:buff.paella.name}}",
+                    "Description": "{{i18n:buff.paella.description}}",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 180000,
+                    "MaxDuration": -1,
+                    "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSpriteIndex": 261,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "blueberry.LoveOfCooking_profiteroles": {
+                    "DisplayName": "{{i18n:buff.profiteroles.name}}",
+                    "Description": "{{i18n:buff.profiteroles.description}}",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 50000,
+                    "MaxDuration": -1,
+                    "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSpriteIndex": 262,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                }
+            }
+        }
+    ]
+}

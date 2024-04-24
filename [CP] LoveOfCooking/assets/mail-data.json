@@ -1,0 +1,14 @@
+{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/mail",
+            "Entries": {
+                "blueberry.LoveOfCooking.cookbook_unlocked": "{{i18n:mail.cookbook_unlocked}}",
+                "blueberry.LoveOfCooking.seasoning_1": "{{i18n:mail.seasoning_1}}",
+                "blueberry.LoveOfCooking.seasoning_2": "{{i18n:mail.seasoning_2}}",
+                "blueberry.LoveOfCooking.migrate_refund_1_6": "{{i18n:mail.migrate_refund_1_6}}"
+            }
+        }
+    ]
+}

@@ -1,0 +1,281 @@
+﻿{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/NPCGiftTastes",
+            "TextOperations": [
+                // Universal gift tastes
+                {
+                    "Operation": "Append",
+                    "Target": [ "Entries", "Universal_Neutral" ],
+                    "Value": "blueberry.LoveOfCooking_chocolate blueberry.LoveOfCooking_eggsando_half blueberry.LoveOfCooking_saladsando_half blueberry.LoveOfCooking_seafoodsando_half",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Entries", "Universal_Dislike" ],
+                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Delimiter": " "
+                },
+                // Individual gift tastes
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Willy", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_admiralpie",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Lewis", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_applepie",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Emily", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_burger",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Krobus", "3" ], // like
+                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Dwarf", "9" ], // neutral
+                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Wizard", "9" ], // neutral
+                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Evelyn", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_cherrypie blueberry.LoveOfCooking_eggsando",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Pierre", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_cherrypie blueberry.LoveOfCooking_craymornay",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leah", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_carrotcake",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Vincent", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_carrotcake",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Abigail", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_chocoflan",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Haley", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_cocococktail",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Gus", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_crepes",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sam", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_curry",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Demetrius", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_fruity",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Linus", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_hunters",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Shane", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_kebab",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Robin", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_lasagna",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "George", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_leeks",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leo", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_lobster",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sebastian", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_nigiri",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Caroline", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_parfait",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Penny", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_pilaf",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Jas", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_profiteroles",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Alex", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_quiche",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leah", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_saladsando",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Willy", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_seafoodsando",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sandy", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_summersalad",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Harvey", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_unagi",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Jas", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_waffles",
+                    "Delimiter": " "
+                },
+                // Villager chocolate preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Haley", "3" ], // like
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Jas", "3" ], // like
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sandy", "3" ], // like
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Vincent", "3" ], // like
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "George", "5" ], // dislike
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leah", "5" ], // dislike
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "5" ], // dislike
+                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Delimiter": " "
+                },
+                // Demetrius sandwich preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_eggsando blueberry.LoveOfCooking_saladsando blueberry.LoveOfCooking_seafoodsando",
+                    "Delimiter": " "
+                },
+                // Krobus sandwich preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "7" ], // hate
+                    "Value": "blueberry.LoveOfCooking_eggsando blueberry.LoveOfCooking_saladsando blueberry.LoveOfCooking_seafoodsando blueberry.LoveOfCooking_chocolate blueberry.LoveOfCooking_eggsando_half blueberry.LoveOfCooking_saladsando_half blueberry.LoveOfCooking_seafoodsando_half",
+                    "Delimiter": " "
+                },
+                // Kent burger preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "1" ], // love
+                    "Value": "blueberry.LoveOfCooking_admiralpie blueberry.LoveOfCooking_applepie blueberry.LoveOfCooking_cherrypie",
+                    "Delimiter": " "
+                },
+                // Penny alcohol preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Penny", "7" ], // hate
+                    "Value": "blueberry.LoveOfCooking_cocococktail blueberry.LoveOfCooking_fruity",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Penny", "9" ], // neutral
+                    "Value": "blueberry.LoveOfCooking_crepes",
+                    "Delimiter": " "
+                }
+            ]
+        }
+    ]
+}

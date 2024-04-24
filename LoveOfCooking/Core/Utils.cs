@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
@@ -1274,6 +1276,55 @@ namespace LoveOfCooking
 				.OrderBy(id => recipes[id].DisplayName)
 				.OrderByDescending(id => Game1.player.cookingRecipes.ContainsKey(id))
 				.ToList();
+		}
+
+		/// <summary>
+		/// Replaces mod translation entries with those from another mod.
+		/// This allows us to share a single group of i18n files between all mod components.
+		/// </summary>
+		public static void CopyTranslations(string from, string to)
+		{
+			(object instance, object files) GetTranslations(string uniqueId)
+			{
+				Type SCore = Type
+					.GetType("StardewModdingAPI.Framework.SCore, StardewModdingAPI");
+				object SCoreInstance = SCore
+					.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static)
+					.GetGetMethod(true)
+					.Invoke(null, null);
+				object SModRegistry = SCore
+					.GetField("ModRegistry", BindingFlags.NonPublic | BindingFlags.Instance)
+					.GetValue(SCoreInstance);
+				object SModMetadata = SModRegistry
+					.GetType()
+					.GetMethod("Get", BindingFlags.Public | BindingFlags.Instance)
+					.Invoke(SModRegistry, new object[] { uniqueId });
+				object directoryPath = SModMetadata
+					.GetType()
+					.GetProperty("DirectoryPath", BindingFlags.Public | BindingFlags.Instance)
+					.GetGetMethod()
+					.Invoke(SModMetadata, null);
+
+				List<string> errors = new();
+				object SCoreTranslationFiles = SCore
+					.GetMethod("ReadTranslationFiles", BindingFlags.NonPublic | BindingFlags.Instance)
+					.Invoke(SCoreInstance, new object[] { Path.Combine((string)directoryPath, "i18n"), errors });
+				object SModTranslations = SModMetadata
+					.GetType()
+					.GetProperty("Translations", BindingFlags.Public | BindingFlags.Instance)
+					.GetGetMethod()
+					.Invoke(SModMetadata, null);
+				return (SModTranslations, SCoreTranslationFiles);
+			}
+
+			(object instance, object files) sourceTranslations = GetTranslations(uniqueId: from);
+			(object instance, object files) targetTranslations = GetTranslations(uniqueId: to);
+
+			// evil plans
+			targetTranslations.instance
+				.GetType()
+				.GetMethod("SetTranslations", BindingFlags.NonPublic | BindingFlags.Instance)
+				.Invoke(targetTranslations.instance, new object[] { sourceTranslations.files });
 		}
 	}
 }

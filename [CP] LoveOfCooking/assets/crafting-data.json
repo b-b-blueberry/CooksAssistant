@@ -1,0 +1,15 @@
+{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/CraftingRecipes",
+            "Entries": {
+                "blueberry.LoveOfCooking_seasoning_1": "399 1 404 1/hello/blueberry.LoveOfCooking_seasoning_1 5/false/null", // spring onion + hot pepper
+                "blueberry.LoveOfCooking_seasoning_2": "248 1 829 1/hello/blueberry.LoveOfCooking_seasoning_2 5/false/null" // garlic + ginger
+            },
+            "When": {
+                "query: {{blueberry.LoveOfCooking/AddSeasonings}}": true
+            }
+        }
+    ]
+}

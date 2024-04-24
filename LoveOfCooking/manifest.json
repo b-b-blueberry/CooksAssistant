@@ -10,6 +10,9 @@
 	"Dependencies": [
 		{
 			"UniqueID": "spacechase0.SpaceCore"
+		},
+		{
+			"UniqueID": "Pathoschild.ContentPatcher"
 		}
 	]
 }

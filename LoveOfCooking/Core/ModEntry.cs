@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using LoveOfCooking.Interface;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework.Graphics;
@@ -10,7 +11,6 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Menus;
-using StardewValley.Mods;
 
 namespace LoveOfCooking
 {
@@ -23,6 +23,7 @@ namespace LoveOfCooking
 
 		internal ITranslationHelper I18n => this.Helper.Translation;
 
+		internal const string ContentModUniqueID = "blueberry.LoveOfCooking.CP"; // DO NOT EDIT
 		internal const string AssetPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
 		internal const string ModDataPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
 		internal const string ObjectPrefix = "blueberry.LoveOfCooking_"; // DO NOT EDIT
@@ -69,6 +70,7 @@ namespace LoveOfCooking
 
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
+		internal static bool IsInitialised = false;
 
 
 		public override void Entry(IModHelper helper)
@@ -88,68 +90,13 @@ namespace LoveOfCooking
 			return new CookingSkillAPI(reflection: this.Helper.Reflection);
 		}
 
-		private bool Init()
-		{
-			// Interfaces
-			try
-			{
-				if (!Interface.Interfaces.Init())
-				{
-					Log.E("Failed to load mod-provided APIs.");
-					return false;
-				}
-			}
-			catch (Exception e)
-			{
-				Log.E($"Error in loading mod-provided APIs:{Environment.NewLine}{e}");
-				return false;
-			}
-
-			// Asset definitions
-			try
-			{
-				if (!AssetManager.Init())
-				{
-					Log.E("Failed to start asset manager.");
-					return false;
-				}
-			}
-			catch (Exception e)
-			{
-				Log.E($"Error in starting asset manager:{Environment.NewLine}{e}");
-				return false;
-			}
-
-			// Game state queries
-			try
-			{
-				Queries.RegisterAll();
-			}
-			catch (Exception e)
-			{
-				Log.E($"Error in registering game state queries:{Environment.NewLine}{e}");
-				return false;
-			}
-
-			// Harmony patches
-			try
-			{
-				HarmonyPatches.HarmonyPatches.Patch(id: this.ModManifest.UniqueID);
-			}
-			catch (Exception e)
-			{
-				Log.E($"Error in applying Harmony patches:{Environment.NewLine}{e}");
-				return false;
-			}
-
-			// Game events
-			this.RegisterEvents();
-
-			return true;
-		}
-
 		private void RegisterEvents()
 		{
+			// Register translation injection and load initial translations
+			LocalizedContentManager.OnLanguageChange += AssetManager.LoadStrings;
+
+			// Game events
+			this.Helper.Events.Specialized.LoadStageChanged += this.Specialized_LoadStageChanged;
 			this.Helper.Events.Content.AssetRequested += AssetManager.OnAssetRequested;
 			this.Helper.Events.GameLoop.SaveLoaded += this.GameLoop_SaveLoaded;
 			this.Helper.Events.GameLoop.Saving += this.GameLoop_Saving;
@@ -379,13 +326,32 @@ namespace LoveOfCooking
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			// Load assets after mods and asset editors have been registered to allow for patches, correct load orders
-			this.Helper.Events.GameLoop.OneSecondUpdateTicked += this.Event_LoadLate;
+			this.Init();
+			this.Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked_LoadLate;
+		}
+
+		private void GameLoop_UpdateTicked_LoadLate(object sender, UpdateTickedEventArgs e)
+		{
+			this.Helper.Events.GameLoop.UpdateTicked -= this.GameLoop_UpdateTicked_LoadLate;
+			this.InitLate();
+		}
+
+		private void Specialized_LoadStageChanged(object sender, LoadStageChangedEventArgs e)
+		{
+			this.States.Value.Reset();
+			this.States.Value.Load(data: Game1.player.modData);
+			
+			// Invalidate and reload assets
+			Log.D("Invalidating assets on LoadStageChanged.",
+				Config.DebugMode);
+			this.ReloadAssets();
+			AssetManager.InvalidateAssets();
 		}
 
 		private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
 		{
-			this.SaveLoadedBehaviours();
+			this.PrintModData();
+			this.PrintCookingSkill();
 		}
 
 		private void GameLoop_Saving(object sender, SavingEventArgs e)
@@ -395,13 +361,6 @@ namespace LoveOfCooking
 
 		private void GameLoop_DayStarted(object sender, DayStartedEventArgs e)
 		{
-			// Perform OnSaveLoaded behaviours when starting a new game
-			bool isNewGame = Game1.dayOfMonth == 1 && Game1.currentSeason == "spring" && Game1.year == 1;
-			if (isNewGame)
-			{
-				this.SaveLoadedBehaviours();
-			}
-
 			// Cooking Skill
 			// Clear daily cooking to free up experience gains
 			ModEntry.Instance.States.Value.FoodCookedToday.Clear();
@@ -423,45 +382,6 @@ namespace LoveOfCooking
 		{
 			// Reset session state
 			this.States.Value.Reset();
-		}
-
-		private void Event_LoadLate(object sender, OneSecondUpdateTickedEventArgs e)
-		{
-			this.Helper.Events.GameLoop.OneSecondUpdateTicked -= this.Event_LoadLate;
-
-			bool isLoaded = false;
-			try
-			{
-				if (!this.Init())
-				{
-					Log.E($"{this.ModManifest.Name} couldn't be initialised.");
-				}
-				else
-				{
-					// Assets and definitions
-					this.ReloadAssets();
-
-					// Console commands
-					this.AddConsoleCommands();
-
-					// APIs and custom content
-					Interface.Interfaces.Load();
-
-					// Cooking skill
-					ModEntry.CookingSkillApi = new CookingSkillAPI(this.Helper.Reflection);
-					SpaceCore.Skills.RegisterSkill(new CookingSkill());
-
-					isLoaded = true;
-				}
-			}
-			catch (Exception ex)
-			{
-				Log.E(ex.ToString());
-			}
-			if (!isLoaded)
-			{
-				Log.E($"{this.ModManifest.Name} failed to load completely. Mod may not be usable.");
-			}
 		}
 
 		[EventPriority(EventPriority.Low)]
@@ -638,36 +558,62 @@ namespace LoveOfCooking
 			}
 		}
 
-
-		private void SaveLoadedBehaviours()
+		private void Init()
 		{
 			try
 			{
-				this.States.Value.Reset();
-				this.States.Value.Load(data: Game1.player.modData);
+				// Interfaces
+				if (!Interfaces.Init())
+				{
+					throw new Exception("Failed to load mod-provided APIs.");
+				}
+
+				Interfaces.RegisterContentPatcherTokens();
+
+				ModEntry.IsInitialised = true;
 			}
-			catch (Exception e)
+			catch (Exception ex)
 			{
-				Log.E("" + e);
+				Log.E(ex.ToString());
+				Log.E($"{this.ModManifest.Name} failed to initialise. Mod may not be usable.");
 			}
+		}
+
+		private void InitLate()
+		{
+			if (!ModEntry.IsInitialised)
+				return;
 
 			try
 			{
-				Interface.Interfaces.SaveLoadedBehaviours();
+				// Game state queries
+				Queries.RegisterAll();
+
+				// Harmony patches
+				HarmonyPatches.HarmonyPatches.Patch(id: this.ModManifest.UniqueID);
+
+				// Game events
+				this.RegisterEvents();
+
+				// Assets and definitions
+				Utils.CopyTranslations(from: ModEntry.ContentModUniqueID, to: this.ModManifest.UniqueID);
+				this.ReloadAssets();
+
+				// Console commands
+				this.AddConsoleCommands();
+
+				// Interfaces
+				Interfaces.Load();
+
+				// Cooking skill
+				ModEntry.CookingSkillApi = new CookingSkillAPI(this.Helper.Reflection);
+				SpaceCore.Skills.RegisterSkill(new CookingSkill());
 			}
 			catch (Exception e)
 			{
-				Log.E("" + e);
+				Log.E(e.ToString());
+				Log.E($"{this.ModManifest.Name} failed to load completely. Mod may not be usable.");
 			}
-
-			this.PrintModData();
-			this.PrintCookingSkill();
-
-			// Invalidate and reload assets
-			Log.D("Invalidating assets on save loaded.",
-				Config.DebugMode);
-			this.ReloadAssets();
-			AssetManager.InvalidateAssets();
 		}
 
 		public void ReloadAssets()
@@ -749,7 +695,7 @@ namespace LoveOfCooking
 				Log.D("Cooking skill is disabled in mod config.",
 					ModEntry.Config.DebugMode);
 			}
-			else if (ModEntry.CookingSkillApi.GetSkill() is null)
+			else if (ModEntry.CookingSkillApi?.GetSkill() is null)
 			{
 				Log.D("Cooking skill is enabled, but skill is not loaded.",
 					ModEntry.Config.DebugMode);

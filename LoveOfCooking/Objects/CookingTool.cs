@@ -43,7 +43,7 @@ namespace LoveOfCooking.Objects
 			ModEntry.Instance.States.Value.CookingToolLevel = tool.UpgradeLevel;
 
 			// Ensure wallet items list is updated for latest tool level
-			AssetManager.InvalidateAssets();
+			ModEntry.Instance.Helper.GameContent.InvalidateCacheAndLocalized(@"Data/Powers");
 		}
 
 		/// <summary>
@@ -123,7 +123,7 @@ namespace LoveOfCooking.Objects
 
 		public static string WalletID(int level)
 		{
-			return $"{ModEntry.ObjectPrefix}cookingtool.level{level}";
+			return CookingTool.InternalName;
 		}
 
 		public static string ToolID(int level)

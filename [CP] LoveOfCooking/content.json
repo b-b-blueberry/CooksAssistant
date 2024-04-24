@@ -1,0 +1,69 @@
+{
+	"Format": "2.0.0",
+	"Changes": [
+		// Definitions
+		{
+			"Action": "Load",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/Definitions",
+			"FromFile": "assets/mod-data.json"
+		},
+		// Sprites
+		{
+			"Action": "Load",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+			"FromFile": "assets/mod-sprites.png"
+		},
+		{
+			"Action": "Load",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/CookbookSprites",
+			"FromFile": "assets/cookbook-sprites.png"
+		},
+		{
+			"Action": "Load",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+			"FromFile": "assets/object-sprites.png"
+		},
+		{
+			"Action": "Load",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+			"FromFile": "assets/tool-sprites.png"
+		},
+		// Data
+		{
+			"Action": "Include",
+			"FromFile": "assets/buff-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/cooking-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/crafting-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/gift-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/mail-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/object-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/power-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/shop-data.json"
+		},
+		{
+			"Action": "Include",
+			"FromFile": "assets/tool-data.json"
+		}
+	]
+}

@@ -106,8 +106,7 @@ namespace LoveOfCooking.Interface
 		private static void CreateInfoPage(IGenericModConfigMenuAPI gmcm, IManifest mod)
 		{
 			float subheadingOffset = 0;
-			Texture2D objectSprites = null;
-			IDictionary<string, ObjectData> objectData = null;
+			Dictionary<string, Texture2D> objectSprites = new();
 
 			gmcm.AddPage(
 				mod: mod,
@@ -143,12 +142,10 @@ namespace LoveOfCooking.Interface
 					int year = ModEntry.Definitions.CookbookMailDate[2];
 					cookbookDeliveryDate = Utility.getDateStringFor(day: day, season: season, year: year);
 
-					objectData = Game1.content.Load
-						<Dictionary<string, ObjectData>>
-						(AssetManager.GameContentObjectDataPath);
-					objectSprites = Game1.content.Load
-						<Texture2D>
-						(AssetManager.GameContentObjectSpriteSheetPath);
+					// Populate object sprites map
+					objectSprites.Clear();
+					foreach (var pair in Game1.objectData.Where(pair => pair.Key.StartsWith(ModEntry.ObjectPrefix)))
+						objectSprites[pair.Key] = ItemRegistry.GetData(pair.Key).GetTexture();
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
@@ -167,16 +164,12 @@ namespace LoveOfCooking.Interface
 					}
 
 					// Draw cookbook icon
-					ObjectData entry = objectData[ModEntry.CookbookItemId];
-					Rectangle fromArea = Game1.getSourceRectForStandardTileSheet(
-						tileSheet: objectSprites,
-						tilePosition: entry.SpriteIndex,
-						width: Game1.smallestTileSize,
-						height: Game1.smallestTileSize);
+					ParsedItemData entry = ItemRegistry.GetData(ModEntry.CookbookItemId);
+					Rectangle fromArea = entry.GetSourceRect();
 					Rectangle toArea = new(location: offset.ToPoint(), size: (fromArea.Size.ToVector2() * Scale).ToPoint());
 					offset = toArea.Location.ToVector2() - toArea.Size.ToVector2() - new Vector2(x: spacing, y: -2 * Scale);
 					b.Draw(
-						texture: objectSprites,
+						texture: objectSprites[entry.ItemId],
 						position: v + offset,
 						sourceRectangle: fromArea,
 						color: isClaimed ? Color.White * 0.5f : Color.White,
@@ -504,15 +497,15 @@ namespace LoveOfCooking.Interface
 							// Draw recipe icons for this level
 							foreach (string item in pair.Value)
 							{
-								ObjectData entry = objectData[$"{ModEntry.ObjectPrefix}{item}"];
+								ObjectData entry = Game1.objectData[$"{ModEntry.ObjectPrefix}{item}"];
 								fromArea = Game1.getSourceRectForStandardTileSheet(
-									tileSheet: objectSprites,
+									tileSheet: objectSprites[entry.Name],
 									tilePosition: entry.SpriteIndex,
 									width: Game1.smallestTileSize,
 									height: Game1.smallestTileSize);
 								toArea.Size = new(x: fromArea.Width * Scale, y: fromArea.Height * Scale);
 								b.Draw(
-									texture: objectSprites,
+									texture: objectSprites[entry.Name],
 									position: toArea.Location.ToVector2(),
 									sourceRectangle: fromArea,
 									color: !Context.IsWorldReady || ModEntry.CookingSkillApi.GetLevel() >= level ? Color.White : LockedColour,
@@ -685,7 +678,7 @@ namespace LoveOfCooking.Interface
 				});
 
 			// Cooking tool
-			Dictionary<string, ToolData> toolData = null;
+			Dictionary<string, ToolData> toolData = new();
 			int toolTableHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
@@ -702,10 +695,10 @@ namespace LoveOfCooking.Interface
 				name: () => string.Empty,
 				beforeMenuOpened: () =>
 				{
-					toolData = Game1.content.Load
-						<Dictionary<string, ToolData>>
-						(AssetManager.GameContentToolDataPath);
 					toolTableHeight = 0;
+					toolData.Clear();
+					foreach (var pair in Game1.toolData.Where(pair => pair.Key.StartsWith(CookingTool.InternalName)))
+						toolData[pair.Key] = pair.Value;
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
