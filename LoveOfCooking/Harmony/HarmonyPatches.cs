@@ -96,29 +96,35 @@ namespace LoveOfCooking.HarmonyPatches
 		}
 
 		/// <summary>
-		/// 
+		/// When claiming the cookbook from mail, closes the menu and plays an animation.
 		/// </summary>
 		public static void Mail_HandleItem_Postfix(ref LetterViewerMenu __instance)
 		{
 			if (__instance.mailTitle == ModEntry.MailCookbookUnlocked && (__instance.itemsToGrab?.Any(item => item.item.ItemId == ModEntry.CookbookItemId) ?? false))
 			{
-				__instance.exitFunction = () =>
+				LetterViewerMenu menu = __instance;
+				DelayedAction.functionAfterDelay(
+				func: () =>
 				{
-					DelayedAction.functionAfterDelay(
-					func: () =>
+					menu.exitFunction = () =>
 					{
-						// Block any item overflow menus created to collect cookbook
-						Game1.activeClickableMenu = null;
-						Game1.nextClickableMenu.Clear();
+						DelayedAction.functionAfterDelay(
+						func: () =>
+						{
+							// Block any item overflow menus created to collect cookbook
+							Game1.activeClickableMenu = null;
+							Game1.nextClickableMenu.Clear();
 
-						// Remove dummy cookbook item at all costs
-						Game1.player.removeFirstOfThisItemFromInventory(ModEntry.CookbookItemId);
+							// Remove dummy cookbook item at all costs
+							Game1.player.removeFirstOfThisItemFromInventory(ModEntry.CookbookItemId);
 
-						// Replace usual hold-item-above-head sequence with cookbook animation
-						Utils.PlayCookbookReceivedSequence();
-					},
-					delay: 1);
-				};
+							// Replace usual hold-item-above-head sequence with cookbook animation
+							Utils.PlayCookbookReceivedSequence();
+						},
+						delay: 1);
+					};
+				},
+				delay: 1);
 			}
 		}
 
