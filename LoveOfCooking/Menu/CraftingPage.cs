@@ -289,6 +289,7 @@ namespace LoveOfCooking.Menu
 				else if (this.SeasoningButton.containsPoint(x,y ))
 				{
 					this.Menu.CookingManager.IsUsingSeasonings = !this.Menu.CookingManager.IsUsingSeasonings;
+					Game1.playSound(ScrollCue);
 				}
 			}
         }
