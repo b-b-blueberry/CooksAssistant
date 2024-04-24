@@ -686,6 +686,7 @@ namespace LoveOfCooking.Interface
 
 			// Cooking tool
 			Dictionary<string, ToolData> toolData = null;
+			int toolTableHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
 				text: () => I18n.Get("config.option.cookingtool_name"));
@@ -704,11 +705,13 @@ namespace LoveOfCooking.Interface
 					toolData = Game1.content.Load
 						<Dictionary<string, ToolData>>
 						(AssetManager.GameContentToolDataPath);
+					toolTableHeight = 0;
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
-					subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.cookingtool.subheading.1")).Y;
-					v.Y += subheadingOffset;
+					toolTableHeight = (int)v.Y;
+
+					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.cookingtool.subheading.1")).Y;
 
 					// Creates a vertical list of groups of item icons, quantities, gold icons, and prices
 
@@ -886,8 +889,9 @@ namespace LoveOfCooking.Interface
 							toArea.Y -= 4 * Scale;
 						}
 					}
+					toolTableHeight = toArea.Bottom - toolTableHeight + 12 * Scale;
 				},
-				height: () => (int)subheadingOffset + CookingMenu.CookingToolBigIconSource.Height * Scale * toolData.Count);
+				height: () => toolTableHeight);
 
 			// More seasonings
 			Dictionary<string, (int Quality, Texture2D Texture, Rectangle Source)> seasoningsMap = new();
