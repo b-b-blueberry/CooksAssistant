@@ -32,22 +32,22 @@ namespace LoveOfCooking.HarmonyPatches
 
 			// Cookbook received in mail
 			harmony.Patch(
-				original: AccessTools.Method(typeof(StardewValley.Menus.LetterViewerMenu), "HandleItemCommand"),
+				original: AccessTools.Method(typeof(LetterViewerMenu), "HandleItemCommand"),
 				postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Mail_HandleItem_Postfix)));
 
 			// Upgrade purchased for cooking tool
 			harmony.Patch(
-				original: AccessTools.Method(typeof(StardewValley.Tool), "actionWhenPurchased"),
+				original: AccessTools.Method(typeof(Tool), "actionWhenPurchased"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Tool_ActionWhenPurchased_Prefix)));
 
 			// Upgrade cooking tool in any instance it's claimed by the player, including interactions with Clint's shop and mail delivery mods
 			harmony.Patch(
-				original: AccessTools.Method(typeof(StardewValley.Tool), "actionWhenClaimed"),
+				original: AccessTools.Method(typeof(Tool), "actionWhenClaimed"),
 				prefix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Tool_ActionWhenClaimed_Prefix)));
 
 			// Handle sale price bonus profession for Cooking skill by affecting object sale multipliers
 			harmony.Patch(
-				original: AccessTools.Method(typeof(StardewValley.Object), "getPriceAfterMultipliers"),
+				original: AccessTools.Method(typeof(Object), "getPriceAfterMultipliers"),
 				postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
 
 			// Food Buffs Start Hidden
