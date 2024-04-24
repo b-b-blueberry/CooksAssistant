@@ -427,17 +427,6 @@ namespace LoveOfCooking
 				{
 					fillColourOrigin.X = Math.Min(fillColourOrigin.X, -Game1.viewport.X + (Game1.currentLocation.Map.Layers[0].LayerWidth * Game1.tileSize));
 				}
-				e.SpriteBatch.Draw(
-					texture: ModEntry.SpriteSheet,
-					position: fillColourOrigin,
-					sourceRectangle: AssetManager.RegenBarArea,
-					color: Color.White,
-					rotation: 0f,
-					origin: Vector2.Zero,
-					scale: Game1.pixelZoom,
-					effects: SpriteEffects.None,
-					layerDepth: 1f);
-
 				// Draw fill colour
 				Color colour = Utility.getRedToGreenLerpColor(0.5f);
 				Rectangle destArea = new Rectangle(
