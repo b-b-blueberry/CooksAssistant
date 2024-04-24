@@ -318,7 +318,7 @@
                     "DisplayName": "{{i18n:item.chocolate.name}}",
                     "Description": "{{i18n:item.chocolate.description}}",
                     "Type": "Basic",
-                    "Category": -999,
+                    "Category": 0,
                     "Price": 280,
                     "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
                     "SpriteIndex": 11,
