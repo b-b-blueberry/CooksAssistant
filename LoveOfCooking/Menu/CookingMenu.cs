@@ -378,6 +378,11 @@ namespace LoveOfCooking.Menu
 
             this._craftingPage.CookButton.upNeighborID = this._craftingPage.FirstIngredientSlot.myID;
 			this._craftingPage.CookButton.downNeighborID = 0;
+			this._craftingPage.CookButton.rightNeighborID = this._craftingPage.SeasoningButton.myID;
+
+			this._craftingPage.SeasoningButton.leftNeighborID = this._craftingPage.CookButton.myID;
+			this._craftingPage.SeasoningButton.upNeighborID = this._craftingPage.FirstIngredientSlot.myID;
+			this._craftingPage.SeasoningButton.downNeighborID = 0;
 
 			this._craftingPage.CookButton.leftNeighborID = this._craftingPage.QuantityUpButton.myID;
 			this._craftingPage.QuantityUpButton.rightNeighborID = this._craftingPage.QuantityDownButton.rightNeighborID = this._craftingPage.CookButton.myID;

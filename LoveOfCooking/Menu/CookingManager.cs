@@ -43,6 +43,14 @@ namespace LoveOfCooking.Menu
                     usableButtons: this.MaxIngredients);
             }
         }
+        private bool _isUsingSeasonings;
+        internal bool IsUsingSeasonings
+        {
+			get => this._isUsingSeasonings;
+            set {
+				this._isUsingSeasonings = value;
+			}
+        }
 
         internal struct Ingredient
         {
@@ -345,7 +353,7 @@ namespace LoveOfCooking.Menu
             }
 
 			// Apply seasoning quality bonuses to the stack choices
-			{
+			if (this.IsUsingSeasonings) {
 			    // Consume seasoning items to improve the recipe output item qualities, rebalancing the stack numbers per quality item
 				// Stop iterating when we've run out of standard quality ingredients or no more seasonings can be found
 				List<Item> items = sourceItems.SelectMany(list => list).ToList();

@@ -7,6 +7,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Netcode;
 using StardewValley;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
 using static LoveOfCooking.Menu.CookingMenu;
 using static StardewValley.LocalizedContentManager;
@@ -26,6 +27,7 @@ namespace LoveOfCooking.Menu
 		private Rectangle _cookIconArea;
 		private Rectangle _quantityScrollableArea;
 		public ClickableTextureComponent CookButton { get; private set; }
+		public ClickableTextureComponent SeasoningButton { get; private set; }
 		public ClickableTextureComponent QuantityUpButton { get; private set; }
 		public ClickableTextureComponent QuantityDownButton { get; private set; }
 		public List<ClickableTextureComponent> IngredientSlotButtons { get; private set; } = new();
@@ -105,7 +107,7 @@ namespace LoveOfCooking.Menu
 		}
 
 		public override List<ClickableComponent> CreateClickableComponents()
-        {
+		{
 			this.CookButton = new(
 				name: "cook",
 				bounds: new(-1, -1, CookingToolBigIconSource.Width * Scale, CookingToolBigIconSource.Height * Scale),
@@ -113,6 +115,16 @@ namespace LoveOfCooking.Menu
 				hoverText: null,
 				texture: CookingMenu.Texture,
 				sourceRect: CookingToolBigIconSource,
+				scale: Scale,
+				drawShadow: true);
+			ParsedItemData seasoningData = ItemRegistry.GetData(ModEntry.Definitions.DefaultSeasoning);
+			this.SeasoningButton = new(
+				name: "seasoning",
+				bounds: new(-1, -1, seasoningData.GetSourceRect().Width * Scale, seasoningData.GetSourceRect().Height * Scale),
+				label: null,
+				hoverText: null,
+				texture: seasoningData.GetTexture(),
+				sourceRect: seasoningData.GetSourceRect(),
 				scale: Scale,
 				drawShadow: true);
 
@@ -141,6 +153,7 @@ namespace LoveOfCooking.Menu
             List<ClickableComponent> components = new()
             {
 				this.CookButton,
+				this.SeasoningButton,
 				this.QuantityUpButton,
 				this.QuantityDownButton
             };
@@ -210,19 +223,21 @@ namespace LoveOfCooking.Menu
 
 				// Cook! button
 				extraSpace = 8 * Scale;
-				offset.Y = this.ContentArea.Height / 4 * 3 - this.CookButton.bounds.Height / 2 - extraSpace;
-				this.CookButton.bounds.X = this.ContentArea.Left + this.ContentArea.Width / 7 * 3;
-				this.CookButton.bounds.Y = this.ContentArea.Top + offset.Y;
+				this.CookButton.bounds.X = this.IngredientSlotButtons[1].bounds.Center.X - this.CookButton.bounds.Width / 2;
+				this.CookButton.bounds.Y = this.ContentArea.Top + this.ContentArea.Height / 4 * 3 - this.CookButton.bounds.Height / 2 - extraSpace;
+
+				// Seasoning button
+				this.SeasoningButton.bounds.X = this.IngredientSlotButtons[2].bounds.Center.X - this.SeasoningButton.bounds.Width / 2;
+				this.SeasoningButton.bounds.Y = this.CookButton.bounds.Center.Y - this.SeasoningButton.bounds.Height / 2;
 
 				// Cooking quantity
+				int iconSize = Game1.smallestTileSize * Scale;
 				// icon
-				offset.X = this.ContentArea.Width / 3 - Game1.smallestTileSize / 2 * Scale - 6 * Scale;
-				offset.Y += Game1.smallestTileSize / 4 * Scale;
 				this._cookIconArea = new(
-					x: this.ContentArea.Left + offset.X,
-					y: this.ContentArea.Top + offset.Y,
-					width: Game1.smallestTileSize * Scale,
-					height: Game1.smallestTileSize * Scale);
+					x: this.IngredientSlotButtons[0].bounds.Center.X - iconSize / 2,
+					y: this.CookButton.bounds.Center.Y - iconSize / 2,
+					width: iconSize,
+					height: iconSize);
 				// buttons
 				extraSpace = 2 * Scale;
 				offset.X = this._cookIconArea.Left + (this._cookIconArea.Width - this.QuantityUpButton.bounds.Width) / 2;
@@ -271,6 +286,10 @@ namespace LoveOfCooking.Menu
 						Game1.playSound(CancelCue);
 					}
 				}
+				else if (this.SeasoningButton.containsPoint(x,y ))
+				{
+					this.Menu.CookingManager.IsUsingSeasonings = !this.Menu.CookingManager.IsUsingSeasonings;
+				}
 			}
         }
 
@@ -318,6 +337,7 @@ namespace LoveOfCooking.Menu
 			if (this.Menu.ReadyToCook)
 			{
 				this.CookButton.tryHover(x, y, 0f);
+				this.SeasoningButton.tryHover(x, y, scaleTo);
 				this.QuantityUpButton.tryHover(x, y, scaleTo);
 				this.QuantityDownButton.tryHover(x, y, scaleTo);
             }
@@ -480,6 +500,12 @@ namespace LoveOfCooking.Menu
 
 			this.QuantityUpButton.draw(b);
 			this.QuantityDownButton.draw(b);
+
+			// Seasoning button
+			this.SeasoningButton.draw(
+				b: b,
+				c: this.Menu.CookingManager.IsUsingSeasonings ? Color.White : Color.Black * 0.3f,
+				layerDepth: 1);
 
 			// Cook button - bouncing frying pan
 			// We don't just call CookButton.draw() here,
