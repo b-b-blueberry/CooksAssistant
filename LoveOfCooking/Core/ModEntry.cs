@@ -631,7 +631,7 @@ namespace LoveOfCooking
 
 			// Order custom seasonings by descending quality, ensuring best seasonings are consumed first
 			ModEntry.Definitions.Seasonings = ModEntry.Definitions.Seasonings
-				.OrderByDescending(pair => pair.Value)
+				.OrderByDescending(pair => pair.Value.Quality)
 				.ToDictionary(pair => pair.Key, pair => pair.Value);
 
 			ModEntry.CookingSkillApi?.GetSkill()?.ReloadAssets();

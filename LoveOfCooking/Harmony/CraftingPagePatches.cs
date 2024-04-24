@@ -35,6 +35,9 @@ namespace LoveOfCooking.HarmonyPatches
 			MethodInfo seasoningMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryApplySeasonings));
+			MethodInfo seasoningUsedMethod = AccessTools.Method(
+				type: typeof(Utils),
+				name: nameof(Utils.SendSeasoningUsedMessage));
 			MethodInfo burnMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryBurnFood));
@@ -56,7 +59,7 @@ namespace LoveOfCooking.HarmonyPatches
 				IL_005f: ldnull
 				IL_0060: stloc.2
 			*/
-			int j = ilOut.FindIndex(
+			int j = i < 0 ? i : ilOut.FindIndex(
 				startIndex: i,
 				match: (CodeInstruction ci) => ci.opcode == OpCodes.Ldnull);
 
@@ -67,7 +70,9 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 
 			// Skip seasonings list assignment; we need the empty list for later
-			i = ilOut.FindIndex(startIndex: i, match: (CodeInstruction ci) => ci.opcode == OpCodes.Stloc_2);
+			i = ilOut.FindIndex(
+				startIndex: i,
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Stloc_2);
 
 			// Replace default seasonings behaviour with override method call signature
 			ilOut.RemoveRange(index: i + 1, count: j - i + 1);
@@ -109,6 +114,29 @@ namespace LoveOfCooking.HarmonyPatches
 				new(OpCodes.Stloc, 1) // crafted
 			});
 
+			// Move index to seasoning used behaviour
+			i = ilOut.FindIndex(
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Ldstr && ((string)ci.operand).EndsWith("StringsFromCSFiles:Seasoning_UsedLast"));
+			j = i < 0 ? i : ilOut.FindLastIndex(
+				startIndex: i,
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Ldsfld);
+			k = i < 0 ? i : ilOut.FindIndex(
+				startIndex: i,
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Call);
+
+			if (i < 0 || j < 0 || k < 0)
+			{
+				Log.E($"Failed to add last seasoning used behaviours for default crafting page in {nameof(CraftItem_Transpiler)}.");
+				return il;
+			}
+
+			// Replace behaviour on seasoning used
+			ilOut.RemoveRange(index: j, count: k - j + 1);
+			ilOut.InsertRange(index: j, collection: new CodeInstruction[]
+			{
+				new(OpCodes.Ldloc, 2), // seasoning: seasoning
+				new(OpCodes.Call, seasoningUsedMethod)
+			});
 			return ilOut;
 		}
 

@@ -910,14 +910,13 @@ namespace LoveOfCooking.Interface
 				{
 					seasoningsHeight = 0;
 					seasoningsMap = ModEntry.Definitions.Seasonings
-						.OrderBy(pair => pair.Value)
+						.OrderBy(pair => pair.Value.Quality)
 						.ToDictionary(
 							pair => pair.Key,
 							pair =>
 							{
-								int quality = pair.Value;
 								ParsedItemData item = ItemRegistry.GetDataOrErrorItem(pair.Key);
-								return (pair.Value, item.GetTexture(), item.GetSourceRect());
+								return (pair.Value.Quality, item.GetTexture(), item.GetSourceRect());
 							});
 				},
 				draw: (SpriteBatch b, Vector2 v) =>

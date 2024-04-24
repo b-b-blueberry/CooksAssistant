@@ -31,6 +31,12 @@ namespace LoveOfCooking
 		public float BurnChanceModifier;
 	}
 
+	public class SeasoningData
+	{
+		public int Quality;
+		public string MessageStringKey;
+	}
+
 	public class Definitions
 	{
 		public Dictionary<string, string[]> CategoryDisplayInformation;
@@ -63,7 +69,7 @@ namespace LoveOfCooking
 		public string[] FarmhouseKitchenStartModIDs;
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
 		public string DefaultSeasoning;
-		public Dictionary<string, int> Seasonings;
+		public Dictionary<string, SeasoningData> Seasonings;
 		public Point CurryBuffDamage;
 		public Point CurryBuffArea;
 		public int CurryBuffKnockbackMultiplier;

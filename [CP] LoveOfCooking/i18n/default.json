@@ -159,6 +159,11 @@
 	"menu.special_items.cookbook.name": "Mom's Cookbook",
 	"menu.special_items.cookbook.description": "Holds your cooking recipes.",
 
+	// Seasonings
+	"seasoning.seasoning_1.empty": "You've used up all of your {0}.",
+	"seasoning.seasoning_2.empty": "You've used up all of your {0}.",
+	"seasoning.seasoning_4.empty": "You've used up all of your {0}.",
+
 	// Buffs
 	"buff.curry.name": "Curry Breath",
 	"buff.curry.description": "Hot, hot, hot, hot, hot, hot!",

@@ -378,7 +378,7 @@ namespace LoveOfCooking.Menu
 							CraftingRecipe.ConsumeAdditionalIngredients(seasoning, inventories);
 							if (!CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(seasoning, items))
 							{
-								Game1.showGlobalMessage(Game1.content.LoadString("Strings\\StringsFromCSFiles:Seasoning_UsedLast"));
+                                Utils.SendSeasoningUsedMessage(seasoning: seasoning);
 							}
 						}
 					}

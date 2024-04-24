@@ -12,6 +12,7 @@ using StardewValley;
 using StardewValley.Buffs;
 using StardewValley.Extensions;
 using StardewValley.Inventories;
+using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
 using StardewValley.Network;
 using StardewValley.Objects;
@@ -895,7 +896,7 @@ namespace LoveOfCooking
 				// Find first available seasoning item of any possible seasoning items
 				foreach (var pair in ModEntry.Definitions.Seasonings)
 				{
-					if (check(itemId: pair.Key, quality: pair.Value) is int quality and > StardewValley.Object.lowQuality)
+					if (check(itemId: pair.Key, quality: pair.Value.Quality) is int quality and > StardewValley.Object.lowQuality)
 					{
 						return quality;
 					}
@@ -924,6 +925,22 @@ namespace LoveOfCooking
 			{
 				item.Quality = quality;
 			}
+		}
+
+		public static void SendSeasoningUsedMessage(List<KeyValuePair<string, int>> seasoning)
+		{
+			ParsedItemData itemData = ItemRegistry.GetData(seasoning.FirstOrDefault().Key);
+			string key;
+			if (ModEntry.Config.AddSeasonings && ModEntry.Definitions.Seasonings.TryGetValue(itemData.ItemId, out SeasoningData seasoningData))
+			{
+				key = seasoningData.MessageStringKey;
+			}
+			else
+			{
+				key = "Strings\\StringsFromCSFiles:Seasoning_UsedLast";
+			}
+			string name = itemData.DisplayName;
+			Game1.showGlobalMessage(Game1.content.LoadString(key, name));
 		}
 
 		public static bool CheckExtraPortion()

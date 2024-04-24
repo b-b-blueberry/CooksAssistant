@@ -131,9 +131,18 @@
 	},
 	"DefaultSeasoning": "917",
 	"Seasonings": {
-		"blueberry.LoveOfCooking_seasoning_1": 1,
-		"blueberry.LoveOfCooking_seasoning_2": 2,
-		"917": 4
+		"blueberry.LoveOfCooking_seasoning_1": {
+			"Quality": 1,
+			"MessageStringKey": "Mods/blueberry.LoveOfCooking.Assets/Strings:seasoning.seasoning_1.empty"
+		},
+		"blueberry.LoveOfCooking_seasoning_2": {
+			"Quality": 2,
+			"MessageStringKey": "Mods/blueberry.LoveOfCooking.Assets/Strings:seasoning.seasoning_2.empty"
+		},
+		"917": {
+			"Quality": 4,
+			"MessageStringKey": "Mods/blueberry.LoveOfCooking.Assets/Strings:seasoning.seasoning_4.empty"
+		}
 	},
 	"CurryBuffDamage": {
 		"X": 1,
