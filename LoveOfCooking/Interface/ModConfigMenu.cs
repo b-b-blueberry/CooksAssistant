@@ -174,7 +174,7 @@ namespace LoveOfCooking.Interface
 						width: Game1.smallestTileSize,
 						height: Game1.smallestTileSize);
 					Rectangle toArea = new(location: offset.ToPoint(), size: (fromArea.Size.ToVector2() * Scale).ToPoint());
-					offset = toArea.Location.ToVector2() - toArea.Size.ToVector2() - new Vector2(x: spacing, y: 0);
+					offset = toArea.Location.ToVector2() - toArea.Size.ToVector2() - new Vector2(x: spacing, y: -2 * Scale);
 					b.Draw(
 						texture: objectSprites,
 						position: v + offset,
@@ -202,8 +202,8 @@ namespace LoveOfCooking.Interface
 							layerDepth: 1);
 					}
 
-					offset.Y += 12 * Scale;
-					cookingMenuPageHeight = (int)subheadingOffset + (int)offset.Y;
+					offset.Y += 18 * Scale;
+					cookingMenuPageHeight = (int)offset.Y;
 				},
 				height: () => cookingMenuPageHeight);
 
