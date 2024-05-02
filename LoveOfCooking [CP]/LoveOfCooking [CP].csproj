@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>net6.0</TargetFramework>
-		<RootNamespace>CP_LoveOfCooking</RootNamespace>
+		<RootNamespace>LoveOfCooking_CP</RootNamespace>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<IgnoreModFilePatterns>\.dll$, \.pdb$</IgnoreModFilePatterns>
