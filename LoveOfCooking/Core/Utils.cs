@@ -306,15 +306,15 @@ namespace LoveOfCooking
 			if (!ModEntry.Config.AddSeasonings)
 				return;
 
-			CheckSeasoningMailRequirementsMet(who, out bool seasoning1, out bool seasoning2);
+			Utils.CheckSeasoningMailRequirementsMet(who, out bool seasoning1, out bool seasoning2);
 
 			// Low quality seasoning
-			if (seasoning1 && !who.hasOrWillReceiveMail(ModEntry.MailSeasoning1))
+			if (seasoning1 && !who.knowsRecipe(ModEntry.Seasoning1ItemId) && !who.hasOrWillReceiveMail(ModEntry.MailSeasoning1))
 			{
 				who.mailbox.Add(ModEntry.MailSeasoning1);
 			}
 			// High quality seasoning
-			if (seasoning2 && !who.hasOrWillReceiveMail(ModEntry.MailSeasoning2))
+			if (seasoning2 && !who.knowsRecipe(ModEntry.Seasoning2ItemId)&&!who.hasOrWillReceiveMail(ModEntry.MailSeasoning2))
 			{
 				who.mailbox.Add(ModEntry.MailSeasoning2);
 			}
