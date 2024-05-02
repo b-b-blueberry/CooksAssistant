@@ -152,8 +152,8 @@
 	"mail.cookbook_unlocked.after.1": "You received Mom's Cookbook.",
 	"mail.cookbook_unlocked.after.2": "Recipes you learn will be saved here to cook at any kitchens in town.",
 	"mail.migrate_refund_1_6": "To the owner,^^We've reviewed our annual farming subsidies and found some discrepancies during our last system migration.^Yes, it appears someone's been cooking the books. Enclosed is compensation for any lost produce.^^Thank you for your continued business,^  Blue Berry Farming & Supplies%item money {{migrateRefund}} %%",
-	"mail.seasoning_1": "Hi honey,^I came across this little recipe in the papers! It's supposed to make anything test better.^^Remember to make balanced meals!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_1 %%[#]Seasonings (1)",
-	"mail.seasoning_2": "Hi sweetie!^A wonderful cookery show was on TV showing all-new ways to flavour your food! I just had to write the recipe down for you.^Keep practicing your cooking!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_2 %%[#]Seasonings (2)",
+	"mail.seasoning_1": "Hi honey,^I came across this recipe in a lifestyle magazine!^It's supposed to make anything taste better.^^Remember to make balanced meals!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_1 %%",
+	"mail.seasoning_2": "Hi sweetie!^A wonderful cookery show was on TV showing all-new ways to flavour your food!^I just had to write the recipe down for you.^Keep practicing your cooking!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_2 %%",
 
 	// Special items
 	"menu.special_items.cookbook.name": "Mom's Cookbook",
