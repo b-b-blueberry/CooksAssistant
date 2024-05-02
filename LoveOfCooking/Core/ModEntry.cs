@@ -82,6 +82,15 @@ namespace LoveOfCooking
 				.Split(':')
 				.Last());
 			this.PrintConfig();
+
+			// Do not load mod if content component is not found
+			if (!helper.ModRegistry.IsLoaded(ModEntry.ContentModUniqueID))
+			{
+				Log.E($"Couldn't find required mod: {ModEntry.ContentModUniqueID}{Environment.NewLine}Please make sure all folders from LoveOfCooking ZIP file have been extracted to your Mods folder.");
+				Log.E($"{this.ModManifest.Name} failed to initialise. Mod may not be usable.");
+				return;
+			}
+
 			this.Helper.Events.GameLoop.GameLaunched += this.GameLoop_GameLaunched;
 		}
 
