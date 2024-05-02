@@ -184,24 +184,30 @@ namespace LoveOfCooking
 
 				Utility.ForEachItem((Item item, Action remove, Action<Item> replaceWith) =>
 				{
-					if (item.Name.StartsWith("blueberry.cac") && TryRemoveItem(item))
+					if (item is not null)
 					{
-						remove();
-					}
-					else if (item is IndoorPot pot && pot.hoeDirt.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
-					{
-						// Don't remove indoor pots
+						if (item.Name.StartsWith("blueberry.cac") && TryRemoveItem(item))
+						{
+							remove();
+						}
+						else if (item is IndoorPot pot && pot.hoeDirt.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
+						{
+							// Don't remove indoor pots
+						}
 					}
 					return true;
 				});
 
 				Utility.ForEachLocation((GameLocation l) =>
 				{
-					foreach (var pair in l.terrainFeatures.Pairs)
+					if (l is not null)
 					{
-						if (pair.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
+						foreach (var pair in l.terrainFeatures.Pairs)
 						{
-							// Do nothing
+							if (pair.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
+							{
+								// Do nothing
+							}
 						}
 					}
 					return true;
