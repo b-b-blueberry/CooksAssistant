@@ -186,7 +186,7 @@ namespace LoveOfCooking
 				{
 					if (item is not null)
 					{
-						if (item.Name.StartsWith("blueberry.cac") && TryRemoveItem(item))
+						if (item.Name is not null && item.Name.StartsWith("blueberry.cac") && TryRemoveItem(item))
 						{
 							remove();
 						}
