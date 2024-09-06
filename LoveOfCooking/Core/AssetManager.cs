@@ -8,6 +8,7 @@ using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.GameData.Characters;
+using StardewValley.GameData.Powers;
 
 namespace LoveOfCooking
 {
@@ -108,6 +109,10 @@ namespace LoveOfCooking
 			{
 				AssetManager.EditCookingRecipes(asset: asset);
 			}
+			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Powers"))
+			{
+				AssetManager.EditPowers(asset: asset);
+			}
 		}
 
 		private static void EditCharacters(IAssetData asset)
@@ -180,6 +185,18 @@ namespace LoveOfCooking
 			{
 				Log.E($"Did not patch {asset.Name}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
 			}
+		}
+
+		private static void EditPowers(IAssetData asset)
+		{
+			var data = asset.AsDictionary<string, PowersData>().Data;
+
+			// Move custom entries to start of list, given they typically unlock earliest
+			data = data.ToList()
+				.OrderByDescending(pair => pair.Key.StartsWith(ModEntry.ObjectPrefix))
+				.ToDictionary(pair => pair.Key, pair => pair.Value);
+
+			asset.AsDictionary<string, PowersData>().ReplaceWith(data);
 		}
 	}
 }
