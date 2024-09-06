@@ -406,7 +406,12 @@ namespace LoveOfCooking.Menu
 
         private void LayoutComponents()
         {
-            Rectangle screen = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
+            Rectangle screen = new Rectangle(
+				x: Game1.uiViewport.X,
+				y: Game1.uiViewport.Y,
+				width: Game1.uiViewport.Width,
+				height: Game1.uiViewport.Height);
+            screen.Offset(Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea.Location - screen.Location);
             Vector2 centre = Utility.PointToVector2(screen.Center);
             int xOffset = 0, yOffset = 0;
 
@@ -420,8 +425,8 @@ namespace LoveOfCooking.Menu
             {
                 yOffset = yOffset / 3 * 2;
             }
-			this.yPositionOnScreen = (int)(centre.Y - CookbookSource.Center.Y * Scale * Game1.options.uiScale + yOffset);
-			this.xPositionOnScreen = (int)(centre.X - CookbookSource.Center.X * Scale * Game1.options.uiScale + xOffset);
+			this.yPositionOnScreen = (int)(centre.Y - CookbookSource.Center.Y * Scale + yOffset);
+			this.xPositionOnScreen = (int)(centre.X - CookbookSource.Center.X * Scale + xOffset);
 
 			// Cookbook menu
 			this._cookbookLeftRect.X = this.xPositionOnScreen;
