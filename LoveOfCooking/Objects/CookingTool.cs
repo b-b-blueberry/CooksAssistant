@@ -60,7 +60,7 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		public static bool IsInstance(ISalable item)
 		{
-			return item?.Name.StartsWith(CookingTool.InternalName) ?? false;
+			return item?.Name?.StartsWith(CookingTool.InternalName) ?? false;
 		}
 
 		/// <summary>
