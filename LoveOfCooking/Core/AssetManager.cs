@@ -105,10 +105,6 @@ namespace LoveOfCooking
 			{
 				AssetManager.EditCharacters(asset: asset);
 			}
-			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/CookingRecipes"))
-			{
-				AssetManager.EditCookingRecipes(asset: asset);
-			}
 			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Powers"))
 			{
 				AssetManager.EditPowers(asset: asset);
@@ -139,47 +135,6 @@ namespace LoveOfCooking
 				}
 
 				// No changes to apply
-			}
-			catch (Exception e) when (e is ArgumentException or NullReferenceException or KeyNotFoundException)
-			{
-				Log.E($"Did not patch {asset.Name}: {(!ModEntry.Config.DebugMode ? e.Message : e.ToString())}");
-			}
-		}
-
-		private static void EditCookingRecipes(IAssetData asset)
-		{
-			try
-			{
-				var data = asset.AsDictionary<string, string>().Data;
-
-				if (Game1.activeClickableMenu is not StardewValley.Menus.TitleMenu)
-				{
-					// Strip recipes with invalid, missing, or duplicate ingredients from the recipe data list
-					Dictionary<string, string> badRecipes = data.Where(
-						pair => pair.Value.Split('/')[0].Split(' ').ToList() is List<string> ingredients
-							&& ingredients.Any(s =>
-								(ingredients.IndexOf(s) % 2 == 0) is bool isItemId
-								&&
-									// Missing ingredients 
-									((isItemId && (s == "0" || s == "-1"))
-									// Duplicate ingredients
-									|| (isItemId && ingredients.Count(x => x == s) > 1)
-									// Bad ingredient quantities
-									|| (!isItemId && (!int.TryParse(s, out int i) || (i < 1 || i > 999))))))
-						.ToDictionary(pair => pair.Key, pair => pair.Value);
-					if (badRecipes.Count > 0)
-					{
-						string str = badRecipes.Aggregate($"Removing {badRecipes.Count} invalid recipes.\nThese recipes may use items from mods that aren't installed:",
-							(str, cur) => $"{str}{Environment.NewLine}{cur.Key}: {cur.Value.Split('/')[0]}");
-						Log.W(str);
-						foreach (string recipe in badRecipes.Keys)
-						{
-							data.Remove(recipe);
-						}
-					}
-				}
-
-				asset.AsDictionary<string, string>().ReplaceWith(data);
 			}
 			catch (Exception e) when (e is ArgumentException or NullReferenceException or KeyNotFoundException)
 			{
