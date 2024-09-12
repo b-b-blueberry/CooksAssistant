@@ -219,7 +219,6 @@ namespace LoveOfCooking.Menu
 			// Set up menu properties
 			this.width = CookbookSource.Width * Scale;
 			this.height = 720;
-			this.trashCan = null;
 			this._iconShakeTimerField = Helper.Reflection.GetField<Dictionary<int, double>>(this.inventory, "_iconShakeTimer");
             Game1.displayHUD = true; // Prevents hidden HUD on crash when initialising menu, set to false at the end of this method
 			ModEntry.Instance.States.Value.IsModConfigMenuTransition = false;
