@@ -1277,39 +1277,6 @@ namespace LoveOfCooking
 				menu.forSale.Add(o);
 		}
 
-		/// <summary>
-		/// Bunches groups of common items together in the seed shop.
-		/// Json Assets appends new stock to the bottom, and we don't want that very much at all.
-		/// </summary>
-		public static void SortSeedShopStock(ref ShopMenu menu)
-		{
-			// Pair a suffix grouping some common items together with the name of the lowest-index (first-found) item in the group
-			List<ISalable> itemList = menu.forSale;
-			var suffixes = new Dictionary<string, string>
-				{{"seeds", null}, {"bulb", null}, {"starter", null}, {"shoot", null}, {"sapling", null}};
-
-			for (int i = 0; i < itemList.Count; ++i)
-			{
-				// Ignore items without one of our group suffixes
-				string suffix = suffixes.Keys
-					.FirstOrDefault(s => itemList[i].Name.ToLower().EndsWith(s));
-				if (suffix is null)
-					continue;
-				// Set the move-to-this-item name to be the first-found item in the group
-				suffixes[suffix] ??= itemList[i].Name;
-				if (suffixes[suffix] == itemList[i].Name)
-					continue;
-				// Move newly-found items of a group up to the first item in the group, and change the move-to name to this item
-				ISalable item = itemList[i];
-				int index = 1 + itemList
-					.FindIndex(i => i.Name == suffixes[suffix]);
-				itemList.RemoveAt(i);
-				itemList.Insert(index, item);
-				suffixes[suffix] = itemList[index].Name;
-			}
-			menu.forSale = itemList;
-		}
-
 		public static List<string> SortRecipesByKnownAndDisplayName(List<string> recipeIds)
 		{
 			var recipes = recipeIds.ToDictionary(
