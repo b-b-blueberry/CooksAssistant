@@ -15,6 +15,7 @@ namespace LoveOfCooking.Interface
 		// Loaded APIs
 		internal static IContentPatcherAPI ContentPatcher;
 		internal static IGenericModConfigMenuAPI GenericModConfigMenu;
+		internal static IBetterCrafting BetterCraftingApi;
 
 		// Loaded mods
 		internal static bool UsingCustomCC;
@@ -52,6 +53,7 @@ namespace LoveOfCooking.Interface
 				{
 					Interfaces.IdentifyLoadedOptionalMods();
 					Interfaces.LoadCustomCommunityCentreContent();
+					Interfaces.LoadBetterCraftingAPI();
 					Interfaces.IsLoaded = true
 						&& Interfaces.LoadModConfigMenu();
 				}
@@ -98,6 +100,15 @@ namespace LoveOfCooking.Interface
 
 			Interfaces.ContentPatcher = cp;
 			return true;
+		}
+
+		private static void LoadBetterCraftingAPI()
+		{
+			IBetterCrafting betterCrafting = Interfaces.Helper.ModRegistry
+				.GetApi<IBetterCrafting>
+				("leclair.bettercrafting");
+
+			Interfaces.BetterCraftingApi = betterCrafting;
 		}
 
 		private static void LoadCustomCommunityCentreContent()
