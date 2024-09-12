@@ -51,7 +51,7 @@ namespace LoveOfCooking.Harmony
 			List<CodeInstruction> ilOut = il.ToList();
             ConstructorInfo targetMethod = AccessTools.Constructor(
 				type: typeof(StardewValley.Menus.CraftingPage),
-				parameters: new[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool), typeof(List<IInventory>) });
+				parameters: [typeof(int), typeof(int), typeof(int), typeof(int), typeof(bool), typeof(bool), typeof(List<IInventory>)]);
 			MethodInfo newMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryOpenNewCookingMenu));
@@ -72,12 +72,12 @@ namespace LoveOfCooking.Harmony
 
 			// Replace CraftingPage constructor and call signature with Utils method params
 			ilOut.RemoveRange(index: i, count: j - i + 1);
-			ilOut.InsertRange(index: i, collection: new CodeInstruction[]
-			{
+			ilOut.InsertRange(index: i, collection:
+			[
 				new(OpCodes.Ldnull), // menu: null
 				new(OpCodes.Ldnull), // mutex: null
 				new(OpCodes.Ldc_I4_0), // forceOpen: false
-			});
+			]);
 
 			return ilOut;
 		}

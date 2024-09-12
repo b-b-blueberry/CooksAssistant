@@ -76,13 +76,13 @@ namespace LoveOfCooking.HarmonyPatches
 
 			// Replace default seasonings behaviour with override method call signature
 			ilOut.RemoveRange(index: i + 1, count: j - i + 1);
-			ilOut.InsertRange(index: i + 1, collection: new CodeInstruction[]
-			{
+			ilOut.InsertRange(index: i + 1, collection:
+			[
 				new(OpCodes.Ldarg_0), // menu: this
 				new(OpCodes.Ldloca_S, 1), // ref item: crafted
 				new(OpCodes.Ldloc, 2), // seasoning: seasoning
 				new(OpCodes.Call, seasoningMethod)
-			});
+			]);
 
 			// Update index to just-added seasoning method
 			/*
@@ -98,8 +98,8 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 
 			// Insert unique behaviours on cooked immediately after seasoning method
-			ilOut.InsertRange(index: k + 1, collection: new CodeInstruction[]
-			{
+			ilOut.InsertRange(index: k + 1, collection:
+			[
 				// Experience and profession behaviours for Cooking Skill
 				new(OpCodes.Ldloc, 0), // recipe: recipe
 				new(OpCodes.Ldloca_S, 1), // ref item: crafted
@@ -112,7 +112,7 @@ namespace LoveOfCooking.HarmonyPatches
 				new(OpCodes.Call, burnMethod),
 				// Assign burnt/unchanged item as crafted item
 				new(OpCodes.Stloc, 1) // crafted
-			});
+			]);
 
 			// Move index to seasoning used behaviour
 			i = ilOut.FindIndex(
@@ -132,11 +132,11 @@ namespace LoveOfCooking.HarmonyPatches
 
 			// Replace behaviour on seasoning used
 			ilOut.RemoveRange(index: j, count: k - j + 1);
-			ilOut.InsertRange(index: j, collection: new CodeInstruction[]
-			{
+			ilOut.InsertRange(index: j, collection:
+			[
 				new(OpCodes.Ldloc, 2), // seasoning: seasoning
 				new(OpCodes.Call, seasoningUsedMethod)
-			});
+			]);
 			return ilOut;
 		}
 
@@ -160,7 +160,7 @@ namespace LoveOfCooking.HarmonyPatches
 		{
 			if (!___cooking)
 				return;
-			var sorted = Utils.SortRecipesByKnownAndDisplayName(playerRecipes);
+			List<string> sorted = Utils.SortRecipesByKnownAndDisplayName(playerRecipes);
 			playerRecipes.Clear();
 			playerRecipes.AddRange(sorted);
 		}

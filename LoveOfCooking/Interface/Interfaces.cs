@@ -30,8 +30,8 @@ namespace LoveOfCooking.Interface
 		{
 			try
 			{
-				return LoadSpaceCoreAPI()
-					&& LoadContentPatcherAPI();
+				return Interfaces.LoadSpaceCoreAPI()
+					&& Interfaces.LoadContentPatcherAPI();
 			}
 			catch (Exception e)
 			{
@@ -48,14 +48,14 @@ namespace LoveOfCooking.Interface
 		{
 			try
 			{
-				if (!IsLoaded)
+				if (!Interfaces.IsLoaded)
 				{
-					IdentifyLoadedOptionalMods();
-					LoadCustomCommunityCentreContent();
-					IsLoaded = true
-						&& LoadModConfigMenu();
+					Interfaces.IdentifyLoadedOptionalMods();
+					Interfaces.LoadCustomCommunityCentreContent();
+					Interfaces.IsLoaded = true
+						&& Interfaces.LoadModConfigMenu();
 				}
-				return IsLoaded;
+				return Interfaces.IsLoaded;
 			}
 			catch (Exception e)
 			{
@@ -66,14 +66,14 @@ namespace LoveOfCooking.Interface
 
 		private static void IdentifyLoadedOptionalMods()
 		{
-			UsingCustomCC = Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
-			UsingBigBackpack = Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Helper.ModRegistry.IsLoaded);
+			UsingCustomCC = Interfaces.Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
+			UsingBigBackpack = Interfaces.Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
+			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Interfaces.Helper.ModRegistry.IsLoaded);
 		}
 
 		private static bool LoadSpaceCoreAPI()
 		{
-			ISpaceCoreAPI spaceCore = Helper.ModRegistry
+			ISpaceCoreAPI spaceCore = Interfaces.Helper.ModRegistry
 				.GetApi<ISpaceCoreAPI>
 				("spacechase0.SpaceCore");
 			if (spaceCore is null)
@@ -87,7 +87,7 @@ namespace LoveOfCooking.Interface
 
 		private static bool LoadContentPatcherAPI()
 		{
-			IContentPatcherAPI cp = Helper.ModRegistry
+			IContentPatcherAPI cp = Interfaces.Helper.ModRegistry
 				.GetApi<IContentPatcherAPI>
 				("Pathoschild.ContentPatcher");
 			if (cp is null)
@@ -102,14 +102,14 @@ namespace LoveOfCooking.Interface
 
 		private static void LoadCustomCommunityCentreContent()
 		{
-			ICustomCommunityCentreAPI ccc = Helper.ModRegistry
+			ICustomCommunityCentreAPI ccc = Interfaces.Helper.ModRegistry
 				.GetApi<ICustomCommunityCentreAPI>
 				("blueberry.CustomCommunityCentre");
-			if (UsingCustomCC && ccc is not null)
+			if (Interfaces.UsingCustomCC && ccc is not null)
 			{
 				Log.D("Registering CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
-				ccc.LoadContentPack(absoluteDirectoryPath: Path.Combine(Helper.DirectoryPath, AssetManager.CommunityCentreContentPackPath));
+				ccc.LoadContentPack(absoluteDirectoryPath: Path.Combine(Interfaces.Helper.DirectoryPath, AssetManager.CommunityCentreContentPackPath));
 			}
 			else
 			{
@@ -120,7 +120,7 @@ namespace LoveOfCooking.Interface
 
 		private static bool LoadModConfigMenu()
 		{
-			IGenericModConfigMenuAPI gmcm = Helper.ModRegistry
+			IGenericModConfigMenuAPI gmcm = Interfaces.Helper.ModRegistry
 				.GetApi<IGenericModConfigMenuAPI>
 				("spacechase0.GenericModConfigMenu");
 			if (gmcm is null)
@@ -138,17 +138,17 @@ namespace LoveOfCooking.Interface
 			// Cooking Skill
 			Interfaces.ContentPatcher.RegisterToken(mod: ModEntry.Instance.ModManifest,
 				name: nameof(ModEntry.Config.AddCookingSkillAndRecipes),
-				getValue: () => new[] { ModEntry.Config.AddCookingSkillAndRecipes.ToString() });
+				getValue: () => [ModEntry.Config.AddCookingSkillAndRecipes.ToString()]);
 
 			// Cooking Tool
 			Interfaces.ContentPatcher.RegisterToken(mod: ModEntry.Instance.ModManifest,
 				name: nameof(State.CookingToolLevel),
-				getValue: () => new[] { ModEntry.Instance.States.Value.CookingToolLevel.ToString() });
+				getValue: () => [ModEntry.Instance.States.Value.CookingToolLevel.ToString()]);
 
 			// More Seasonings
 			Interfaces.ContentPatcher.RegisterToken(mod: ModEntry.Instance.ModManifest,
 				name: nameof(ModEntry.Config.AddSeasonings),
-				getValue: () => new[] { ModEntry.Config.AddSeasonings.ToString() });
+				getValue: () => [ModEntry.Config.AddSeasonings.ToString()]);
 		}
 
 		internal static StardewValley.Objects.Chest GetCommunityCentreFridge(StardewValley.Locations.CommunityCenter cc)

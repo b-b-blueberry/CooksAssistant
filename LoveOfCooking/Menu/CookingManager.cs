@@ -149,7 +149,7 @@ namespace LoveOfCooking.Menu
         /// <param name="limit">Maximum number of matching ingredients to return.</param>
         internal static List<Ingredient> GetMatchingIngredients(string id, List<IList<Item>> sourceItems, int required, int limit = DefaultIngredientsSlots)
         {
-			List<Ingredient> foundIngredients = new();
+			List<Ingredient> foundIngredients = [];
 			int ingredientsFulfilled = 0;
 			int ingredientsRequired = required;
             for (int i = 0; i < sourceItems.Count; ++i)
@@ -180,10 +180,10 @@ namespace LoveOfCooking.Menu
 
         private int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient> ingredients)
         {
-			List<IList<Item>> ingredientsItems = new()
-            {
-                ingredients.Select(i => this.GetItemForIngredient(ingredient: i, sourceItems: sourceItems)).ToList()
-            };
+			List<IList<Item>> ingredientsItems =
+			[
+				ingredients.Select(i => this.GetItemForIngredient(ingredient: i, sourceItems: sourceItems)).ToList()
+            ];
             return this.GetAmountCraftable(recipe: recipe, sourceItems: ingredientsItems, limitToCurrentIngredients: true);
         }
 
@@ -247,7 +247,7 @@ namespace LoveOfCooking.Menu
         /// </returns>
         internal Dictionary<int, int> ChooseIngredientsForCrafting(CraftingRecipe recipe, List<IList<Item>> sourceItems)
         {
-			Dictionary<int, int> ingredientsToConsume = new();
+			Dictionary<int, int> ingredientsToConsume = [];
             foreach (KeyValuePair<string, int> itemAndQuantity in recipe.recipeList)
             {
                 int remainingRequired = itemAndQuantity.Value;
@@ -287,7 +287,7 @@ namespace LoveOfCooking.Menu
 				string msg2 = recipe.recipeList.Aggregate("Requires: ", (str, pair) => $"{str} ({pair.Key} x{pair.Value})");
 				string msg3 = sourceItems.Aggregate("Sources: ", (str, list) => $"{str} ({sourceItems.IndexOf(list)} x{list.Count})");
 				string msg4 = this.CurrentIngredients.Aggregate("Current: ", (str, i) => $"{str} [{(i.HasValue ? i.Value.WhichInventory + ", " + i.Value.WhichItem : "null")}]");
-                Log.D(string.Join(Environment.NewLine, new[] { msg1, msg2, msg3, msg4 }),
+                Log.D(string.Join(Environment.NewLine, [msg1, msg2, msg3, msg4]),
                     ModEntry.Config.DebugMode);
             }
 
@@ -358,7 +358,7 @@ namespace LoveOfCooking.Menu
 				// Stop iterating when we've run out of standard quality ingredients or no more seasonings can be found
 				List<Item> items = sourceItems.SelectMany(list => list).ToList();
 				List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories.Select(pair => pair.Inventory).ToList();
-				List<KeyValuePair<string, int>> seasoning = new();
+				List<KeyValuePair<string, int>> seasoning = [];
 				int quality = 0;
 				do
 				{
@@ -402,7 +402,7 @@ namespace LoveOfCooking.Menu
             }
 
 			// Create item list from quality stacks
-			List<StardewValley.Object> itemsCooked = new();
+			List<StardewValley.Object> itemsCooked = [];
             foreach (KeyValuePair<int, int> pair in qualityStacks.Where(pair => pair.Value > 0))
             {
 				StardewValley.Object item = recipe.createItem() as StardewValley.Object;
@@ -518,7 +518,7 @@ namespace LoveOfCooking.Menu
 
 			// Add items from each list of matching ingredients in turn
 			// This should create a mixed list where each required item has an ingredient represented
-			List<Ingredient> ingredientsToUse = new();
+			List<Ingredient> ingredientsToUse = [];
             int maxItems = matchingItemIndexes.Max(list => list.Count);
             int maxLists = matchingItemIndexes.Count;
             for (int whichItem = 0; whichItem < maxItems; ++whichItem)
