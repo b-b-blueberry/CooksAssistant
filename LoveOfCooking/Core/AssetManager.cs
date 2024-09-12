@@ -43,16 +43,8 @@ namespace LoveOfCooking
 		// Assets to edit: asset keys passed to Edit()
 		private static readonly List<string> AssetsToEdit =
 		[
-			@"Data/Buffs",
 			@"Data/Characters",
-			@"Data/CookingRecipes",
-			@"Data/CraftingRecipes",
-			@"Data/mail",
-			@"Data/NPCGiftTastes",
-			@"Data/Objects",
-			@"Data/Powers",
-			@"Data/Shops",
-			@"Data/Tools"
+			@"Data/Powers"
 		];
 
 
