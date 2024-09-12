@@ -323,8 +323,9 @@ namespace LoveOfCooking.Interface
 					int maxLevel = ModEntry.CookingSkillApi.GetMaximumLevel();
 					int nextLevel = level + 1;
 					bool isMaxLevel = level == maxLevel;
-					int requiredXP = ModEntry.CookingSkillApi.GetExperienceRequiredForLevel(level + 1);
-					int currentXP = ModEntry.CookingSkillApi.GetTotalCurrentExperience() - ModEntry.CookingSkillApi.GetExperienceRequiredForLevel(level);
+					int baseXP = ModEntry.CookingSkillApi.GetTotalExperienceRequiredForLevel(level);
+					int requiredXP = ModEntry.CookingSkillApi.GetTotalExperienceRequiredForLevel(level + 1) - baseXP;
+					int currentXP = ModEntry.CookingSkillApi.GetTotalCurrentExperience() - baseXP;
 					float ratio = isMaxLevel ? 1 : (float)currentXP / requiredXP;
 					int spacing = 4 * Scale;
 					int width = 128 * Scale;
