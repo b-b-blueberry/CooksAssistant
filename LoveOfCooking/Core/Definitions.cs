@@ -79,6 +79,7 @@ namespace LoveOfCooking
 		public int LasagnaBuffMinSpeed;
 		public int PaellaBuffCoinValue;
 		public Point PaellaBuffCoinCount;
+		public float LeeksBuffKnockbackMultiplier;
 		public string[] MarmaladeyFoods;
 		public string[] PizzayFoods;
 		public string[] PancakeyFoods;

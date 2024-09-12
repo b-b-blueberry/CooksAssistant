@@ -165,6 +165,7 @@
 		"X": 3,
 		"Y": 8
 	},
+	"LeeksBuffKnockbackMultiplier": 0.5,
 	"MarmaladeFoods": [
 		"lemon",
 		"lime",

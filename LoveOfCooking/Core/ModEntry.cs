@@ -38,6 +38,7 @@ namespace LoveOfCooking
 		internal const string LasagnaBuffId = ModEntry.ObjectPrefix + "lasagna"; // DO NOT EDIT
 		internal const string PaellaBuffId = ModEntry.ObjectPrefix + "paella"; // DO NOT EDIT
 		internal const string ProfiterolesBuffId = ModEntry.ObjectPrefix + "profiteroles"; // DO NOT EDIT
+		internal const string LeeksBuffId = ModEntry.ObjectPrefix + "leeks"; // DO NOT EDIT
 		internal static int SpriteId => (int)Game1.player.UniqueMultiplayerID + 5050505;
 		internal static int NexusId { get; private set; }
 
@@ -542,6 +543,13 @@ namespace LoveOfCooking
 			{
 				// tipsy (kebab already active)
 				Utils.ApplyKebabBuffUpgrade(who: who, buff: kebab2);
+			}
+			else if (food.GetFoodOrDrinkBuffs().FirstOrDefault(buff => buff.id == ModEntry.LeeksBuffId) is Buff leeks)
+			{
+				// leeks
+				leeks.effects.KnockbackMultiplier.Value = ModEntry.Definitions.LeeksBuffKnockbackMultiplier;
+				who.buffs.Remove(leeks.id);
+				who.buffs.Apply(leeks);
 			}
 
 			// Track foods eaten

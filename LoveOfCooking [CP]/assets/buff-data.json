@@ -75,6 +75,19 @@
                     "Effects": null,
                     "ActionsOnApply": null,
                     "CustomFields": null
+                },
+                "blueberry.LoveOfCooking_leeks": {
+                    "DisplayName": "{{i18n:buff.leeks.name}}",
+                    "Description": "{{i18n:buff.leeks.description}}",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 80000,
+                    "MaxDuration": -1,
+                    "IconTexture": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSpriteIndex": 263,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
                 }
             }
         }

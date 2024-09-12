@@ -620,9 +620,14 @@
                     "Price": 90,
                     "Texture": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
                     "SpriteIndex": 23,
-                    "Edibility": 28,
+                    "Edibility": 25,
                     "IsDrink": false,
-                    "Buffs": null,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": "blueberry.LoveOfCooking_leeks"
+                        }
+                    ],
                     "ContextTags": [
                         "color_sand"
                     ],

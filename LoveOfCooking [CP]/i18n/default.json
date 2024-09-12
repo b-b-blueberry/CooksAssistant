@@ -175,6 +175,8 @@
 	"buff.paella.description": "Gold coins scatter everywhere when slaying monsters.",
 	"buff.profiteroles.name": "Proliferate Projectiles",
 	"buff.profiteroles.description": "All slingshot projectiles fire in threes.",
+	"buff.leeks.name": "Leek Me Alone",
+	"buff.leeks.description": "Increases weapon knockback.",
 
 	// Cooking skill
 	"menu.cooking_skill.name": "Cooking",
