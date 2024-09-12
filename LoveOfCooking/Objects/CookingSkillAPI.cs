@@ -166,12 +166,12 @@ namespace LoveOfCooking.Objects
 			// Level undefined
 			if (!ModEntry.Definitions.CookingSkillValues.LevelUpRecipes.ContainsKey(level))
 			{
-				return new List<string>();
+				return [];
 			}
 			// Level used for professions, no new recipes added
 			if (level % 5 == 0)
 			{
-				return new List<string>();
+				return [];
 			}
 			return (IReadOnlyList<string>)ModEntry.Definitions.CookingSkillValues.LevelUpRecipes[level];
 		}

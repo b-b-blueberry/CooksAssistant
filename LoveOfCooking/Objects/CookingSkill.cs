@@ -90,7 +90,7 @@ namespace LoveOfCooking.Objects
 		
 		public override List<string> GetExtraLevelUpInfo(int level)
 		{
-			List<string> list = new();
+			List<string> list = [];
 			if (ModEntry.Config.FoodCanBurn)
 			{
 				list.Add(I18n.Get("menu.cooking_skill.levelup_burn", new

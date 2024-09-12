@@ -360,20 +360,20 @@ namespace LoveOfCooking
 					width: sourceArea.Width * Game1.pixelZoom,
 					height: sourceArea.Height * Game1.pixelZoom);
 
-				Point[] sourceOffsets = new Point[]
-				{
+				Point[] sourceOffsets =
+				[
 					Point.Zero,
 					new Point(originalArea.Width - sourceArea.Width, 0),
 					new Point(0, originalArea.Height - sourceArea.Height),
 					new Point(originalArea.Width - sourceArea.Width, originalArea.Height - sourceArea.Height)
-				};
-				Point[] destOffsets = new Point[]
-				{
+				];
+				Point[] destOffsets =
+				[
 					Point.Zero,
 					new Point(destArea.Width, 0),
 					new Point(0, destArea.Height),
 					new Point(destArea.Width, destArea.Height)
-				};
+				];
 				for (int i = 0; i < 4; ++i)
 				{
 					Rectangle newSourceArea = sourceArea;
@@ -487,12 +487,12 @@ namespace LoveOfCooking
 					y: 224 + (int)((Game1.player.MaxStamina - 270) * 0.625f));
 
 				// Labels
-				debugLines = new[] {
+				debugLines = [
 					new string('\n', this.TickerHistory.Count),
 					"TICKS",
 					"RATE",
 					"REGEN"
-				};
+				];
 				linePosition = blockPosition = new Vector2(
 					x: viewport.Right - margin.X,
 					y: viewport.Bottom - margin.Y);
@@ -513,10 +513,10 @@ namespace LoveOfCooking
 				// Values
 				debugLines = this.TickerHistory
 					.Select(regen => regen)
-					.Concat(new[]{
+					.Concat([
 						this.TicksCurrent,
 						this.TicksRequired,
-						this.RemainingValue})
+						this.RemainingValue])
 					.Select(regen => regen.ToString())
 					.ToArray();
 				blockPosition.X -= 220;

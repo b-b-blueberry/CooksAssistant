@@ -38,7 +38,7 @@ namespace LoveOfCooking.Objects
 				&& !monster.IsInvisible
 				&& !monster.isInvincible()
 				&& !monster.isGlider.Value
-				&& monster.IsWalkingTowardPlayer)?.Cast<Monster>()?.ToList() ?? new();
+				&& monster.IsWalkingTowardPlayer)?.Cast<Monster>()?.ToList() ?? [];
 		}
 
 		public override bool update(GameTime time)
