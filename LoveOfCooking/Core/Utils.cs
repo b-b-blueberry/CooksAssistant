@@ -128,9 +128,9 @@ namespace LoveOfCooking
 			{
 				int count = 0;
 				int refund = 0;
-				Dictionary<int, int> values = new();
-				Dictionary<int, (int Price, int Quantity)> crops = new();
-				Dictionary<int, (Item Item, int Quantity)> items = new();
+				Dictionary<int, int> values = [];
+				Dictionary<int, (int Price, int Quantity)> crops = [];
+				Dictionary<int, (Item Item, int Quantity)> items = [];
 
 				bool TryRemoveItem(Item item)
 				{
@@ -410,9 +410,9 @@ namespace LoveOfCooking
 		{
 			// Rebuild mutexes because the IL is unreadable
 			Chest fridge = location.GetFridge();
-			List<Chest> minifridges = new();
-			List<NetMutex> mutexes = new();
-			foreach (Chest chest in location.Objects.Values.Where(Utils.IsFridgeOrMinifridge))
+			List<Chest> minifridges = [];
+			List<NetMutex> mutexes = [];
+			foreach (Chest chest in location.Objects.Values.Where(IsFridgeOrMinifridge).Cast<Chest>())
 			{
 				minifridges.Add(chest);
 				mutexes.Add(chest.mutex);
@@ -470,8 +470,8 @@ namespace LoveOfCooking
 			DelayedAction.playSoundAfterDelay("getNewSpecialItem", 750);
 
 			Game1.player.freezePause = 7500;
-			Game1.player.FarmerSprite.animateOnce(new FarmerSprite.AnimationFrame[]
-			{
+			Game1.player.FarmerSprite.animateOnce(
+			[
 				new( // Face forwards
 					frame: 57,
 					milliseconds: 0),
@@ -512,11 +512,11 @@ namespace LoveOfCooking
 										Game1.delayedActions.Add(new(delay: delay, behavior: delegate
 										{
 											// Show dialogue
-											Game1.drawObjectDialogue(new List<string>()
-											{
+											Game1.drawObjectDialogue(
+											[
 												ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.1"),
 												ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.2")
-											});
+											]);
 											// Hide animation after dialogue
 											Game1.afterDialogues = delegate
 											{
@@ -527,7 +527,7 @@ namespace LoveOfCooking
 							});
 					},
 					behaviorAtEndOfFrame: true)
-			});
+			]);
 		}
 
 		public static void TryDrawHiddenBuffInHoverTooltip(SpriteBatch b, SpriteFont font, Item item, int x, int y)
@@ -647,8 +647,8 @@ namespace LoveOfCooking
 				ms = 100;
 
 				// Before jumble
-				List<FarmerSprite.AnimationFrame> newFrames = new()
-				{
+				List<FarmerSprite.AnimationFrame> newFrames =
+				[
 					// Toss dough
 					new(54, 0) { frameEndBehavior = delegate { Game1.Multiplayer.broadcastSprites(Game1.currentLocation, sprite); } },
 					new(54, ms) { frameEndBehavior = delegate { Game1.playSound("breathin"); } },
@@ -658,7 +658,7 @@ namespace LoveOfCooking
 					new(56, ms),
 					new(55, ms),
 					new(54, ms) { frameEndBehavior = delegate { Game1.player.FacingDirection = 0; } },
-				};
+				];
 
 				// Extra sprite
 				spritePosition = new(x: Game1.player.Position.X, y: Game1.player.Position.Y - 40 * spriteScale);
@@ -686,8 +686,8 @@ namespace LoveOfCooking
 				ms = 100;
 
 				// After jumble
-				List<FarmerSprite.AnimationFrame> newFrames = new()
-				{
+				List<FarmerSprite.AnimationFrame> newFrames =
+				[
 					// Flip pancake
 					new(29, 0) { frameEndBehavior = delegate { Game1.player.FacingDirection = 2; } },
 					new(29, ms) { frameEndBehavior = delegate { Game1.playSound("swordswipe"); } },
@@ -701,7 +701,7 @@ namespace LoveOfCooking
 					new(29, ms * 2),
 					new(28, ms),
 					new(0, ms),
-				};
+				];
 
 				// Extra sprite
 				spritePosition = new(x: Game1.player.Position.X, y: Game1.player.Position.Y - 40 * spriteScale);
@@ -830,7 +830,7 @@ namespace LoveOfCooking
 			}
 
 			// Add crafting recipes
-			List<CraftingRecipe> craftingRecipes = new();
+			List<CraftingRecipe> craftingRecipes = [];
 			// No new crafting recipes currently.
 
 			// Apply new recipes
@@ -887,7 +887,7 @@ namespace LoveOfCooking
 			// Check for seasoning items in inventories
 			int check(string itemId, int quality)
 			{
-				List<KeyValuePair<string, int>> newSeasoning = new() { new(itemId, 1) };
+				List<KeyValuePair<string, int>> newSeasoning = [new(itemId, 1)];
 				if (CraftingRecipe.DoesFarmerHaveAdditionalIngredientsInInventory(newSeasoning, expandedInventory))
 				{
 					seasoning.AddRange(newSeasoning);
@@ -1317,7 +1317,7 @@ namespace LoveOfCooking
 				elementSelector: s => new CraftingRecipe(name: s));
 			return recipeIds
 				.OrderBy(id => recipes[id].DisplayName)
-				.OrderByDescending(id => Game1.player.cookingRecipes.ContainsKey(id))
+				.OrderByDescending(Game1.player.cookingRecipes.ContainsKey)
 				.ToList();
 		}
 
@@ -1341,17 +1341,17 @@ namespace LoveOfCooking
 				object SModMetadata = SModRegistry
 					.GetType()
 					.GetMethod("Get", BindingFlags.Public | BindingFlags.Instance)
-					.Invoke(SModRegistry, new object[] { uniqueId });
+					.Invoke(SModRegistry, [uniqueId]);
 				object directoryPath = SModMetadata
 					.GetType()
 					.GetProperty("DirectoryPath", BindingFlags.Public | BindingFlags.Instance)
 					.GetGetMethod()
 					.Invoke(SModMetadata, null);
 
-				List<string> errors = new();
+				List<string> errors = [];
 				object SCoreTranslationFiles = SCore
 					.GetMethod("ReadTranslationFiles", BindingFlags.NonPublic | BindingFlags.Instance)
-					.Invoke(SCoreInstance, new object[] { Path.Combine((string)directoryPath, "i18n"), errors });
+					.Invoke(SCoreInstance, [Path.Combine((string)directoryPath, "i18n"), errors]);
 				object SModTranslations = SModMetadata
 					.GetType()
 					.GetProperty("Translations", BindingFlags.Public | BindingFlags.Instance)
@@ -1367,7 +1367,7 @@ namespace LoveOfCooking
 			targetTranslations.instance
 				.GetType()
 				.GetMethod("SetTranslations", BindingFlags.NonPublic | BindingFlags.Instance)
-				.Invoke(targetTranslations.instance, new object[] { sourceTranslations.files });
+				.Invoke(targetTranslations.instance, [sourceTranslations.files]);
 		}
 	}
 }

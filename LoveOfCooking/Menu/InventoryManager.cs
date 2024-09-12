@@ -38,13 +38,13 @@ namespace LoveOfCooking.Menu
 		private Rectangle _inventoryCardArea;
 		public ClickableTextureComponent TabButton { get; private set; }
 		public ClickableTextureComponent ToggleAutofillButton { get; private set; }
-		public List<ClickableTextureComponent> InventorySelectButtons { get; private set; } = new();
+		public List<ClickableTextureComponent> InventorySelectButtons { get; private set; } = [];
 
 		// Inventory management
 		private int _inventoryId;
 		private List<(IInventory Inventory, Chest Chest)> _inventoryAndChestList;
-		private readonly List<IList<Item>> _inventoryList = new();
-		private readonly List<KeyValuePair<Color, bool>> _chestColours = new();
+		private readonly List<IList<Item>> _inventoryList = [];
+		private readonly List<KeyValuePair<Color, bool>> _chestColours = [];
 		internal const int BackpackInventoryId = 0;
 		internal const int MaximumExtraInventories = 24;
 		private int _inventoryIdsBeforeMinifridges = 0;
@@ -55,7 +55,7 @@ namespace LoveOfCooking.Menu
 		public InventoryManager(CookingMenu menu, Dictionary<IInventory, Chest> inventoryAndChestMap) : base(menu)
 		{
 			// Set initial material containers for additional inventories
-			this._inventoryAndChestList = inventoryAndChestMap?.Select(pair => (pair.Key, pair.Value)).ToList() ?? new();
+			this._inventoryAndChestList = inventoryAndChestMap?.Select(pair => (pair.Key, pair.Value)).ToList() ?? [];
 		}
 
 		public void ChangeInventory(bool selectNext, bool loop)
@@ -465,11 +465,11 @@ namespace LoveOfCooking.Menu
 				sourceRect: AutofillDisabledButtonSource,
 				scale: Scale);
 
-			List<ClickableComponent> components = new() {
+			List<ClickableComponent> components = [
 				this.TabButton,
-				this.ToggleAutofillButton
-			};
-			components.AddRange(this.InventorySelectButtons);
+				this.ToggleAutofillButton,
+				.. this.InventorySelectButtons,
+			];
 
 			return components;
 		}

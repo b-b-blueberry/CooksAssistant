@@ -47,7 +47,7 @@ namespace LoveOfCooking
 		
 		// Mod data definitions
 		internal static Definitions Definitions;
-		internal static Dictionary<string, string> Strings = new();
+		internal static Dictionary<string, string> Strings = [];
 
 		// Others:
 		// base game reference
@@ -61,7 +61,7 @@ namespace LoveOfCooking
 			Luck
 		}
 		// cook at kitchens
-		internal static Dictionary<string, string> NpcHomeLocations = new();
+		internal static Dictionary<string, string> NpcHomeLocations = [];
 
 		// Mail titles
 		internal static readonly string MailCookbookUnlocked = MailPrefix + "cookbook_unlocked"; // DO NOT EDIT
@@ -384,7 +384,7 @@ namespace LoveOfCooking
 			// Cooking Menu
 			Utils.TryAddCookbook(who: Game1.player);
 
-			// Add Seasonings
+			// More Seasonings
 			Utils.TrySendSeasoningRecipes(who: Game1.player);
 		}
 

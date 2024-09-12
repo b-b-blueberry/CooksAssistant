@@ -42,9 +42,9 @@ namespace LoveOfCooking.Menu
 		// Search feature
 		private int _resultsIndex;
         private int _resultsPerPage;
-        private List<CraftingRecipe> _filteredResults = new();
-        private readonly List<CraftingRecipe> _unfilteredResults = new();
-        private readonly List<CraftingRecipe> _visibleResults = new();
+		private List<CraftingRecipe> _filteredResults = [];
+		private readonly List<CraftingRecipe> _unfilteredResults = [];
+        private readonly List<CraftingRecipe> _visibleResults = [];
 
 		// Components
 		private Rectangle _resultsArea;
@@ -58,11 +58,11 @@ namespace LoveOfCooking.Menu
 		public ClickableTextureComponent SearchButton { get; private set; }
 		public ClickableTextureComponent DownButton { get; private set; }
 		public ClickableTextureComponent UpButton { get; private set; }
-		public List<ClickableComponent> ResultsListClickables { get; private set; } = new();
-		public List<ClickableComponent> ResultsGridClickables { get; private set; } = new();
-		public List<ClickableTextureComponent> FilterButtons { get; private set; } = new();
-		public List<ClickableTextureComponent> SorterButtons { get; private set; } = new();
-		public List<ClickableTextureComponent> ToggleButtons { get; private set; } = new();
+		public List<ClickableComponent> ResultsListClickables { get; private set; } = [];
+		public List<ClickableComponent> ResultsGridClickables { get; private set; } = [];
+		public List<ClickableTextureComponent> FilterButtons { get; private set; } = [];
+		public List<ClickableTextureComponent> SorterButtons { get; private set; } = [];
+		public List<ClickableTextureComponent> ToggleButtons { get; private set; } = [];
 
         // Filters
         private bool _isFilterBarVisible;
@@ -118,7 +118,7 @@ namespace LoveOfCooking.Menu
             {
 				max = GridColumns * (max / GridColumns) + GridColumns;
             }
-			int delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, new[] { new InputButton(Keys.LeftShift) })
+			int delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, [new InputButton(Keys.LeftShift)])
                 ? this._resultsPerPage
                 : this.IsGridView ? this._resultsArea.Width / this._resultHeight : 1;
 			int index = Math.Max(min, Math.Min(max - this._visibleResults.Count / 2, this._resultsIndex + delta * (isDownwards ? 1 : -1)));
@@ -486,12 +486,12 @@ namespace LoveOfCooking.Menu
 			}
 
 			// Toggle buttons
-			this.ToggleButtons.AddRange(new[]
-            {
+			this.ToggleButtons.AddRange(
+			[
 				this.ToggleFilterButton,
 				this.ToggleSorterButton,
 				this.ToggleViewButton
-            });
+            ]);
 
             // Search results
             for (int i = 0; i < ListRows; ++i)
@@ -507,19 +507,18 @@ namespace LoveOfCooking.Menu
 					name: "searchGrid" + i));
             }
 
-            List<ClickableComponent> components = new()
-            {
+            List<ClickableComponent> components =
+			[
 				this.DownButton,
 				this.UpButton,
 				this.SearchButton,
 				this.SearchBarClickable,
-            };
-
-            components.AddRange(this.ToggleButtons);
-            components.AddRange(this.FilterButtons);
-            components.AddRange(this.SorterButtons);
-			components.AddRange(this.ResultsListClickables);
-            components.AddRange(this.ResultsGridClickables);
+				.. this.ToggleButtons,
+				.. this.FilterButtons,
+				.. this.SorterButtons,
+				.. this.ResultsListClickables,
+				.. this.ResultsGridClickables,
+            ];
 
             return components;
         }
@@ -689,8 +688,8 @@ namespace LoveOfCooking.Menu
                 }
                 foreach (ClickableComponent clickable in this.ResultsListClickables)
                 {
-                    clickable.bounds.Height = this.ResultsListClickables[this.ResultsListClickables.Count - 1].bounds.Y
-                        - this.ResultsListClickables[this.ResultsListClickables.Count - 2].bounds.Y;
+                    clickable.bounds.Height = this.ResultsListClickables[^1].bounds.Y
+                        - this.ResultsListClickables[^2].bounds.Y;
                 }
             }
         }

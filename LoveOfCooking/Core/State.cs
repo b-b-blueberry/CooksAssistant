@@ -13,8 +13,8 @@ namespace LoveOfCooking
 		public int CookingToolLevel;
 		public bool IsUsingAutofill;
 		public bool IsUsingRecipeGridView;
-		public List<string> FoodsEaten = new();
-		public List<string> FavouriteRecipes = new();
+		public List<string> FoodsEaten = [];
+		public List<string> FavouriteRecipes = [];
 
 		// Cooking Menu
 		public CookingMenu.Filter LastRecipeFilterThisSession;
@@ -25,7 +25,7 @@ namespace LoveOfCooking
 		public MultipleMutexRequest MenuMutex;
 
 		// Cooking Skill
-		public readonly Dictionary<string, int> FoodCookedToday = new();
+		public readonly Dictionary<string, int> FoodCookedToday = [];
 
 		// Cooking Tool
 		// ...

@@ -11,12 +11,12 @@ namespace LoveOfCooking.Menu
         public Rectangle Area { get; private set; }
         public CookingMenu Menu { get; protected set; }
 
-        public CookingMenuSubMenu(CookingMenu menu)
-        {
-            Menu = menu;
-        }
+		public CookingMenuSubMenu(CookingMenu menu)
+		{
+			this.Menu = menu;
+		}
 
-        public abstract List<ClickableComponent> CreateClickableComponents();
+		public abstract List<ClickableComponent> CreateClickableComponents();
         public abstract void AssignNestedComponentIds(ref int id);
         public abstract void OnKeyPressed(Keys key);
         public abstract void OnButtonPressed(Buttons button);
@@ -30,7 +30,7 @@ namespace LoveOfCooking.Menu
 
         public virtual void LayoutComponents(Rectangle area)
         {
-            Area = area;
+			this.Area = area;
         }
     }
 }

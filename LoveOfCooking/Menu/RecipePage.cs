@@ -81,12 +81,12 @@ namespace LoveOfCooking.Menu
                 scale: Scale,
                 drawShadow: true);
 
-            return new()
-            {
+            return
+			[
 				this.RightButton,
 				this.LeftButton,
 				this.RecipeIconButton
-            };
+            ];
         }
 
         public override void AssignNestedComponentIds(ref int id)
@@ -216,7 +216,7 @@ namespace LoveOfCooking.Menu
             bool isKorean = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts;
             Point cursor = Game1.getMousePosition(ui_scale: true);
             float textHeightCheck;
-			int[] textHeightCheckMilestones = new[] { 60, 100, 120 };
+			int[] textHeightCheckMilestones = [60, 100, 120];
             Vector2 textPosition = Vector2.Zero;
 			int textWidth;
             string text;

@@ -30,7 +30,7 @@ namespace LoveOfCooking.Menu
 		public ClickableTextureComponent SeasoningButton { get; private set; }
 		public ClickableTextureComponent QuantityUpButton { get; private set; }
 		public ClickableTextureComponent QuantityDownButton { get; private set; }
-		public List<ClickableTextureComponent> IngredientSlotButtons { get; private set; } = new();
+		public List<ClickableTextureComponent> IngredientSlotButtons { get; private set; } = [];
 
 		// Animations
 		private double _animBounceTimer;
@@ -57,7 +57,7 @@ namespace LoveOfCooking.Menu
 
 		public void TryClickQuantityButton(int x, int y)
         {
-			int delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, new[] { new InputButton(Keys.LeftShift) })
+			int delta = Game1.isOneOfTheseKeysDown(Game1.oldKBState, [new InputButton(Keys.LeftShift)])
                 ? 10 : 1;
 			int value = this._quantity;
 
@@ -150,14 +150,14 @@ namespace LoveOfCooking.Menu
                 scale: Scale,
                 drawShadow: true);
 
-            List<ClickableComponent> components = new()
-            {
+            List<ClickableComponent> components =
+			[
 				this.CookButton,
 				this.SeasoningButton,
 				this.QuantityUpButton,
-				this.QuantityDownButton
-            };
-            components.AddRange(this.IngredientSlotButtons);
+				this.QuantityDownButton,
+				.. this.IngredientSlotButtons,
+            ];
 
             return components;
         }
@@ -763,8 +763,8 @@ namespace LoveOfCooking.Menu
 					const int width = 3;
 					const int height = 3;
 					int count = 0;
-					List<NetFloat> attributes = new()
-					{
+					List<NetFloat> attributes =
+					[
 						buff.effects.FarmingLevel,
 						buff.effects.FishingLevel,
 						buff.effects.MiningLevel,
@@ -777,7 +777,7 @@ namespace LoveOfCooking.Menu
 						buff.effects.Speed,
 						buff.effects.Defense,
 						buff.effects.Attack
-					};
+					];
 					int numToDisplay = attributes.Count(a => a is not null && a.Value != 0);
 					for (int i = 0; i < attributes.Count && count < width * height; ++i)
 					{

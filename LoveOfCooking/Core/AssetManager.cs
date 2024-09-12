@@ -41,8 +41,8 @@ namespace LoveOfCooking
 		public static string CommunityCentreContentPackPath { get; private set; } = Path.Combine(RootContentPackPath, "[CCC] KitchenContentPack");
 
 		// Assets to edit: asset keys passed to Edit()
-		private static readonly List<string> AssetsToEdit = new()
-		{
+		private static readonly List<string> AssetsToEdit =
+		[
 			@"Data/Buffs",
 			@"Data/Characters",
 			@"Data/CookingRecipes",
@@ -53,7 +53,7 @@ namespace LoveOfCooking
 			@"Data/Powers",
 			@"Data/Shops",
 			@"Data/Tools"
-		};
+		];
 
 
 		internal static void LoadStrings(LocalizedContentManager.LanguageCode code)
@@ -169,7 +169,7 @@ namespace LoveOfCooking
 						.ToDictionary(pair => pair.Key, pair => pair.Value);
 					if (badRecipes.Count > 0)
 					{
-						string str = badRecipes.Aggregate($"Removing {badRecipes.Count()} invalid recipes.\nThese recipes may use items from mods that aren't installed:",
+						string str = badRecipes.Aggregate($"Removing {badRecipes.Count} invalid recipes.\nThese recipes may use items from mods that aren't installed:",
 							(str, cur) => $"{str}{Environment.NewLine}{cur.Key}: {cur.Value.Split('/')[0]}");
 						Log.W(str);
 						foreach (string recipe in badRecipes.Keys)

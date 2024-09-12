@@ -51,7 +51,7 @@ namespace LoveOfCooking.HarmonyPatches
 				postfix: new HarmonyMethod(typeof(HarmonyPatches), nameof(Object_GetPriceAfterMultipliers_Postfix)));
 
 			// Food Buffs Start Hidden
-			parameters = new[] { typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(string), typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>), typeof(Texture2D), typeof(Rectangle), typeof(Color), typeof(Color), typeof(float), typeof(int), typeof(int) };
+			parameters = [typeof(SpriteBatch), typeof(StringBuilder), typeof(SpriteFont), typeof(int), typeof(int), typeof(int), typeof(string), typeof(int), typeof(string[]), typeof(Item), typeof(int), typeof(string), typeof(int), typeof(int), typeof(int), typeof(float), typeof(CraftingRecipe), typeof(IList<Item>), typeof(Texture2D), typeof(Rectangle), typeof(Color), typeof(Color), typeof(float), typeof(int), typeof(int)];
 			harmony.Patch(
 				original: AccessTools.Method(
 					type: typeof(IClickableMenu),
@@ -164,15 +164,15 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 
 			// Replace draw behaviour for hidden buffs
-			ilOut.InsertRange(index: j + 1, collection: new CodeInstruction[]
-			{
+			ilOut.InsertRange(index: j + 1, collection:
+			[
 				new(OpCodes.Ldarg, 0), // SpriteBatch b
 				new(OpCodes.Ldarg, 2), // SpriteFont font
 				new(OpCodes.Ldarg, 9), // Item item
 				new(OpCodes.Ldloc_S, 5), // int x
 				new(OpCodes.Ldloc_S, 6), // int y
 				new(OpCodes.Call, newMethod), // hidden buff draw method call
-			});
+			]);
 
 			return ilOut;
 		}
@@ -299,7 +299,7 @@ namespace LoveOfCooking.HarmonyPatches
 			List<CodeInstruction> ilOut = il.ToList();
 			ConstructorInfo targetMethod = AccessTools.Constructor(
 				type: typeof(BasicProjectile),
-				parameters: new Type[] { typeof(int), typeof(int), typeof(int), typeof(int), typeof(float), typeof(float), typeof(float), typeof(Vector2), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(GameLocation), typeof(Character), typeof(BasicProjectile.onCollisionBehavior), typeof(string) });
+				parameters: [typeof(int), typeof(int), typeof(int), typeof(int), typeof(float), typeof(float), typeof(float), typeof(Vector2), typeof(string), typeof(string), typeof(string), typeof(bool), typeof(bool), typeof(GameLocation), typeof(Character), typeof(BasicProjectile.onCollisionBehavior), typeof(string)]);
 			MethodInfo newMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryProliferateLastProjectile));
@@ -314,11 +314,11 @@ namespace LoveOfCooking.HarmonyPatches
 			}
 
 			// Add projectile proliferate behaviour
-			ilOut.InsertRange(index: j + 1, collection: new CodeInstruction[]
-			{
+			ilOut.InsertRange(index: j + 1, collection:
+			[
 				new(OpCodes.Ldarg, 1), // GameLocation location
 				new(OpCodes.Call, newMethod), // Utils TryProliferateLastProjectile
-			});
+			]);
 
 			return ilOut;
 		}

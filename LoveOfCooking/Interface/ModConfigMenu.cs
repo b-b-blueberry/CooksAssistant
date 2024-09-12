@@ -106,7 +106,7 @@ namespace LoveOfCooking.Interface
 		private static void CreateInfoPage(IGenericModConfigMenuAPI gmcm, IManifest mod)
 		{
 			float subheadingOffset = 0;
-			Dictionary<string, Texture2D> objectSprites = new();
+			Dictionary<string, Texture2D> objectSprites = [];
 
 			gmcm.AddPage(
 				mod: mod,
@@ -125,7 +125,7 @@ namespace LoveOfCooking.Interface
 				{
 					string cookingItem = Game1.content.LoadString("Strings\\Objects:CookoutKit_Name");
 					string cookbookItem = I18n.Get("item.cookbook.name");
-					string text = I18n.Get("config.info.cookingmenu.text.1", new { cookingItem = cookingItem, cookbookItem = cookbookItem });
+					string text = I18n.Get("config.info.cookingmenu.text.1", new { cookingItem, cookbookItem });
 					if (!ModEntry.Config.AddCookingMenu)
 					{
 						text += $"\n\n{I18n.Get("config.info.disabled")}";
@@ -202,14 +202,14 @@ namespace LoveOfCooking.Interface
 
 			// Gamepad controls and mappings
 			int controllerMapHeight = 0;
-			List<(Rectangle Source, string Text)> controllerMap = new();
+			List<(Rectangle Source, string Text)> controllerMap = [];
 			gmcm.AddComplexOption(
 				mod: mod,
 				name: () => string.Empty,
 				beforeMenuOpened: () =>
 				{
-					controllerMap = new()
-					{
+					controllerMap =
+					[
 						(CookingMenu.AButtonSource, I18n.Get("config.info.controllermap.button.a")),
 						(CookingMenu.BButtonSource, I18n.Get("config.info.controllermap.button.b")),
 						(CookingMenu.XButtonSource, I18n.Get("config.info.controllermap.button.x")),
@@ -218,7 +218,7 @@ namespace LoveOfCooking.Interface
 						(CookingMenu.StartButtonSource, I18n.Get("config.info.controllermap.button.start")),
 						(Rectangle.Empty, I18n.Get("config.info.controllermap.shoulders")),
 						(Rectangle.Empty, I18n.Get("config.info.controllermap.triggers")),
-					};
+					];
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
@@ -679,7 +679,7 @@ namespace LoveOfCooking.Interface
 				});
 
 			// Cooking tool
-			Dictionary<string, ToolData> toolData = new();
+			Dictionary<string, ToolData> toolData = [];
 			int toolTableHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
@@ -689,7 +689,7 @@ namespace LoveOfCooking.Interface
 				text: () =>
 				{
 					string tool = CookingTool.DisplayName();
-					return I18n.Get("config.info.cookingtool.text.1", new { tool = tool });
+					return I18n.Get("config.info.cookingtool.text.1", new { tool });
 				});
 			gmcm.AddComplexOption(
 				mod: mod,
@@ -888,7 +888,7 @@ namespace LoveOfCooking.Interface
 				height: () => toolTableHeight);
 
 			// More seasonings
-			Dictionary<string, (int Quality, Texture2D Texture, Rectangle Source)> seasoningsMap = new();
+			Dictionary<string, (int Quality, Texture2D Texture, Rectangle Source)> seasoningsMap = [];
 			int seasoningsHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
@@ -1006,7 +1006,7 @@ namespace LoveOfCooking.Interface
 						.Where(npc => npc is not null && Game1.getLocationFromName(ModEntry.NpcHomeLocations[npc.Name]) is GameLocation gl && !gl.IsOutdoors)
 						.OrderBy(npc => npc.displayName)
 						.ToList()
-					?? new();
+					?? [];
 					characterRows = (int)Math.Ceiling((float)characters.Count / characterColumns);
 					isCharacterListVisible = ModEntry.Config.CanUseTownKitchens && characters.Any();
 				},
@@ -1093,7 +1093,7 @@ namespace LoveOfCooking.Interface
 				{
 					string healthItem = Game1.content.LoadString("Strings\\Objects:LifeElixir_Name");
 					string energyItem = Game1.content.LoadString("Strings\\Objects:EnergyTonic_Name");
-					string text = I18n.Get("config.info.foodhealingtakestime.text", new { healthItem = healthItem, energyItem = energyItem });
+					string text = I18n.Get("config.info.foodhealingtakestime.text", new { healthItem, energyItem });
 					if (!ModEntry.Config.FoodHealingTakesTime)
 					{
 						text += $"\n\n{I18n.Get("config.info.disabled")}";
