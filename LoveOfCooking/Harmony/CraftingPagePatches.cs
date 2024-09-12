@@ -40,7 +40,7 @@ namespace LoveOfCooking.HarmonyPatches
 				name: nameof(Utils.SendSeasoningUsedMessage));
 			MethodInfo burnMethod = AccessTools.Method(
 				type: typeof(Utils),
-				name: nameof(Utils.TryBurnFood));
+				name: nameof(Utils.TryBurnFoodForCraftingPage));
 			MethodInfo skillMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryCookingSkillBehavioursOnCooked));
@@ -79,7 +79,7 @@ namespace LoveOfCooking.HarmonyPatches
 			ilOut.InsertRange(index: i + 1, collection:
 			[
 				new(OpCodes.Ldarg_0), // menu: this
-				new(OpCodes.Ldloca_S, 1), // ref item: crafted
+				new(OpCodes.Ldloca_S, 1), // item: crafted
 				new(OpCodes.Ldloc, 2), // seasoning: seasoning
 				new(OpCodes.Call, seasoningMethod)
 			]);
@@ -102,7 +102,7 @@ namespace LoveOfCooking.HarmonyPatches
 			[
 				// Experience and profession behaviours for Cooking Skill
 				new(OpCodes.Ldloc, 0), // recipe: recipe
-				new(OpCodes.Ldloca_S, 1), // ref item: crafted
+				new(OpCodes.Ldloc, 1), // item: crafted
 				new(OpCodes.Call, skillMethod),
 				// Burnt item for Food Can Burn
 				new(OpCodes.Ldarg_0), // menu: this

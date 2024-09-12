@@ -976,11 +976,16 @@ namespace LoveOfCooking
 			return ItemRegistry.Create(itemId: itemId);
 		}
 
-		public static Item TryBurnFood(CraftingPage menu, CraftingRecipe recipe, Item input, bool playSound)
+		public static bool TryBurnFood(CraftingRecipe recipe, Item input, out Item output)
 		{
 			bool isBurnt = Utils.CheckBurntFood(recipe: recipe);
-			Item output = isBurnt ? Utils.CreateBurntFood() : input;
-			if (isBurnt)
+			output = isBurnt ? Utils.CreateBurntFood() : input;
+			return isBurnt;
+		}
+
+		public static Item TryBurnFoodForCraftingPage(CraftingPage menu, CraftingRecipe recipe, Item input, bool playSound)
+		{
+			if (Utils.TryBurnFood(recipe: recipe, input: input, output: out Item output))
 			{
 				Utils.PlayFoodBurnEffects(burntQuantity: output.Stack, position: Utils.GuessKitchenGrabTilePosition());
 				if (menu.heldItem is not null && !output.canStackWith(menu.heldItem))
@@ -994,6 +999,21 @@ namespace LoveOfCooking
 				}
 			}
 			return output;
+		}
+
+		public static bool TryBurnFoodForBetterCrafting(IClickableMenu menu, CraftingRecipe recipe, Item input, out Item output)
+		{
+			if (Utils.TryBurnFood(recipe: recipe, input: input, output: out output))
+			{
+				// Play effects
+				Utils.PlayFoodBurnEffects(burntQuantity: output.Stack, position: Utils.GuessKitchenGrabTilePosition());
+				// Add burnt food to inventory if possible
+				Utils.AddOrDropItem(item: output);
+				// Prevent BetterCrafting from assigning burnt food to HeldItem
+				output = null;
+				return true;
+			}
+			return false;
 		}
 
 		public static bool TryApplyCookingQuantityBonus(Item item = null)
@@ -1011,7 +1031,7 @@ namespace LoveOfCooking
 			return false;
 		}
 
-		public static void TryCookingSkillBehavioursOnCooked(CraftingRecipe recipe, ref Item item)
+		public static void TryCookingSkillBehavioursOnCooked(CraftingRecipe recipe, Item item)
 		{
 			if (!ModEntry.Config.AddCookingSkillAndRecipes)
 				return;

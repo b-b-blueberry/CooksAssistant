@@ -107,8 +107,28 @@ namespace LoveOfCooking.Interface
 			IBetterCrafting betterCrafting = Interfaces.Helper.ModRegistry
 				.GetApi<IBetterCrafting>
 				("leclair.bettercrafting");
+			if (betterCrafting is not null)
+			{
+				betterCrafting.PostCraft += Interfaces.BetterCrafting_PostCraft;
+			}
 
 			Interfaces.BetterCraftingApi = betterCrafting;
+		}
+
+		private static void BetterCrafting_PostCraft(IPostCraftEvent @event)
+		{
+			if (!@event.Recipe.CraftingRecipe.isCookingRecipe)
+				return;
+
+			Utils.TryCookingSkillBehavioursOnCooked(
+				recipe: @event.Recipe.CraftingRecipe,
+				item: @event.Item);
+			Utils.TryBurnFoodForBetterCrafting(
+				menu: @event.Menu,
+				recipe: @event.Recipe.CraftingRecipe,
+				input: @event.Item,
+				output: out Item output);
+			@event.Item = output;
 		}
 
 		private static void LoadCustomCommunityCentreContent()
