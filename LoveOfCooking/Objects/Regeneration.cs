@@ -320,7 +320,7 @@ namespace LoveOfCooking
 		[EventPriority(EventPriority.Low)]
 		protected void Draw(object sender, RenderingHudEventArgs e)
 		{
-			if (!Context.IsWorldReady || Game1.farmEvent is not null || this.RemainingValue.Total <= 0)
+			if (!Game1.IsHudDrawn || this.RemainingValue.Total <= 0)
 			{
 				return;
 			}

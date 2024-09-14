@@ -85,7 +85,7 @@ namespace LoveOfCooking.Objects
 		/// <returns>Whether the player has unlocked and chosen the given profession.</returns>
 		public bool HasProfession(ICookingSkillAPI.Profession profession, long playerID = -1L)
 		{
-			Farmer player = Game1.getFarmer(playerID);
+			Farmer player = Game1.GetPlayer(playerID, onlyOnline: false) ?? Game1.MasterPlayer;
 			return (player ?? Game1.player).HasCustomProfession(this.GetSkill().Professions[(int)profession]);
 		}
 
