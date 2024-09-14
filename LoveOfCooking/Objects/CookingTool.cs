@@ -88,15 +88,15 @@ namespace LoveOfCooking.Objects
 		/// <summary>
 		/// Returns the translated description for a given upgrade level.
 		/// </summary>
-		public static string Description(int level)
+		public static string Description(int level = 0)
 		{
 			string key = level switch
 			{
-				0 => "menu.cooking_equipment.description.basic",
-				1 => "menu.cooking_equipment.description.copper",
-				2 => "menu.cooking_equipment.description.steel",
-				3 => "menu.cooking_equipment.description.gold",
-				_ => "menu.cooking_equipment.description.iridium",
+				1 => "menu.cooking_tool.description.copper",
+				2 => "menu.cooking_tool.description.steel",
+				3 => "menu.cooking_tool.description.gold",
+				4 => "menu.cooking_tool.description.iridium",
+				_ => "menu.cooking_tool.description.basic",
 			};
 			return ModEntry.Instance.I18n.Get(key).ToString();
 		}
@@ -106,9 +106,15 @@ namespace LoveOfCooking.Objects
 		/// </summary>
 		public static string DisplayName(int level = 0)
 		{
-			string generic = ModEntry.Instance.I18n.Get("menu.cooking_equipment.name");
-			string qualified = string.Format(Game1.content.LoadString("Strings\\StringsFromCSFiles:Tool.cs." + (14299 + level - 1)), generic);
-			return level is < 1 or > CookingTool.MaxUpgradeLevel ? generic : qualified;
+			string key = level switch
+			{
+				1 => "menu.cooking_tool.name.copper",
+				2 => "menu.cooking_tool.name.steel",
+				3 => "menu.cooking_tool.name.gold",
+				4 => "menu.cooking_tool.name.iridium",
+				_ => "menu.cooking_tool.name.basic",
+			};
+			return ModEntry.Instance.I18n.Get(key).ToString();
 		}
 
 		/// <summary>

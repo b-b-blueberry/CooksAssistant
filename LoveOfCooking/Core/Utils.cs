@@ -112,7 +112,7 @@ namespace LoveOfCooking
 
 			// Replace cooking tool
 			{
-				if (Game1.player.toolBeingUpgraded.Name == "blueberry.LoveOfCooking.cookingtool")
+				if (Game1.player.toolBeingUpgraded.Name == CookingTool.InternalName)
 				{
 					Tool oldTool = Game1.player.toolBeingUpgraded.Value;
 					int level = oldTool?.UpgradeLevel ?? ModEntry.Instance.States.Value.CookingToolLevel;

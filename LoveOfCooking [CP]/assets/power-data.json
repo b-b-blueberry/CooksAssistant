@@ -21,8 +21,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "blueberry.LoveOfCooking_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_equipment.name}}",
-                    "Description": "{{i18n:menu.cooking_equipment.description.basic}}",
+                    "DisplayName": "{{i18n:menu.cooking_tool.name.basic}}",
+                    "Description": "{{i18n:menu.cooking_tool.description.basic}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
                         "X": 0,
@@ -40,8 +40,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "blueberry.LoveOfCooking_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_equipment.name}}",
-                    "Description": "{{i18n:menu.cooking_equipment.description.copper}}",
+                    "DisplayName": "{{i18n:menu.cooking_tool.name.copper}}",
+                    "Description": "{{i18n:menu.cooking_tool.description.copper}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
                         "X": 16,
@@ -59,8 +59,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "blueberry.LoveOfCooking_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_equipment.name}}",
-                    "Description": "{{i18n:menu.cooking_equipment.description.steel}}",
+                    "DisplayName": "{{i18n:menu.cooking_tool.name.steel}}",
+                    "Description": "{{i18n:menu.cooking_tool.description.steel}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
                         "X": 32,
@@ -78,8 +78,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "blueberry.LoveOfCooking_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_equipment.name}}",
-                    "Description": "{{i18n:menu.cooking_equipment.description.gold}}",
+                    "DisplayName": "{{i18n:menu.cooking_tool.name.gold}}",
+                    "Description": "{{i18n:menu.cooking_tool.description.gold}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
                         "X": 48,
@@ -97,8 +97,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "blueberry.LoveOfCooking_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_equipment.name}}",
-                    "Description": "{{i18n:menu.cooking_equipment.description.iridium}}",
+                    "DisplayName": "{{i18n:menu.cooking_tool.name.iridium}}",
+                    "Description": "{{i18n:menu.cooking_tool.description.iridium}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
                         "X": 64,

@@ -85,12 +85,16 @@
 	// General strings
 
 	// Cooking tool
-	"menu.cooking_equipment.name": "Frying Pan",
-	"menu.cooking_equipment.description.basic": "Can cook recipes with only 1 ingredient.",
-	"menu.cooking_equipment.description.copper": "Can cook recipes with only 1 or 2 ingredients.",
-	"menu.cooking_equipment.description.steel": "Can cook recipes with up to 3 ingredients.",
-	"menu.cooking_equipment.description.gold": "Can cook recipes with up to 4 ingredients.",
-	"menu.cooking_equipment.description.iridium": "Can cook recipes with any number of ingredients!",
+	"menu.cooking_tool.name.basic": "Frying Pan",
+	"menu.cooking_tool.name.copper": "Copper Frying Pan",
+	"menu.cooking_tool.name.steel": "Steel Frying Pan",
+	"menu.cooking_tool.name.gold": "Gold Frying Pan",
+	"menu.cooking_tool.name.iridium": "Iridium Frying Pan",
+	"menu.cooking_tool.description.basic": "Can cook recipes with only 1 ingredient.",
+	"menu.cooking_tool.description.copper": "Can cook recipes with only 1 or 2 ingredients.",
+	"menu.cooking_tool.description.steel": "Can cook recipes with up to 3 ingredients.",
+	"menu.cooking_tool.description.gold": "Can cook recipes with up to 4 ingredients.",
+	"menu.cooking_tool.description.iridium": "Can cook recipes with any number of ingredients!",
 
 	// Cooking menu
 	"menu.cooking_station.no_cookbook": "You don't have a cookbook.",
