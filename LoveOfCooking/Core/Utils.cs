@@ -23,6 +23,7 @@ using xTile.Layers;
 using xTile.Tiles;
 using CraftingPage = StardewValley.Menus.CraftingPage;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
+using StardewValley.Internal;
 using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking
@@ -182,15 +183,15 @@ namespace LoveOfCooking
 					return false;
 				}
 
-				Utility.ForEachItem((Item item, Action remove, Action<Item> replaceWith) =>
+				Utility.ForEachItemContext((in ForEachItemContext context) =>
 				{
-					if (item is not null)
+					if (context.Item is not null)
 					{
-						if (item.Name is not null && item.Name.StartsWith("blueberry.cac") && TryRemoveItem(item))
+						if (context.Item.Name is not null && context.Item.Name.StartsWith("blueberry.cac") && TryRemoveItem(context.Item))
 						{
-							remove();
+							context.RemoveItem();
 						}
-						else if (item is IndoorPot pot && pot.hoeDirt.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
+						else if (context.Item is IndoorPot pot && pot.hoeDirt.Value is HoeDirt dirt && dirt.crop is Crop crop && crop.IsErrorCrop() && TryRemoveCrop(dirt: dirt))
 						{
 							// Don't remove indoor pots
 						}
