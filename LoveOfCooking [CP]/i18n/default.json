@@ -1,4 +1,7 @@
 ﻿{
+	// Mod info
+	"mod.name": "Love of Cooking",
+
 	// Config options
 	"config.page.info": "Info",
 	"config.page.options": "Options",

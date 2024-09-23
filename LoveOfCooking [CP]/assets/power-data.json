@@ -1,5 +1,23 @@
 {
     "Changes": [
+        // Mod compatibility
+        {
+            "Action": "EditData",
+            "Target": "Spiderbuttons.SpecialPowerUtilities/PowerTabs",
+            "Entries": {
+                "{{ModId}}": {
+                    "TabDisplayName": "{{i18n:mod.name}}",
+                    "IconPath": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconSourceRect": {
+                        "X": 0,
+                        "Y": 16,
+                        "Width": 16,
+                        "Height": 16
+                    }
+                }
+            }
+        },
+        // Vanilla
         {
             "Action": "EditData",
             "Target": "Data/Powers",
@@ -12,7 +30,10 @@
                         "X": 0,
                         "Y": 80
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked"
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                    }
                 }
             }
         },
@@ -28,7 +49,10 @@
                         "X": 0,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked"
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                    }
                 }
             },
             "When": {
@@ -47,7 +71,10 @@
                         "X": 16,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked"
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                    }
                 }
             },
             "When": {
@@ -66,7 +93,10 @@
                         "X": 32,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked"
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                    }
                 }
             },
             "When": {
@@ -85,7 +115,10 @@
                         "X": 48,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked"
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                    }
                 }
             },
             "When": {
@@ -104,7 +137,10 @@
                         "X": 64,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked"
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                    }
                 }
             },
             "When": {
