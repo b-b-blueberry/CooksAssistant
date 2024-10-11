@@ -5,6 +5,7 @@ using LoveOfCooking.Objects;
 using StardewValley;
 using StardewValley.Inventories;
 using StardewValley.Objects;
+using StardewValley.Quests;
 
 namespace LoveOfCooking.Menu
 {
@@ -435,12 +436,12 @@ namespace LoveOfCooking.Menu
                 for (int i = 0; i < quantityCooked; ++i)
                 {
                     Game1.player.cookedRecipe(item.ItemId);
-                }
+					Game1.player.NotifyQuests((Quest quest) => quest.OnRecipeCrafted(recipe: recipe, item: item));
+				}
 
                 // Update game stats
                 Game1.stats.ItemsCooked += (uint)quantityCooked;
-                Game1.player.checkForQuestComplete(null, -1, -1, item, null, 2);
-                Game1.stats.checkForCookingAchievements();
+				Game1.stats.checkForCookingAchievements();
             }
 
             // Add cooked items to inventory if possible
