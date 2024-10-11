@@ -1106,7 +1106,6 @@ namespace LoveOfCooking
 			// Avoid blocking the player from submitting items to special order dropboxes
 			if (who.team.specialOrders.Any(order => order is not null && order.objectives.Any(
 				obj => obj is DonateObjective donate
-					&& donate.dropBox.Value.EndsWith("Kitchen")
 					&& donate.dropBoxGameLocation.Value == location.Name
 					&& donate.dropBoxTileLocation.Value == point.ToVector2())))
 			{
