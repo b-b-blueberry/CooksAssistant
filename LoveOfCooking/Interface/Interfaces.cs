@@ -121,14 +121,14 @@ namespace LoveOfCooking.Interface
 			if (!@event.Recipe.CraftingRecipe.isCookingRecipe)
 				return;
 
+			Item output = @event.Item;
 			Utils.TryCookingSkillBehavioursOnCooked(
 				recipe: @event.Recipe.CraftingRecipe,
-				item: @event.Item);
+				item: ref output);
 			Utils.TryBurnFoodForBetterCrafting(
 				menu: @event.Menu,
 				recipe: @event.Recipe.CraftingRecipe,
-				input: @event.Item,
-				output: out Item output);
+				input: ref output);
 			@event.Item = output;
 		}
 

@@ -44,12 +44,20 @@ namespace LoveOfCooking.HarmonyPatches
 			MethodInfo skillMethod = AccessTools.Method(
 				type: typeof(Utils),
 				name: nameof(Utils.TryCookingSkillBehavioursOnCooked));
+			FieldInfo recipe = ilOut.FirstOrDefault(ci =>
+				ci.opcode == OpCodes.Stfld
+				&& ci.operand is FieldInfo info
+				&& info.Name == "recipe").operand as FieldInfo;
+			FieldInfo crafted = ilOut.FirstOrDefault(ci =>
+				ci.opcode == OpCodes.Stfld
+				&& ci.operand is FieldInfo info
+				&& info.Name == "crafted").operand as FieldInfo;
 
 			// Seek to new seasonings list creation
 			/*
 				IL_0031: newobj instance void class
 			[System.Collections]System.Collections.Generic.List`1<valuetype [System.Runtime]System.Collections.Generic.KeyValuePair`2<string, int32>>::.ctor()
-				IL_0036: stloc.2
+				IL_0036: stloc.1
 			*/
 			int i = ilOut.FindIndex(
 				match: (CodeInstruction ci) => ci.opcode == OpCodes.Newobj
@@ -57,11 +65,16 @@ namespace LoveOfCooking.HarmonyPatches
 			/*
 				IL_005d: br.s IL_0061
 				IL_005f: ldnull
-				IL_0060: stloc.2
+				IL_0060: stloc.1
 			*/
 			int j = i < 0 ? i : ilOut.FindIndex(
 				startIndex: i,
 				match: (CodeInstruction ci) => ci.opcode == OpCodes.Ldnull);
+
+			// Leave seasonings list assignment as-is; we need the empty list for later
+			i = ilOut.FindIndex(
+				startIndex: i,
+				match: (CodeInstruction ci) => ci.opcode == OpCodes.Stloc_1);
 
 			if (i < 0 || j < 0)
 			{
@@ -69,18 +82,14 @@ namespace LoveOfCooking.HarmonyPatches
 				return il;
 			}
 
-			// Skip seasonings list assignment; we need the empty list for later
-			i = ilOut.FindIndex(
-				startIndex: i,
-				match: (CodeInstruction ci) => ci.opcode == OpCodes.Stloc_2);
-
 			// Replace default seasonings behaviour with override method call signature
 			ilOut.RemoveRange(index: i + 1, count: j - i + 1);
 			ilOut.InsertRange(index: i + 1, collection:
 			[
 				new(OpCodes.Ldarg_0), // menu: this
-				new(OpCodes.Ldloca_S, 1), // item: crafted
-				new(OpCodes.Ldloc, 2), // seasoning: seasoning
+				new(OpCodes.Ldloc, 0), // item: crafted
+				new(OpCodes.Ldflda, crafted), // ^
+				new(OpCodes.Ldloc, 1), // seasoning: seasoning
 				new(OpCodes.Call, seasoningMethod)
 			]);
 
@@ -102,16 +111,18 @@ namespace LoveOfCooking.HarmonyPatches
 			[
 				// Experience and profession behaviours for Cooking Skill
 				new(OpCodes.Ldloc, 0), // recipe: recipe
-				new(OpCodes.Ldloc, 1), // item: crafted
+				new(OpCodes.Ldfld, recipe), // ^
+				new(OpCodes.Ldloc, 0), // item: crafted
+				new(OpCodes.Ldflda, crafted), // ^
 				new(OpCodes.Call, skillMethod),
 				// Burnt item for Food Can Burn
 				new(OpCodes.Ldarg_0), // menu: this
 				new(OpCodes.Ldloc, 0), // recipe: recipe
-				new(OpCodes.Ldloc, 1), // item: crafted
+				new(OpCodes.Ldfld, recipe), // ^
+				new(OpCodes.Ldloc, 0), // item: crafted
+				new(OpCodes.Ldflda, crafted), // ^
 				new(OpCodes.Ldarg, 2), // playSound: playSound
 				new(OpCodes.Call, burnMethod),
-				// Assign burnt/unchanged item as crafted item
-				new(OpCodes.Stloc, 1) // crafted
 			]);
 
 			// Move index to seasoning used behaviour
@@ -134,7 +145,7 @@ namespace LoveOfCooking.HarmonyPatches
 			ilOut.RemoveRange(index: j, count: k - j + 1);
 			ilOut.InsertRange(index: j, collection:
 			[
-				new(OpCodes.Ldloc, 2), // seasoning: seasoning
+				new(OpCodes.Ldloc, 1), // seasoning: seasoning
 				new(OpCodes.Call, seasoningUsedMethod)
 			]);
 			return ilOut;
