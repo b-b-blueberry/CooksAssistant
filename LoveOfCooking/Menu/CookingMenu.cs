@@ -1131,7 +1131,7 @@ namespace LoveOfCooking.Menu
             int firstID = this._recipePage.IsVisible
                 ? this._recipePage.DefaultClickableComponent.myID
                 : this._searchPage.DefaultClickableComponent.myID;
-			List<int> list = new () { firstID, 0, this._craftingPage.FirstIngredientSlot.myID };
+			List<int> list = [firstID, 0, this._craftingPage.FirstIngredientSlot.myID];
 			int index = list.IndexOf(id);
             if (b is Buttons.LeftShoulder)
             {
