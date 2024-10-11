@@ -273,11 +273,6 @@ namespace LoveOfCooking
 			return reachedNextYear || reachedNextMonth || reachedMailDate;
 		}
 
-		public static void AddCookbook(Farmer who)
-		{
-			who.mailbox.Add(ModEntry.MailCookbookUnlocked);
-		}
-
 		public static bool TryAddCookbook(Farmer who, bool force = false)
 		{
 			// Add the cookbook for the player once they've reached the unlock date
@@ -288,7 +283,7 @@ namespace LoveOfCooking
 				bool unlockedFarmhouseKitchen = Game1.player.HouseUpgradeLevel > 0;
 				if (force || unlockedFarmhouseKitchen || Utils.IsCookbookMailDateMet())
 				{
-					Utils.AddCookbook(who: who);
+					who.mailbox.Add(ModEntry.MailCookbookUnlocked);
 					return true;
 				}
 			}

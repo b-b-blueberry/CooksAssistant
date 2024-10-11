@@ -260,19 +260,11 @@ namespace LoveOfCooking
 				});
 			this.Helper.ConsoleCommands.Add(
 				name: cmd + "give_cookbook",
-				documentation: "Adds the cookbook to your mailbox, allowing kitchens to be used when claimed.",
+				documentation: "Adds Cookbook and Frying Pan to your Special Items, allowing kitchens to be used and frying pans to be upgraded.",
 				callback: (s, args) =>
 				{
-					if (!Utils.TryAddCookbook(who: Game1.player, force: true))
-					{
-						Log.D("Didn't add cookbook: already in your mailbox or wallet items.");
-					}
-					else
-					{
-						Utils.AddCookbook(who: Game1.player);
-						// Utils.PlayCookbookReceivedSequence();
-						Log.D($"Added the cookbook to your mailbox.");
-					} 
+					Utils.PlayCookbookReceivedSequence();
+					Log.D($"Added Cookbook and Frying Pan to your Special Items.");
 				});
 			this.Helper.ConsoleCommands.Add(
 				name: cmd + "unstuck_me",
@@ -483,12 +475,11 @@ namespace LoveOfCooking
 				|| ModEntry.Definitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.Name))
 				return;
 
-			if (food.Name == ModEntry.CookbookItemId)
+			if (food.ItemId == ModEntry.CookbookItemId)
 			{
 				// Whoops
 				// Yes, it's come up before
-				Utils.AddCookbook(who: who);
-				Game1.addHUDMessage(new HUDMessage($"You ate the cookbook, gaining its knowledge."));
+				Utils.PlayCookbookReceivedSequence();
 			}
 
 			// Determine food healing

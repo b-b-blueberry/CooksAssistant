@@ -320,7 +320,7 @@
 	// objects
 	"item.burntfood.description": "Can be sold. It didn't turn out so good...",
 	"item.chocolate.description": "Mmmmm... chocolate.",
-	"item.cookbook.description": "It's a tattered old cookbook. Better find some new recipes!",
+	"item.cookbook.description": "Debug item.\n\nMom's Cookbook and Frying Pan are added to your Special Items when consumed.",
 	"item.seasoning_1.description": "A little spice slightly improves the quality of a dish. Automatically applied when cooking.",
 	"item.seasoning_2.description": "A potent mix of seasonings to enrich any dish. Automatically applied when cooking."
 }
