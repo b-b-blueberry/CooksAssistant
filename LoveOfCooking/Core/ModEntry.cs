@@ -632,9 +632,6 @@ namespace LoveOfCooking
 			ModEntry.SpriteSheet = Game1.content.Load
 				<Texture2D>
 				(AssetManager.GameContentSpriteSheetPath);
-			CookingTool.Texture = Game1.content.Load
-				<Texture2D>
-				(AssetManager.GameContentToolSpriteSheetPath);
 			CookbookAnimation.Reload(this.Helper);
 
 			// Order custom seasonings by descending quality, ensuring best seasonings are consumed first

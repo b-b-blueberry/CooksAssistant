@@ -7,7 +7,6 @@ namespace LoveOfCooking.Objects
 {
 	public static class CookingTool
 	{
-		public static Texture2D Texture { get; set; }
 		public const string InternalName = ModEntry.ObjectPrefix + "cookingtool"; // DO NOT EDIT
 		public const int DaysToUpgrade = 2;
 		public const int MaxUpgradeLevel = 4;
