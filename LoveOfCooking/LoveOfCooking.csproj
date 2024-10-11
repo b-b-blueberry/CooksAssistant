@@ -13,7 +13,7 @@
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<AnalysisLevel>5.0</AnalysisLevel>
+		<AnalysisLevel>6.0</AnalysisLevel>
 	</PropertyGroup>
 
 	<ItemGroup>
