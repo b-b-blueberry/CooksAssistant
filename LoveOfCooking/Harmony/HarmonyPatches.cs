@@ -26,6 +26,7 @@ namespace LoveOfCooking.HarmonyPatches
 
 			CookingMenuPatches.Patch(harmony);
 			CraftingPagePatches.Patch(harmony);
+			ModPatches.Patch(harmony);
 
 			// Perform miscellaneous patches
 			Type[] parameters;
