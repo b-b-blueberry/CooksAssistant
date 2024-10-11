@@ -46,7 +46,7 @@
                     "Description": "{{i18n:menu.cooking_tool.description.basic}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
-                        "X": 0,
+                        "X": 196,
                         "Y": 0
                     },
                     "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
@@ -68,7 +68,7 @@
                     "Description": "{{i18n:menu.cooking_tool.description.copper}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
-                        "X": 16,
+                        "X": 208,
                         "Y": 0
                     },
                     "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
@@ -90,7 +90,7 @@
                     "Description": "{{i18n:menu.cooking_tool.description.steel}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
-                        "X": 32,
+                        "X": 224,
                         "Y": 0
                     },
                     "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
@@ -112,7 +112,7 @@
                     "Description": "{{i18n:menu.cooking_tool.description.gold}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
-                        "X": 48,
+                        "X": 240,
                         "Y": 0
                     },
                     "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
@@ -134,7 +134,7 @@
                     "Description": "{{i18n:menu.cooking_tool.description.iridium}}",
                     "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
                     "TexturePosition": {
-                        "X": 64,
+                        "X": 256,
                         "Y": 0
                     },
                     "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
