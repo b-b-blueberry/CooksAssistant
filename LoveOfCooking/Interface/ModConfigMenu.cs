@@ -107,6 +107,7 @@ namespace LoveOfCooking.Interface
 		{
 			float subheadingOffset = 0;
 			Dictionary<string, Texture2D> objectSprites = [];
+			Dictionary<string, ToolData> toolData = [];
 
 			gmcm.AddPage(
 				mod: mod,
@@ -146,6 +147,11 @@ namespace LoveOfCooking.Interface
 					objectSprites.Clear();
 					foreach (var pair in Game1.objectData.Where(pair => pair.Key.StartsWith(ModEntry.ObjectPrefix)))
 						objectSprites[pair.Key] = ItemRegistry.GetData(pair.Key).GetTexture();
+
+					// Populate tool data map
+					toolData.Clear();
+					foreach (var pair in Game1.toolData.Where(pair => pair.Key.StartsWith(CookingTool.InternalName)))
+						toolData[pair.Key] = pair.Value;
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
@@ -679,7 +685,6 @@ namespace LoveOfCooking.Interface
 				});
 
 			// Cooking tool
-			Dictionary<string, ToolData> toolData = [];
 			int toolTableHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
@@ -688,7 +693,7 @@ namespace LoveOfCooking.Interface
 				mod: mod,
 				text: () =>
 				{
-					string tool = CookingTool.DisplayName();
+					string tool = toolData.FirstOrDefault().Value.DisplayName;
 					return I18n.Get("config.info.cookingtool.text.1", new { tool });
 				});
 			gmcm.AddComplexOption(
@@ -697,9 +702,6 @@ namespace LoveOfCooking.Interface
 				beforeMenuOpened: () =>
 				{
 					toolTableHeight = 0;
-					toolData.Clear();
-					foreach (var pair in Game1.toolData.Where(pair => pair.Key.StartsWith(CookingTool.InternalName)))
-						toolData[pair.Key] = pair.Value;
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{

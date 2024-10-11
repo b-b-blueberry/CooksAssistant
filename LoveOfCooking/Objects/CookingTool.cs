@@ -1,6 +1,5 @@
 ﻿using System;
 using LoveOfCooking.Menu;
-using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 
@@ -83,48 +82,6 @@ namespace LoveOfCooking.Objects
 			return level < CookingTool.MaxUpgradeLevel
 				? CookingTool.MinIngredients + level
 				: CookingTool.MaxIngredients;
-		}
-
-		/// <summary>
-		/// Returns the translated description for a given upgrade level.
-		/// </summary>
-		public static string Description(int level = 0)
-		{
-			string key = level switch
-			{
-				1 => "menu.cooking_tool.description.copper",
-				2 => "menu.cooking_tool.description.steel",
-				3 => "menu.cooking_tool.description.gold",
-				4 => "menu.cooking_tool.description.iridium",
-				_ => "menu.cooking_tool.description.basic",
-			};
-			return ModEntry.Instance.I18n.Get(key).ToString();
-		}
-
-		/// <summary>
-		/// Returns the display name of the tool with any level qualifiers.
-		/// </summary>
-		public static string DisplayName(int level = 0)
-		{
-			string key = level switch
-			{
-				1 => "menu.cooking_tool.name.copper",
-				2 => "menu.cooking_tool.name.steel",
-				3 => "menu.cooking_tool.name.gold",
-				4 => "menu.cooking_tool.name.iridium",
-				_ => "menu.cooking_tool.name.basic",
-			};
-			return ModEntry.Instance.I18n.Get(key).ToString();
-		}
-
-		/// <summary>
-		/// Returns the source rectangle used when drawing the tool, respective of its <paramref name="level"/>.
-		/// </summary>
-		public static Rectangle CookingToolSourceRectangle(int level)
-		{
-			int size = Game1.smallestTileSize;
-			Rectangle source = new(size * level, 0, size, size);
-			return source;
 		}
 
 		public static string WalletID(int level)
