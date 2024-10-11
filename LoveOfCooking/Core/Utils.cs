@@ -511,7 +511,9 @@ namespace LoveOfCooking
 											Game1.drawObjectDialogue(
 											[
 												ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.1"),
-												ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.2")
+												ModEntry.Config.CanUseTownKitchens
+													? ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.2_alt")
+													: ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.2")
 											]);
 											// Hide animation after dialogue
 											Game1.afterDialogues = delegate
