@@ -27,9 +27,9 @@
 	"config.option.cookinganimation_name": "Cooking animations",
 	"config.option.cookinganimation_description": "Whether to play a little animation when cooking at the kitchen.\n\nRequires the new cooking menu.",
 	"config.option.foodregenbar_name": "Show food healing regen bar",
-	"config.option.foodregenbar_description": "With food healing over time enabled, you can optionally hide the new contextual bar.\nThe bar appears beside the health and energy bars to show your remaining food regeneration.",
+	"config.option.foodregenbar_description": "With food healing over time enabled, you can hide the food regen bar.\nThe bar appears beside the health and energy bars to show your remaining food regeneration.",
 	"config.option.fixcraftingpagerecipesorting_name": "Fix default recipe sorting",
-	"config.option.fixcraftingpagerecipesorting_description": "With the new Cooking Menu config option disabled, recipes are sorted by vanilla first and custom second.\nThis option updates the sort method to mix all recipes together.\n\nRequires the default cooking menu.",
+	"config.option.fixcraftingpagerecipesorting_description": "With the new cooking menu disabled, recipes are sorted by vanilla first and custom second.\nThis option updates the sort method to mix all recipes together.\n\nRequires the default cooking menu.",
 	"config.option.remembersearchfilter_name": "Remember search filter",
 	"config.option.remembersearchfilter_description": "With the new cooking menu enabled, you can search for recipes with filters.\nThe menu already saves your last-used search filter,\nbut it resets for when you next play.\nYou can disable this here to always use start with the default filter.",
 	"config.option.defaultsearchfilter_name": "Default search filter",
@@ -49,10 +49,10 @@
 	"config.info.controllermap.shoulders": "LB/RB   Change region",
 	"config.info.controllermap.triggers": "LT/RT   Change recipe",
 
-	"config.info.cookingmenu.text.1": "Replaces the usual crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {{cookbookItem}} in the mail.\n\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {{cookingItem}}.\nCan be used in town kitchens if enabled in the Options page.",
+	"config.info.cookingmenu.text.1": "Replaces the vanilla crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {{cookbookItem}} in the mail.\n\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {{cookingItem}}.\nCan be used in town kitchens if enabled in the Options page.",
 	"config.info.cookingmenu.subheading.1": "Cookbook delivery",
 
-	"config.info.cookingskill.text.1": "Skill levels unlock new recipes, improve your cooking, and eventually open new professions.\n\nMore experience is earned by cooking each day, less is earned by cooking in bulk.\nEarn extra experience by cooking new and difficult recipes.",
+	"config.info.cookingskill.text.1": "Skill levels unlock new recipes, improve your cooking, and open new professions.\n\nMore experience is earned by cooking each day, less is earned by cooking in bulk.\nEarn extra experience by cooking new and difficult recipes.",
 	"config.info.cookingskill.text.2": "Cooking skill professions are unlocked as with any other skill.\nProfession perks improve results when cooking and eating food.",
 	"config.info.cookingskill.subheading.1": "Skill progress",
 	"config.info.cookingskill.subheading.2": "{{current}} experience",
@@ -77,7 +77,7 @@
 
 	"config.info.disabled": "> Can be enabled in the Options page.",
 	"config.info.disabled_bad": "> Can be enabled in the Options page.\nWARNING: This isn't fun at all.",
-	"config.info.features_blocked": "Features can't be changed while a save is loaded.\n\nWhen ready, return to the title screen to change your preferences.",
+	"config.info.features_blocked": "Features can't be changed while a save is loaded.\n\nWhen you're 'ready, return to the title screen to change your preferences.",
 
 	"config.features_label": "Features",
 	"config.changes_label": "Changes",
@@ -153,7 +153,7 @@
 	"menu.inventory.fridge": "Fridge",
 	"menu.inventory.minifridge": "Mini-Fridge",
 
-	"menu.config.enabled": "Open mod config",
+	"menu.config.enabled": "Open mod config menu",
 	"menu.config.disabled": "Requires Generic Mod Config Menu.",
 
 	// Mail
@@ -298,7 +298,7 @@
 	"item.curry.description": "It'll set your breath on fire!\n\nTemporarily causes you to breathe fire when eaten.",
 	"item.eggsando.description": "Fluffy white bread packed with egg and mayo. Perfectly seasoned.",
 	"item.eggsando_half.description": "More, more!",
-	"item.fruity.description": "A sweet alcoholic drink topped with whipped cream.",
+	"item.fruity.description": "A sweet alcoholic drink with sherry, cherry, and berry, topped with whipped cream.",
 	"item.hotcocoa.description": "Warms you up. There's a big marshmallow on top!",
 	"item.hunters.description": "A hot plate of classic vegetables.",
 	"item.kebab.description": "Goes well with a drink. And another. And another.\n\nTemporarily increases combat power when Tipsy.",
