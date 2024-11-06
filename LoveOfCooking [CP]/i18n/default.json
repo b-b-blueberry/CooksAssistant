@@ -28,6 +28,8 @@
 	"config.option.cookinganimation_description": "Whether to play a little animation when cooking at the kitchen.\n\nRequires the new cooking menu.",
 	"config.option.foodregenbar_name": "Show food healing regen bar",
 	"config.option.foodregenbar_description": "With food healing over time enabled, you can optionally hide the new contextual bar.\nThe bar appears beside the health and energy bars to show your remaining food regeneration.",
+	"config.option.fixcraftingpagerecipesorting_name": "Fix default recipe sorting",
+	"config.option.fixcraftingpagerecipesorting_description": "With the new Cooking Menu config option disabled, recipes are sorted by vanilla first and custom second.\nThis option updates the sort method to mix all recipes together.\n\nRequires the default cooking menu.",
 	"config.option.remembersearchfilter_name": "Remember search filter",
 	"config.option.remembersearchfilter_description": "With the new cooking menu enabled, you can search for recipes with filters.\nThe menu already saves your last-used search filter,\nbut it resets for when you next play.\nYou can disable this here to always use start with the default filter.",
 	"config.option.defaultsearchfilter_name": "Default search filter",

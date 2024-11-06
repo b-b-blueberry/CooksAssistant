@@ -1289,6 +1289,12 @@ namespace LoveOfCooking.Interface
 					setValue: (bool value) => ModEntry.Config.ShowFoodRegenBar = value);
 				gmcm.AddBoolOption(
 					mod: mod,
+					name: () => I18n.Get("config.option.fixcraftingpagerecipesorting_name"),
+					tooltip: () => I18n.Get("config.option.fixcraftingpagerecipesorting_description"),
+					getValue: () => ModEntry.Config.FixCraftingPageRecipeSorting,
+					setValue: (bool value) => ModEntry.Config.FixCraftingPageRecipeSorting = value);
+				gmcm.AddBoolOption(
+					mod: mod,
 					name: () => I18n.Get("config.option.remembersearchfilter_name"),
 					tooltip: () => I18n.Get("config.option.remembersearchfilter_description"),
 					getValue: () => ModEntry.Config.RememberSearchFilter,

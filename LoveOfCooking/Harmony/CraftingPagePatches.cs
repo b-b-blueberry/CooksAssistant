@@ -169,7 +169,7 @@ namespace LoveOfCooking.HarmonyPatches
 			bool ___cooking,
 			List<string> playerRecipes)
 		{
-			if (!___cooking)
+			if (!___cooking || !ModEntry.Config.FixCraftingPageRecipeSorting)
 				return;
 			List<string> sorted = Utils.SortRecipesByKnownAndDisplayName(playerRecipes);
 			playerRecipes.Clear();
