@@ -50,6 +50,9 @@ namespace LoveOfCooking.Interface
 
 		private static void CreateHomePage(IGenericModConfigMenuAPI gmcm, IManifest mod)
 		{
+			string version = $"C#: {ModEntry.Instance.ModManifest.Version}";
+			string versionCP = $"CP: {ModEntry.Instance.Helper.ModRegistry.Get(ModEntry.ContentModUniqueID).Manifest.Version}";
+
 			// Replace unintuitive GMCM page links with fullwidth clickables and a centred title banner drawn over the top
 			string s = new(c: ' ', count: 46);
 			int offset = 20 * Scale;
@@ -100,6 +103,18 @@ namespace LoveOfCooking.Interface
 				{
 					v.Y -= offset;
 					DrawBanner(b: b, v: v, text: I18n.Get("config.page.options"));
+
+					SpriteFont font = Game1.smallFont;
+					Color textColor = Game1.textColor;
+					Vector2 textOffset = new (512, 64);
+
+					string text = versionCP;
+					Vector2 v1 = font.MeasureString(text);
+					b.DrawString(spriteFont: font, text: text, position: v + textOffset + new Vector2(-v1.X, 0), color: textColor);
+					text = version;
+					textOffset -= new Vector2(0, v1.Y);
+					v1 = font.MeasureString(text);
+					b.DrawString(spriteFont: font, text: text, position: v + textOffset + new Vector2(-v1.X, 0), color: textColor);
 				});
 		}
 
