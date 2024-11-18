@@ -1,6 +1,5 @@
 ﻿using System;
 using LoveOfCooking.Menu;
-using Microsoft.Xna.Framework.Graphics;
 using StardewValley;
 
 namespace LoveOfCooking.Objects
