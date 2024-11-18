@@ -340,14 +340,17 @@ namespace LoveOfCooking
 
 		private void Specialized_LoadStageChanged(object sender, LoadStageChangedEventArgs e)
 		{
-			this.States.Value.Reset();
-			this.States.Value.Load(data: Game1.player.modData);
-			
-			// Invalidate and reload assets
-			Log.D("Invalidating assets on LoadStageChanged.",
-				Config.DebugMode);
-			this.ReloadAssets();
-			AssetManager.InvalidateAssets();
+			if (e.NewStage is StardewModdingAPI.Enums.LoadStage.Loaded)
+			{
+				this.States.Value.Reset();
+				this.States.Value.Load(data: Game1.player.modData);
+
+				// Invalidate and reload assets
+				Log.D("Invalidating assets on LoadStageChanged.",
+					Config.DebugMode);
+				this.ReloadAssets();
+				AssetManager.InvalidateAssets();
+			}
 		}
 
 		private void GameLoop_SaveLoaded(object sender, SaveLoadedEventArgs e)
