@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using HarmonyLib; // el diavolo nuevo
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
+using StardewModdingAPI.Utilities;
 using StardewValley;
 using StardewValley.Buffs;
 using StardewValley.Extensions;
+using StardewValley.Internal;
 using StardewValley.Inventories;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
@@ -23,8 +26,6 @@ using xTile.Layers;
 using xTile.Tiles;
 using CraftingPage = StardewValley.Menus.CraftingPage;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
-using StardewValley.Internal;
-using HarmonyLib; // el diavolo nuevo
 
 namespace LoveOfCooking
 {
@@ -275,13 +276,26 @@ namespace LoveOfCooking
 
 		public static bool TryAddCookbook(Farmer who, bool force = false)
 		{
+			bool hasCookingMenu = ModEntry.Config.AddCookingMenu;
+			bool hasOrWillReceiveMail = Utils.HasOrWillReceiveCookbook(who: Game1.player);
+			bool hasMail = Utils.HasCookbook(who: Game1.player);
+			bool hasKitchen = Game1.player.HouseUpgradeLevel > 0;
+			bool isMailDateMet = Utils.IsCookbookMailDateMet();
+
+			Log.D($"{nameof(TryAddCookbook)} at {SDate.Now().ToLocaleString()}:"
+				+ $"{Environment.NewLine}{nameof(hasCookingMenu)}: {hasCookingMenu}"
+				+ $"{Environment.NewLine}{nameof(hasOrWillReceiveMail)}: {hasOrWillReceiveMail}"
+				+ $"{Environment.NewLine}{nameof(hasMail)}: {hasMail}"
+				+ $"{Environment.NewLine}{nameof(hasKitchen)}: {hasKitchen}"
+				+ $"{Environment.NewLine}{nameof(isMailDateMet)}: {isMailDateMet}",
+				ModEntry.Config.DebugMode);
+
 			// Add the cookbook for the player once they've reached the unlock date
 			// Internally day and month are zero-indexed, but are one-indexed in data file for consistency with year
 			// Alternatively if the player somehow upgrades their house early, add the cookbook mail
-			if (ModEntry.Config.AddCookingMenu && !Utils.HasOrWillReceiveCookbook(who: Game1.player) && !Utils.HasCookbook(who: Game1.player))
+			if (hasCookingMenu && !hasOrWillReceiveMail && !hasMail)
 			{
-				bool unlockedFarmhouseKitchen = Game1.player.HouseUpgradeLevel > 0;
-				if (force || unlockedFarmhouseKitchen || Utils.IsCookbookMailDateMet())
+				if (force || hasKitchen || isMailDateMet)
 				{
 					who.mailbox.Add(ModEntry.MailCookbookUnlocked);
 					return true;
