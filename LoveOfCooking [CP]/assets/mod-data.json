@@ -15,9 +15,9 @@
 		"Fried Egg"
 	],
 	"CookbookMailDate": [
-		14,
-		1,
-		1
+		14, // Day
+		1, // Season
+		1 // Year
 	],
 	"CookingSkillValues": {
 		// Level-up pages

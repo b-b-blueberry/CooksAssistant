@@ -154,7 +154,7 @@ namespace LoveOfCooking.Interface
 				beforeMenuOpened: () =>
 				{
 					int day = ModEntry.Definitions.CookbookMailDate[0];
-					int season = ModEntry.Definitions.CookbookMailDate[1];
+					int season = ModEntry.Definitions.CookbookMailDate[1] - 1;
 					int year = ModEntry.Definitions.CookbookMailDate[2];
 					cookbookDeliveryDate = Utility.getDateStringFor(day: day, season: season, year: year);
 

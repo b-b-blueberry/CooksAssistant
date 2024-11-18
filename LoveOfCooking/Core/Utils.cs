@@ -263,14 +263,14 @@ namespace LoveOfCooking
 
 		public static bool IsCookbookMailDateMet()
 		{
-			int day = ModEntry.Definitions.CookbookMailDate[0] - 1;
-			int month = ModEntry.Definitions.CookbookMailDate[1] - 1;
+			int day = ModEntry.Definitions.CookbookMailDate[0];
+			int season = ModEntry.Definitions.CookbookMailDate[1] - 1;
 			int year = ModEntry.Definitions.CookbookMailDate[2];
-			int gameMonth = Utility.getSeasonNumber(Game1.currentSeason);
+			int gameSeason = Utility.getSeasonNumber(Game1.currentSeason);
 			bool reachedNextYear = (Game1.year > year);
-			bool reachedNextMonth = (Game1.year == year && gameMonth > month);
-			bool reachedMailDate = (Game1.year == year && gameMonth == month && Game1.dayOfMonth >= day);
-			return reachedNextYear || reachedNextMonth || reachedMailDate;
+			bool reachedNextSeason = (Game1.year == year && gameSeason > season);
+			bool reachedMailDate = (Game1.year == year && gameSeason == season && Game1.dayOfMonth >= day);
+			return reachedNextYear || reachedNextSeason || reachedMailDate;
 		}
 
 		public static bool TryAddCookbook(Farmer who, bool force = false)
