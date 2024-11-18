@@ -54,7 +54,7 @@
 	"menu.cooking_search.filter.7": "Ricette preferite",
 	"menu.cooking_search.none_label": "Nessuna ricetta trovata.",
 
-	"mail.cookbook_unlocked": "Caro @,^  Stavo guardando delle vecchie cose ieri notte, e ho trovato la cosa perfetta per te - il vecchio libro di ricette di famiglia! ^  Mancano alcune pagine, ma sono certo che ti andrà bene. Abbi cura di te tesoro, e ricorda di mangiare bene! ^   Ti voglio bene, Mamma.[#]Dalla Mamma",
+	"mail.cookbook_unlocked": "Caro @,^  Stavo guardando delle vecchie cose ieri notte, e ho trovato la cosa perfetta per te - il vecchio libro di ricette di famiglia! ^  Mancano alcune pagine, ma sono certo che ti andrà bene. Abbi cura di te tesoro, e ricorda di mangiare bene! ^   Ti voglio bene, Mamma.{{cookbook}}[#]Dalla Mamma",
 	"mail.cookbook_unlocked.after": "Hai ricevuto il Libro di ricette della Mamma. Le ricette che impari verranno salvate qui per essere cucinate nelle cucine del paese.",
 
 	// Cooking skill

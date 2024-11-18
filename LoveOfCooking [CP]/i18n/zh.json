@@ -54,7 +54,7 @@
 	"menu.cooking_search.filter.7": "收藏的料理",
 	"menu.cooking_search.none_label": "没有找到此料理.",
 
-	"mail.cookbook_unlocked": "亲爱的 @,^  昨晚我在整理旧物, 我找到了一个很适合你的东西 - 我们家的老家庭烹饪书! ^  它缺少了几页, 但我确定你能凑活着用. 保重亲爱的, 记得吃点好的! ^   爱你的, 妈妈.[#]来自 妈妈",
+	"mail.cookbook_unlocked": "亲爱的 @,^  昨晚我在整理旧物, 我找到了一个很适合你的东西 - 我们家的老家庭烹饪书! ^  它缺少了几页, 但我确定你能凑活着用. 保重亲爱的, 记得吃点好的! ^   爱你的, 妈妈.{{cookbook}}[#]来自 妈妈",
 	"mail.cookbook_unlocked.after": "你收到了妈妈的烹饪书. 你学会的料理将被记录在书上以供你在镇上的厨房里烹饪时使用.",
 
 	// Cooking skill

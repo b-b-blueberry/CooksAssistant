@@ -54,7 +54,7 @@
 	"menu.cooking_search.filter.7": "Favori tarifler",
 	"menu.cooking_search.none_label": "Herhangi bir tarif bulunamadı.",
 
-	"mail.cookbook_unlocked": "Sevgili @,^  Dün gece bazı eski şeylere bakıyordum ve tam sana göre bir şey buldum - eski aile yemek kitabı ^  Birkaç sayfası eksik. Ama tamamlayabileceğinden eminim! Kendine iyi bak tatlım. Daha çok yemeyi unutma! ^   Sevgilerinle Annen.[#]Annen'den",
+	"mail.cookbook_unlocked": "Sevgili @,^  Dün gece bazı eski şeylere bakıyordum ve tam sana göre bir şey buldum - eski aile yemek kitabı ^  Birkaç sayfası eksik. Ama tamamlayabileceğinden eminim! Kendine iyi bak tatlım. Daha çok yemeyi unutma! ^   Sevgilerinle Annen.{{cookbook}}[#]Annen'den",
 	"mail.cookbook_unlocked.after": "Annenin kayıp kitabını buldun. Kazandığın tarifler kasabadaki mutfaklarda pişirebilmen için buraya kaydedilecek.",
 
 	// Cooking skill

@@ -87,7 +87,7 @@
 	"menu.cooking_search.filter.7": "즐겨찾기",
 	"menu.cooking_search.none_label": "레시피를 찾을 수 없습니다.",
 
-	"mail.cookbook_unlocked": "@에게,^  어제 밤에 오래된 짐을 정리하다가 너에게 딱 필요할 거라고 생각한 걸 찾았단다. 대대로 물려받은 우리 가족의 요리책이야!^ 몇 페이지가 빠졌지만, 분명 네게 유용할 거라고 생각한단다. 항상 몸 조심하고 식사 챙겨 먹으렴! ^   사랑을 담아, 엄마가.[#]엄마의 요리책",
+	"mail.cookbook_unlocked": "@에게,^  어제 밤에 오래된 짐을 정리하다가 너에게 딱 필요할 거라고 생각한 걸 찾았단다. 대대로 물려받은 우리 가족의 요리책이야!^ 몇 페이지가 빠졌지만, 분명 네게 유용할 거라고 생각한단다. 항상 몸 조심하고 식사 챙겨 먹으렴! ^   사랑을 담아, 엄마가.{{cookbook}}[#]엄마의 요리책",
 	"mail.cookbook_unlocked.after": "엄마의 요리책을 받았습니다. 당신이 배우는 요리법을 적어두고 마을의 부엌에서 조리할 수 있습니다.",
 
 	// Cooking skill
@@ -95,7 +95,7 @@
 	"menu.cooking_skill.levelupbonus.2": "쐐기풀 차를 만들 수 있습니다.",
 	//"menu.cooking_skill.levelupbonus.3": "이제 {{Name}}을/를 만들 수 있습니다.",
 	"menu.cooking_skill.levelup_burn": "음식이 탈 확률이 {{Number}}% 낮아집니다.",
-	
+
 
 	// Tier 1:
 	// Path 1: Cooking

@@ -54,7 +54,7 @@
 	"menu.cooking_search.filter.7": "Lieblingsrezepte",
 	"menu.cooking_search.none_label": "Keine Rezepte gefunden.",
 
-	"mail.cookbook_unlocked": "Hallo @,^Ich habe letzte Nacht durch ein paar alte Sachen gewühlt, und habe das perfekte Ding für dich gefunden - das alte Familien-Kochbuch! ^Es fehlen ein paar Seiten, aber ich bin sicher du kommst klar. Pass auf dich auf Schatz, und erinnere dich dran, genug zu essen!^Hab dich lieb, Mama.[#]Von Mama",
+	"mail.cookbook_unlocked": "Hallo @,^Ich habe letzte Nacht durch ein paar alte Sachen gewühlt, und habe das perfekte Ding für dich gefunden - das alte Familien-Kochbuch! ^Es fehlen ein paar Seiten, aber ich bin sicher du kommst klar. Pass auf dich auf Schatz, und erinnere dich dran, genug zu essen!^Hab dich lieb, Mama.{{cookbook}}[#]Von Mama",
 	"mail.cookbook_unlocked.after": "Du hast Mamas Rezeptbuch erhalten. Rezepte, die du lernst werden hier notiert, damit du in allen Küchen der Stadt kochen kannst.",
 
 	// Cooking skill

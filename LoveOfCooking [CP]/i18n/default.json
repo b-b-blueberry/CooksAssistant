@@ -157,7 +157,7 @@
 	"menu.config.disabled": "Requires Generic Mod Config Menu.",
 
 	// Mail
-	"mail.cookbook_unlocked": "Dear @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom%item id blueberry.LoveOfCooking_cookbook 1 %%[#]Mom's Cookbook",
+	"mail.cookbook_unlocked": "Dear @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom{{cookbook}}[#]Mom's Cookbook",
 	"mail.cookbook_unlocked.after.1": "Mom's Cookbook and Frying Pan have been added to your = Special Items.",
 	"mail.cookbook_unlocked.after.2": "Recipes you learn will be saved in the cookbook for cooking at the farmhouse.",
 	"mail.cookbook_unlocked.after.2_alt": "Recipes you learn will be saved in the cookbook for cooking at the farmhouse or in town.",

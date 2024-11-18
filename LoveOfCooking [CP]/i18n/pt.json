@@ -54,7 +54,7 @@
 	"menu.cooking_search.filter.7": "Receitas favoritas",
 	"menu.cooking_search.none_label": "Nenhuma receita encontrada.",
 
-	"mail.cookbook_unlocked": "Caro (a) @,^ Eu estava olhando algumas coisas antigas ontem à noite e encontrei exatamente o que você queria - o antigo livro de receitas da família! ^ Faltam algumas páginas, mas tenho certeza sobre o quê você deve fazer. Tome cuidado, querido (a), e lembre-se de comer bem! ^ Com amor, mamãe. [#] Da mamãe ",
+	"mail.cookbook_unlocked": "Caro (a) @,^ Eu estava olhando algumas coisas antigas ontem à noite e encontrei exatamente o que você queria - o antigo livro de receitas da família! ^ Faltam algumas páginas, mas tenho certeza sobre o quê você deve fazer. Tome cuidado, querido (a), e lembre-se de comer bem! ^ Com amor, mamãe.{{cookbook}}[#] Da mamãe ",
 	"mail.cookbook_unlocked.after": "Você recebeu o livro de receitas da mamãe. As receitas que você aprender serão salvas aqui para cozinhar nas cozinhas da cidade.",
 
 	// Cooking Skill
