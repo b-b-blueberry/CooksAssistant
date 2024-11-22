@@ -255,7 +255,7 @@ namespace LoveOfCooking.Menu
             textWidth = (int)(40.5f * Scale * this._textScale.Y);
             text = knowsRecipe
                 ? recipe.DisplayName
-                : I18n.Get("menu.cooking_recipe.title_unknown");
+                : Strings.Get("menu.cooking_recipe.title_unknown");
             textPosition.X = this.LeftButton.bounds.Width + 14 * Scale;
 
             // Attempt to fix for Deutsch lange names
@@ -291,7 +291,7 @@ namespace LoveOfCooking.Menu
             textWidth = (int)(this._textWidth * this._textScale.X);
             text = knowsRecipe
                 ? recipe.description
-                : I18n.Get("menu.cooking_recipe.title_unknown");
+                : Strings.Get("menu.cooking_recipe.title_unknown");
 			this.DrawText(
 				b: b,
 				text: text,
@@ -316,7 +316,7 @@ namespace LoveOfCooking.Menu
 				y: textPosition.Y,
 				w: this._lineWidth);
             textPosition.Y += TextDividerGap;
-            text = I18n.Get("menu.cooking_recipe.ingredients_label");
+            text = Strings.Get("menu.cooking_recipe.ingredients_label");
 			this.DrawText(
 				b: b,
 				text: text,
@@ -430,7 +430,7 @@ namespace LoveOfCooking.Menu
             else
             {
                 textPosition.Y += 16 * Scale / 2 + 1 * Scale;
-                text = I18n.Get("menu.cooking_recipe.title_unknown");
+                text = Strings.Get("menu.cooking_recipe.title_unknown");
 				this.DrawText(
 					b: b,
 					text: text,

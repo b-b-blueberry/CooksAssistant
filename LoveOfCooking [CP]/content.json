@@ -7,6 +7,12 @@
 			"Target": "Mods/blueberry.LoveOfCooking.Assets/Definitions",
 			"FromFile": "assets/mod-data.json"
 		},
+		// Strings
+		{
+			"Action": "Load",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/Strings",
+			"FromFile": "i18n/default.json"
+		},
 		// Sprites
 		{
 			"Action": "Load",

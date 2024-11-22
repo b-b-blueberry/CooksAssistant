@@ -21,7 +21,6 @@ namespace LoveOfCooking.Interface
 	internal static class ModConfigMenu
 	{
 		private static IModHelper Helper => ModEntry.Instance.Helper;
-		private static ITranslationHelper I18n => Helper.Translation;
 
 		private const int Scale = 3;
 		private const int SmallScale = 2;
@@ -79,7 +78,7 @@ namespace LoveOfCooking.Interface
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
 					v.Y -= offset;
-					DrawBanner(b: b, v: v, text: I18n.Get("config.page.info"));
+					DrawBanner(b: b, v: v, text: Strings.Get("config.page.info"));
 				});
 
 			gmcm.AddImage(
@@ -102,7 +101,7 @@ namespace LoveOfCooking.Interface
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
 					v.Y -= offset;
-					DrawBanner(b: b, v: v, text: I18n.Get("config.page.options"));
+					DrawBanner(b: b, v: v, text: Strings.Get("config.page.options"));
 
 					SpriteFont font = Game1.smallFont;
 					Color textColor = Game1.textColor;
@@ -127,24 +126,24 @@ namespace LoveOfCooking.Interface
 			gmcm.AddPage(
 				mod: mod,
 				pageId: "info",
-				pageTitle: () => I18n.Get("config.page.info"));
+				pageTitle: () => Strings.Get("config.page.info"));
 
 			// Cooking menu
 			int cookingMenuPageHeight = 0;
 			string cookbookDeliveryDate = null;
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.cookingmenu_name"));
+				text: () => Strings.Get("config.option.cookingmenu_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
 					string cookingItem = Game1.content.LoadString("Strings\\Objects:CookoutKit_Name");
-					string cookbookItem = I18n.Get("item.cookbook.name");
-					string text = I18n.Get("config.info.cookingmenu.text.1", new { cookingItem, cookbookItem });
+					string cookbookItem = Strings.Get("item.cookbook.name");
+					string text = Strings.Get("config.info.cookingmenu.text.1", cookbookItem, cookingItem);
 					if (!ModEntry.Config.AddCookingMenu)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled")}";
+						text += $"\n\n{Strings.Get("config.info.disabled")}";
 					}
 					return text;
 				});
@@ -178,7 +177,7 @@ namespace LoveOfCooking.Interface
 
 					// Draw cookbook delivery date
 					{
-						Vector2 v1 = ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.cookingmenu.subheading.1"), font: Game1.smallFont);
+						Vector2 v1 = ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: Strings.Get("config.info.cookingmenu.subheading.1"), font: Game1.smallFont);
 						offset.Y += v1.Y;
 						Vector2 v2 = ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: cookbookDeliveryDate, font: Game1.smallFont);
 						offset.X -= Math.Max(v1.X, v2.X);
@@ -231,14 +230,14 @@ namespace LoveOfCooking.Interface
 				{
 					controllerMap =
 					[
-						(CookingMenu.AButtonSource, I18n.Get("config.info.controllermap.button.a")),
-						(CookingMenu.BButtonSource, I18n.Get("config.info.controllermap.button.b")),
-						(CookingMenu.XButtonSource, I18n.Get("config.info.controllermap.button.x")),
-						(CookingMenu.YButtonSource, I18n.Get("config.info.controllermap.button.y")),
-						(CookingMenu.SelectButtonSource, I18n.Get("config.info.controllermap.button.select")),
-						(CookingMenu.StartButtonSource, I18n.Get("config.info.controllermap.button.start")),
-						(Rectangle.Empty, I18n.Get("config.info.controllermap.shoulders")),
-						(Rectangle.Empty, I18n.Get("config.info.controllermap.triggers")),
+						(CookingMenu.AButtonSource, Strings.Get("config.info.controllermap.button.a")),
+						(CookingMenu.BButtonSource, Strings.Get("config.info.controllermap.button.b")),
+						(CookingMenu.XButtonSource, Strings.Get("config.info.controllermap.button.x")),
+						(CookingMenu.YButtonSource, Strings.Get("config.info.controllermap.button.y")),
+						(CookingMenu.SelectButtonSource, Strings.Get("config.info.controllermap.button.select")),
+						(CookingMenu.StartButtonSource, Strings.Get("config.info.controllermap.button.start")),
+						(Rectangle.Empty, Strings.Get("config.info.controllermap.shoulders")),
+						(Rectangle.Empty, Strings.Get("config.info.controllermap.triggers")),
 					];
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
@@ -247,7 +246,7 @@ namespace LoveOfCooking.Interface
 					Vector2 offset = Vector2.Zero;
 
 					// Draw gamepad controls
-					//v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.controllermap.title")).Y;
+					//v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: Strings.Get("config.info.controllermap.title")).Y;
 
 					controllerMapHeight = (int)v.Y;
 
@@ -306,15 +305,15 @@ namespace LoveOfCooking.Interface
 			int experienceBarHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.cookingskill_name"));
+				text: () => Strings.Get("config.option.cookingskill_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
-					string text = I18n.Get("config.info.cookingskill.text.1");
+					string text = Strings.Get("config.info.cookingskill.text.1");
 					if (!ModEntry.Config.AddCookingSkillAndRecipes)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled")}";
+						text += $"\n\n{Strings.Get("config.info.disabled")}";
 					}
 					return text;
 				});
@@ -338,7 +337,7 @@ namespace LoveOfCooking.Interface
 					Vector2 offset = Vector2.Zero;
 
 					// Draw friendship requirements
-					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.cookingskill.subheading.1"), font: Game1.smallFont).Y;
+					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: Strings.Get("config.info.cookingskill.subheading.1"), font: Game1.smallFont).Y;
 
 					int level = ModEntry.CookingSkillApi.GetLevel();
 					int maxLevel = ModEntry.CookingSkillApi.GetMaximumLevel();
@@ -422,8 +421,8 @@ namespace LoveOfCooking.Interface
 					// Draw friendship requirements
 					v.Y += 8 * Scale;
 					string experience = isMaxLevel
-						? I18n.Get("config.info.cookingskill.subheading.2", new { current = currentXP })
-						: I18n.Get("config.info.cookingskill.subheading.3", new { current = currentXP, required = requiredXP });
+						? Strings.Get("config.info.cookingskill.subheading.2", currentXP)
+						: Strings.Get("config.info.cookingskill.subheading.3", currentXP, requiredXP);
 					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: width / 2, y: offset.Y), text: experience, font: Game1.smallFont).Y;
 					v.Y += 8 * Scale;
 
@@ -442,7 +441,7 @@ namespace LoveOfCooking.Interface
 				},
 				draw: (SpriteBatch b, Vector2 v) =>
 				{
-					subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.cookingskill.subheading.4")).Y;
+					subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: Strings.Get("config.info.cookingskill.subheading.4")).Y;
 					v.Y += subheadingOffset;
 
 					// Creates a vertical bar chart of recipe icons per cooking skill level
@@ -547,7 +546,7 @@ namespace LoveOfCooking.Interface
 				mod: mod,
 				text: () =>
 				{
-					string text = I18n.Get("config.info.cookingskill.text.2");
+					string text = Strings.Get("config.info.cookingskill.text.2");
 					return text;
 				});
 			gmcm.AddComplexOption(
@@ -565,7 +564,7 @@ namespace LoveOfCooking.Interface
 
 					professionTableHeight = (int)v.Y;
 
-					subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.cookingskill.subheading.5")).Y;
+					subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: Strings.Get("config.info.cookingskill.subheading.5")).Y;
 					v.Y += subheadingOffset;
 
 					// Creates a binary tree of branching profession icons per cooking skill level milestone
@@ -638,14 +637,14 @@ namespace LoveOfCooking.Interface
 
 						// Draw profession details
 						SpriteFont font = Game1.smallFont;
-						string text = isTitleVisible.First ? Game1.parseText(text: pair.First.GetName(), whichFont: font, width: 9999) : I18n.Get("config.format.unknown");
+						string text = isTitleVisible.First ? Game1.parseText(text: pair.First.GetName(), whichFont: font, width: 9999) : Strings.Get("config.format.unknown");
 						Vector2 textSize = font.MeasureString(text);
 						b.DrawString(
 							spriteFont: font,
 							text: text,
 							position: toArea.Location.ToVector2() + new Vector2(x: -textSize.X / 2, y: -(toArea.Height / 2) - textSize.Y / 2),
 							color: Game1.textColor);
-						text = isTitleVisible.Second ? Game1.parseText(text: pair.Second.GetName(), whichFont: font, width: 9999) : I18n.Get("config.format.unknown");
+						text = isTitleVisible.Second ? Game1.parseText(text: pair.Second.GetName(), whichFont: font, width: 9999) : Strings.Get("config.format.unknown");
 						textSize = font.MeasureString(text);
 						b.DrawString(
 							spriteFont: font,
@@ -691,9 +690,9 @@ namespace LoveOfCooking.Interface
 						if (!isVisible.First && !isVisible.Second)
 							continue;
 
-						text.AppendLine(I18n.Get("config.format.level", new { level = pair.Level }));
-						text.AppendLine(isVisible.First ? I18n.Get("config.format.profession", new { name = pair.First.GetName(), description = pair.First.GetDescription() }) : I18n.Get("config.format.unknown"));
-						text.AppendLine(isVisible.Second ? I18n.Get("config.format.profession", new { name = pair.Second.GetName(), description = pair.Second.GetDescription() }) : I18n.Get("config.format.unknown"));
+						text.AppendLine(Strings.Get("config.format.level", pair.Level));
+						text.AppendLine(isVisible.First ? Strings.Get("config.format.profession", pair.First.GetName(), pair.First.GetDescription()) : Strings.Get("config.format.unknown"));
+						text.AppendLine(isVisible.Second ? Strings.Get("config.format.profession", pair.Second.GetName(), pair.Second.GetDescription()) : Strings.Get("config.format.unknown"));
 						text.AppendLine();
 					}
 					return text.ToString();
@@ -703,13 +702,13 @@ namespace LoveOfCooking.Interface
 			int toolTableHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.cookingtool_name"));
+				text: () => Strings.Get("config.option.cookingtool_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
 					string tool = toolData.FirstOrDefault().Value.DisplayName;
-					return I18n.Get("config.info.cookingtool.text.1", new { tool });
+					return Strings.Get("config.info.cookingtool.text.1", tool);
 				});
 			gmcm.AddComplexOption(
 				mod: mod,
@@ -722,7 +721,7 @@ namespace LoveOfCooking.Interface
 				{
 					toolTableHeight = (int)v.Y;
 
-					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.cookingtool.subheading.1")).Y;
+					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v, text: Strings.Get("config.info.cookingtool.subheading.1")).Y;
 
 					// Creates a vertical list of groups of item icons, quantities, gold icons, and prices
 
@@ -909,15 +908,15 @@ namespace LoveOfCooking.Interface
 			int seasoningsHeight = 0;
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.seasonings_name"));
+				text: () => Strings.Get("config.option.seasonings_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
-					string text = I18n.Get("config.info.seasonings.text.1");
+					string text = Strings.Get("config.info.seasonings.text.1");
 					if (!ModEntry.Config.AddSeasonings)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled")}";
+						text += $"\n\n{Strings.Get("config.info.disabled")}";
 					}
 					return text;
 				});
@@ -947,7 +946,7 @@ namespace LoveOfCooking.Interface
 					Vector2 offset = Vector2.Zero;
 
 					// Draw seasoning items
-					offset.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.seasonings.subheading.1"), font: Game1.smallFont).Y;
+					offset.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: Strings.Get("config.info.seasonings.subheading.1"), font: Game1.smallFont).Y;
 
 					int spacing = 1 * Scale;
 					int count = seasoningsMap.Count;
@@ -1001,15 +1000,15 @@ namespace LoveOfCooking.Interface
 			bool isCharacterListVisible = false;
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.townkitchens_name"));
+				text: () => Strings.Get("config.option.townkitchens_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
-					string text = I18n.Get("config.info.townkitchens.text.1");
+					string text = Strings.Get("config.info.townkitchens.text.1");
 					if (!ModEntry.Config.CanUseTownKitchens)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled")}";
+						text += $"\n\n{Strings.Get("config.info.disabled")}";
 					}
 					return text;
 				});
@@ -1036,7 +1035,7 @@ namespace LoveOfCooking.Interface
 
 					if (isCharacterListVisible)
 					{
-						subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.townkitchens.subheading.1")).Y;
+						subheadingOffset = ModConfigMenu.DrawSubheading(b: b, v: v, text: Strings.Get("config.info.townkitchens.subheading.1")).Y;
 						v.Y += subheadingOffset;
 
 						float remainder = (float)characters.Count / characterColumns - characterRows + 1;
@@ -1072,7 +1071,7 @@ namespace LoveOfCooking.Interface
 					}
 
 					// Draw friendship requirements
-					offset.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: I18n.Get("config.info.townkitchens.subheading.2"), font: Game1.smallFont).Y;
+					offset.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: 0, y: offset.Y), text: Strings.Get("config.info.townkitchens.subheading.2"), font: Game1.smallFont).Y;
 
 					int spacing = 1 * Scale;
 					int hearts = (int)ModEntry.Definitions.NpcKitchenFriendshipRequired;
@@ -1103,17 +1102,17 @@ namespace LoveOfCooking.Interface
 			// Food healing takes time
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.foodhealingtakestime_name"));
+				text: () => Strings.Get("config.option.foodhealingtakestime_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
 					string healthItem = Game1.content.LoadString("Strings\\Objects:LifeElixir_Name");
 					string energyItem = Game1.content.LoadString("Strings\\Objects:EnergyTonic_Name");
-					string text = I18n.Get("config.info.foodhealingtakestime.text", new { healthItem, energyItem });
+					string text = Strings.Get("config.info.foodhealingtakestime.text", healthItem, energyItem);
 					if (!ModEntry.Config.FoodHealingTakesTime)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled")}";
+						text += $"\n\n{Strings.Get("config.info.disabled")}";
 					}
 					return text;
 				});
@@ -1121,15 +1120,15 @@ namespace LoveOfCooking.Interface
 			// Food Buffs Start Hidden
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.foodbuffsstarthidden_name"));
+				text: () => Strings.Get("config.option.foodbuffsstarthidden_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
-					string text = I18n.Get("config.info.foodbuffsstarthidden.text");
+					string text = Strings.Get("config.info.foodbuffsstarthidden.text");
 					if (!ModEntry.Config.FoodBuffsStartHidden)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled")}";
+						text += $"\n\n{Strings.Get("config.info.disabled")}";
 					}
 					return text;
 				});
@@ -1137,15 +1136,15 @@ namespace LoveOfCooking.Interface
 			// Food can burn
 			gmcm.AddSectionTitle(
 				mod: mod,
-				text: () => I18n.Get("config.option.foodcanburn_name"));
+				text: () => Strings.Get("config.option.foodcanburn_name"));
 			gmcm.AddParagraph(
 				mod: mod,
 				text: () =>
 				{
-					string text = I18n.Get("config.info.foodcanburn.text");
+					string text = Strings.Get("config.info.foodcanburn.text");
 					if (!ModEntry.Config.FoodCanBurn)
 					{
-						text += $"\n\n{I18n.Get("config.info.disabled_bad")}";
+						text += $"\n\n{Strings.Get("config.info.disabled_bad")}";
 					}
 					else
 					{
@@ -1154,7 +1153,7 @@ namespace LoveOfCooking.Interface
 						int scale = 100;
 						string minFormatted = $"{min * scale:.0}";
 						string maxFormatted = $"{max * scale:.0}";
-						text += $"\n\n{I18n.Get("config.info.foodcanburn.subheading", new { min = minFormatted, max = maxFormatted})}";
+						text += $"\n\n{Strings.Get("config.info.foodcanburn.subheading", minFormatted, maxFormatted)}";
 					}
 					return text;
 				});
@@ -1167,31 +1166,31 @@ namespace LoveOfCooking.Interface
 			gmcm.AddPage(
 				mod: mod,
 				pageId: "options",
-				pageTitle: () => I18n.Get("config.page.options"));
+				pageTitle: () => Strings.Get("config.page.options"));
 			// Features
 			{
 				gmcm.AddSectionTitle(
 					mod: mod,
-					text: () => I18n.Get("config.features_label"));
+					text: () => Strings.Get("config.features_label"));
 				gmcm.SetTitleScreenOnlyForNextOptions(
 					mod: mod,
 					titleScreenOnly: true);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.cookingmenu_name"),
-					tooltip: () => I18n.Get("config.option.cookingmenu_description"),
+					name: () => Strings.Get("config.option.cookingmenu_name"),
+					tooltip: () => Strings.Get("config.option.cookingmenu_description"),
 					getValue: () => ModEntry.Config.AddCookingMenu,
 					setValue: (bool value) => ModEntry.Config.AddCookingMenu = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.cookingskill_name"),
-					tooltip: () => I18n.Get("config.option.cookingskill_description"),
+					name: () => Strings.Get("config.option.cookingskill_name"),
+					tooltip: () => Strings.Get("config.option.cookingskill_description"),
 					getValue: () => ModEntry.Config.AddCookingSkillAndRecipes,
 					setValue: (bool value) => ModEntry.Config.AddCookingSkillAndRecipes = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.cookingtool_name"),
-					tooltip: () => I18n.Get("config.option.cookingtool_description"),
+					name: () => Strings.Get("config.option.cookingtool_name"),
+					tooltip: () => Strings.Get("config.option.cookingtool_description"),
 					getValue: () => ModEntry.Config.AddCookingToolProgression,
 					setValue: (bool value) => ModEntry.Config.AddCookingToolProgression = value);
 				gmcm.SetTitleScreenOnlyForNextOptions(
@@ -1216,7 +1215,7 @@ namespace LoveOfCooking.Interface
 
 							// Disclaimer text
 							v.Y += 32 * Scale;
-							v.Y += ModConfigMenu.DrawSubheading(b: b, v: v, text: I18n.Get("config.info.features_blocked"), width: 600, font: Game1.smallFont).Y;
+							v.Y += ModConfigMenu.DrawSubheading(b: b, v: v, text: Strings.Get("config.info.features_blocked"), width: 600, font: Game1.smallFont).Y;
 
 							// ???
 							v.Y += 12 * Scale;
@@ -1247,35 +1246,35 @@ namespace LoveOfCooking.Interface
 			{
 				gmcm.AddSectionTitle(
 					mod: mod,
-					text: () => I18n.Get("config.changes_label"));
+					text: () => Strings.Get("config.changes_label"));
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.seasonings_name"),
-					tooltip: () => I18n.Get("config.option.seasonings_description"),
+					name: () => Strings.Get("config.option.seasonings_name"),
+					tooltip: () => Strings.Get("config.option.seasonings_description"),
 					getValue: () => ModEntry.Config.AddSeasonings,
 					setValue: (bool value) => ModEntry.Config.AddSeasonings = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.townkitchens_name"),
-					tooltip: () => I18n.Get("config.option.townkitchens_description"),
+					name: () => Strings.Get("config.option.townkitchens_name"),
+					tooltip: () => Strings.Get("config.option.townkitchens_description"),
 					getValue: () => ModEntry.Config.CanUseTownKitchens,
 					setValue: (bool value) => ModEntry.Config.CanUseTownKitchens = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.foodhealingtakestime_name"),
-					tooltip: () => I18n.Get("config.option.foodhealingtakestime_description"),
+					name: () => Strings.Get("config.option.foodhealingtakestime_name"),
+					tooltip: () => Strings.Get("config.option.foodhealingtakestime_description"),
 					getValue: () => ModEntry.Config.FoodHealingTakesTime,
 					setValue: (bool value) => ModEntry.Config.FoodHealingTakesTime = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.foodbuffsstarthidden_name"),
-					tooltip: () => I18n.Get("config.option.foodbuffsstarthidden_description"),
+					name: () => Strings.Get("config.option.foodbuffsstarthidden_name"),
+					tooltip: () => Strings.Get("config.option.foodbuffsstarthidden_description"),
 					getValue: () => ModEntry.Config.FoodBuffsStartHidden,
 					setValue: (bool value) => ModEntry.Config.FoodBuffsStartHidden = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.foodcanburn_name"),
-					tooltip: () => I18n.Get("config.option.foodcanburn_description"),
+					name: () => Strings.Get("config.option.foodcanburn_name"),
+					tooltip: () => Strings.Get("config.option.foodcanburn_description"),
 					getValue: () => ModEntry.Config.FoodCanBurn,
 					setValue: (bool value) => ModEntry.Config.FoodCanBurn = value);
 			}
@@ -1283,55 +1282,55 @@ namespace LoveOfCooking.Interface
 			{
 				gmcm.AddSectionTitle(
 					mod: mod,
-					text: () => I18n.Get("config.others_label"));
+					text: () => Strings.Get("config.others_label"));
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.menuanimation_name"),
-					tooltip: () => I18n.Get("config.option.menuanimation_description"),
+					name: () => Strings.Get("config.option.menuanimation_name"),
+					tooltip: () => Strings.Get("config.option.menuanimation_description"),
 					getValue: () => ModEntry.Config.PlayMenuAnimation,
 					setValue: (bool value) => ModEntry.Config.PlayMenuAnimation = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.cookinganimation_name"),
-					tooltip: () => I18n.Get("config.option.cookinganimation_description"),
+					name: () => Strings.Get("config.option.cookinganimation_name"),
+					tooltip: () => Strings.Get("config.option.cookinganimation_description"),
 					getValue: () => ModEntry.Config.PlayCookingAnimation,
 					setValue: (bool value) => ModEntry.Config.PlayCookingAnimation = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.foodregenbar_name"),
-					tooltip: () => I18n.Get("config.option.foodregenbar_description"),
+					name: () => Strings.Get("config.option.foodregenbar_name"),
+					tooltip: () => Strings.Get("config.option.foodregenbar_description"),
 					getValue: () => ModEntry.Config.ShowFoodRegenBar,
 					setValue: (bool value) => ModEntry.Config.ShowFoodRegenBar = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.fixcraftingpagerecipesorting_name"),
-					tooltip: () => I18n.Get("config.option.fixcraftingpagerecipesorting_description"),
+					name: () => Strings.Get("config.option.fixcraftingpagerecipesorting_name"),
+					tooltip: () => Strings.Get("config.option.fixcraftingpagerecipesorting_description"),
 					getValue: () => ModEntry.Config.FixCraftingPageRecipeSorting,
 					setValue: (bool value) => ModEntry.Config.FixCraftingPageRecipeSorting = value);
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.remembersearchfilter_name"),
-					tooltip: () => I18n.Get("config.option.remembersearchfilter_description"),
+					name: () => Strings.Get("config.option.remembersearchfilter_name"),
+					tooltip: () => Strings.Get("config.option.remembersearchfilter_description"),
 					getValue: () => ModEntry.Config.RememberSearchFilter,
 					setValue: (bool value) => ModEntry.Config.RememberSearchFilter = value);
 				gmcm.AddTextOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.defaultsearchfilter_name"),
-					tooltip: () => I18n.Get("config.option.defaultsearchfilter_description"),
+					name: () => Strings.Get("config.option.defaultsearchfilter_name"),
+					tooltip: () => Strings.Get("config.option.defaultsearchfilter_description"),
 					getValue: () => ModEntry.Config.DefaultSearchFilter,
 					setValue: (string value) => ModEntry.Config.DefaultSearchFilter = value,
 					allowedValues: Enum.GetNames(typeof(CookingMenu.Filter)));
 				gmcm.AddTextOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.defaultsearchsorter_name"),
-					tooltip: () => I18n.Get("config.option.defaultsearchsorter_description"),
+					name: () => Strings.Get("config.option.defaultsearchsorter_name"),
+					tooltip: () => Strings.Get("config.option.defaultsearchsorter_description"),
 					getValue: () => ModEntry.Config.DefaultSearchSorter,
 					setValue: (string value) => ModEntry.Config.DefaultSearchSorter = value,
 					allowedValues: Enum.GetNames(typeof(CookingMenu.Sorter)));
 				gmcm.AddBoolOption(
 					mod: mod,
-					name: () => I18n.Get("config.option.resizekoreanfonts_name"),
-					tooltip: () => I18n.Get("config.option.resizekoreanfonts_description"),
+					name: () => Strings.Get("config.option.resizekoreanfonts_name"),
+					tooltip: () => Strings.Get("config.option.resizekoreanfonts_description"),
 					getValue: () => ModEntry.Config.ResizeKoreanFonts,
 					setValue: (bool value) => ModEntry.Config.ResizeKoreanFonts = value);
 			}

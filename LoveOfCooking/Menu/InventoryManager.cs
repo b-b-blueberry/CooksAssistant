@@ -137,15 +137,15 @@ namespace LoveOfCooking.Menu
 				if (this._inventoryAndChestList[this._inventoryId - this._inventoryIdsBeforeChests].Chest is Chest chest)
 				{
 					text = Utils.IsMinifridge(chest)
-						? I18n.Get("menu.inventory.minifridge")
+						? Strings.Get("menu.inventory.minifridge")
 						: Utils.IsFridgeOrMinifridge(chest)
-							? I18n.Get("menu.inventory.fridge")
+							? Strings.Get("menu.inventory.fridge")
 							: chest.DisplayName;
 				}
 			}
 			else
 			{
-				text = I18n.Get("menu.inventory.backpack");
+				text = Strings.Get("menu.inventory.backpack");
 			}
 			return text;
 		}
@@ -460,7 +460,7 @@ namespace LoveOfCooking.Menu
 				name: "autofill",
 				bounds: new(-1, -1, AutofillDisabledButtonSource.Width * Scale, AutofillDisabledButtonSource.Height * Scale),
 				label: null,
-				hoverText: I18n.Get("menu.cooking_recipe.autofill_label"),
+				hoverText: Strings.Get("menu.cooking_recipe.autofill_label"),
 				texture: CookingMenu.Texture,
 				sourceRect: AutofillDisabledButtonSource,
 				scale: Scale);

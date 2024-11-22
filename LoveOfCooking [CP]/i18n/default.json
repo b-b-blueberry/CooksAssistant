@@ -49,18 +49,18 @@
 	"config.info.controllermap.shoulders": "LB/RB   Change region",
 	"config.info.controllermap.triggers": "LT/RT   Change recipe",
 
-	"config.info.cookingmenu.text.1": "Replaces the vanilla crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {{cookbookItem}} in the mail.\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {{cookingItem}}.\nCan be used in town kitchens if enabled in the Options page.",
+	"config.info.cookingmenu.text.1": "Replaces the vanilla crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {0} in the mail.\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {1}.\nCan be used in town kitchens if enabled in the Options page.",
 	"config.info.cookingmenu.subheading.1": "Cookbook delivery",
 
 	"config.info.cookingskill.text.1": "Skill levels teach you new recipes, improve your cooking, and unlock new professions.\n\nMore experience is earned by cooking each day, less is earned by cooking in bulk.\nEarn extra experience by cooking new and difficult recipes.",
 	"config.info.cookingskill.text.2": "Cooking skill professions are unlocked as with any other skill.\nProfession perks improve results when cooking and eating food.",
 	"config.info.cookingskill.subheading.1": "Skill progress",
-	"config.info.cookingskill.subheading.2": "{{current}} experience",
-	"config.info.cookingskill.subheading.3": "{{current}}/{{required}} experience",
+	"config.info.cookingskill.subheading.2": "{0} experience",
+	"config.info.cookingskill.subheading.3": "{0}/{1} experience",
 	"config.info.cookingskill.subheading.4": "Cooking recipes",
 	"config.info.cookingskill.subheading.5": "Skill professions",
 
-	"config.info.cookingtool.text.1": "Your {{tool}} determines the number of ingredients you can use when cooking.\nUpgrading your cooking tool at the Blacksmith unlocks extra slots.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nYou can check your {{tool}} level here, at the character page, or in the cooking menu.\nIf disabled in Options page, your {{tool}} is always considered max level.",
+	"config.info.cookingtool.text.1": "Your {0} determines the number of ingredients you can use when cooking.\nUpgrading your cooking tool at the Blacksmith unlocks extra slots.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nYou can check your {0} level here, at the character page, or in the cooking menu.\nIf disabled in Options page, your {0} is always considered max level.",
 	"config.info.cookingtool.subheading.1": "Tool upgrades",
 
 	"config.info.townkitchens.text.1": "Food can be cooked at any kitchens in town, provided you're friends with the owner.\nYou'll need a Cookbook and recipes to cook!",
@@ -70,10 +70,10 @@
 	"config.info.seasonings.text.1": "Adds new seasoning items to improve the quality of cooked food.\n\nSeasonings are unlocked from reaching cooking milestones.\nConsumed automatically when cooking.",
 	"config.info.seasonings.subheading.1": "Seasoning items",
 
-	"config.info.foodhealingtakestime.text": "Instead of healing instantly, food restoration happens gradually over time.\n\nHealth and energy restores far more quickly when low.\nHealing is mostly preserved when health and energy are full.\nEating several foods will stack restoration for the day.\nHealing speed increases with various skill levels.\n{{healthItem}} and {{energyItem}} will always heal instantly.",
+	"config.info.foodhealingtakestime.text": "Instead of healing instantly, food restoration happens gradually over time.\n\nHealth and energy restores far more quickly when low.\nHealing is mostly preserved when health and energy are full.\nEating several foods will stack restoration for the day.\nHealing speed increases with various skill levels.\n{0} and {1} will always heal instantly.",
 	"config.info.foodbuffsstarthidden.text": "All foods will have on-consumed effects hidden until you've eaten one.\nBuffs (or lack of) will be visible on all items of that kind afterward.\nHealth and energy restoration remains visible.",
 	"config.info.foodcanburn.text": "When cooking any recipes, some of the food you make may be ruined.\nBurnt food will become useless trash. Your ingredients will be wasted.\nSkill experience is awarded even if your food was burnt.",
-	"config.info.foodcanburn.subheading": "Burn chance: {{min}} ~ {{max}}%",
+	"config.info.foodcanburn.subheading": "Burn chance: {0} ~ {1}%",
 
 	"config.info.disabled": "> Can be enabled in the Options page.",
 	"config.info.disabled_bad": "> Can be enabled in the Options page.\nWARNING: This isn't fun at all.",
@@ -83,8 +83,8 @@
 	"config.changes_label": "Changes",
 	"config.others_label": "Others",
 
-	"config.format.level": "Level {{level}}",
-	"config.format.profession": "{{name}} - {{description}}",
+	"config.format.level": "Level {0}",
+	"config.format.profession": "{0} - {1}",
 	"config.format.unknown": "???",
 
 	// General strings
@@ -103,14 +103,14 @@
 
 	// Cooking menu
 	"menu.cooking_station.no_cookbook": "You don't have a cookbook.",
-	"menu.cooking_station.no_friendship": "You aren't good enough friends with {{name}} to use this kitchen.",
+	"menu.cooking_station.no_friendship": "You aren't good enough friends with {0} to use this kitchen.",
 
 	"menu.cooking_recipe.title_unknown": "???",
 	"menu.cooking_recipe.notes_unknown": "You haven't eaten this yet.",
 	"menu.cooking_recipe.ingredients_label": "Ingredients:",
 	"menu.cooking_recipe.notes_label": "Notes:",
 	"menu.cooking_recipe.time_label": "Cooking time:",
-	"menu.cooking_recipe.time_value": "{{duration}} min",
+	"menu.cooking_recipe.time_value": "{0} min",
 	"menu.cooking_recipe.search_label": "Search",
 	"menu.cooking_recipe.favourite_label": "Favourite",
 	"menu.cooking_recipe.quantity_label": "Makes",
@@ -157,11 +157,11 @@
 	"menu.config.disabled": "Requires Generic Mod Config Menu.",
 
 	// Mail
-	"mail.cookbook_unlocked": "Dear @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom{{cookbook}}[#]Mom's Cookbook",
+	"mail.cookbook_unlocked": "Dear @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom%item id blueberry.LoveOfCooking_cookbook 1 %%[#]Mom's Cookbook",
 	"mail.cookbook_unlocked.after.1": "Mom's Cookbook and Frying Pan have been added to your = Special Items.",
 	"mail.cookbook_unlocked.after.2": "Recipes you learn will be saved in the cookbook for cooking at the farmhouse.",
 	"mail.cookbook_unlocked.after.2_alt": "Recipes you learn will be saved in the cookbook for cooking at the farmhouse or in town.",
-	"mail.migrate_refund_1_6": "To the owner,^^We've reviewed our annual farming subsidies and found some discrepancies during our last system migration.^Yes, it appears someone's been cooking the books. Enclosed is compensation for any lost produce.^^Thank you for your continued business,^  Blue Berry Farming & Supplies%item money {{migrateRefund}} %%",
+	"mail.migrate_refund_1_6": "To the owner,^^We've reviewed our annual farming subsidies and found some discrepancies during our last system migration.^Yes, it appears someone's been cooking the books. Enclosed is compensation for any lost produce.^^Thank you for your continued business,^  Blue Berry Farming & Supplies%item money {0} %%",
 	"mail.seasoning_1": "Hi honey,^I came across this recipe in a lifestyle magazine!^It's supposed to make anything taste better.^^Remember to make balanced meals!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_1 %%",
 	"mail.seasoning_2": "Hi sweetie!^A wonderful cookery show was on TV showing all-new ways to flavour your food!^I just had to write the recipe down for you.^Keep practicing your cooking!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_2 %%",
 
@@ -190,8 +190,7 @@
 
 	// Cooking skill
 	"menu.cooking_skill.name": "Cooking",
-	"menu.cooking_skill.levelupbonus": "Can cook recipes with up to {{Number}} ingredients",
-	"menu.cooking_skill.levelup_burn": "Food burns {{Number}}% less often",
+	"menu.cooking_skill.levelup_burn": "Food burns {0}% less often",
 
 	// Tier 1:
 	// Path 1: Cooking
@@ -202,7 +201,7 @@
 	"menu.cooking_skill.tier1_path2.description": "Food restores your energy more quickly.",
 	// Path 2: Eating (CONFIG: Food restores instantly)
 	"menu.cooking_skill.tier1_path2_alt.name": "Big Eater",
-	"menu.cooking_skill.tier1_path2_alt.description": "Cooked food restores {{RestorationAltValue}}% more.",
+	"menu.cooking_skill.tier1_path2_alt.description": "Cooked food restores {0}% more.",
 
 	// Tier 2: Path 1
 	// Choice A: Gifting
@@ -210,7 +209,7 @@
 	"menu.cooking_skill.tier2_path1a.description": "Cooked foods given as gifts befriend quicker.",
 	// Choice B: Selling
 	"menu.cooking_skill.tier2_path1b.name": "Five Star Cook",
-	"menu.cooking_skill.tier2_path1b.description": "Cooked foods worth {{SaleValue}}% more.",
+	"menu.cooking_skill.tier2_path1b.description": "Cooked foods worth {0}% more.",
 
 	// Tier 2: Path B
 	// Choice A: Crafting

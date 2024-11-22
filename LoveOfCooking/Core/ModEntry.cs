@@ -21,8 +21,6 @@ namespace LoveOfCooking
 		public static Texture2D SpriteSheet;
 		public static ICookingSkillAPI CookingSkillApi;
 
-		internal ITranslationHelper I18n => this.Helper.Translation;
-
 		internal const string ContentModUniqueID = "blueberry.LoveOfCooking.CP"; // DO NOT EDIT
 		internal const string AssetPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
 		internal const string ModDataPrefix = "blueberry.LoveOfCooking."; // DO NOT EDIT
@@ -47,7 +45,6 @@ namespace LoveOfCooking
 		
 		// Mod data definitions
 		internal static Definitions Definitions;
-		internal static Dictionary<string, string> Strings = [];
 
 		// Others:
 		// base game reference
@@ -102,8 +99,8 @@ namespace LoveOfCooking
 
 		private void RegisterEvents()
 		{
-			// Register translation injection and load initial translations
-			LocalizedContentManager.OnLanguageChange += AssetManager.LoadStrings;
+			// Translated strings are loaded from CP i18n file contents
+			LocalizedContentManager.OnLanguageChange += AssetManager.ReloadStrings;
 
 			// Game events
 			this.Helper.Events.Specialized.LoadStageChanged += this.Specialized_LoadStageChanged;
@@ -423,7 +420,7 @@ namespace LoveOfCooking
 					{
 						string name = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == Game1.currentLocation.Name).Key;
 						NPC npc = Game1.getCharacterFromName(name);
-						Game1.drawDialogueNoTyping(this.I18n.Get("menu.cooking_station.no_friendship", new { name = npc.displayName }));
+						Game1.drawDialogueNoTyping(Strings.Get("menu.cooking_station.no_friendship", npc.displayName));
 					}
 					this.Helper.Input.Suppress(e.Button);
 					return;
@@ -607,7 +604,6 @@ namespace LoveOfCooking
 				this.RegisterEvents();
 
 				// Assets and definitions
-				Utils.CopyTranslations(from: ModEntry.ContentModUniqueID, to: this.ModManifest.UniqueID);
 				this.ReloadAssets();
 
 				// Console commands
@@ -636,6 +632,7 @@ namespace LoveOfCooking
 				<Texture2D>
 				(AssetManager.GameContentSpriteSheetPath);
 			CookbookAnimation.Reload(this.Helper);
+			Strings.Reload();
 
 			// Order custom seasonings by descending quality, ensuring best seasonings are consumed first
 			ModEntry.Definitions.Seasonings = ModEntry.Definitions.Seasonings

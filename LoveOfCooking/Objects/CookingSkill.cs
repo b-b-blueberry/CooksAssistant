@@ -8,7 +8,6 @@ namespace LoveOfCooking.Objects
 {
 	public class CookingSkill : SpaceCore.Skills.Skill
 	{
-		private static ITranslationHelper I18n => ModEntry.Instance.Helper.Translation;
 		public static readonly string InternalName = ModEntry.AssetPrefix + "CookingSkill"; // DO NOT EDIT
 
 		public class SkillProfession : SpaceCore.Skills.Skill.Profession
@@ -64,13 +63,12 @@ namespace LoveOfCooking.Objects
 				{
 					// v-- Skill profession icon is applied here
 					Icon = Utils.Slice(texture: ModEntry.SpriteSheet, area: area),
-					Name = I18n.Get($"{id}{extra}.name"),
-					Description = I18n.Get($"{id}{extra}.description",
-					new
-					{ // v-- Skill profession description values are tokenised here
-						SaleValue = $"{((ModEntry.Definitions.CookingSkillValues.SalePriceModifier - 1) * 100):0}",
-						RestorationAltValue = $"{(ModEntry.Definitions.CookingSkillValues.RestorationAltValue):0}",
-					})
+					Name = Strings.Get($"{id}{extra}.name"),
+					Description = Strings.Get($"{id}{extra}.description",
+						// v-- Skill profession description values are tokenised here
+						$"{(ModEntry.Definitions.CookingSkillValues.SalePriceModifier - 1) * 100:0}",
+						$"{ModEntry.Definitions.CookingSkillValues.RestorationAltValue:0}"
+					)
 				};
 				// Skill professions are paired and applied
 				this.Professions.Add(profession);
@@ -85,7 +83,7 @@ namespace LoveOfCooking.Objects
 
 		public override string GetName()
 		{
-			return I18n.Get("menu.cooking_skill.name");
+			return Strings.Get("menu.cooking_skill.name");
 		}
 		
 		public override List<string> GetExtraLevelUpInfo(int level)
@@ -93,16 +91,7 @@ namespace LoveOfCooking.Objects
 			List<string> list = [];
 			if (ModEntry.Config.FoodCanBurn)
 			{
-				list.Add(I18n.Get("menu.cooking_skill.levelup_burn", new
-					{
-						Number = $"{(level * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction):0.00}"
-					}));
-			}
-
-			Translation extra = I18n.Get($"menu.cooking_skill.levelupbonus.{level}");
-			if (extra.HasValue())
-			{
-				list.Add(extra);
+				list.Add(Strings.Get("menu.cooking_skill.levelup_burn", $"{level * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction:0.00}"));
 			}
 
 			return list;
@@ -115,12 +104,7 @@ namespace LoveOfCooking.Objects
 			if (ModEntry.Config.FoodCanBurn)
 			{
 				float value = level * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction;
-				hoverText += Environment.NewLine + I18n.Get(
-					key: "menu.cooking_skill.levelup_burn",
-					tokens: new
-					{
-						Number = $"{(value):0.00}"
-					});
+				hoverText += Environment.NewLine + Strings.Get("menu.cooking_skill.levelup_burn", $"{value:0.00}");
 			}
 
 			return hoverText;

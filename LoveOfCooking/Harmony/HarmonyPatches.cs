@@ -142,7 +142,7 @@ namespace LoveOfCooking.HarmonyPatches
 
 			string[] array = new string[13];
 			Array.Fill(array, string.Empty);
-			array[^1] = ModEntry.Instance.I18n.Get("menu.cooking_recipe.buff.unknown");
+			array[^1] = Strings.Get("menu.cooking_recipe.buff.unknown");
 			buffIconsToDisplay = array;
 		}
 

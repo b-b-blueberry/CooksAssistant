@@ -603,13 +603,13 @@ namespace LoveOfCooking.Menu
 			Vector2 position = Vector2.Zero;
 			string text;
 
-			position = this.DrawSubheading(b: b, position: Vector2.Zero, textWidth: textWidth, text: I18n.Get("menu.cooking_recipe.notes_label"));
+			position = this.DrawSubheading(b: b, position: Vector2.Zero, textWidth: textWidth, text: Strings.Get("menu.cooking_recipe.notes_label"));
 
 			if (ModEntry.Config.FoodBuffsStartHidden && !ModEntry.Instance.States.Value.FoodsEaten.Contains(item.Name))
 			{
 				// Draw unknown information text
 
-				text = I18n.Get("menu.cooking_recipe.notes_unknown");
+				text = Strings.Get("menu.cooking_recipe.notes_unknown");
 				this.DrawText(
 					b: b,
 					text: text,
@@ -684,7 +684,7 @@ namespace LoveOfCooking.Menu
 
 				// Buff duration
 				text = buff.millisecondsDuration == Buff.ENDLESS
-					? I18n.Get("menu.cooking_recipe.buff.daily")
+					? Strings.Get("menu.cooking_recipe.buff.daily")
 					: Utility.getMinutesSecondsStringFromMilliseconds(buff.millisecondsDuration);
 
 				// Duration icon
@@ -813,7 +813,7 @@ namespace LoveOfCooking.Menu
 
 						// Show attribute name if we're only showing a single column
 						if (numToDisplay <= height)
-							text += I18n.Get($"menu.cooking_recipe.buff.{i}");
+							text += Strings.Get($"menu.cooking_recipe.buff.{i}");
 						this.DrawText(
 							b: b,
 							text: text,

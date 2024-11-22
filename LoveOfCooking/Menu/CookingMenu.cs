@@ -19,7 +19,6 @@ namespace LoveOfCooking.Menu
         // Mirrors
         internal static IModHelper Helper => ModEntry.Instance.Helper;
         internal static Config Config => ModEntry.Config;
-        internal static ITranslationHelper I18n => ModEntry.Instance.Helper.Translation;
         internal static Texture2D Texture => ModEntry.SpriteSheet;
 
         // Managers
@@ -943,8 +942,8 @@ namespace LoveOfCooking.Menu
             if (this._upperRightInfoButton.containsPoint(x, y))
             {
                 hoverText = Interfaces.GenericModConfigMenu is not null
-                    ? I18n.Get("menu.config.enabled")
-                    : I18n.Get("menu.config.disabled");
+                    ? Strings.Get("menu.config.enabled")
+                    : Strings.Get("menu.config.disabled");
             }
 			this._searchTabButton.tryHover(x, y, this._searchPage.IsVisible ? 0 : scaleTo);
 

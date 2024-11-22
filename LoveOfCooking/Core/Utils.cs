@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Reflection;
 using HarmonyLib; // el diavolo nuevo
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
@@ -411,7 +409,7 @@ namespace LoveOfCooking
 			else
 			{
 				mutex.ReleaseLocks();
-				Game1.drawDialogueNoTyping(ModEntry.Instance.I18n.Get("menu.cooking_station.no_cookbook"));
+				Game1.drawDialogueNoTyping(Strings.Get("menu.cooking_station.no_cookbook"));
 				Game1.displayHUD = true;
 			}
 		}
@@ -524,10 +522,10 @@ namespace LoveOfCooking
 											// Show dialogue
 											Game1.drawObjectDialogue(
 											[
-												ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.1"),
+												Strings.Get("mail.cookbook_unlocked.after.1"),
 												ModEntry.Config.CanUseTownKitchens
-													? ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.2_alt")
-													: ModEntry.Instance.I18n.Get("mail.cookbook_unlocked.after.2")
+													? Strings.Get("mail.cookbook_unlocked.after.2_alt")
+													: Strings.Get("mail.cookbook_unlocked.after.2")
 											]);
 											// Hide animation after dialogue
 											Game1.afterDialogues = delegate
@@ -1297,55 +1295,6 @@ namespace LoveOfCooking
 				.OrderBy(id => recipes[id].DisplayName)
 				.OrderByDescending(Game1.player.cookingRecipes.ContainsKey)
 				.ToList();
-		}
-
-		/// <summary>
-		/// Replaces mod translation entries with those from another mod.
-		/// This allows us to share a single group of i18n files between all mod components.
-		/// </summary>
-		public static void CopyTranslations(string from, string to)
-		{
-			(object instance, object files) GetTranslations(string uniqueId)
-			{
-				Type SCore = Type
-					.GetType("StardewModdingAPI.Framework.SCore, StardewModdingAPI");
-				object SCoreInstance = SCore
-					.GetProperty("Instance", BindingFlags.NonPublic | BindingFlags.Static)
-					.GetGetMethod(true)
-					.Invoke(null, null);
-				object SModRegistry = SCore
-					.GetField("ModRegistry", BindingFlags.NonPublic | BindingFlags.Instance)
-					.GetValue(SCoreInstance);
-				object SModMetadata = SModRegistry
-					.GetType()
-					.GetMethod("Get", BindingFlags.Public | BindingFlags.Instance)
-					.Invoke(SModRegistry, [uniqueId]);
-				object directoryPath = SModMetadata
-					.GetType()
-					.GetProperty("DirectoryPath", BindingFlags.Public | BindingFlags.Instance)
-					.GetGetMethod()
-					.Invoke(SModMetadata, null);
-
-				List<string> errors = [];
-				object SCoreTranslationFiles = SCore
-					.GetMethod("ReadTranslationFiles", BindingFlags.NonPublic | BindingFlags.Instance)
-					.Invoke(SCoreInstance, [Path.Combine((string)directoryPath, "i18n"), errors]);
-				object SModTranslations = SModMetadata
-					.GetType()
-					.GetProperty("Translations", BindingFlags.Public | BindingFlags.Instance)
-					.GetGetMethod()
-					.Invoke(SModMetadata, null);
-				return (SModTranslations, SCoreTranslationFiles);
-			}
-
-			(object instance, object files) sourceTranslations = GetTranslations(uniqueId: from);
-			(object instance, object files) targetTranslations = GetTranslations(uniqueId: to);
-
-			// evil plans
-			targetTranslations.instance
-				.GetType()
-				.GetMethod("SetTranslations", BindingFlags.NonPublic | BindingFlags.Instance)
-				.Invoke(targetTranslations.instance, [sourceTranslations.files]);
 		}
 	}
 }

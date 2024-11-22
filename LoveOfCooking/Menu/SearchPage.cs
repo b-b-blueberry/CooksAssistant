@@ -37,7 +37,7 @@ namespace LoveOfCooking.Menu
         private int _searchBarTextBoxMinWidth;
 		private int _searchBarWidth;
         private int _resultHeight;
-        private string SearchBarDefaultText => I18n.Get("menu.cooking_recipe.search_label");
+        private string SearchBarDefaultText => Strings.Get("menu.cooking_recipe.search_label");
 
 		// Search feature
 		private int _resultsIndex;
@@ -276,11 +276,11 @@ namespace LoveOfCooking.Menu
 
 			if (this.ToggleFilterButton is not null)
 			{
-				this.ToggleFilterButton.hoverText = $"{I18n.Get("menu.cooking_search.filter_label")}\n{I18n.Get($"menu.cooking_search.filter.{(int)filter}")}";
+				this.ToggleFilterButton.hoverText = $"{Strings.Get("menu.cooking_search.filter_label")}\n{Strings.Get($"menu.cooking_search.filter.{(int)filter}")}";
 			}
 			if (this.ToggleSorterButton is not null)
 			{
-				this.ToggleSorterButton.hoverText = $"{I18n.Get("menu.cooking_search.sorter_label")}\n{I18n.Get($"menu.cooking_search.sorter.{(int)sorter}")}";
+				this.ToggleSorterButton.hoverText = $"{Strings.Get("menu.cooking_search.sorter_label")}\n{Strings.Get($"menu.cooking_search.sorter.{(int)sorter}")}";
 			}
 
 			this._lastFilterUsed = filter;
@@ -293,8 +293,8 @@ namespace LoveOfCooking.Menu
             // Show grid view style when grid view enabled, and vice versa
 			this.ToggleViewButton.sourceRect = this.IsGridView ? TileButtonGridSource : TileButtonListSource;
 			this.ToggleViewButton.hoverText = this.IsGridView
-				? $"{I18n.Get("menu.cooking_search.view_label")}\n{I18n.Get($"menu.cooking_search.view.grid")}"
-				: $"{I18n.Get("menu.cooking_search.view_label")}\n{I18n.Get($"menu.cooking_search.view.list")}";
+				? $"{Strings.Get("menu.cooking_search.view_label")}\n{Strings.Get($"menu.cooking_search.view.grid")}"
+				: $"{Strings.Get("menu.cooking_search.view_label")}\n{Strings.Get($"menu.cooking_search.view.list")}";
 		}
 
         public void ToggleFilterPopup(bool playSound, bool? forceToggleTo = null, List<ClickableTextureComponent> buttons = null)
@@ -435,7 +435,7 @@ namespace LoveOfCooking.Menu
                 name: "toggleFilter",
                 bounds: new(-1, -1, TileButtonBlankSource.Width * SmallScale, TileButtonBlankSource.Height * SmallScale),
                 label: null,
-                hoverText: I18n.Get("menu.cooking_search.filter_label"),
+                hoverText: Strings.Get("menu.cooking_search.filter_label"),
                 texture: CookingMenu.Texture,
                 sourceRect: TileButtonBlankSource,
                 scale: SmallScale,
@@ -444,7 +444,7 @@ namespace LoveOfCooking.Menu
                 name: "toggleSorter",
                 bounds: new(-1, -1, TileButtonBlankSource.Width * SmallScale, TileButtonBlankSource.Height * SmallScale),
                 label: null,
-                hoverText: I18n.Get("menu.cooking_search.sorter_label"),
+                hoverText: Strings.Get("menu.cooking_search.sorter_label"),
                 texture: CookingMenu.Texture,
                 sourceRect: TileButtonBlankSource,
                 scale: SmallScale,
@@ -464,7 +464,7 @@ namespace LoveOfCooking.Menu
 					name: $"filter{i}",
 					bounds: new(-1, -1, FilterIconSource.Width * SmallScale, FilterIconSource.Height * SmallScale),
 					label: null,
-					hoverText: I18n.Get($"menu.cooking_search.filter.{i}"),
+					hoverText: Strings.Get($"menu.cooking_search.filter.{i}"),
 					texture: CookingMenu.Texture,
 					sourceRect: new(
 						FilterIconSource.X + i * FilterIconSource.Width, FilterIconSource.Y,
@@ -477,7 +477,7 @@ namespace LoveOfCooking.Menu
 					name: $"sorter{i}",
 					bounds: new(-1, -1, SorterIconSource.Width * SmallScale, SorterIconSource.Height * SmallScale),
 					label: null,
-					hoverText: I18n.Get($"menu.cooking_search.sorter.{i}"),
+					hoverText: Strings.Get($"menu.cooking_search.sorter.{i}"),
 					texture: CookingMenu.Texture,
 					sourceRect: new(
 						SorterIconSource.X + i * SorterIconSource.Width, SorterIconSource.Y,
@@ -930,7 +930,7 @@ namespace LoveOfCooking.Menu
                 if (index >= 0 && index < this._visibleResults.Count && this._visibleResults[index] is not null && this._visibleResults[index].name != InvalidRecipeName)
                     hoverText = Game1.player.knowsRecipe(this._visibleResults[index].name)
                         ? this._visibleResults[index].DisplayName
-                        : I18n.Get("menu.cooking_recipe.title_unknown");
+                        : Strings.Get("menu.cooking_recipe.title_unknown");
             }
         }
 
@@ -967,7 +967,7 @@ namespace LoveOfCooking.Menu
 
             if (!this._visibleResults.Any() || this._visibleResults.Any(recipe => recipe?.name == InvalidRecipeName))
             {
-                text = I18n.Get("menu.cooking_search.none_label");
+                text = Strings.Get("menu.cooking_search.none_label");
 				this.DrawText(
 					b: b,
 					text: text,
@@ -1004,7 +1004,7 @@ namespace LoveOfCooking.Menu
 
                         text = Game1.player.knowsRecipe(recipe?.name)
                             ? recipe.DisplayName
-                            : I18n.Get("menu.cooking_recipe.title_unknown");
+                            : Strings.Get("menu.cooking_recipe.title_unknown");
 
 						this.DrawText(
                             b: b,

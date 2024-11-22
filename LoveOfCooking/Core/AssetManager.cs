@@ -14,8 +14,6 @@ namespace LoveOfCooking
 {
 	public static class AssetManager
 	{
-		private static ITranslationHelper I18n => ModEntry.Instance.Helper.Translation;
-
 		// Regions
 
 		internal static readonly Rectangle RegenBarArea = new(116, 0, 12, 38);
@@ -48,19 +46,14 @@ namespace LoveOfCooking
 		];
 
 
-		internal static void LoadStrings(LocalizedContentManager.LanguageCode code)
+		internal static void ReloadStrings(LocalizedContentManager.LanguageCode code)
 		{
-			// Update translated strings for current locale
-			ModEntry.Strings.Clear();
-			foreach (Translation entry in I18n.GetTranslations())
-			{
-				ModEntry.Strings[entry.Key] = entry.ToString();
-			}
+			Strings.Reload();
 		}
 
 		internal static void InvalidateAssets()
 		{
-			AssetManager.LoadStrings(code: LocalizedContentManager.CurrentLanguageCode);
+			AssetManager.ReloadStrings(code: LocalizedContentManager.CurrentLanguageCode);
 			foreach (var asset in AssetManager.AssetsToEdit)
 			{
 				ModEntry.Instance.Helper.GameContent.InvalidateCacheAndLocalized(asset);
@@ -69,21 +62,10 @@ namespace LoveOfCooking
 
 		internal static void OnAssetRequested(object sender, AssetRequestedEventArgs e)
 		{
-			AssetManager.Load(e: e);
-
 			if (AssetManager.AssetsToEdit.All(s => !e.NameWithoutLocale.IsEquivalentTo(s)))
 				return;
 
 			e.Edit(apply: AssetManager.EditAsset, priority: AssetEditPriority.Late);
-		}
-
-		private static void Load(AssetRequestedEventArgs e)
-		{
-			if (e.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentStringsPath))
-			{
-				// Translated strings are loaded from i18n data file contents, handled on locale changed or set
-				e.LoadFrom(load: () => ModEntry.Strings, priority: AssetLoadPriority.Exclusive);
-			}
 		}
 
 		private static void EditAsset(IAssetData asset)
