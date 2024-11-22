@@ -21,7 +21,7 @@ namespace LoveOfCooking.HarmonyPatches
 
 			// UiInfoSuite2 (2.3.4)
 			// Crash on CookingTool upgrading with ShowToolUpgradeStatus enabled
-			if (ModEntry.Instance.Helper.ModRegistry.Get("Annosz.UiInfoSuite2") is IModInfo mod && mod.Manifest.Version.ToString() == "2.3.4")
+			if (ModEntry.Instance.Helper.ModRegistry.Get("Annosz.UiInfoSuite2") is IModInfo mod && mod.Manifest.Version.CompareTo(new SemanticVersion("2.3.5")) < 0)
 			{
 				MethodInfo method = AccessTools.Method(AccessTools.TypeByName("ShowToolUpgradeStatus"), "UpdateToolInfo");
 				Log.D($"Patching {mod.Manifest.UniqueID} ({mod.Manifest.Version}):{Environment.NewLine}{method.DeclaringType}.{method.Name}",
