@@ -340,7 +340,7 @@ namespace LoveOfCooking
 
 		private void Specialized_LoadStageChanged(object sender, LoadStageChangedEventArgs e)
 		{
-			if (e.NewStage is StardewModdingAPI.Enums.LoadStage.Loaded)
+			if (e.NewStage is StardewModdingAPI.Enums.LoadStage.Ready)
 			{
 				this.States.Value.Reset();
 				this.States.Value.Load(data: Game1.player.modData);
