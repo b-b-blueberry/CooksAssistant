@@ -49,10 +49,10 @@
 	"config.info.controllermap.shoulders": "LB/RB   Change region",
 	"config.info.controllermap.triggers": "LT/RT   Change recipe",
 
-	"config.info.cookingmenu.text.1": "Replaces the vanilla crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {{cookbookItem}} in the mail.\n\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {{cookingItem}}.\nCan be used in town kitchens if enabled in the Options page.",
+	"config.info.cookingmenu.text.1": "Replaces the vanilla crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {{cookbookItem}} in the mail.\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {{cookingItem}}.\nCan be used in town kitchens if enabled in the Options page.",
 	"config.info.cookingmenu.subheading.1": "Cookbook delivery",
 
-	"config.info.cookingskill.text.1": "Skill levels unlock new recipes, improve your cooking, and open new professions.\n\nMore experience is earned by cooking each day, less is earned by cooking in bulk.\nEarn extra experience by cooking new and difficult recipes.",
+	"config.info.cookingskill.text.1": "Skill levels teach you new recipes, improve your cooking, and unlock new professions.\n\nMore experience is earned by cooking each day, less is earned by cooking in bulk.\nEarn extra experience by cooking new and difficult recipes.",
 	"config.info.cookingskill.text.2": "Cooking skill professions are unlocked as with any other skill.\nProfession perks improve results when cooking and eating food.",
 	"config.info.cookingskill.subheading.1": "Skill progress",
 	"config.info.cookingskill.subheading.2": "{{current}} experience",
