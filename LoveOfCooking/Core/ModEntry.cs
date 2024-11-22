@@ -68,7 +68,6 @@ namespace LoveOfCooking
 
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
-		internal static bool IsInitialised = false;
 
 
 		public override void Entry(IModHelper helper)
@@ -325,13 +324,15 @@ namespace LoveOfCooking
 
 		private void GameLoop_GameLaunched(object sender, GameLaunchedEventArgs e)
 		{
-			this.Init();
-			this.Helper.Events.GameLoop.UpdateTicked += this.GameLoop_UpdateTicked_LoadLate;
+			if (this.Init())
+			{
+				this.Helper.Events.GameLoop.OneSecondUpdateTicked += this.GameLoop_OneSecondUpdateTicked_LoadLate;
+			}
 		}
 
-		private void GameLoop_UpdateTicked_LoadLate(object sender, UpdateTickedEventArgs e)
+		private void GameLoop_OneSecondUpdateTicked_LoadLate(object sender, OneSecondUpdateTickedEventArgs e)
 		{
-			this.Helper.Events.GameLoop.UpdateTicked -= this.GameLoop_UpdateTicked_LoadLate;
+			this.Helper.Events.GameLoop.OneSecondUpdateTicked -= this.GameLoop_OneSecondUpdateTicked_LoadLate;
 			this.InitLate();
 		}
 
@@ -566,7 +567,7 @@ namespace LoveOfCooking
 			}
 		}
 
-		private void Init()
+		private bool Init()
 		{
 			try
 			{
@@ -578,20 +579,18 @@ namespace LoveOfCooking
 
 				Interfaces.RegisterContentPatcherTokens();
 
-				ModEntry.IsInitialised = true;
+				return true;
 			}
 			catch (Exception ex)
 			{
 				Log.E(ex.ToString());
 				Log.E($"{this.ModManifest.Name} failed to initialise. Mod may not be usable.");
 			}
+			return false;
 		}
 
 		private void InitLate()
 		{
-			if (!ModEntry.IsInitialised)
-				return;
-
 			try
 			{
 				// Game state queries
