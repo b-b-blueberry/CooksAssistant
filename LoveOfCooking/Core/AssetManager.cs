@@ -70,12 +70,7 @@ namespace LoveOfCooking
 
 		private static void EditAsset(IAssetData asset)
 		{
-			if (asset.NameWithoutLocale.IsEquivalentTo(AssetManager.GameContentDefinitionsPath))
-			{
-				// Update cached mod definitions
-				ModEntry.Instance.States.Value.Regeneration.UpdateDefinitions();
-			}
-			else if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Characters"))
+			if (asset.NameWithoutLocale.IsEquivalentTo(@"Data/Characters"))
 			{
 				AssetManager.EditCharacters(asset: asset);
 			}
