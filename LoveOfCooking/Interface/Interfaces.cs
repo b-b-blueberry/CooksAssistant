@@ -137,7 +137,7 @@ namespace LoveOfCooking.Interface
 			ICustomCommunityCentreAPI ccc = Interfaces.Helper.ModRegistry
 				.GetApi<ICustomCommunityCentreAPI>
 				("blueberry.CustomCommunityCentre");
-			if (Interfaces.UsingCustomCC && ccc is not null)
+			if (Interfaces.UsingCustomCC && ccc is not null && false)
 			{
 				Log.D("Registering CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
