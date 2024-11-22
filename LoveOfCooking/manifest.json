@@ -1,11 +1,11 @@
 ﻿{
 	"Name": "Love of Cooking",
 	"Author": "blueberry",
-	"Version": "2.0.0-alpha.9",
+	"Version": "2.0.0",
 	"Description": "Cooking overhaul suite. Enter a world of food!",
 	"UniqueID": "blueberry.LoveOfCooking",
 	"EntryDll": "LoveOfCooking.dll",
-	"MinimumApiVersion": "4.0.0-alpha.0",
+	"MinimumApiVersion": "4.0.0",
 	"UpdateKeys": [ "Nexus:6830" ],
 	"Dependencies": [
 		{
