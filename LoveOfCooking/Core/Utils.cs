@@ -549,7 +549,7 @@ namespace LoveOfCooking
 			Utility.drawWithShadow(
 				b: b,
 				texture: ModEntry.SpriteSheet,
-				position: new(x: x + size + 4, y: y + size),
+				position: new Vector2(x: x + size - 2.5f, y: y + size - 2.5f),
 				sourceRect: CookingMenu.BuffIconSource,
 				color: Color.White,
 				rotation: 0f,
