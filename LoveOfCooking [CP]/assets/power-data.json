@@ -7,7 +7,7 @@
             "Entries": {
                 "{{ModId}}": {
                     "TabDisplayName": "{{i18n:mod.name}}",
-                    "IconPath": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+                    "IconPath": "{{ASSETS}}/Sprites",
                     "IconSourceRect": {
                         "X": 0,
                         "Y": 16,
@@ -25,7 +25,7 @@
                 "blueberry.LoveOfCooking_cookbook": {
                     "DisplayName": "{{i18n:menu.special_items.cookbook.name}}",
                     "Description": "{{i18n:menu.special_items.cookbook.description}}",
-                    "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+                    "TexturePath": "{{ASSETS}}/ObjectSprites",
                     "TexturePosition": {
                         "X": 0,
                         "Y": 80
@@ -44,7 +44,7 @@
                 "blueberry.LoveOfCooking_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.basic}}",
                     "Description": "{{i18n:menu.cooking_tool.description.basic}}",
-                    "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 0,
                         "Y": 0
@@ -66,7 +66,7 @@
                 "blueberry.LoveOfCooking_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.copper}}",
                     "Description": "{{i18n:menu.cooking_tool.description.copper}}",
-                    "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 16,
                         "Y": 0
@@ -88,7 +88,7 @@
                 "blueberry.LoveOfCooking_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.steel}}",
                     "Description": "{{i18n:menu.cooking_tool.description.steel}}",
-                    "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 32,
                         "Y": 0
@@ -110,7 +110,7 @@
                 "blueberry.LoveOfCooking_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.gold}}",
                     "Description": "{{i18n:menu.cooking_tool.description.gold}}",
-                    "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 48,
                         "Y": 0
@@ -132,7 +132,7 @@
                 "blueberry.LoveOfCooking_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.iridium}}",
                     "Description": "{{i18n:menu.cooking_tool.description.iridium}}",
-                    "TexturePath": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 64,
                         "Y": 0

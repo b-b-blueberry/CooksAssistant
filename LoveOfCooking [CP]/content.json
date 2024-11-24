@@ -4,34 +4,34 @@
 		// Definitions
 		{
 			"Action": "Load",
-			"Target": "Mods/blueberry.LoveOfCooking.Assets/Definitions",
+			"Target": "{{ASSETS}}/Definitions",
 			"FromFile": "assets/mod-data.json"
 		},
 		// Strings
 		{
 			"Action": "Load",
-			"Target": "Mods/blueberry.LoveOfCooking.Assets/Strings",
+			"Target": "{{ASSETS}}/Strings",
 			"FromFile": "i18n/default.json"
 		},
 		// Sprites
 		{
 			"Action": "Load",
-			"Target": "Mods/blueberry.LoveOfCooking.Assets/Sprites",
+			"Target": "{{ASSETS}}/Sprites",
 			"FromFile": "assets/mod-sprites.png"
 		},
 		{
 			"Action": "Load",
-			"Target": "Mods/blueberry.LoveOfCooking.Assets/CookbookSprites",
+			"Target": "{{ASSETS}}/CookbookSprites",
 			"FromFile": "assets/cookbook-sprites.png"
 		},
 		{
 			"Action": "Load",
-			"Target": "Mods/blueberry.LoveOfCooking.Assets/ObjectSprites",
+			"Target": "{{ASSETS}}/ObjectSprites",
 			"FromFile": "assets/object-sprites.png"
 		},
 		{
 			"Action": "Load",
-			"Target": "Mods/blueberry.LoveOfCooking.Assets/ToolSprites",
+			"Target": "{{ASSETS}}/ToolSprites",
 			"FromFile": "assets/tool-sprites.png"
 		},
 		// Data
@@ -70,6 +70,12 @@
 		{
 			"Action": "Include",
 			"FromFile": "assets/tool-data.json"
+		}
+	],
+	"DynamicTokens": [
+		{
+			"Name": "ASSETS",
+			"Value": "Mods\\blueberry.LoveOfCooking.Assets"
 		}
 	]
 }
