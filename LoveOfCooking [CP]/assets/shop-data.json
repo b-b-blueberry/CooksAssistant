@@ -1,0 +1,40 @@
+﻿{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "SeedShop", "Items" ],
+            "Entries": {
+                "{{ID}}_chocolate": {
+                    "Id": "{{ID}}_chocolate",
+                    "ItemId": "{{ID}}_chocolate",
+                    "Condition": "PLAYER_FARMHOUSE_UPGRADE Current 1, PLAYER_HAS_MAIL Current ccComplete"
+                }
+            },
+            "MoveEntries": [
+                {
+                    "Id": "{{ID}}_chocolate",
+                    "AfterId": "(O)245" // Sugar
+                }
+            ]
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Shops",
+            "TargetField": [ "Joja", "Items" ],
+            "Entries": {
+                "{{ID}}_chocolate": {
+                    "Id": "{{ID}}_chocolate",
+                    "ItemId": "{{ID}}_chocolate",
+                    "Condition": null
+                }
+            },
+            "MoveEntries": [
+                {
+                    "Id": "{{ID}}_chocolate",
+                    "AfterId": "(O)245" // Sugar
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,281 @@
+﻿{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/NPCGiftTastes",
+            "TextOperations": [
+                // Universal gift tastes
+                {
+                    "Operation": "Append",
+                    "Target": [ "Entries", "Universal_Neutral" ],
+                    "Value": "{{ID}}_chocolate {{ID}}_eggsando_half {{ID}}_saladsando_half {{ID}}_seafoodsando_half",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Entries", "Universal_Dislike" ],
+                    "Value": "{{ID}}_burntfood",
+                    "Delimiter": " "
+                },
+                // Individual gift tastes
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Willy", "1" ], // love
+                    "Value": "{{ID}}_admiralpie",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Lewis", "1" ], // love
+                    "Value": "{{ID}}_applepie",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Emily", "1" ], // love
+                    "Value": "{{ID}}_burger",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Krobus", "3" ], // like
+                    "Value": "{{ID}}_burntfood",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Dwarf", "9" ], // neutral
+                    "Value": "{{ID}}_burntfood",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Wizard", "9" ], // neutral
+                    "Value": "{{ID}}_burntfood",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Evelyn", "1" ], // love
+                    "Value": "{{ID}}_cherrypie {{ID}}_eggsando",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Pierre", "1" ], // love
+                    "Value": "{{ID}}_cherrypie {{ID}}_craymornay",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leah", "1" ], // love
+                    "Value": "{{ID}}_carrotcake",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Vincent", "1" ], // love
+                    "Value": "{{ID}}_carrotcake",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Abigail", "1" ], // love
+                    "Value": "{{ID}}_chocoflan",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Haley", "1" ], // love
+                    "Value": "{{ID}}_cocococktail",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Gus", "1" ], // love
+                    "Value": "{{ID}}_crepes",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sam", "1" ], // love
+                    "Value": "{{ID}}_curry",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Demetrius", "1" ], // love
+                    "Value": "{{ID}}_fruity",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Linus", "1" ], // love
+                    "Value": "{{ID}}_hunters",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Shane", "1" ], // love
+                    "Value": "{{ID}}_kebab",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Robin", "1" ], // love
+                    "Value": "{{ID}}_lasagna",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "George", "1" ], // love
+                    "Value": "{{ID}}_leeks",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leo", "1" ], // love
+                    "Value": "{{ID}}_lobster",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sebastian", "1" ], // love
+                    "Value": "{{ID}}_nigiri",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Caroline", "1" ], // love
+                    "Value": "{{ID}}_parfait",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Penny", "1" ], // love
+                    "Value": "{{ID}}_pilaf",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Jas", "1" ], // love
+                    "Value": "{{ID}}_profiteroles",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Alex", "1" ], // love
+                    "Value": "{{ID}}_quiche",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leah", "1" ], // love
+                    "Value": "{{ID}}_saladsando",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Willy", "1" ], // love
+                    "Value": "{{ID}}_seafoodsando",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sandy", "1" ], // love
+                    "Value": "{{ID}}_summersalad",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Harvey", "1" ], // love
+                    "Value": "{{ID}}_unagi",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Jas", "1" ], // love
+                    "Value": "{{ID}}_waffles",
+                    "Delimiter": " "
+                },
+                // Villager chocolate preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Haley", "3" ], // like
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Jas", "3" ], // like
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Sandy", "3" ], // like
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Vincent", "3" ], // like
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "George", "5" ], // dislike
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Leah", "5" ], // dislike
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "5" ], // dislike
+                    "Value": "{{ID}}_chocolate",
+                    "Delimiter": " "
+                },
+                // Demetrius sandwich preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "1" ], // love
+                    "Value": "{{ID}}_eggsando {{ID}}_saladsando {{ID}}_seafoodsando",
+                    "Delimiter": " "
+                },
+                // Krobus sandwich preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "7" ], // hate
+                    "Value": "{{ID}}_eggsando {{ID}}_saladsando {{ID}}_seafoodsando {{ID}}_chocolate {{ID}}_eggsando_half {{ID}}_saladsando_half {{ID}}_seafoodsando_half",
+                    "Delimiter": " "
+                },
+                // Kent burger preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Kent", "1" ], // love
+                    "Value": "{{ID}}_admiralpie {{ID}}_applepie {{ID}}_cherrypie",
+                    "Delimiter": " "
+                },
+                // Penny alcohol preferences
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Penny", "7" ], // hate
+                    "Value": "{{ID}}_cocococktail {{ID}}_fruity",
+                    "Delimiter": " "
+                },
+                {
+                    "Operation": "Append",
+                    "Target": [ "Fields", "Penny", "9" ], // neutral
+                    "Value": "{{ID}}_crepes",
+                    "Delimiter": " "
+                }
+            ]
+        }
+    ]
+}

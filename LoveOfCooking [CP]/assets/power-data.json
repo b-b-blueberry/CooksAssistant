@@ -1,0 +1,151 @@
+{
+    "Changes": [
+        // Mod compatibility
+        {
+            "Action": "EditData",
+            "Target": "Spiderbuttons.SpecialPowerUtilities/PowerTabs",
+            "Entries": {
+                "{{ID}}": {
+                    "TabDisplayName": "[LocalizedText {{STRINGS}}:mod.name]",
+                    "IconPath": "{{ASSETS}}/Sprites",
+                    "IconSourceRect": {
+                        "X": 0,
+                        "Y": 16,
+                        "Width": 16,
+                        "Height": 16
+                    }
+                }
+            }
+        },
+        // Vanilla
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "{{ID}}_cookbook": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.special_items.cookbook.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.special_items.cookbook.description]",
+                    "TexturePath": "{{ASSETS}}/ObjectSprites",
+                    "TexturePosition": {
+                        "X": 0,
+                        "Y": 80
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
+                    }
+                }
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "{{ID}}_cookingtool": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.basic]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.basic]",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
+                    "TexturePosition": {
+                        "X": 0,
+                        "Y": 0
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
+                    }
+                }
+            },
+            "When": {
+                "blueberry.LoveOfCooking/CookingToolLevel": "0"
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "{{ID}}_cookingtool": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.copper]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.copper]",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
+                    "TexturePosition": {
+                        "X": 16,
+                        "Y": 0
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
+                    }
+                }
+            },
+            "When": {
+                "blueberry.LoveOfCooking/CookingToolLevel": "1"
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "{{ID}}_cookingtool": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.steel]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.steel]",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
+                    "TexturePosition": {
+                        "X": 32,
+                        "Y": 0
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
+                    }
+                }
+            },
+            "When": {
+                "blueberry.LoveOfCooking/CookingToolLevel": "2"
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "{{ID}}_cookingtool": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.gold]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.gold]",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
+                    "TexturePosition": {
+                        "X": 48,
+                        "Y": 0
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
+                    }
+                }
+            },
+            "When": {
+                "blueberry.LoveOfCooking/CookingToolLevel": "3"
+            }
+        },
+        {
+            "Action": "EditData",
+            "Target": "Data/Powers",
+            "Entries": {
+                "{{ID}}_cookingtool": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.iridium]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.iridium]",
+                    "TexturePath": "{{ASSETS}}/ToolSprites",
+                    "TexturePosition": {
+                        "X": 64,
+                        "Y": 0
+                    },
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
+                    "CustomFields": {
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
+                    }
+                }
+            },
+            "When": {
+                "blueberry.LoveOfCooking/CookingToolLevel": "4"
+            }
+        }
+    ]
+}

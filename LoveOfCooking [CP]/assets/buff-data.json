@@ -1,0 +1,95 @@
+{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/Buffs",
+            "Entries": {
+                "{{ID}}_curry": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.curry.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.curry.description]",
+                    "IsDebuff": false,
+                    "GlowColor": "Orange",
+                    "Duration": 100000,
+                    "MaxDuration": -1,
+                    "IconTexture": "{{ASSETS}}/Sprites",
+                    "IconSpriteIndex": 257,
+                    "Effects": {
+                        "Speed": 1,
+                        "Defense": -3,
+                        "Attack": 2
+                    },
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "{{ID}}_kebab": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.kebab.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.kebab.description]",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 80000,
+                    "MaxDuration": -1,
+                    "IconTexture": "{{ASSETS}}/Sprites",
+                    "IconSpriteIndex": 258, // Upgrade: 259 // Set in definitions data
+                    "Effects": {
+                        "Attack": 2,
+                        "Defense": 2
+                    },
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "{{ID}}_lasagna": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.lasagna.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.lasagna.description]",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 120000,
+                    "MaxDuration": -1,
+                    "IconTexture": "{{ASSETS}}/Sprites",
+                    "IconSpriteIndex": 260,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "{{ID}}_paella": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.paella.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.paella.description]",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 180000,
+                    "MaxDuration": -1,
+                    "IconTexture": "{{ASSETS}}/Sprites",
+                    "IconSpriteIndex": 261,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "{{ID}}_profiteroles": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.profiteroles.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.profiteroles.description]",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 50000,
+                    "MaxDuration": -1,
+                    "IconTexture": "{{ASSETS}}/Sprites",
+                    "IconSpriteIndex": 262,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                },
+                "{{ID}}_leeks": {
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.leeks.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.leeks.description]",
+                    "IsDebuff": false,
+                    "GlowColor": null,
+                    "Duration": 80000,
+                    "MaxDuration": -1,
+                    "IconTexture": "{{ASSETS}}/Sprites",
+                    "IconSpriteIndex": 263,
+                    "Effects": null,
+                    "ActionsOnApply": null,
+                    "CustomFields": null
+                }
+            }
+        }
+    ]
+}

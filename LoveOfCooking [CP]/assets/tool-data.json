@@ -1,0 +1,137 @@
+{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/Tools",
+            "Entries": {
+                "{{ID}}_cookingtool.level0": {
+                    "ClassName": "GenericTool",
+                    "Name": "{{ID}}_cookingtool.level0",
+                    "AttachmentSlots": -1,
+                    "SalePrice": -1,
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.basic]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.basic]",
+                    "Texture": "{{ASSETS}}/ToolSprites",
+                    "SpriteIndex": 0,
+                    "MenuSpriteIndex": -1,
+                    "UpgradeLevel": 0,
+                    "ApplyUpgradeLevelToDisplayName": false,
+                    "ConventionalUpgradeFrom": null,
+                    "UpgradeFrom": null,
+                    "CanBeLostOnDeath": false,
+                    "SetProperties": null,
+                    "ModData": null,
+                    "CustomFields": {}
+                },
+                "{{ID}}_cookingtool.level1": {
+                    "ClassName": "GenericTool",
+                    "Name": "{{ID}}_cookingtool.level1",
+                    "AttachmentSlots": -1,
+                    "SalePrice": 1000,
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.copper]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.copper]",
+                    "Texture": "{{ASSETS}}/ToolSprites",
+                    "SpriteIndex": 1,
+                    "MenuSpriteIndex": -1,
+                    "UpgradeLevel": 1,
+                    "ApplyUpgradeLevelToDisplayName": true,
+                    "ConventionalUpgradeFrom": null,
+                    "UpgradeFrom": [
+                        {
+                            "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 0 0",
+                            "Price": -1,
+                            "RequireToolId": null,
+                            "TradeItemId": "(O)334",
+                            "TradeItemAmount": 3
+                        }
+                    ],
+                    "CanBeLostOnDeath": false,
+                    "SetProperties": null,
+                    "ModData": null,
+                    "CustomFields": {}
+                },
+                "{{ID}}_cookingtool.level2": {
+                    "ClassName": "GenericTool",
+                    "Name": "{{ID}}_cookingtool.level2",
+                    "AttachmentSlots": -1,
+                    "SalePrice": 2500,
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.steel]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.steel]",
+                    "Texture": "{{ASSETS}}/ToolSprites",
+                    "SpriteIndex": 2,
+                    "MenuSpriteIndex": -1,
+                    "UpgradeLevel": 2,
+                    "ApplyUpgradeLevelToDisplayName": true,
+                    "ConventionalUpgradeFrom": null,
+                    "UpgradeFrom": [
+                        {
+                            "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 1 1",
+                            "Price": -1,
+                            "RequireToolId": null,
+                            "TradeItemId": "(O)335",
+                            "TradeItemAmount": 3
+                        }
+                    ],
+                    "CanBeLostOnDeath": false,
+                    "SetProperties": null,
+                    "ModData": null,
+                    "CustomFields": {}
+                },
+                "{{ID}}_cookingtool.level3": {
+                    "ClassName": "GenericTool",
+                    "Name": "{{ID}}_cookingtool.level3",
+                    "AttachmentSlots": -1,
+                    "SalePrice": 5000,
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.gold]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.gold]",
+                    "Texture": "{{ASSETS}}/ToolSprites",
+                    "SpriteIndex": 3,
+                    "MenuSpriteIndex": -1,
+                    "UpgradeLevel": 3,
+                    "ApplyUpgradeLevelToDisplayName": true,
+                    "ConventionalUpgradeFrom": null,
+                    "UpgradeFrom": [
+                        {
+                            "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 2 2",
+                            "Price": -1,
+                            "RequireToolId": null,
+                            "TradeItemId": "(O)336",
+                            "TradeItemAmount": 3
+                        }
+                    ],
+                    "CanBeLostOnDeath": false,
+                    "SetProperties": null,
+                    "ModData": null,
+                    "CustomFields": {}
+                },
+                "{{ID}}_cookingtool.level4": {
+                    "ClassName": "GenericTool",
+                    "Name": "{{ID}}_cookingtool.level4",
+                    "AttachmentSlots": -1,
+                    "SalePrice": 12500,
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.iridium]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.iridium]",
+                    "Texture": "{{ASSETS}}/ToolSprites",
+                    "SpriteIndex": 4,
+                    "MenuSpriteIndex": -1,
+                    "UpgradeLevel": 4,
+                    "ApplyUpgradeLevelToDisplayName": true,
+                    "ConventionalUpgradeFrom": null,
+                    "UpgradeFrom": [
+                        {
+                            "Condition": "BLUEBERRY_LOC_CAN_UPGRADE_COOKING_TOOL, BLUEBERRY_LOC_COOKING_TOOL_LEVEL 3 3",
+                            "Price": -1,
+                            "RequireToolId": null,
+                            "TradeItemId": "(O)337",
+                            "TradeItemAmount": 3
+                        }
+                    ],
+                    "CanBeLostOnDeath": false,
+                    "SetProperties": null,
+                    "ModData": null,
+                    "CustomFields": {}
+                }
+            }
+        }
+    ]
+}

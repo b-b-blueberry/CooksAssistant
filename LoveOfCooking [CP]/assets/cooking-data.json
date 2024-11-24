@@ -1,0 +1,48 @@
+﻿{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/CookingRecipes",
+            "Entries": {
+                "{{ID}}_admiralpie": "246 1 -6 1 -4 2/1 10/{{ID}}_admiralpie/l 100",
+                "{{ID}}_applepie": "246 1 245 1 613 2/1 10/{{ID}}_applepie/l 100",
+                "{{ID}}_arancini": "399 1 423 1/1 10/{{ID}}_arancini/l 100",
+                "{{ID}}_bakedpotato": "192 1 424 1/1 10/{{ID}}_bakedpotato/l 100",
+                "{{ID}}_breakfast": "195 1 395 1/1 10/{{ID}}_breakfast/l 100",
+                "{{ID}}_burger": "216 1 284 1 266 1/1 10/{{ID}}_burger/l 100",
+                "{{ID}}_burrito": "229 1 423 1 260 1/1 10/{{ID}}_burrito/l 100",
+                "{{ID}}_carrotcake": "Carrot 2 246 2 -5 1/1 10/{{ID}}_carrotcake/l 100",
+                "{{ID}}_cherrypie": "638 2 246 2 245 1/1 10/{{ID}}_cherrypie/l 100",
+                "{{ID}}_chocoflan": "{{ID}}_chocolate 2 408 2/1 10/{{ID}}_chocoflan/l 100",
+                "{{ID}}_cocococktail": "88 1 245 1/1 10/{{ID}}_cocococktail/l 100",
+                "{{ID}}_craymornay": "716 2 274 1/1 10/{{ID}}_craymornay/l 100",
+                "{{ID}}_crepes": "246 1 635 1 724 1/1 10/{{ID}}_crepes/l 100",
+                "{{ID}}_curry": "90 3 260 1 423 1/1 10/{{ID}}_curry/l 100",
+                "{{ID}}_eggsando": "216 1 194 1 306 1/1 10/{{ID}}_eggsando/l 100",
+                "{{ID}}_fruity": "-6 1 638 1 400 1/1 10/{{ID}}_fruity/l 100",
+                "{{ID}}_hotcocoa": "-6 1 {{ID}}_chocolate 1/1 10/{{ID}}_hotcocoa/l 100",
+                "{{ID}}_hunters": "192 1 248 1 16 1/1 10/{{ID}}_hunters/l 100",
+                "{{ID}}_kebab": "229 1 256 1 250 1/1 10/{{ID}}_kebab/l 100",
+                "{{ID}}_lasagna": "426 1 259 2/1 10/{{ID}}_lasagna/l 100",
+                "{{ID}}_leeks": "20 3 256 1/1 10/{{ID}}_leeks/l 100",
+                "{{ID}}_lobster": "715 1 248 1/1 10/{{ID}}_lobster/l 100",
+                "{{ID}}_nigiri": "812 1 152 1 423 1/1 10/{{ID}}_nigiri/l 100",
+                "{{ID}}_oceanplatter": "198 1 {{ID}}_lobster 1 423 1 723 2/1 10/{{ID}}_oceanplatter/l 100",
+                "{{ID}}_paella": "399 1 423 1 720 1 256 1 719 1/1 10/{{ID}}_paella/l 100",
+                "{{ID}}_parfait": "-6 1 406 1 410 1/1 10/{{ID}}_parfait/l 100",
+                "{{ID}}_pilaf": "281 1 423 1 376 1/1 10/{{ID}}_pilaf/l 100",
+                "{{ID}}_profiteroles": "{{ID}}_chocolate 1 246 1 245 1/1 10/{{ID}}_profiteroles/l 100",
+                "{{ID}}_quiche": "-5 2 424 1 272 1/1 10/{{ID}}_quiche/l 100",
+                "{{ID}}_roast": "238 1 244 1 239 1 Broccoli 1/1 10/{{ID}}_roast/l 100",
+                "{{ID}}_saladsando": "216 1 196 1 256 1/1 10/{{ID}}_saladsando/l 100",
+                "{{ID}}_seafoodsando": "216 1 717 1 300 1/1 10/{{ID}}_seafoodsando/l 100",
+                "{{ID}}_summersalad": "398 1 264 1 254 1/1 10/{{ID}}_summersalad/l 100",
+                "{{ID}}_unagi": "148 1 423 1 152 1/1 10/{{ID}}_unagi/l 100",
+                "{{ID}}_waffles": "262 3 258 1 400 1/1 10/{{ID}}_waffles/l 100"
+            },
+            "When": {
+                "blueberry.LoveOfCooking/AddCookingSkillAndRecipes": true
+            }
+        }
+    ]
+}

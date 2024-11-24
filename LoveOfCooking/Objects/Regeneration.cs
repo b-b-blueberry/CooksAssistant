@@ -1,12 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using LoveOfCooking.Menu;
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using SpaceCore;
 using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewValley;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace LoveOfCooking
 {
@@ -17,13 +18,14 @@ namespace LoveOfCooking
 			public float HP;
 			public float EP;
 
-			public float Total => this.HP + this.EP;
+			public readonly float Total => this.HP + this.EP;
 
 			public Regen(float hp, float ep)
 			{
 				this.HP = hp;
 				this.EP = ep;
 			}
+
 
 			public static implicit operator Regen(int operand)
 			{
@@ -105,6 +107,31 @@ namespace LoveOfCooking
 
 		/// <summary> Queue of the most recent 5 tick counts for regenerating player status bars. </summary>
 		protected readonly Queue<Regen> TickerHistory = new();
+
+		/// <summary>
+		/// Reset all variables to default values.
+		/// </summary>
+		public void Reset()
+		{
+			// Active variables
+			this.IsHealthBarVisible = false;
+			this.LastFoodEaten = new();
+			this.PlayerValue = new();
+			this.RemainingValue = new();
+			this.InitialValue = new();
+			this.TicksCurrent = new();
+			this.TicksRequired = new();
+
+			// Config variables
+			this.BaseRate = 0;
+			this.FinalRate = 0;
+			this.HealthRate = 0;
+			this.EnergyRate = 0;
+			this.SkillModifierRate = 0;
+
+			// Debug variables
+			this.TickerHistory.Clear();
+		}
 		
 		/// <summary>
 		/// Register listeners/handlers for game and SMAPI event hooks.
@@ -131,31 +158,30 @@ namespace LoveOfCooking
 		{
 			// Calculate food regeneration rate from skill levels
 			const int maxLevel = 10;
-			float[] scalingCurrent = new float[ModEntry.ItemDefinitions["RegenSkillModifiers"].Count];
-			float[] scalingMax = new float[scalingCurrent.Length];
-			for (int i = 0; i < ModEntry.ItemDefinitions["RegenSkillModifiers"].Count; ++i)
+			float scalingCurrent = 0;
+			float scalingMax = 0;
+			foreach (var pair in ModEntry.Definitions.RegenSkillModifiers)
 			{
-				string[] split = ModEntry.ItemDefinitions["RegenSkillModifiers"][i].Split(':');
-				string name = split[0];
+				string name = pair.Key;
 				bool isDefined = Enum.TryParse(name, out ModEntry.SkillIndex skillIndex);
 				int level = isDefined
 					? Game1.player.GetSkillLevel((int)Enum.Parse(typeof(ModEntry.SkillIndex), name))
 					: SpaceCore.Skills.GetSkill(name) is not null
 						? Game1.player.GetCustomSkillLevel(name)
 						: -1;
-				float value = float.Parse(split[1]);
+				float value = pair.Value;
 				if (level < 0)
 					continue;
-				scalingCurrent[i] = level * value;
-				scalingMax[i] = maxLevel * value;
+				scalingCurrent += level * value;
+				scalingMax += maxLevel * value;
 			}
 
 			// Set values
-			this.SkillModifierRate = scalingCurrent.Sum() / scalingMax.Sum();
-			this.BaseRate = int.Parse(ModEntry.ItemDefinitions["RegenBaseRate"][0]);
-			this.HealthRate = float.Parse(ModEntry.ItemDefinitions["RegenHealthRate"][0]);
-			this.EnergyRate = float.Parse(ModEntry.ItemDefinitions["RegenEnergyRate"][0]);
-			this.FinalRate = float.Parse(ModEntry.ItemDefinitions["RegenFinalRate"][0]);
+			this.SkillModifierRate = scalingCurrent / scalingMax;
+			this.BaseRate = ModEntry.Definitions.RegenBaseRate;
+			this.HealthRate = ModEntry.Definitions.RegenHealthRate;
+			this.EnergyRate = ModEntry.Definitions.RegenEnergyRate;
+			this.FinalRate = ModEntry.Definitions.RegenFinalRate;
 		}
 
 		/// <summary>
@@ -294,12 +320,12 @@ namespace LoveOfCooking
 		[EventPriority(EventPriority.Low)]
 		protected void Draw(object sender, RenderingHudEventArgs e)
 		{
-			if (!Context.IsWorldReady || Game1.farmEvent is not null || this.RemainingValue.Total <= 0)
+			if (!Game1.IsHudDrawn || this.RemainingValue.Total <= 0)
 			{
 				return;
 			}
 
-			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.GetTitleSafeArea();
+			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
 
 			const int heightFromBottom = 4 * Game1.pixelZoom;
 			const int otherBarWidth = 12 * Game1.pixelZoom;
@@ -334,20 +360,20 @@ namespace LoveOfCooking
 					width: sourceArea.Width * Game1.pixelZoom,
 					height: sourceArea.Height * Game1.pixelZoom);
 
-				Point[] sourceOffsets = new Point[]
-				{
+				Point[] sourceOffsets =
+				[
 					Point.Zero,
 					new Point(originalArea.Width - sourceArea.Width, 0),
 					new Point(0, originalArea.Height - sourceArea.Height),
 					new Point(originalArea.Width - sourceArea.Width, originalArea.Height - sourceArea.Height)
-				};
-				Point[] destOffsets = new Point[]
-				{
+				];
+				Point[] destOffsets =
+				[
 					Point.Zero,
 					new Point(destArea.Width, 0),
 					new Point(0, destArea.Height),
 					new Point(destArea.Width, destArea.Height)
-				};
+				];
 				for (int i = 0; i < 4; ++i)
 				{
 					Rectangle newSourceArea = sourceArea;
@@ -370,7 +396,7 @@ namespace LoveOfCooking
 				// cooking skill icon
 				e.SpriteBatch.Draw(
 					texture: ModEntry.SpriteSheet,
-					sourceRectangle: AssetManager.CookingSkillIconArea,
+					sourceRectangle: CookingMenu.CookingSkillIconArea,
 					position: new Vector2(
 						x: destArea.X - (barIconOffset.X * Game1.pixelZoom),
 						y: destArea.Y - (barIconOffset.Y * Game1.pixelZoom)),
@@ -389,7 +415,7 @@ namespace LoveOfCooking
 					y: 3 * Game1.pixelZoom);
 				float fillColourHeightRatio = (float)this.RemainingValue.Total / this.InitialValue.Total;
 				int xOffset = borderWidth.X;
-				int yOffset = barIconOffset.Y + (AssetManager.CookingSkillIconArea.Height * Game1.pixelZoom);
+				int yOffset = barIconOffset.Y + (CookingMenu.CookingSkillIconArea.Height * Game1.pixelZoom);
 				width -= (xOffset + borderWidth.X);
 				height -= (yOffset + borderWidth.Y);
 
@@ -401,17 +427,6 @@ namespace LoveOfCooking
 				{
 					fillColourOrigin.X = Math.Min(fillColourOrigin.X, -Game1.viewport.X + (Game1.currentLocation.Map.Layers[0].LayerWidth * Game1.tileSize));
 				}
-				e.SpriteBatch.Draw(
-					texture: ModEntry.SpriteSheet,
-					position: fillColourOrigin,
-					sourceRectangle: AssetManager.RegenBarArea,
-					color: Color.White,
-					rotation: 0f,
-					origin: Vector2.Zero,
-					scale: Game1.pixelZoom,
-					effects: SpriteEffects.None,
-					layerDepth: 1f);
-
 				// Draw fill colour
 				Color colour = Utility.getRedToGreenLerpColor(0.5f);
 				Rectangle destArea = new Rectangle(
@@ -472,12 +487,12 @@ namespace LoveOfCooking
 					y: 224 + (int)((Game1.player.MaxStamina - 270) * 0.625f));
 
 				// Labels
-				debugLines = new[] {
+				debugLines = [
 					new string('\n', this.TickerHistory.Count),
 					"TICKS",
 					"RATE",
 					"REGEN"
-				};
+				];
 				linePosition = blockPosition = new Vector2(
 					x: viewport.Right - margin.X,
 					y: viewport.Bottom - margin.Y);
@@ -498,10 +513,10 @@ namespace LoveOfCooking
 				// Values
 				debugLines = this.TickerHistory
 					.Select(regen => regen)
-					.Concat(new[]{
+					.Concat([
 						this.TicksCurrent,
 						this.TicksRequired,
-						this.RemainingValue})
+						this.RemainingValue])
 					.Select(regen => regen.ToString())
 					.ToArray();
 				blockPosition.X -= 220;

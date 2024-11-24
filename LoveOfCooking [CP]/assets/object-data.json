@@ -1,0 +1,1031 @@
+﻿{
+    "Changes": [
+        {
+            "Action": "EditData",
+            "Target": "Data/Objects",
+            "Entries": {
+                "{{ID}}_admiralpie": {
+                    "Name": "{{ID}}_admiralpie",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.admiralpie.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.admiralpie.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 395,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 0,
+                    "Edibility": 81,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 500,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 0,
+                                "FishingLevel": 2,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 0,
+                                "MaxStamina": 30,
+                                "MagneticRadius": 0,
+                                "Speed": 0,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_sand",
+                        "food_bakery"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_applepie": {
+                    "Name": "{{ID}}_applepie",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.applepie.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.applepie.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 380,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 1,
+                    "Edibility": 88,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 500,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 0,
+                                "FishingLevel": 0,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 2,
+                                "MaxStamina": 20,
+                                "MagneticRadius": 0,
+                                "Speed": 0,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_sand",
+                        "food_bakery",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_arancini": {
+                    "Name": "{{ID}}_arancini",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.arancini.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.arancini.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 90,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 2,
+                    "Edibility": 18,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_orange"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_bakedpotato": {
+                    "Name": "{{ID}}_bakedpotato",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.bakedpotato.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.bakedpotato.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 40,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 3,
+                    "Edibility": 55,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_sand"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_breakfast": {
+                    "Name": "{{ID}}_breakfast",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.breakfast.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.breakfast.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 185,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 4,
+                    "Edibility": 48,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 100,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 1,
+                                "FishingLevel": 0,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 0,
+                                "MaxStamina": 0,
+                                "MagneticRadius": 0,
+                                "Speed": 1,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_yellow",
+                        "drink_item",
+                        "food_breakfast"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_burger": {
+                    "Name": "{{ID}}_burger",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.burger.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.burger.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 180,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 5,
+                    "Edibility": 63,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_pink",
+                        "food_sandwich"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_burntfood": {
+                    "Name": "{{ID}}_burntfood",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.burntfood.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.burntfood.description]",
+                    "Type": "Junk",
+                    "Category": -999,
+                    "Price": 80,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 6,
+                    "Edibility": 18,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_black",
+                        "trash_item"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_burrito": {
+                    "Name": "{{ID}}_burrito",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.burrito.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.burrito.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 185,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 7,
+                    "Edibility": 63,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_brown",
+                        "food_sandwich"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_carrotcake": {
+                    "Name": "{{ID}}_carrotcake",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.carrotcake.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.carrotcake.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 125,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 8,
+                    "Edibility": 44,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 144,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 0,
+                                "FishingLevel": 0,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 0,
+                                "MaxStamina": 0,
+                                "MagneticRadius": 0,
+                                "Speed": 1,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_orange",
+                        "food_bakery",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_cherrypie": {
+                    "Name": "{{ID}}_cherrypie",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.cherrypie.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.cherrypie.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 180,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 9,
+                    "Edibility": 58,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 500,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 0,
+                                "FishingLevel": 0,
+                                "MiningLevel": 2,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 0,
+                                "MaxStamina": 10,
+                                "MagneticRadius": 0,
+                                "Speed": 0,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_red",
+                        "food_bakery"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_chocoflan": {
+                    "Name": "{{ID}}_chocoflan",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.chocoflan.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.chocoflan.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 90,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 10,
+                    "Edibility": 46,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_brown",
+                        "food_bakery"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_chocolate": {
+                    "Name": "{{ID}}_chocolate",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.chocolate.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.chocolate.description]",
+                    "Type": "Basic",
+                    "Category": 0,
+                    "Price": 280,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 11,
+                    "Edibility": 10,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_dark_brown",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_cocococktail": {
+                    "Name": "{{ID}}_cocococktail",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.cocococktail.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.cocococktail.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 80,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 12,
+                    "Edibility": 34,
+                    "IsDrink": true,
+                    "Buffs": [
+                        {
+                            "Id": "Tipsy",
+                            "BuffId": "17"
+                        }
+                    ],
+                    "ContextTags": [
+                        "alcohol_item",
+                        "color_white",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_craymornay": {
+                    "Name": "{{ID}}_craymornay",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.craymornay.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.craymornay.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 180,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 13,
+                    "Edibility": 52,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_dark_gray",
+                        "food_seafood"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_crepes": {
+                    "Name": "{{ID}}_crepes",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.crepes.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.crepes.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 95,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 14,
+                    "Edibility": 58,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Tipsy",
+                            "BuffId": "17"
+                        }
+                    ],
+                    "ContextTags": [
+                        "alcohol_item",
+                        "color_orange",
+                        "food_bakery",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_curry": {
+                    "Name": "{{ID}}_curry",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.curry.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.curry.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 220,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 15,
+                    "Edibility": 35,
+                    "IsDrink": true,
+                    "Buffs": [
+                        {
+                            "Id": "Drink",
+                            "BuffId": "{{ID}}_curry"
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_red",
+                        "dye_strong",
+                        "food_soup",
+                        "food_spicy"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_eggsando": {
+                    "Name": "{{ID}}_eggsando",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.eggsando.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.eggsando.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 190,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 16,
+                    "Edibility": 66,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_white",
+                        "food_sandwich"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_eggsando_half": {
+                    "Name": "{{ID}}_eggsando_half",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.eggsando_half.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.eggsando_half.description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 40,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 17,
+                    "Edibility": 33,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_white"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_fruity": {
+                    "Name": "{{ID}}_fruity",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.fruity.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.fruity.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 180,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 18,
+                    "Edibility": 48,
+                    "IsDrink": true,
+                    "Buffs": [
+                        {
+                            "Id": "Tipsy",
+                            "BuffId": "17"
+                        }
+                    ],
+                    "ContextTags": [
+                        "alcohol_item",
+                        "color_red",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_hotcocoa": {
+                    "Name": "{{ID}}_hotcocoa",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.hotcocoa.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.hotcocoa.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 200,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 19,
+                    "Edibility": 65,
+                    "IsDrink": true,
+                    "Buffs": [
+                        {
+                            "Id": "Drink",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 90,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 0,
+                                "FishingLevel": 0,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 0,
+                                "MaxStamina": 0,
+                                "MagneticRadius": 0,
+                                "Speed": 0,
+                                "Defense": 2,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_dark_brown",
+                        "dye_strong",
+                        "drink_item",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_hunters": {
+                    "Name": "{{ID}}_hunters",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.hunters.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.hunters.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 170,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 20,
+                    "Edibility": 65,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 210,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 1,
+                                "FishingLevel": 0,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 1,
+                                "MaxStamina": 0,
+                                "MagneticRadius": 0,
+                                "Speed": 0,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_brown",
+                        "food_soup"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_kebab": {
+                    "Name": "{{ID}}_kebab",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.kebab.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.kebab.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 97,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 21,
+                    "Edibility": 48,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": "{{ID}}_kebab"
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_red",
+                        "food_sandwich",
+                        "food_spicy"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_lasagna": {
+                    "Name": "{{ID}}_lasagna",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.lasagna.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.lasagna.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 380,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 22,
+                    "Edibility": 62,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": "{{ID}}_lasagna"
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_sand",
+                        "food_bakery"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_leeks": {
+                    "Name": "{{ID}}_leeks",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.leeks.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.leeks.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 90,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 23,
+                    "Edibility": 25,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": "{{ID}}_leeks"
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_sand"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_lobster": {
+                    "Name": "{{ID}}_lobster",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.lobster.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.lobster.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 150,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 24,
+                    "Edibility": 28,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_red",
+                        "food_seafood"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_nigiri": {
+                    "Name": "{{ID}}_nigiri",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.nigiri.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.nigiri.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 60,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 25,
+                    "Edibility": 38,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_gold",
+                        "food_sushi"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_oceanplatter": {
+                    "Name": "{{ID}}_oceanplatter",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.oceanplatter.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.oceanplatter.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 420,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 26,
+                    "Edibility": 84,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_cyan",
+                        "dye_medium",
+                        "food_seafood"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_paella": {
+                    "Name": "{{ID}}_paella",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.paella.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.paella.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 340,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 27,
+                    "Edibility": 74,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": "{{ID}}_paella"
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_gold",
+                        "dye_medium",
+                        "food_seafood"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_parfait": {
+                    "Name": "{{ID}}_parfait",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.parfait.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.parfait.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 280,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 28,
+                    "Edibility": 22,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_purple",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_pilaf": {
+                    "Name": "{{ID}}_pilaf",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.pilaf.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.pilaf.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 140,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 29,
+                    "Edibility": 28,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 160,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 2,
+                                "FishingLevel": 0,
+                                "MiningLevel": 0,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 2,
+                                "MaxStamina": 0,
+                                "MagneticRadius": 32,
+                                "Speed": 0,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_sand"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_profiteroles": {
+                    "Name": "{{ID}}_profiteroles",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.profiteroles.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.profiteroles.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 60,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 30,
+                    "Edibility": 26,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": "{{ID}}_profiteroles"
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_brown",
+                        "food_sweet",
+                        "food_bakery"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_quiche": {
+                    "Name": "{{ID}}_quiche",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.quiche.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.quiche.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 250,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 31,
+                    "Edibility": 55,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_gold",
+                        "food_bakery"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_roast": {
+                    "Name": "{{ID}}_roast",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.roast.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.roast.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 440,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 32,
+                    "Edibility": 89,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_brown",
+                        "dye_medium",
+                        "food_soup"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_saladsando": {
+                    "Name": "{{ID}}_saladsando",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.saladsando.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.saladsando.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 195,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 33,
+                    "Edibility": 33,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_green",
+                        "food_salad",
+                        "food_sandwich"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_saladsando_half": {
+                    "Name": "{{ID}}_saladsando_half",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.saladsando_half.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.saladsando_half.description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 75,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 34,
+                    "Edibility": 66,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_green"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_seafoodsando": {
+                    "Name": "{{ID}}_seafoodsando",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.seafoodsando.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.seafoodsando.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 200,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 35,
+                    "Edibility": 47,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_cyan",
+                        "food_sandwich",
+                        "food_seafood"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_seafoodsando_half": {
+                    "Name": "{{ID}}_seafoodsando_half",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.seafoodsando_half.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.seafoodsando_half.description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 80,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 36,
+                    "Edibility": 47,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_cyan"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_summersalad": {
+                    "Name": "{{ID}}_summersalad",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.summersalad.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.summersalad.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 425,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 37,
+                    "Edibility": 98,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_purple",
+                        "food_salad"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_unagi": {
+                    "Name": "{{ID}}_unagi",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.unagi.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.unagi.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 240,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 38,
+                    "Edibility": 40,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [
+                        "color_green",
+                        "food_sushi"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_waffles": {
+                    "Name": "{{ID}}_waffles",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.waffles.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.waffles.description]",
+                    "Type": "Cooking",
+                    "Category": -7,
+                    "Price": 380,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 39,
+                    "Edibility": 45,
+                    "IsDrink": false,
+                    "Buffs": [
+                        {
+                            "Id": "Food",
+                            "BuffId": null,
+                            "IconTexture": null,
+                            "IconSpriteIndex": 0,
+                            "Duration": 142,
+                            "IsDebuff": false,
+                            "CustomAttributes": {
+                                "FarmingLevel": 0,
+                                "FishingLevel": 0,
+                                "MiningLevel": 1,
+                                "LuckLevel": 0,
+                                "ForagingLevel": 1,
+                                "MaxStamina": 20,
+                                "MagneticRadius": 0,
+                                "Speed": 0,
+                                "Defense": 0,
+                                "Attack": 0
+                            },
+                            "CustomFields": {}
+                        }
+                    ],
+                    "ContextTags": [
+                        "color_purple",
+                        "dye_medium",
+                        "food_breakfast",
+                        "food_sweet"
+                    ],
+                    "CustomFields": {}
+                },
+                "{{ID}}_cookbook": {
+                    "Name": "{{ID}}_cookbook",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.cookbook.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.cookbook.description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 0,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 40,
+                    "Edibility": 0,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [],
+                    "CustomFields": {}
+                },
+                "{{ID}}_seasoning_1": {
+                    "Name": "{{ID}}_seasoning_1",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.seasoning_1.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.seasoning_1.description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 50,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 41,
+                    "Edibility": -300,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [],
+                    "CustomFields": {}
+                },
+                "{{ID}}_seasoning_2": {
+                    "Name": "{{ID}}_seasoning_2",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:item.seasoning_2.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:item.seasoning_2.description]",
+                    "Type": "Basic",
+                    "Category": -999,
+                    "Price": 100,
+                    "Texture": "{{ASSETS}}/ObjectSprites",
+                    "SpriteIndex": 42,
+                    "Edibility": -300,
+                    "IsDrink": false,
+                    "Buffs": null,
+                    "ContextTags": [],
+                    "CustomFields": {}
+                }
+            }
+        }
+    ]
+}

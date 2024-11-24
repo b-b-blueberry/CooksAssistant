@@ -66,11 +66,6 @@
 		LATER: Goblin cooking
 			https://discord.com/channels/137344473976799233/156109690059751424/768058195057836042
 
-	Patches:
-	✔	Cider -> Keg + Apple
-	?	Vinegar -> Keg + Wine/Cider
-	✔	Nettle Tea -> Keg + Nettles
-
 	Ingredients:
 w!	🍰	Sugar Cane
 	✔	Onion
@@ -102,7 +97,7 @@ G	✔	Hearty Stew				Carrot x2 + Potato									New ingredients, homely
 	✔	Hot Curry				Hearty Stew + Hot Pepper + Rice						+Speed -Defence
 	✔	Hot Pot Roast			Cranberry Sauce + Roots Platter + Stuffing + Onion	Superfood, personal pref
 	✔	Hunter's Plate			Potato + Cabbage + Horseradish						New ingredients
-	✔	Kebab					Tortilla + Tomato + Onion (Kebab bonus)				Runescape, tortilla
+	✔	Kebab					Tortilla + Tomato + Onion							Runescape, tortilla
 	✔	Loaded Potato			Baked Potato + Tuna + Corn							Augmented recipe
 	✔	Lobster Bake			Lobster												Add opportunity value to an appealing ingredient
 	?	Onion Soup				Onion + Garlic + Cheese								Onion / Outmoded

@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<AssemblyName>LoveOfCooking</AssemblyName>
 		<RootNamespace>LoveOfCooking</RootNamespace>
-		<Version>1.0.30</Version>
-		<TargetFramework>net5.0</TargetFramework>
+		<Version>2.0.0</Version>
+		<TargetFramework>net6.0</TargetFramework>
 		<Platforms>AnyCPU</Platforms>
 		<PlatformTarget>AnyCPU</PlatformTarget>
 		<EnableHarmony>true</EnableHarmony>
@@ -13,34 +13,31 @@
 	<PropertyGroup>
 		<LangVersion>latest</LangVersion>
 		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<AnalysisLevel>5.0</AnalysisLevel>
+		<AnalysisLevel>6.0</AnalysisLevel>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<Compile Remove="assets\CookingBundlePack\**" />
-		<Compile Remove="assets\NewCropsPack\Objects\Sugar Cane\**" />
-		<Compile Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
-		<EmbeddedResource Remove="assets\CookingBundlePack\**" />
-		<EmbeddedResource Remove="assets\NewCropsPack\Objects\Sugar Cane\**" />
-		<EmbeddedResource Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
-		<None Remove="assets\CookingBundlePack\**" />
-		<None Remove="assets\NewCropsPack\Objects\Sugar Cane\**" />
-		<None Remove="assets\NewRecipesPack\Objects\Buttered Corn\**" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.3.2" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Reference Include="Newtonsoft.Json" HintPath="$(GamePath)\smapi-internal\Newtonsoft.Json.dll" private="false" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<Reference Include="SpaceCore">
+			<HintPath>$(GamePath)\Mods\SpaceCore\SpaceCore.dll</HintPath>
+			<Private>false</Private>
+		</Reference>
 	</ItemGroup>
 
 	<ItemGroup>
-		<Reference Include="SpaceCore">
-			<HintPath>$(GamePath)\Mods\[CORE]\SpaceCore\SpaceCore.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
+		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)"/>
+		<ContentPacks Include="../LoveOfCooking [EN]" Version="$(Version)"/>
 	</ItemGroup>
 
 </Project>

@@ -1,0 +1,351 @@
+{
+	// Love of Cooking - Translation pack [EN]
+	// May be used as a base for custom translations for other languages.
+	// Read the mod description for help with making a translation pack:
+	// https://www.nexusmods.com/stardewvalley/mods/6830
+	"Format": "2.3.0",
+	"Changes": [
+		{
+			"LogName": "Love of Cooking - Mail [EN]",
+			"Action": "EditData",
+			"Target": "Data/mail",
+			"Priority": "Early", // [EN]-ONLY: REMOVE THIS LINE FROM CUSTOM TRANSLATION PACKS!!
+			"Entries": {
+				"blueberry.LoveOfCooking.cookbook_unlocked": "Hi @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom%item id blueberry.LoveOfCooking_cookbook 1 %%[#]Mom's Cookbook",
+				"blueberry.LoveOfCooking.seasoning_1": "Hi honey,^I came across this recipe in a lifestyle magazine!^It's supposed to make anything taste better.^^Remember to make balanced meals!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_1 %%",
+				"blueberry.LoveOfCooking.seasoning_2": "Hi sweetie!^A wonderful cookery show was on TV showing all-new ways to flavour your food!^I just had to write the recipe down for you.^Keep practicing your cooking!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_2 %%",
+				"blueberry.LoveOfCooking.migrate_refund_1_6": "To the owner,^^We've reviewed our annual farming subsidies and found some discrepancies during our last system migration.^Yes, it appears someone's been cooking the books. Enclosed is compensation for any lost produce.^^Thank you for your continued business,^  Blue Berry Farming & Supplies%item money {0} %%"
+			}
+		},
+		{
+			"LogName": "Love of Cooking - Translations [EN]",
+			"Action": "EditData",
+			"Target": "Mods/blueberry.LoveOfCooking.Assets/Strings",
+			"Priority": "Early", // [EN]-ONLY: REMOVE THIS LINE FROM CUSTOM TRANSLATION PACKS!!
+			"Entries": {
+				// Mod info
+				"mod.name": "Love of Cooking",
+
+				// Config options
+				"config.page.info": "Info",
+				"config.page.options": "Options",
+
+				"config.option.cookingmenu_name": "Cooking menu",
+				"config.option.cookingmenu_description": "Replaces the crafting interface with a new cooking menu!\nRecipes are saved to your cookbook to search, sort, filter, and favourite.\nIngredients are added manually when cooking.",
+				"config.option.cookingskill_name": "Cooking skill & recipes",
+				"config.option.cookingskill_description": "Adds a new cooking skill to level!\nSkill levels unlock new cooking recipes and professions.\nGain experience by cooking, with bonuses for new and advanced recipes.",
+				"config.option.cookingtool_name": "Cooking tool & upgrades",
+				"config.option.cookingtool_description": "Adds a new cooking tool to upgrade!\nReduces number of usable ingredients when cooking to 1, increasing with tool level.\nYou can buy upgrades from the Blacksmith to cook advanced recipes.\n\nRequires the new cooking menu.",
+				"config.option.seasonings_name": "More seasonings",
+				"config.option.seasonings_description": "Adds new flavours to improve your cooking!\nIntroduces lower-value items that raise the quality of cooked food.\nConsumed automatically when cooking.",
+				"config.option.foodbuffsstarthidden_name": "Food buffs start hidden",
+				"config.option.foodbuffsstarthidden_description": "Buff values aren't shown on foods until you've eaten them!\nIf disabled, foods and recipes will always show their buff attributes.",
+				"config.option.foodhealingtakestime_name": "Food heals over time",
+				"config.option.foodhealingtakestime_description": "Food will gradually restore health over time when eaten!\nYou'll be able to make better use of buff foods when at full energy,\nbut you won't be able to instantly restore health when in danger.",
+				"config.option.foodcanburn_name": "Food can burn",
+				"config.option.foodcanburn_description": "You have a chance to ruin your food when cooking!\nNot recommended unless you enjoy failure.",
+				"config.option.townkitchens_name": "Town kitchens",
+				"config.option.townkitchens_description": "Allows you to interact with any kitchens in town!\nYou need to be friends with someone living there.",
+				"config.option.menuanimation_name": "Menu animations",
+				"config.option.menuanimation_description": "Whether to play a quick transition on opening the cooking menu.\n\nRequires the new cooking menu.",
+				"config.option.cookinganimation_name": "Cooking animations",
+				"config.option.cookinganimation_description": "Whether to play a little animation when cooking at the kitchen.\n\nRequires the new cooking menu.",
+				"config.option.foodregenbar_name": "Show food healing regen bar",
+				"config.option.foodregenbar_description": "With food healing over time enabled, you can hide the food regen bar.\nThe bar appears beside the health and energy bars to show your remaining food regeneration.",
+				"config.option.fixcraftingpagerecipesorting_name": "Fix default recipe sorting",
+				"config.option.fixcraftingpagerecipesorting_description": "With the new cooking menu disabled, recipes are sorted by vanilla first and custom second.\nThis option updates the sort method to mix all recipes together.\n\nRequires the default cooking menu.",
+				"config.option.remembersearchfilter_name": "Remember search filter",
+				"config.option.remembersearchfilter_description": "With the new cooking menu enabled, you can search for recipes with filters.\nThe menu already saves your last-used search filter,\nbut it resets for when you next play.\nYou can disable this here to always use start with the default filter.",
+				"config.option.defaultsearchfilter_name": "Default search filter",
+				"config.option.defaultsearchfilter_description": "With the new cooking menu enabled, you can search for recipes with filters.\nThe menu already saves your last-used search filter,\nbut it resets for when you next play.\nYou can set a default filter for all play sessions here.",
+				"config.option.defaultsearchsorter_name": "Default search sorter",
+				"config.option.defaultsearchsorter_description": "With the new cooking menu enabled, you can search for recipes with filters.\nThe menu already saves your last-used search filter,\nbut it resets for when you next play.\nYou can set a default filter for all play sessions here.",
+				"config.option.resizekoreanfonts_name": "Resize Korean fonts",
+				"config.option.resizekoreanfonts_description": "If playing in Korean with the default font, keep this enabled.\nIf using FixFontOption or others to resize your font, you may want this disabled.",
+
+				"config.info.controllermap.title": "Gamepad controls",
+				"config.info.controllermap.button.a": "   Select",
+				"config.info.controllermap.button.b": "   Cancel",
+				"config.info.controllermap.button.x": "   Auto-add ingredients",
+				"config.info.controllermap.button.y": "   Cancel",
+				"config.info.controllermap.button.select": "   Search",
+				"config.info.controllermap.button.start": "   Cancel",
+				"config.info.controllermap.shoulders": "LB/RB   Change region",
+				"config.info.controllermap.triggers": "LT/RT   Change recipe",
+
+				"config.info.cookingmenu.text.1": "Replaces the vanilla crafting interface with a new cooking menu.\nOpen by interacting with kitchens as usual after receiving {0} in the mail.\nSearch, sort, filter, and favourite recipes to cook the foods you love.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nUsable from farmhouse and cabin kitchens, as well as the {1}.\nCan be used in town kitchens if enabled in the Options page.",
+				"config.info.cookingmenu.subheading.1": "Cookbook delivery",
+
+				"config.info.cookingskill.text.1": "Skill levels teach you new recipes, improve your cooking, and unlock new professions.\n\nMore experience is earned by cooking each day, less is earned by cooking in bulk.\nEarn extra experience by cooking new and difficult recipes.",
+				"config.info.cookingskill.text.2": "Cooking skill professions are unlocked as with any other skill.\nProfession perks improve results when cooking and eating food.",
+				"config.info.cookingskill.subheading.1": "Skill progress",
+				"config.info.cookingskill.subheading.2": "{0} experience",
+				"config.info.cookingskill.subheading.3": "{0}/{1} experience",
+				"config.info.cookingskill.subheading.4": "Cooking recipes",
+				"config.info.cookingskill.subheading.5": "Skill professions",
+
+				"config.info.cookingtool.text.1": "Your {0} determines the number of ingredients you can use when cooking.\nUpgrading your cooking tool at the Blacksmith unlocks extra slots.\n\nDoesn't use an inventory slot: Can be found in the = Special Items tab.\n\nYou can check your {0} level here, at the character page, or in the cooking menu.\nIf disabled in Options page, your {0} is always considered max level.",
+				"config.info.cookingtool.subheading.1": "Tool upgrades",
+
+				"config.info.townkitchens.text.1": "Food can be cooked at any kitchens in town, provided you're friends with the owner.\nYou'll need a Cookbook and recipes to cook!",
+				"config.info.townkitchens.subheading.1": "Available kitchens",
+				"config.info.townkitchens.subheading.2": "Friendship required",
+
+				"config.info.seasonings.text.1": "Adds new seasoning items to improve the quality of cooked food.\n\nSeasonings are unlocked from reaching cooking milestones.\nConsumed automatically when cooking.",
+				"config.info.seasonings.subheading.1": "Seasoning items",
+
+				"config.info.foodhealingtakestime.text": "Instead of healing instantly, food restoration happens gradually over time.\n\nHealth and energy restores far more quickly when low.\nHealing is mostly preserved when health and energy are full.\nEating several foods will stack restoration for the day.\nHealing speed increases with various skill levels.\n{0} and {1} will always heal instantly.",
+				"config.info.foodbuffsstarthidden.text": "All foods will have on-consumed effects hidden until you've eaten one.\nBuffs (or lack of) will be visible on all items of that kind afterward.\nHealth and energy restoration remains visible.",
+				"config.info.foodcanburn.text": "When cooking any recipes, some of the food you make may be ruined.\nBurnt food will become useless trash. Your ingredients will be wasted.\nSkill experience is awarded even if your food was burnt.",
+				"config.info.foodcanburn.subheading": "Burn chance: {0} ~ {1}%",
+
+				"config.info.disabled": "> Can be enabled in the Options page.",
+				"config.info.disabled_bad": "> Can be enabled in the Options page.\nWARNING: This isn't fun at all.",
+				"config.info.features_blocked": "Features can't be changed while a save is loaded.\n\nWhen you're ready, return to the title screen to change your preferences.",
+
+				"config.features_label": "Features",
+				"config.changes_label": "Changes",
+				"config.others_label": "Others",
+
+				"config.format.level": "Level {0}",
+				"config.format.profession": "{0} - {1}",
+				"config.format.unknown": "???",
+
+				// General strings
+
+				// Cooking tool
+				"menu.cooking_tool.name.basic": "Frying Pan",
+				"menu.cooking_tool.name.copper": "Copper Frying Pan",
+				"menu.cooking_tool.name.steel": "Steel Frying Pan",
+				"menu.cooking_tool.name.gold": "Gold Frying Pan",
+				"menu.cooking_tool.name.iridium": "Iridium Frying Pan",
+				"menu.cooking_tool.description.basic": "Can cook recipes with only 1 ingredient.",
+				"menu.cooking_tool.description.copper": "Can cook recipes with only 1 or 2 ingredients.",
+				"menu.cooking_tool.description.steel": "Can cook recipes with up to 3 ingredients.",
+				"menu.cooking_tool.description.gold": "Can cook recipes with up to 4 ingredients.",
+				"menu.cooking_tool.description.iridium": "Can cook recipes with any number of ingredients!",
+
+				// Cooking menu
+				"menu.cooking_station.no_cookbook": "You don't have a cookbook.",
+				"menu.cooking_station.no_friendship": "You aren't good enough friends with {0} to use this kitchen.",
+
+				"menu.cooking_recipe.title_unknown": "???",
+				"menu.cooking_recipe.notes_unknown": "You haven't eaten this yet.",
+				"menu.cooking_recipe.ingredients_label": "Ingredients:",
+				"menu.cooking_recipe.notes_label": "Notes:",
+				"menu.cooking_recipe.time_label": "Cooking time:",
+				"menu.cooking_recipe.time_value": "{0} min",
+				"menu.cooking_recipe.search_label": "Search",
+				"menu.cooking_recipe.favourite_label": "Favourite",
+				"menu.cooking_recipe.quantity_label": "Makes",
+				"menu.cooking_recipe.which_label": "Which would you like to make?",
+				"menu.cooking_recipe.autofill_label": "Auto-add ingredients",
+
+				"menu.cooking_recipe.buff.0": "Farming",
+				"menu.cooking_recipe.buff.1": "Fishing",
+				"menu.cooking_recipe.buff.2": "Mining",
+				"menu.cooking_recipe.buff.3": "Digging",
+				"menu.cooking_recipe.buff.4": "Luck",
+				"menu.cooking_recipe.buff.5": "Foraging",
+				"menu.cooking_recipe.buff.6": "Crafting",
+				"menu.cooking_recipe.buff.7": "Energy",
+				"menu.cooking_recipe.buff.8": "Magnetism",
+				"menu.cooking_recipe.buff.9": "Speed",
+				"menu.cooking_recipe.buff.10": "Defense",
+				"menu.cooking_recipe.buff.11": "Attack",
+				"menu.cooking_recipe.buff.12": "Cooking",
+				"menu.cooking_recipe.buff.daily": "All day",
+				"menu.cooking_recipe.buff.unknown": "???",
+
+				"menu.cooking_search.view_label": "View:",
+				"menu.cooking_search.filter_label": "Filter:",
+				"menu.cooking_search.sorter_label": "Sort by:",
+				"menu.cooking_search.view.list": "List",
+				"menu.cooking_search.view.grid": "Icons",
+				"menu.cooking_search.filter.0": "All recipes",
+				"menu.cooking_search.filter.1": "Ready to cook",
+				"menu.cooking_search.filter.2": "Favourites",
+				"menu.cooking_search.filter.3": "New recipes",
+				"menu.cooking_search.filter.4": "Buff recipes",
+				"menu.cooking_search.sorter.0": "Name",
+				"menu.cooking_search.sorter.1": "Healing",
+				"menu.cooking_search.sorter.2": "Price",
+				"menu.cooking_search.sorter.3": "Favourite recipes",
+				"menu.cooking_search.none_label": "No recipes found.",
+
+				"menu.inventory.backpack": "Backpack",
+				"menu.inventory.fridge": "Fridge",
+				"menu.inventory.minifridge": "Mini-Fridge",
+
+				"menu.config.enabled": "Open mod config menu",
+				"menu.config.disabled": "Requires Generic Mod Config Menu.",
+
+				// Mail
+				"mail.cookbook_unlocked.after.1": "Mom's Cookbook and Frying Pan have been added to your = Special Items.",
+				"mail.cookbook_unlocked.after.2": "Recipes you learn will be saved in the cookbook for cooking at the farmhouse.",
+				"mail.cookbook_unlocked.after.2_alt": "Recipes you learn will be saved in the cookbook for cooking at the farmhouse or in town.",
+
+				// Special items
+				"menu.special_items.cookbook.name": "Mom's Cookbook",
+				"menu.special_items.cookbook.description": "Holds your cooking recipes.",
+
+				// Seasonings
+				"seasoning.seasoning_1.empty": "You've used up all of your {0}.",
+				"seasoning.seasoning_2.empty": "You've used up all of your {0}.",
+				"seasoning.seasoning_4.empty": "You've used up all of your {0}.",
+
+				// Buffs
+				"buff.curry.name": "Curry Breath",
+				"buff.curry.description": "Hot, hot, hot, hot, hot, hot!",
+				"buff.kebab.name": "Drunken Brawler",
+				"buff.kebab.description": "Growing stronger with each drink when Tipsy.",
+				"buff.lasagna.name": "Fullness Aura",
+				"buff.lasagna.description": "Nearby enemies walk more slowly.",
+				"buff.paella.name": "Saffron Stash",
+				"buff.paella.description": "Gold coins scatter everywhere when slaying monsters.",
+				"buff.profiteroles.name": "Proliferate Projectiles",
+				"buff.profiteroles.description": "All slingshot projectiles fire in threes.",
+				"buff.leeks.name": "Leek Me Alone!",
+				"buff.leeks.description": "Increases weapon knockback.",
+
+				// Cooking skill
+				"menu.cooking_skill.name": "Cooking",
+				"menu.cooking_skill.levelup_burn": "Food burns {0}% less often",
+
+				// Tier 1:
+				// Path 1: Cooking
+				"menu.cooking_skill.tier1_path1.name": "Sous Chef",
+				"menu.cooking_skill.tier1_path1.description": "Seasoning further improves the quality of recipes.",
+				// Path 2: Eating (CONFIG: Food restores over time)
+				"menu.cooking_skill.tier1_path2.name": "Quick Eater",
+				"menu.cooking_skill.tier1_path2.description": "Food restores your energy more quickly.",
+				// Path 2: Eating (CONFIG: Food restores instantly)
+				"menu.cooking_skill.tier1_path2_alt.name": "Big Eater",
+				"menu.cooking_skill.tier1_path2_alt.description": "Cooked food restores {0}% more.",
+
+				// Tier 2: Path 1
+				// Choice A: Gifting
+				"menu.cooking_skill.tier2_path1a.name": "Head Chef",
+				"menu.cooking_skill.tier2_path1a.description": "Cooked foods given as gifts befriend quicker.",
+				// Choice B: Selling
+				"menu.cooking_skill.tier2_path1b.name": "Five Star Cook",
+				"menu.cooking_skill.tier2_path1b.description": "Cooked foods worth {0}% more.",
+
+				// Tier 2: Path B
+				// Choice A: Crafting
+				"menu.cooking_skill.tier2_path2a.name": "Gourmet",
+				"menu.cooking_skill.tier2_path2a.description": "Chance to craft an extra portion when cooking.",
+				// Choice B: Healing
+				"menu.cooking_skill.tier2_path2b.name": "Glutton",
+				"menu.cooking_skill.tier2_path2b.description": "Buff duration from food and drinks increased when at full energy.",
+
+				// Object categories
+				"item.fruit.label": "Fruit (Any)",
+				"item.flower.label": "Flower (Any)",
+				"item.vegetable.label": "Vegetable (Any)",
+				"item.meat.label": "Meat (Any)",
+				"item.forage.label": "Forage (Any)",
+				"item.cooking.label": "Cooking (Any)",
+				"item.mineral.label": "Mineral (Any)",
+				"item.seed.label": "Seeds (Any)",
+				"item.metal.label": "Metal (Any)",
+				"item.gem.label": "Gems (Any)",
+
+				// Object names
+				// recipes
+				"item.admiralpie.name": "Admiral Pie",
+				"item.applepie.name": "Apple Pie",
+				"item.arancini.name": "Arancini",
+				"item.bakedpotato.name": "Baked Potato",
+				"item.breakfast.name": "Quick Breakfast",
+				"item.burger.name": "Beet Burger",
+				"item.burrito.name": "Burrito",
+				"item.carrotcake.name": "Carrot Cake",
+				"item.cherrypie.name": "Cherry Pie",
+				"item.chocoflan.name": "Hazelnut Bakewell",
+				"item.cocococktail.name": "Coconut Cocktail",
+				"item.craymornay.name": "Cray Mornay",
+				"item.crepes.name": "Crêpes Suzette",
+				"item.curry.name": "Curry Diablo",
+				"item.eggsando.name": "Egg Sandwich",
+				"item.eggsando_half.name": "Egg Sandwich Half",
+				"item.fruity.name": "Sherry Syllabub",
+				"item.hotcocoa.name": "Hot Cocoa",
+				"item.hunters.name": "Hunter's Plate",
+				"item.kebab.name": "Kebab",
+				"item.lasagna.name": "Lasagna Ricotta",
+				"item.leeks.name": "Braised Leeks",
+				"item.lobster.name": "Baked Lobster",
+				"item.nigiri.name": "Roe Roll",
+				"item.oceanplatter.name": "Ocean Platter",
+				"item.paella.name": "Paella",
+				"item.parfait.name": "Plum Parfait",
+				"item.pilaf.name": "Mushroom Pilaf",
+				"item.profiteroles.name": "Profiteroles",
+				"item.quiche.name": "Quiche Provencale",
+				"item.roast.name": "Hot Pot Roast",
+				"item.skewers.name": "Pineapple Skewers",
+				"item.saladsando.name": "Salad Sandwich",
+				"item.saladsando_half.name": "Salad Sandwich Half",
+				"item.seafoodsando.name": "Seafood Sandwich",
+				"item.seafoodsando_half.name": "Seafood Sandwich Half",
+				"item.summersalad.name": "Summer Salad",
+				"item.unagi.name": "Eel Sushi",
+				"item.waffles.name": "Berry Waffles",
+				// objects
+				"item.burntfood.name": "Burnt Food",
+				"item.chocolate.name": "Cooking Chocolate",
+				"item.cookbook.name": "Mom's Cookbook",
+				"item.seasoning_1.name": "Simple Seasoning",
+				"item.seasoning_2.name": "Super Seasoning",
+
+				// Object descriptions
+				// recipes
+				"item.admiralpie.description": "Whole fish stuffed into a saucy pie. Watch out for bones!",
+				"item.applepie.description": "Smells of fresh cooking apples and cinnamon spice.",
+				"item.arancini.description": "Stuffed with goodness and deep-fried.",
+				"item.bakedpotato.description": "A humble potato, stuffed with mash and cheese.",
+				"item.breakfast.description": "Guaranteed to get you out of bed!",
+				"item.burger.description": "It's a mix of bitter and sweet flavours in a shocking pink look.",
+				"item.burrito.description": "A wrap of all things nice.",
+				"item.carrotcake.description": "Creamy frosting and crumbly carrot, yum!",
+				"item.cherrypie.description": "Looks tasty. Smells gorgeous.",
+				"item.chocoflan.description": "A rich short-crust tart made with sweet, sweet chocolate.",
+				"item.cocococktail.description": "A refreshing mixed drink with mint leaf and coconut milk.",
+				"item.craymornay.description": "Freshwater bugs slathered in rich cream sauce.",
+				"item.crepes.description": "Thin pancakes swimming in a rich orange brandy syrup.",
+				"item.curry.description": "It'll set your breath on fire!\n\nTemporarily causes you to breathe fire when eaten.",
+				"item.eggsando.description": "Fluffy white bread packed with egg and mayo. Perfectly seasoned.",
+				"item.eggsando_half.description": "More, more!",
+				"item.fruity.description": "A sweet alcoholic drink with sherry, cherry, and berry, topped with whipped cream.",
+				"item.hotcocoa.description": "Warms you up. There's a big marshmallow on top!",
+				"item.hunters.description": "A hot plate of classic vegetables.",
+				"item.kebab.description": "Goes well with a drink. And another. And another.\n\nTemporarily increases combat power when Tipsy.",
+				"item.lasagna.description": "Layers of decadent cheese and spinach in bechamel sauce.\n\nTemporarily slows nearby enemies to a crawl.",
+				"item.leeks.description": "Makes for a light appetiser.\n\nTemporarily increases weapon knockback.",
+				"item.lobster.description": "A classic islanders' recipe.",
+				"item.nigiri.description": "Fish eggs nestled in rice. Salty!",
+				"item.oceanplatter.description": "A bountiful hot-and-cold selection of fresh seafood.",
+				"item.paella.description": "What's inside? Everything!\n\nTemporarily scatters coins from slain monsters.",
+				"item.parfait.description": "Parfait au plum purée, perfect for long, hot summer days.",
+				"item.pilaf.description": "Light and spicy, with fine forest mushrooms.",
+				"item.profiteroles.description": "Small and sweet. Easy to eat!\n\nTemporarily triples slingshot output.",
+				"item.quiche.description": "Life's better with cheese.",
+				"item.roast.description": "A bountiful stew with all the trimmings.",
+				"item.saladsando.description": "It's got lettuce, rocket, dandelion, spinach, dockleaf...",
+				"item.saladsando_half.description": ".. Hey, there's tomato in this half!",
+				"item.seafoodsando.description": "A freshly made sandwich, stuffed with crab and cress.",
+				"item.seafoodsando_half.description": "Half eaten, but still good!",
+				"item.summersalad.description": "A refreshing fruit salad with a tangy twist.",
+				"item.unagi.description": "It's even more slippery for the seaweed.",
+				"item.waffles.description": "Whole-grain waffles glazed with a summer berry drizzle.",
+				// objects
+				"item.burntfood.description": "Can be sold. It didn't turn out so good...",
+				"item.chocolate.description": "Mmmmm... chocolate.",
+				"item.cookbook.description": "Debug item.\n\nMom's Cookbook and Frying Pan are added to your Special Items when consumed.",
+				"item.seasoning_1.description": "A little spice slightly improves the quality of a dish. Automatically applied when cooking.",
+				"item.seasoning_2.description": "A potent mix of seasonings to enrich any dish. Automatically applied when cooking."
+			}
+		}
+	]
+}
