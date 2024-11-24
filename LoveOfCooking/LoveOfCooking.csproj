@@ -36,10 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)">
-			<IgnoreModFilePaths>bin/.*, obj/.*</IgnoreModFilePaths>
-			<IgnoreModFilePatterns>\.dll$, \.pdb$, \.csproj$</IgnoreModFilePatterns>
-		</ContentPacks>
+		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)"/>
 	</ItemGroup>
 
 </Project>
