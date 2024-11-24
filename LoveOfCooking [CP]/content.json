@@ -5,6 +5,10 @@
 		{
 			"Action": "Load",
 			"Target": "{{ASSETS}}/Definitions",
+			"FromFile": "assets/blank.json"
+		},
+		{
+			"Action": "Include",
 			"FromFile": "assets/mod-data.json"
 		},
 		// Strings
