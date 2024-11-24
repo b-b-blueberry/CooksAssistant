@@ -5,15 +5,15 @@
             "Target": "Data/Shops",
             "TargetField": [ "SeedShop", "Items" ],
             "Entries": {
-                "blueberry.LoveOfCooking_chocolate": {
-                    "Id": "blueberry.LoveOfCooking_chocolate",
-                    "ItemId": "blueberry.LoveOfCooking_chocolate",
+                "{{ID}}_chocolate": {
+                    "Id": "{{ID}}_chocolate",
+                    "ItemId": "{{ID}}_chocolate",
                     "Condition": "PLAYER_FARMHOUSE_UPGRADE Current 1, PLAYER_HAS_MAIL Current ccComplete"
                 }
             },
             "MoveEntries": [
                 {
-                    "Id": "blueberry.LoveOfCooking_chocolate",
+                    "Id": "{{ID}}_chocolate",
                     "AfterId": "(O)245" // Sugar
                 }
             ]
@@ -23,15 +23,15 @@
             "Target": "Data/Shops",
             "TargetField": [ "Joja", "Items" ],
             "Entries": {
-                "blueberry.LoveOfCooking_chocolate": {
-                    "Id": "blueberry.LoveOfCooking_chocolate",
-                    "ItemId": "blueberry.LoveOfCooking_chocolate",
+                "{{ID}}_chocolate": {
+                    "Id": "{{ID}}_chocolate",
+                    "ItemId": "{{ID}}_chocolate",
                     "Condition": null
                 }
             },
             "MoveEntries": [
                 {
-                    "Id": "blueberry.LoveOfCooking_chocolate",
+                    "Id": "{{ID}}_chocolate",
                     "AfterId": "(O)245" // Sugar
                 }
             ]

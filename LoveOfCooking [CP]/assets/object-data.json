@@ -4,8 +4,8 @@
             "Action": "EditData",
             "Target": "Data/Objects",
             "Entries": {
-                "blueberry.LoveOfCooking_admiralpie": {
-                    "Name": "blueberry.LoveOfCooking_admiralpie",
+                "{{ID}}_admiralpie": {
+                    "Name": "{{ID}}_admiralpie",
                     "DisplayName": "{{i18n:item.admiralpie.name}}",
                     "Description": "{{i18n:item.admiralpie.description}}",
                     "Type": "Cooking",
@@ -44,8 +44,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_applepie": {
-                    "Name": "blueberry.LoveOfCooking_applepie",
+                "{{ID}}_applepie": {
+                    "Name": "{{ID}}_applepie",
                     "DisplayName": "{{i18n:item.applepie.name}}",
                     "Description": "{{i18n:item.applepie.description}}",
                     "Type": "Cooking",
@@ -85,8 +85,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_arancini": {
-                    "Name": "blueberry.LoveOfCooking_arancini",
+                "{{ID}}_arancini": {
+                    "Name": "{{ID}}_arancini",
                     "DisplayName": "{{i18n:item.arancini.name}}",
                     "Description": "{{i18n:item.arancini.description}}",
                     "Type": "Cooking",
@@ -102,8 +102,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_bakedpotato": {
-                    "Name": "blueberry.LoveOfCooking_bakedpotato",
+                "{{ID}}_bakedpotato": {
+                    "Name": "{{ID}}_bakedpotato",
                     "DisplayName": "{{i18n:item.bakedpotato.name}}",
                     "Description": "{{i18n:item.bakedpotato.description}}",
                     "Type": "Cooking",
@@ -119,8 +119,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_breakfast": {
-                    "Name": "blueberry.LoveOfCooking_breakfast",
+                "{{ID}}_breakfast": {
+                    "Name": "{{ID}}_breakfast",
                     "DisplayName": "{{i18n:item.breakfast.name}}",
                     "Description": "{{i18n:item.breakfast.description}}",
                     "Type": "Cooking",
@@ -160,8 +160,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_burger": {
-                    "Name": "blueberry.LoveOfCooking_burger",
+                "{{ID}}_burger": {
+                    "Name": "{{ID}}_burger",
                     "DisplayName": "{{i18n:item.burger.name}}",
                     "Description": "{{i18n:item.burger.description}}",
                     "Type": "Cooking",
@@ -178,8 +178,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_burntfood": {
-                    "Name": "blueberry.LoveOfCooking_burntfood",
+                "{{ID}}_burntfood": {
+                    "Name": "{{ID}}_burntfood",
                     "DisplayName": "{{i18n:item.burntfood.name}}",
                     "Description": "{{i18n:item.burntfood.description}}",
                     "Type": "Junk",
@@ -196,8 +196,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_burrito": {
-                    "Name": "blueberry.LoveOfCooking_burrito",
+                "{{ID}}_burrito": {
+                    "Name": "{{ID}}_burrito",
                     "DisplayName": "{{i18n:item.burrito.name}}",
                     "Description": "{{i18n:item.burrito.description}}",
                     "Type": "Cooking",
@@ -214,8 +214,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_carrotcake": {
-                    "Name": "blueberry.LoveOfCooking_carrotcake",
+                "{{ID}}_carrotcake": {
+                    "Name": "{{ID}}_carrotcake",
                     "DisplayName": "{{i18n:item.carrotcake.name}}",
                     "Description": "{{i18n:item.carrotcake.description}}",
                     "Type": "Cooking",
@@ -255,8 +255,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cherrypie": {
-                    "Name": "blueberry.LoveOfCooking_cherrypie",
+                "{{ID}}_cherrypie": {
+                    "Name": "{{ID}}_cherrypie",
                     "DisplayName": "{{i18n:item.cherrypie.name}}",
                     "Description": "{{i18n:item.cherrypie.description}}",
                     "Type": "Cooking",
@@ -295,8 +295,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_chocoflan": {
-                    "Name": "blueberry.LoveOfCooking_chocoflan",
+                "{{ID}}_chocoflan": {
+                    "Name": "{{ID}}_chocoflan",
                     "DisplayName": "{{i18n:item.chocoflan.name}}",
                     "Description": "{{i18n:item.chocoflan.description}}",
                     "Type": "Cooking",
@@ -313,8 +313,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_chocolate": {
-                    "Name": "blueberry.LoveOfCooking_chocolate",
+                "{{ID}}_chocolate": {
+                    "Name": "{{ID}}_chocolate",
                     "DisplayName": "{{i18n:item.chocolate.name}}",
                     "Description": "{{i18n:item.chocolate.description}}",
                     "Type": "Basic",
@@ -331,8 +331,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cocococktail": {
-                    "Name": "blueberry.LoveOfCooking_cocococktail",
+                "{{ID}}_cocococktail": {
+                    "Name": "{{ID}}_cocococktail",
                     "DisplayName": "{{i18n:item.cocococktail.name}}",
                     "Description": "{{i18n:item.cocococktail.description}}",
                     "Type": "Cooking",
@@ -355,8 +355,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_craymornay": {
-                    "Name": "blueberry.LoveOfCooking_craymornay",
+                "{{ID}}_craymornay": {
+                    "Name": "{{ID}}_craymornay",
                     "DisplayName": "{{i18n:item.craymornay.name}}",
                     "Description": "{{i18n:item.craymornay.description}}",
                     "Type": "Cooking",
@@ -373,8 +373,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_crepes": {
-                    "Name": "blueberry.LoveOfCooking_crepes",
+                "{{ID}}_crepes": {
+                    "Name": "{{ID}}_crepes",
                     "DisplayName": "{{i18n:item.crepes.name}}",
                     "Description": "{{i18n:item.crepes.description}}",
                     "Type": "Cooking",
@@ -398,8 +398,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_curry": {
-                    "Name": "blueberry.LoveOfCooking_curry",
+                "{{ID}}_curry": {
+                    "Name": "{{ID}}_curry",
                     "DisplayName": "{{i18n:item.curry.name}}",
                     "Description": "{{i18n:item.curry.description}}",
                     "Type": "Cooking",
@@ -412,7 +412,7 @@
                     "Buffs": [
                         {
                             "Id": "Drink",
-                            "BuffId": "blueberry.LoveOfCooking_curry"
+                            "BuffId": "{{ID}}_curry"
                         }
                     ],
                     "ContextTags": [
@@ -423,8 +423,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_eggsando": {
-                    "Name": "blueberry.LoveOfCooking_eggsando",
+                "{{ID}}_eggsando": {
+                    "Name": "{{ID}}_eggsando",
                     "DisplayName": "{{i18n:item.eggsando.name}}",
                     "Description": "{{i18n:item.eggsando.description}}",
                     "Type": "Cooking",
@@ -441,8 +441,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_eggsando_half": {
-                    "Name": "blueberry.LoveOfCooking_eggsando_half",
+                "{{ID}}_eggsando_half": {
+                    "Name": "{{ID}}_eggsando_half",
                     "DisplayName": "{{i18n:item.eggsando_half.name}}",
                     "Description": "{{i18n:item.eggsando_half.description}}",
                     "Type": "Basic",
@@ -458,8 +458,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_fruity": {
-                    "Name": "blueberry.LoveOfCooking_fruity",
+                "{{ID}}_fruity": {
+                    "Name": "{{ID}}_fruity",
                     "DisplayName": "{{i18n:item.fruity.name}}",
                     "Description": "{{i18n:item.fruity.description}}",
                     "Type": "Cooking",
@@ -482,8 +482,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_hotcocoa": {
-                    "Name": "blueberry.LoveOfCooking_hotcocoa",
+                "{{ID}}_hotcocoa": {
+                    "Name": "{{ID}}_hotcocoa",
                     "DisplayName": "{{i18n:item.hotcocoa.name}}",
                     "Description": "{{i18n:item.hotcocoa.description}}",
                     "Type": "Cooking",
@@ -524,8 +524,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_hunters": {
-                    "Name": "blueberry.LoveOfCooking_hunters",
+                "{{ID}}_hunters": {
+                    "Name": "{{ID}}_hunters",
                     "DisplayName": "{{i18n:item.hunters.name}}",
                     "Description": "{{i18n:item.hunters.description}}",
                     "Type": "Cooking",
@@ -564,8 +564,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_kebab": {
-                    "Name": "blueberry.LoveOfCooking_kebab",
+                "{{ID}}_kebab": {
+                    "Name": "{{ID}}_kebab",
                     "DisplayName": "{{i18n:item.kebab.name}}",
                     "Description": "{{i18n:item.kebab.description}}",
                     "Type": "Cooking",
@@ -578,7 +578,7 @@
                     "Buffs": [
                         {
                             "Id": "Food",
-                            "BuffId": "blueberry.LoveOfCooking_kebab"
+                            "BuffId": "{{ID}}_kebab"
                         }
                     ],
                     "ContextTags": [
@@ -588,8 +588,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_lasagna": {
-                    "Name": "blueberry.LoveOfCooking_lasagna",
+                "{{ID}}_lasagna": {
+                    "Name": "{{ID}}_lasagna",
                     "DisplayName": "{{i18n:item.lasagna.name}}",
                     "Description": "{{i18n:item.lasagna.description}}",
                     "Type": "Cooking",
@@ -602,7 +602,7 @@
                     "Buffs": [
                         {
                             "Id": "Food",
-                            "BuffId": "blueberry.LoveOfCooking_lasagna"
+                            "BuffId": "{{ID}}_lasagna"
                         }
                     ],
                     "ContextTags": [
@@ -611,8 +611,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_leeks": {
-                    "Name": "blueberry.LoveOfCooking_leeks",
+                "{{ID}}_leeks": {
+                    "Name": "{{ID}}_leeks",
                     "DisplayName": "{{i18n:item.leeks.name}}",
                     "Description": "{{i18n:item.leeks.description}}",
                     "Type": "Cooking",
@@ -625,7 +625,7 @@
                     "Buffs": [
                         {
                             "Id": "Food",
-                            "BuffId": "blueberry.LoveOfCooking_leeks"
+                            "BuffId": "{{ID}}_leeks"
                         }
                     ],
                     "ContextTags": [
@@ -633,8 +633,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_lobster": {
-                    "Name": "blueberry.LoveOfCooking_lobster",
+                "{{ID}}_lobster": {
+                    "Name": "{{ID}}_lobster",
                     "DisplayName": "{{i18n:item.lobster.name}}",
                     "Description": "{{i18n:item.lobster.description}}",
                     "Type": "Cooking",
@@ -651,8 +651,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_nigiri": {
-                    "Name": "blueberry.LoveOfCooking_nigiri",
+                "{{ID}}_nigiri": {
+                    "Name": "{{ID}}_nigiri",
                     "DisplayName": "{{i18n:item.nigiri.name}}",
                     "Description": "{{i18n:item.nigiri.description}}",
                     "Type": "Cooking",
@@ -669,8 +669,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_oceanplatter": {
-                    "Name": "blueberry.LoveOfCooking_oceanplatter",
+                "{{ID}}_oceanplatter": {
+                    "Name": "{{ID}}_oceanplatter",
                     "DisplayName": "{{i18n:item.oceanplatter.name}}",
                     "Description": "{{i18n:item.oceanplatter.description}}",
                     "Type": "Cooking",
@@ -688,8 +688,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_paella": {
-                    "Name": "blueberry.LoveOfCooking_paella",
+                "{{ID}}_paella": {
+                    "Name": "{{ID}}_paella",
                     "DisplayName": "{{i18n:item.paella.name}}",
                     "Description": "{{i18n:item.paella.description}}",
                     "Type": "Cooking",
@@ -702,7 +702,7 @@
                     "Buffs": [
                         {
                             "Id": "Food",
-                            "BuffId": "blueberry.LoveOfCooking_paella"
+                            "BuffId": "{{ID}}_paella"
                         }
                     ],
                     "ContextTags": [
@@ -712,8 +712,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_parfait": {
-                    "Name": "blueberry.LoveOfCooking_parfait",
+                "{{ID}}_parfait": {
+                    "Name": "{{ID}}_parfait",
                     "DisplayName": "{{i18n:item.parfait.name}}",
                     "Description": "{{i18n:item.parfait.description}}",
                     "Type": "Cooking",
@@ -730,8 +730,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_pilaf": {
-                    "Name": "blueberry.LoveOfCooking_pilaf",
+                "{{ID}}_pilaf": {
+                    "Name": "{{ID}}_pilaf",
                     "DisplayName": "{{i18n:item.pilaf.name}}",
                     "Description": "{{i18n:item.pilaf.description}}",
                     "Type": "Cooking",
@@ -769,8 +769,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_profiteroles": {
-                    "Name": "blueberry.LoveOfCooking_profiteroles",
+                "{{ID}}_profiteroles": {
+                    "Name": "{{ID}}_profiteroles",
                     "DisplayName": "{{i18n:item.profiteroles.name}}",
                     "Description": "{{i18n:item.profiteroles.description}}",
                     "Type": "Cooking",
@@ -783,7 +783,7 @@
                     "Buffs": [
                         {
                             "Id": "Food",
-                            "BuffId": "blueberry.LoveOfCooking_profiteroles"
+                            "BuffId": "{{ID}}_profiteroles"
                         }
                     ],
                     "ContextTags": [
@@ -793,8 +793,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_quiche": {
-                    "Name": "blueberry.LoveOfCooking_quiche",
+                "{{ID}}_quiche": {
+                    "Name": "{{ID}}_quiche",
                     "DisplayName": "{{i18n:item.quiche.name}}",
                     "Description": "{{i18n:item.quiche.description}}",
                     "Type": "Cooking",
@@ -811,8 +811,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_roast": {
-                    "Name": "blueberry.LoveOfCooking_roast",
+                "{{ID}}_roast": {
+                    "Name": "{{ID}}_roast",
                     "DisplayName": "{{i18n:item.roast.name}}",
                     "Description": "{{i18n:item.roast.description}}",
                     "Type": "Cooking",
@@ -830,8 +830,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_saladsando": {
-                    "Name": "blueberry.LoveOfCooking_saladsando",
+                "{{ID}}_saladsando": {
+                    "Name": "{{ID}}_saladsando",
                     "DisplayName": "{{i18n:item.saladsando.name}}",
                     "Description": "{{i18n:item.saladsando.description}}",
                     "Type": "Cooking",
@@ -849,8 +849,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_saladsando_half": {
-                    "Name": "blueberry.LoveOfCooking_saladsando_half",
+                "{{ID}}_saladsando_half": {
+                    "Name": "{{ID}}_saladsando_half",
                     "DisplayName": "{{i18n:item.saladsando_half.name}}",
                     "Description": "{{i18n:item.saladsando_half.description}}",
                     "Type": "Basic",
@@ -866,8 +866,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_seafoodsando": {
-                    "Name": "blueberry.LoveOfCooking_seafoodsando",
+                "{{ID}}_seafoodsando": {
+                    "Name": "{{ID}}_seafoodsando",
                     "DisplayName": "{{i18n:item.seafoodsando.name}}",
                     "Description": "{{i18n:item.seafoodsando.description}}",
                     "Type": "Cooking",
@@ -885,8 +885,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_seafoodsando_half": {
-                    "Name": "blueberry.LoveOfCooking_seafoodsando_half",
+                "{{ID}}_seafoodsando_half": {
+                    "Name": "{{ID}}_seafoodsando_half",
                     "DisplayName": "{{i18n:item.seafoodsando_half.name}}",
                     "Description": "{{i18n:item.seafoodsando_half.description}}",
                     "Type": "Basic",
@@ -902,8 +902,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_summersalad": {
-                    "Name": "blueberry.LoveOfCooking_summersalad",
+                "{{ID}}_summersalad": {
+                    "Name": "{{ID}}_summersalad",
                     "DisplayName": "{{i18n:item.summersalad.name}}",
                     "Description": "{{i18n:item.summersalad.description}}",
                     "Type": "Cooking",
@@ -920,8 +920,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_unagi": {
-                    "Name": "blueberry.LoveOfCooking_unagi",
+                "{{ID}}_unagi": {
+                    "Name": "{{ID}}_unagi",
                     "DisplayName": "{{i18n:item.unagi.name}}",
                     "Description": "{{i18n:item.unagi.description}}",
                     "Type": "Cooking",
@@ -938,8 +938,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_waffles": {
-                    "Name": "blueberry.LoveOfCooking_waffles",
+                "{{ID}}_waffles": {
+                    "Name": "{{ID}}_waffles",
                     "DisplayName": "{{i18n:item.waffles.name}}",
                     "Description": "{{i18n:item.waffles.description}}",
                     "Type": "Cooking",
@@ -980,8 +980,8 @@
                     ],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cookbook": {
-                    "Name": "blueberry.LoveOfCooking_cookbook",
+                "{{ID}}_cookbook": {
+                    "Name": "{{ID}}_cookbook",
                     "DisplayName": "{{i18n:item.cookbook.name}}",
                     "Description": "{{i18n:item.cookbook.description}}",
                     "Type": "Basic",
@@ -995,8 +995,8 @@
                     "ContextTags": [],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_seasoning_1": {
-                    "Name": "blueberry.LoveOfCooking_seasoning_1",
+                "{{ID}}_seasoning_1": {
+                    "Name": "{{ID}}_seasoning_1",
                     "DisplayName": "{{i18n:item.seasoning_1.name}}",
                     "Description": "{{i18n:item.seasoning_1.description}}",
                     "Type": "Basic",
@@ -1010,8 +1010,8 @@
                     "ContextTags": [],
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_seasoning_2": {
-                    "Name": "blueberry.LoveOfCooking_seasoning_2",
+                "{{ID}}_seasoning_2": {
+                    "Name": "{{ID}}_seasoning_2",
                     "DisplayName": "{{i18n:item.seasoning_2.name}}",
                     "Description": "{{i18n:item.seasoning_2.description}}",
                     "Type": "Basic",

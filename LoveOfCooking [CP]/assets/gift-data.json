@@ -8,271 +8,271 @@
                 {
                     "Operation": "Append",
                     "Target": [ "Entries", "Universal_Neutral" ],
-                    "Value": "blueberry.LoveOfCooking_chocolate blueberry.LoveOfCooking_eggsando_half blueberry.LoveOfCooking_saladsando_half blueberry.LoveOfCooking_seafoodsando_half",
+                    "Value": "{{ID}}_chocolate {{ID}}_eggsando_half {{ID}}_saladsando_half {{ID}}_seafoodsando_half",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Entries", "Universal_Dislike" ],
-                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Value": "{{ID}}_burntfood",
                     "Delimiter": " "
                 },
                 // Individual gift tastes
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Willy", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_admiralpie",
+                    "Value": "{{ID}}_admiralpie",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Lewis", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_applepie",
+                    "Value": "{{ID}}_applepie",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Emily", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_burger",
+                    "Value": "{{ID}}_burger",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Krobus", "3" ], // like
-                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Value": "{{ID}}_burntfood",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Dwarf", "9" ], // neutral
-                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Value": "{{ID}}_burntfood",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Wizard", "9" ], // neutral
-                    "Value": "blueberry.LoveOfCooking_burntfood",
+                    "Value": "{{ID}}_burntfood",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Evelyn", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_cherrypie blueberry.LoveOfCooking_eggsando",
+                    "Value": "{{ID}}_cherrypie {{ID}}_eggsando",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Pierre", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_cherrypie blueberry.LoveOfCooking_craymornay",
+                    "Value": "{{ID}}_cherrypie {{ID}}_craymornay",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Leah", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_carrotcake",
+                    "Value": "{{ID}}_carrotcake",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Vincent", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_carrotcake",
+                    "Value": "{{ID}}_carrotcake",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Abigail", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_chocoflan",
+                    "Value": "{{ID}}_chocoflan",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Haley", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_cocococktail",
+                    "Value": "{{ID}}_cocococktail",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Gus", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_crepes",
+                    "Value": "{{ID}}_crepes",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Sam", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_curry",
+                    "Value": "{{ID}}_curry",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Demetrius", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_fruity",
+                    "Value": "{{ID}}_fruity",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Linus", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_hunters",
+                    "Value": "{{ID}}_hunters",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Shane", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_kebab",
+                    "Value": "{{ID}}_kebab",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Robin", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_lasagna",
+                    "Value": "{{ID}}_lasagna",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "George", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_leeks",
+                    "Value": "{{ID}}_leeks",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Leo", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_lobster",
+                    "Value": "{{ID}}_lobster",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Sebastian", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_nigiri",
+                    "Value": "{{ID}}_nigiri",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Caroline", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_parfait",
+                    "Value": "{{ID}}_parfait",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Penny", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_pilaf",
+                    "Value": "{{ID}}_pilaf",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Jas", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_profiteroles",
+                    "Value": "{{ID}}_profiteroles",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Alex", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_quiche",
+                    "Value": "{{ID}}_quiche",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Leah", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_saladsando",
+                    "Value": "{{ID}}_saladsando",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Willy", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_seafoodsando",
+                    "Value": "{{ID}}_seafoodsando",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Sandy", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_summersalad",
+                    "Value": "{{ID}}_summersalad",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Harvey", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_unagi",
+                    "Value": "{{ID}}_unagi",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Jas", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_waffles",
+                    "Value": "{{ID}}_waffles",
                     "Delimiter": " "
                 },
                 // Villager chocolate preferences
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Haley", "3" ], // like
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Jas", "3" ], // like
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Sandy", "3" ], // like
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Vincent", "3" ], // like
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "George", "5" ], // dislike
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Leah", "5" ], // dislike
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Kent", "5" ], // dislike
-                    "Value": "blueberry.LoveOfCooking_chocolate",
+                    "Value": "{{ID}}_chocolate",
                     "Delimiter": " "
                 },
                 // Demetrius sandwich preferences
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Kent", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_eggsando blueberry.LoveOfCooking_saladsando blueberry.LoveOfCooking_seafoodsando",
+                    "Value": "{{ID}}_eggsando {{ID}}_saladsando {{ID}}_seafoodsando",
                     "Delimiter": " "
                 },
                 // Krobus sandwich preferences
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Kent", "7" ], // hate
-                    "Value": "blueberry.LoveOfCooking_eggsando blueberry.LoveOfCooking_saladsando blueberry.LoveOfCooking_seafoodsando blueberry.LoveOfCooking_chocolate blueberry.LoveOfCooking_eggsando_half blueberry.LoveOfCooking_saladsando_half blueberry.LoveOfCooking_seafoodsando_half",
+                    "Value": "{{ID}}_eggsando {{ID}}_saladsando {{ID}}_seafoodsando {{ID}}_chocolate {{ID}}_eggsando_half {{ID}}_saladsando_half {{ID}}_seafoodsando_half",
                     "Delimiter": " "
                 },
                 // Kent burger preferences
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Kent", "1" ], // love
-                    "Value": "blueberry.LoveOfCooking_admiralpie blueberry.LoveOfCooking_applepie blueberry.LoveOfCooking_cherrypie",
+                    "Value": "{{ID}}_admiralpie {{ID}}_applepie {{ID}}_cherrypie",
                     "Delimiter": " "
                 },
                 // Penny alcohol preferences
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Penny", "7" ], // hate
-                    "Value": "blueberry.LoveOfCooking_cocococktail blueberry.LoveOfCooking_fruity",
+                    "Value": "{{ID}}_cocococktail {{ID}}_fruity",
                     "Delimiter": " "
                 },
                 {
                     "Operation": "Append",
                     "Target": [ "Fields", "Penny", "9" ], // neutral
-                    "Value": "blueberry.LoveOfCooking_crepes",
+                    "Value": "{{ID}}_crepes",
                     "Delimiter": " "
                 }
             ]

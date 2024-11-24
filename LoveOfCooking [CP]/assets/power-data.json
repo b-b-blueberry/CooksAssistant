@@ -5,7 +5,7 @@
             "Action": "EditData",
             "Target": "Spiderbuttons.SpecialPowerUtilities/PowerTabs",
             "Entries": {
-                "{{ModId}}": {
+                "{{ID}}": {
                     "TabDisplayName": "{{i18n:mod.name}}",
                     "IconPath": "{{ASSETS}}/Sprites",
                     "IconSourceRect": {
@@ -22,7 +22,7 @@
             "Action": "EditData",
             "Target": "Data/Powers",
             "Entries": {
-                "blueberry.LoveOfCooking_cookbook": {
+                "{{ID}}_cookbook": {
                     "DisplayName": "{{i18n:menu.special_items.cookbook.name}}",
                     "Description": "{{i18n:menu.special_items.cookbook.description}}",
                     "TexturePath": "{{ASSETS}}/ObjectSprites",
@@ -30,9 +30,9 @@
                         "X": 0,
                         "Y": 80
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
                     "CustomFields": {
-                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
                     }
                 }
             }
@@ -41,7 +41,7 @@
             "Action": "EditData",
             "Target": "Data/Powers",
             "Entries": {
-                "blueberry.LoveOfCooking_cookingtool": {
+                "{{ID}}_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.basic}}",
                     "Description": "{{i18n:menu.cooking_tool.description.basic}}",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
@@ -49,21 +49,21 @@
                         "X": 0,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
                     "CustomFields": {
-                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
                     }
                 }
             },
             "When": {
-                "query: {{blueberry.LoveOfCooking/CookingToolLevel}}": "0"
+                "blueberry.LoveOfCooking/CookingToolLevel": "0"
             }
         },
         {
             "Action": "EditData",
             "Target": "Data/Powers",
             "Entries": {
-                "blueberry.LoveOfCooking_cookingtool": {
+                "{{ID}}_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.copper}}",
                     "Description": "{{i18n:menu.cooking_tool.description.copper}}",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
@@ -71,21 +71,21 @@
                         "X": 16,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
                     "CustomFields": {
-                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
                     }
                 }
             },
             "When": {
-                "query: {{blueberry.LoveOfCooking/CookingToolLevel}}": "1"
+                "blueberry.LoveOfCooking/CookingToolLevel": "1"
             }
         },
         {
             "Action": "EditData",
             "Target": "Data/Powers",
             "Entries": {
-                "blueberry.LoveOfCooking_cookingtool": {
+                "{{ID}}_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.steel}}",
                     "Description": "{{i18n:menu.cooking_tool.description.steel}}",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
@@ -93,21 +93,21 @@
                         "X": 32,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
                     "CustomFields": {
-                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
                     }
                 }
             },
             "When": {
-                "query: {{blueberry.LoveOfCooking/CookingToolLevel}}": "2"
+                "blueberry.LoveOfCooking/CookingToolLevel": "2"
             }
         },
         {
             "Action": "EditData",
             "Target": "Data/Powers",
             "Entries": {
-                "blueberry.LoveOfCooking_cookingtool": {
+                "{{ID}}_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.gold}}",
                     "Description": "{{i18n:menu.cooking_tool.description.gold}}",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
@@ -115,21 +115,21 @@
                         "X": 48,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
                     "CustomFields": {
-                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
                     }
                 }
             },
             "When": {
-                "query: {{blueberry.LoveOfCooking/CookingToolLevel}}": "3"
+                "blueberry.LoveOfCooking/CookingToolLevel": "3"
             }
         },
         {
             "Action": "EditData",
             "Target": "Data/Powers",
             "Entries": {
-                "blueberry.LoveOfCooking_cookingtool": {
+                "{{ID}}_cookingtool": {
                     "DisplayName": "{{i18n:menu.cooking_tool.name.iridium}}",
                     "Description": "{{i18n:menu.cooking_tool.description.iridium}}",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
@@ -137,14 +137,14 @@
                         "X": 64,
                         "Y": 0
                     },
-                    "UnlockedCondition": "PLAYER_HAS_MAIL Current blueberry.LoveOfCooking.cookbook_unlocked",
+                    "UnlockedCondition": "PLAYER_HAS_MAIL Current {{ID}}.cookbook_unlocked",
                     "CustomFields": {
-                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ModId}}"
+                        "Spiderbuttons.SpecialPowerUtilities/Tab": "{{ID}}"
                     }
                 }
             },
             "When": {
-                "query: {{blueberry.LoveOfCooking/CookingToolLevel}}": "4"
+                "blueberry.LoveOfCooking/CookingToolLevel": "4"
             }
         }
     ]

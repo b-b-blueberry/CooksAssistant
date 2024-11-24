@@ -4,7 +4,7 @@
             "Action": "EditData",
             "Target": "Data/Buffs",
             "Entries": {
-                "blueberry.LoveOfCooking_curry": {
+                "{{ID}}_curry": {
                     "DisplayName": "{{i18n:buff.curry.name}}",
                     "Description": "{{i18n:buff.curry.description}}",
                     "IsDebuff": false,
@@ -21,7 +21,7 @@
                     "ActionsOnApply": null,
                     "CustomFields": null
                 },
-                "blueberry.LoveOfCooking_kebab": {
+                "{{ID}}_kebab": {
                     "DisplayName": "{{i18n:buff.kebab.name}}",
                     "Description": "{{i18n:buff.kebab.description}}",
                     "IsDebuff": false,
@@ -37,7 +37,7 @@
                     "ActionsOnApply": null,
                     "CustomFields": null
                 },
-                "blueberry.LoveOfCooking_lasagna": {
+                "{{ID}}_lasagna": {
                     "DisplayName": "{{i18n:buff.lasagna.name}}",
                     "Description": "{{i18n:buff.lasagna.description}}",
                     "IsDebuff": false,
@@ -50,7 +50,7 @@
                     "ActionsOnApply": null,
                     "CustomFields": null
                 },
-                "blueberry.LoveOfCooking_paella": {
+                "{{ID}}_paella": {
                     "DisplayName": "{{i18n:buff.paella.name}}",
                     "Description": "{{i18n:buff.paella.description}}",
                     "IsDebuff": false,
@@ -63,7 +63,7 @@
                     "ActionsOnApply": null,
                     "CustomFields": null
                 },
-                "blueberry.LoveOfCooking_profiteroles": {
+                "{{ID}}_profiteroles": {
                     "DisplayName": "{{i18n:buff.profiteroles.name}}",
                     "Description": "{{i18n:buff.profiteroles.description}}",
                     "IsDebuff": false,
@@ -76,7 +76,7 @@
                     "ActionsOnApply": null,
                     "CustomFields": null
                 },
-                "blueberry.LoveOfCooking_leeks": {
+                "{{ID}}_leeks": {
                     "DisplayName": "{{i18n:buff.leeks.name}}",
                     "Description": "{{i18n:buff.leeks.description}}",
                     "IsDebuff": false,

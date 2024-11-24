@@ -4,9 +4,9 @@
             "Action": "EditData",
             "Target": "Data/Tools",
             "Entries": {
-                "blueberry.LoveOfCooking_cookingtool.level0": {
+                "{{ID}}_cookingtool.level0": {
                     "ClassName": "GenericTool",
-                    "Name": "blueberry.LoveOfCooking_cookingtool.level0",
+                    "Name": "{{ID}}_cookingtool.level0",
                     "AttachmentSlots": -1,
                     "SalePrice": -1,
                     "DisplayName": "{{i18n:menu.cooking_tool.name.basic}}",
@@ -23,9 +23,9 @@
                     "ModData": null,
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cookingtool.level1": {
+                "{{ID}}_cookingtool.level1": {
                     "ClassName": "GenericTool",
-                    "Name": "blueberry.LoveOfCooking_cookingtool.level1",
+                    "Name": "{{ID}}_cookingtool.level1",
                     "AttachmentSlots": -1,
                     "SalePrice": 1000,
                     "DisplayName": "{{i18n:menu.cooking_tool.name.copper}}",
@@ -50,9 +50,9 @@
                     "ModData": null,
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cookingtool.level2": {
+                "{{ID}}_cookingtool.level2": {
                     "ClassName": "GenericTool",
-                    "Name": "blueberry.LoveOfCooking_cookingtool.level2",
+                    "Name": "{{ID}}_cookingtool.level2",
                     "AttachmentSlots": -1,
                     "SalePrice": 2500,
                     "DisplayName": "{{i18n:menu.cooking_tool.name.steel}}",
@@ -77,9 +77,9 @@
                     "ModData": null,
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cookingtool.level3": {
+                "{{ID}}_cookingtool.level3": {
                     "ClassName": "GenericTool",
-                    "Name": "blueberry.LoveOfCooking_cookingtool.level3",
+                    "Name": "{{ID}}_cookingtool.level3",
                     "AttachmentSlots": -1,
                     "SalePrice": 5000,
                     "DisplayName": "{{i18n:menu.cooking_tool.name.gold}}",
@@ -104,9 +104,9 @@
                     "ModData": null,
                     "CustomFields": {}
                 },
-                "blueberry.LoveOfCooking_cookingtool.level4": {
+                "{{ID}}_cookingtool.level4": {
                     "ClassName": "GenericTool",
-                    "Name": "blueberry.LoveOfCooking_cookingtool.level4",
+                    "Name": "{{ID}}_cookingtool.level4",
                     "AttachmentSlots": -1,
                     "SalePrice": 12500,
                     "DisplayName": "{{i18n:menu.cooking_tool.name.iridium}}",

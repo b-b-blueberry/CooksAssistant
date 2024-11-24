@@ -105,7 +105,7 @@
                     "Combat": 0.025,
                     "Foraging": 0.0025,
                     "Cooking": 0.01,
-                    "blueberry.LoveOfCooking.CookingSkill": 0.01
+                    "{{ID}}.CookingSkill": 0.01
                 },
                 "EdibleItemsWithNoFoodBehaviour": [
                     "Life Elixir",
@@ -117,7 +117,7 @@
                 "BurnChancePerIngredient": 0.0035,
                 "BurntItemCreated": "168",
                 "BurntItemAlternatives": [
-                    "blueberry.LoveOfCooking_burntfood"
+                    "{{ID}}_burntfood"
                 ],
                 "BurntItemAlternativeChance": 0.333,
                 "FarmhouseKitchenStartModIDs": [
@@ -127,17 +127,17 @@
                     "minervamaga.FR.BiggerFarmhouses"
                 ],
                 "FoodsThatGiveLeftovers": {
-                    "blueberry.LoveOfCooking_seafoodsando": "blueberry.LoveOfCooking_seafoodsando_half",
-                    "blueberry.LoveOfCooking_eggsando": "blueberry.LoveOfCooking_eggsando_half",
-                    "blueberry.LoveOfCooking_saladsando": "blueberry.LoveOfCooking_saladsando_half"
+                    "{{ID}}_seafoodsando": "{{ID}}_seafoodsando_half",
+                    "{{ID}}_eggsando": "{{ID}}_eggsando_half",
+                    "{{ID}}_saladsando": "{{ID}}_saladsando_half"
                 },
                 "DefaultSeasoning": "917",
                 "Seasonings": {
-                    "blueberry.LoveOfCooking_seasoning_1": {
+                    "{{ID}}_seasoning_1": {
                         "Quality": 1,
                         "MessageStringKey": "{{ASSETS}}/Strings:seasoning.seasoning_1.empty"
                     },
-                    "blueberry.LoveOfCooking_seasoning_2": {
+                    "{{ID}}_seasoning_2": {
                         "Quality": 2,
                         "MessageStringKey": "{{ASSETS}}/Strings:seasoning.seasoning_2.empty"
                     },

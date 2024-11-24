@@ -78,6 +78,10 @@
 	],
 	"DynamicTokens": [
 		{
+			"Name": "ID",
+			"Value": "blueberry.LoveOfCooking"
+		},
+		{
 			"Name": "ASSETS",
 			"Value": "Mods\\blueberry.LoveOfCooking.Assets"
 		}
