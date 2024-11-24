@@ -5,8 +5,8 @@
             "Target": "Data/Buffs",
             "Entries": {
                 "{{ID}}_curry": {
-                    "DisplayName": "{{i18n:buff.curry.name}}",
-                    "Description": "{{i18n:buff.curry.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.curry.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.curry.description]",
                     "IsDebuff": false,
                     "GlowColor": "Orange",
                     "Duration": 100000,
@@ -22,8 +22,8 @@
                     "CustomFields": null
                 },
                 "{{ID}}_kebab": {
-                    "DisplayName": "{{i18n:buff.kebab.name}}",
-                    "Description": "{{i18n:buff.kebab.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.kebab.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.kebab.description]",
                     "IsDebuff": false,
                     "GlowColor": null,
                     "Duration": 80000,
@@ -38,8 +38,8 @@
                     "CustomFields": null
                 },
                 "{{ID}}_lasagna": {
-                    "DisplayName": "{{i18n:buff.lasagna.name}}",
-                    "Description": "{{i18n:buff.lasagna.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.lasagna.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.lasagna.description]",
                     "IsDebuff": false,
                     "GlowColor": null,
                     "Duration": 120000,
@@ -51,8 +51,8 @@
                     "CustomFields": null
                 },
                 "{{ID}}_paella": {
-                    "DisplayName": "{{i18n:buff.paella.name}}",
-                    "Description": "{{i18n:buff.paella.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.paella.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.paella.description]",
                     "IsDebuff": false,
                     "GlowColor": null,
                     "Duration": 180000,
@@ -64,8 +64,8 @@
                     "CustomFields": null
                 },
                 "{{ID}}_profiteroles": {
-                    "DisplayName": "{{i18n:buff.profiteroles.name}}",
-                    "Description": "{{i18n:buff.profiteroles.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.profiteroles.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.profiteroles.description]",
                     "IsDebuff": false,
                     "GlowColor": null,
                     "Duration": 50000,
@@ -77,8 +77,8 @@
                     "CustomFields": null
                 },
                 "{{ID}}_leeks": {
-                    "DisplayName": "{{i18n:buff.leeks.name}}",
-                    "Description": "{{i18n:buff.leeks.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:buff.leeks.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:buff.leeks.description]",
                     "IsDebuff": false,
                     "GlowColor": null,
                     "Duration": 80000,

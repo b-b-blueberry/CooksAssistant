@@ -6,7 +6,7 @@
             "Target": "Spiderbuttons.SpecialPowerUtilities/PowerTabs",
             "Entries": {
                 "{{ID}}": {
-                    "TabDisplayName": "{{i18n:mod.name}}",
+                    "TabDisplayName": "[LocalizedText {{STRINGS}}:mod.name]",
                     "IconPath": "{{ASSETS}}/Sprites",
                     "IconSourceRect": {
                         "X": 0,
@@ -23,8 +23,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "{{ID}}_cookbook": {
-                    "DisplayName": "{{i18n:menu.special_items.cookbook.name}}",
-                    "Description": "{{i18n:menu.special_items.cookbook.description}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.special_items.cookbook.name]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.special_items.cookbook.description]",
                     "TexturePath": "{{ASSETS}}/ObjectSprites",
                     "TexturePosition": {
                         "X": 0,
@@ -42,8 +42,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "{{ID}}_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_tool.name.basic}}",
-                    "Description": "{{i18n:menu.cooking_tool.description.basic}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.basic]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.basic]",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 0,
@@ -64,8 +64,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "{{ID}}_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_tool.name.copper}}",
-                    "Description": "{{i18n:menu.cooking_tool.description.copper}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.copper]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.copper]",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 16,
@@ -86,8 +86,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "{{ID}}_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_tool.name.steel}}",
-                    "Description": "{{i18n:menu.cooking_tool.description.steel}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.steel]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.steel]",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 32,
@@ -108,8 +108,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "{{ID}}_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_tool.name.gold}}",
-                    "Description": "{{i18n:menu.cooking_tool.description.gold}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.gold]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.gold]",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 48,
@@ -130,8 +130,8 @@
             "Target": "Data/Powers",
             "Entries": {
                 "{{ID}}_cookingtool": {
-                    "DisplayName": "{{i18n:menu.cooking_tool.name.iridium}}",
-                    "Description": "{{i18n:menu.cooking_tool.description.iridium}}",
+                    "DisplayName": "[LocalizedText {{STRINGS}}:menu.cooking_tool.name.iridium]",
+                    "Description": "[LocalizedText {{STRINGS}}:menu.cooking_tool.description.iridium]",
                     "TexturePath": "{{ASSETS}}/ToolSprites",
                     "TexturePosition": {
                         "X": 64,

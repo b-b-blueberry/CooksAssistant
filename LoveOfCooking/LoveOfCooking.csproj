@@ -37,6 +37,7 @@
 
 	<ItemGroup>
 		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)"/>
+		<ContentPacks Include="../LoveOfCooking [EN]" Version="$(Version)"/>
 	</ItemGroup>
 
 </Project>

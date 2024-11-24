@@ -5,16 +5,16 @@
             "Target": "{{ASSETS}}/Definitions",
             "Entries": {
                 "CategoryDisplayInformation": {
-                    "-81": [ "22", "[LocalizedText {{ASSETS}}/Strings:item.forage.label]" ],
-                    "-80": [ "591", "[LocalizedText {{ASSETS}}/Strings:item.flower.label]" ],
-                    "-79": [ "406", "[LocalizedText {{ASSETS}}/Strings:item.fruit.label]" ],
-                    "-75": [ "278", "[LocalizedText {{ASSETS}}/Strings:item.vegetable.label]" ],
-                    "-14": [ "640", "[LocalizedText {{ASSETS}}/Strings:item.meat.label]" ],
-                    "-7": [ "662", "[LocalizedText {{ASSETS}}/Strings:item.cooking.label]" ],
-                    "-2": [ "60", "[LocalizedText {{ASSETS}}/Strings:item.gem.label]" ],
-                    "-12": [ "546", "[LocalizedText {{ASSETS}}/Strings:item.mineral.label]" ],
-                    "-15": [ "380", "[LocalizedText {{ASSETS}}/Strings:item.metal.label]" ],
-                    "-74": [ "770", "[LocalizedText {{ASSETS}}/Strings:item.seed.label]" ]
+                    "-81": [ "22", "[LocalizedText {{STRINGS}}:item.forage.label]" ],
+                    "-80": [ "591", "[LocalizedText {{STRINGS}}:item.flower.label]" ],
+                    "-79": [ "406", "[LocalizedText {{STRINGS}}:item.fruit.label]" ],
+                    "-75": [ "278", "[LocalizedText {{STRINGS}}:item.vegetable.label]" ],
+                    "-14": [ "640", "[LocalizedText {{STRINGS}}:item.meat.label]" ],
+                    "-7": [ "662", "[LocalizedText {{STRINGS}}:item.cooking.label]" ],
+                    "-2": [ "60", "[LocalizedText {{STRINGS}}:item.gem.label]" ],
+                    "-12": [ "546", "[LocalizedText {{STRINGS}}:item.mineral.label]" ],
+                    "-15": [ "380", "[LocalizedText {{STRINGS}}:item.metal.label]" ],
+                    "-74": [ "770", "[LocalizedText {{STRINGS}}:item.seed.label]" ]
                 },
                 "StartingRecipes": [
                     "Fried Egg"
@@ -135,15 +135,15 @@
                 "Seasonings": {
                     "{{ID}}_seasoning_1": {
                         "Quality": 1,
-                        "MessageStringKey": "{{ASSETS}}/Strings:seasoning.seasoning_1.empty"
+                        "MessageStringKey": "{{STRINGS}}:seasoning.seasoning_1.empty"
                     },
                     "{{ID}}_seasoning_2": {
                         "Quality": 2,
-                        "MessageStringKey": "{{ASSETS}}/Strings:seasoning.seasoning_2.empty"
+                        "MessageStringKey": "{{STRINGS}}:seasoning.seasoning_2.empty"
                     },
                     "917": {
                         "Quality": 4,
-                        "MessageStringKey": "{{ASSETS}}/Strings:seasoning.seasoning_4.empty"
+                        "MessageStringKey": "{{STRINGS}}:seasoning.seasoning_4.empty"
                     }
                 },
                 "CurryBuffDamage": {

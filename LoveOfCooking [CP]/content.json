@@ -15,7 +15,7 @@
 		{
 			"Action": "Load",
 			"Target": "{{ASSETS}}/Strings",
-			"FromFile": "i18n/default.json"
+			"FromFile": "assets/blank.json"
 		},
 		// Sprites
 		{
@@ -57,10 +57,6 @@
 		},
 		{
 			"Action": "Include",
-			"FromFile": "assets/mail-data.json"
-		},
-		{
-			"Action": "Include",
 			"FromFile": "assets/object-data.json"
 		},
 		{
@@ -84,6 +80,10 @@
 		{
 			"Name": "ASSETS",
 			"Value": "Mods\\blueberry.LoveOfCooking.Assets"
+		},
+		{
+			"Name": "STRINGS",
+			"Value": "Mods\\blueberry.LoveOfCooking.Assets\\Strings"
 		}
 	]
 }
