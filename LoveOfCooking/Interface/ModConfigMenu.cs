@@ -52,8 +52,6 @@ namespace LoveOfCooking.Interface
 			string version = $"C#: {ModEntry.Instance.ModManifest.Version}";
 			string versionCP = $"CP: {ModEntry.Instance.Helper.ModRegistry.Get(ModEntry.ContentModUniqueID).Manifest.Version}";
 
-			// Replace unintuitive GMCM page links with fullwidth clickables and a centred title banner drawn over the top
-			string s = new(c: ' ', count: 46);
 			int offset = 20 * Scale;
 			static void DrawBanner(SpriteBatch b, Vector2 v, string text)
 			{
@@ -67,11 +65,23 @@ namespace LoveOfCooking.Interface
 					scroll_text_alignment: SpriteText.ScrollTextAlignment.Center,
 					drawBGScroll: 0);
 			}
+			static string GetFullWidthSpace()
+			{
+				// Replace unintuitive GMCM page links with fullwidth clickables and a centred title banner drawn over the top
+				int width = LocalizedContentManager.CurrentLanguageCode switch
+				{
+					LocalizedContentManager.LanguageCode.zh => 144,
+					LocalizedContentManager.LanguageCode.ko => 55,
+					LocalizedContentManager.LanguageCode.ja => 50,
+					_ => 46
+				};
+				return new(c: ' ', count: width);
+			}
 
 			gmcm.AddPageLink(
 				mod: mod,
 				pageId: "info",
-				text: () => s);
+				text: GetFullWidthSpace);
 			gmcm.AddComplexOption(
 				mod: mod,
 				name: () => string.Empty,
@@ -94,7 +104,7 @@ namespace LoveOfCooking.Interface
 			gmcm.AddPageLink(
 				mod: mod,
 				pageId: "options",
-				text: () => s);
+				text: GetFullWidthSpace);
 			gmcm.AddComplexOption(
 				mod: mod,
 				name: () => string.Empty,
