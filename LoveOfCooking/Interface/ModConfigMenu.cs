@@ -14,6 +14,7 @@ using StardewValley.BellsAndWhistles;
 using StardewValley.GameData.Objects;
 using StardewValley.GameData.Tools;
 using StardewValley.ItemTypeDefinitions;
+using StardewValley.TokenizableStrings;
 using static SpaceCore.Skills.Skill;
 
 namespace LoveOfCooking.Interface
@@ -717,7 +718,7 @@ namespace LoveOfCooking.Interface
 				mod: mod,
 				text: () =>
 				{
-					string tool = toolData.FirstOrDefault().Value.DisplayName;
+					string tool = TokenParser.ParseText(toolData.FirstOrDefault().Value.DisplayName);
 					return Strings.Get("config.info.cookingtool.text.1", tool);
 				});
 			gmcm.AddComplexOption(
