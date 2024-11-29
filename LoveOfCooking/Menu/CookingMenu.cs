@@ -515,6 +515,8 @@ namespace LoveOfCooking.Menu
 				this.TryAutoFillIngredients(isClearedIfDisabled: false);
             }
 
+            this._recipePage.OnRecipeChanged();
+
             return true;
         }
 
@@ -1447,9 +1449,6 @@ namespace LoveOfCooking.Menu
             if (!this.IsGoodState())
                 return;
 
-			// Draw tab buttons
-			this._searchTabButton.draw(b);
-
 			// Draw pages
 			foreach (GenericPage page in this._pages)
             {
@@ -1458,6 +1457,9 @@ namespace LoveOfCooking.Menu
                     page.Draw(b: b);
                 }
             }
+
+			// Draw tab buttons
+			this._searchTabButton.draw(b);
 
 			// Draw inventory
 			this.InventoryManager.Draw(b);

@@ -53,6 +53,12 @@ namespace LoveOfCooking.Objects
 			this.Reset();
 		}
 
+		public Vector2 GetDrawOrigin()
+		{
+			Rectangle area = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
+			return area.Center.ToVector2() + this._offset.ToVector2() * this._scale;
+		}
+
 		public static void Reload(IModHelper helper)
 		{
 			CookbookAnimation.Texture = Game1.content.Load
@@ -271,7 +277,7 @@ namespace LoveOfCooking.Objects
 			// Animation
 			e.SpriteBatch.Draw(
 				texture: CookbookAnimation.Texture,
-				position: area.Center.ToVector2() + this._offset.ToVector2() * this._scale,
+				position: this.GetDrawOrigin(),
 				sourceRectangle: new(
 					x: CookbookAnimation.Size.X * (int)this._frame,
 					y: 0,

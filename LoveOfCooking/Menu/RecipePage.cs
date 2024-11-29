@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -16,6 +18,8 @@ namespace LoveOfCooking.Menu
         public bool CanScrollLeft => this.Menu.RecipeInfo.Index > 0;
         public bool CanScrollRight => this.Menu.RecipeInfo.Index < this.Menu.Recipes.Count - 1;
 
+		public bool CanScrollDescription;
+
 		// Components
 		public ClickableTextureComponent RightButton { get; private set; }
 		public ClickableTextureComponent LeftButton { get; private set; }
@@ -23,10 +27,17 @@ namespace LoveOfCooking.Menu
 
 		public override ClickableComponent DefaultClickableComponent => this.RecipeIconButton;
 
+		protected double _scrollTimer;
+
         public RecipePage(CookingMenu menu) : base(menu: menu)
         {
 			this.IsLeftSide = true;
         }
+
+		public void OnRecipeChanged()
+		{
+			this._scrollTimer = 0;
+		}
 
         public bool IsCursorOverAnyNavButton()
         {
@@ -206,57 +217,116 @@ namespace LoveOfCooking.Menu
 
         public override void Update(GameTime time)
         {
-			// ...
+			this._scrollTimer += time.ElapsedGameTime.TotalMilliseconds;
 		}
 
 		public override void Draw(SpriteBatch b)
-        {
-            CraftingRecipe recipe = this.Menu.RecipeInfo.Recipe;
+		{
+			void drawMenuSlice(Rectangle slice, bool isMenuLocal)
+			{
+				int overhead = 162 / 2;
+
+				//Rectangle menuArea = new Rectangle(this.Area.X, this.Area.Y, this.Area.Width * 2, this.Area.Height);
+				//Vector2 menuSize = menuArea.Size.ToVector2();
+				//Vector2 menuAt = menuArea.Location.ToVector2();
+
+				Vector2 animSize = CookbookAnimation.Size.ToVector2() * CookingMenu.Scale;
+				Vector2 animAt = ModEntry.Instance.States.Value.CookbookAnimation.GetDrawOrigin()
+					- animSize / 2;
+
+				Vector2 drawPos = animAt
+					+ slice.Location.ToVector2() * CookingMenu.Scale;
+
+                if (isMenuLocal)
+				{
+					drawPos.Y += overhead * Scale;
+					slice.Y += overhead;
+				}
+
+				b.Draw(
+					texture: CookbookAnimation.Texture,
+					position: drawPos,
+					sourceRectangle: new Rectangle(
+						x: slice.X,
+						y: slice.Y,
+						width: slice.Width,
+						height: slice.Height),
+					color: Color.White,
+					rotation: 0,
+					origin: Vector2.Zero,
+					scale: CookingMenu.Scale,
+					effects: SpriteEffects.None,
+					layerDepth: 1);
+			}
+
+			void drawDivider(int x, int y, int w, Vector2 textOffset, bool justChecking, out float h)
+			{
+				// Recipe ingredients subheader and divider
+				float initialY = textOffset.Y;
+				string text;
+				if (!justChecking)
+					this.DrawHorizontalDivider(
+						b: b,
+						x: x,
+						y: y + textOffset.Y,
+						w: this._lineWidth);
+				textOffset.Y += TextDividerGap;
+				text = Strings.Get("menu.cooking_recipe.ingredients_label");
+				if (!justChecking)
+				{
+					// Recipe ingredients subtitle
+					this.DrawText(
+					b: b,
+					text: text,
+					x: x + textOffset.X,
+					y: y + textOffset.Y,
+					colour: SubtextColour);
+					if (Game1.options.showAdvancedCraftingInformation)
+					{
+						// Recipe craftable count
+						this.DrawText(
+							b: b,
+							text: $"({this.Menu.RecipeInfo.NumCraftable})",
+							x: x + this.ContentArea.Width + (this.ContentArea.Width - this._lineWidth) * -0.5f,
+							y: y + textOffset.Y,
+							justify: TextJustify.Right,
+							colour: SubtextColour);
+					}
+				}
+				textOffset.Y += Game1.smallFont.MeasureString(text).Y * this._textScale.Y;
+				this.DrawHorizontalDivider(
+					b: b,
+					x: x,
+					y: y + textOffset.Y,
+					w: this._lineWidth);
+				textOffset.Y += TextDividerGap;
+				h = textOffset.Y - initialY;
+			}
+
+			CraftingRecipe recipe = this.Menu.RecipeInfo.Recipe;
 			bool knowsRecipe = recipe is not null && Game1.player.knowsRecipe(recipe.name);
             bool isKorean = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts;
             Point cursor = Game1.getMousePosition(ui_scale: true);
-            float textHeightCheck;
+            float textHeight;
 			int[] textHeightCheckMilestones = [60, 100, 120];
-            Vector2 textPosition = Vector2.Zero;
+            Vector2 textOffset = Vector2.Zero;
+            Vector2 titleOffset = Vector2.Zero;
+            int x = 0;
+            int y = this.LeftButton.bounds.Top;
 			int textWidth;
+			int titleWidth;
             string text;
+            string title;
+			int ingredientRowHeight = Game1.smallestTileSize * Scale / 2 + (recipe.getNumberOfIngredients() < 5 ? 4 : 0);
+			int ingredientDividerSpacing = 4 * Scale;
 
-            // Clickables
-            if (this.CanScrollLeft)
-				this.LeftButton.draw(b);
-            if (this.CanScrollRight)
-				this.RightButton.draw(b);
-
-            // Recipe icon
-            Rectangle recipeIcon = this.RecipeIconButton.bounds;
-			recipe.drawMenuView(
-				b: b,
-				x: recipeIcon.Location.X,
-				y: recipeIcon.Location.Y);
-
-            // Favourite icon on recipe icon
-            Color favouriteColour = Instance.States.Value.FavouriteRecipes.Contains(recipe.name)
-                ? Color.White
-                : recipeIcon.Contains(cursor)
-                    ? Color.Wheat * 0.5f
-                    : Color.Transparent;
-            Utility.drawWithShadow(
-				b: b,
-				texture: CookingMenu.Texture,
-				position: recipeIcon.Location.ToVector2() + new Vector2(x: 0, y: recipeIcon.Height),
-				sourceRect: FavouriteIconSource,
-				color: favouriteColour,
-				rotation: 0,
-				origin: FavouriteIconSource.Size.ToVector2() / 2,
-				scale: 3f,
-                shadowIntensity: favouriteColour.A / 255 * 0.35f);
-
-			float titleScale = 1f;
-            textWidth = (int)(40.5f * Scale * this._textScale.Y);
+			float baseTitleScale = 1.5f;
+			float adjustedTitleScale = 1f;
+            textWidth = (int)(40f * Scale * this._textScale.Y);
             text = knowsRecipe
                 ? recipe.DisplayName
                 : Strings.Get("menu.cooking_recipe.title_unknown");
-            textPosition.X = this.LeftButton.bounds.Width + 14 * Scale;
+            textOffset.X = this.LeftButton.bounds.Width + 14 * Scale;
 
             // Attempt to fix for Deutsch lange names
             if (CurrentLanguageCode is LanguageCode.de && Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X > textWidth)
@@ -264,91 +334,159 @@ namespace LoveOfCooking.Menu
 
             // Try squeeze large names into title area
             if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X * 0.8 > textWidth)
-                titleScale = 0.735f;
+                adjustedTitleScale = 0.735f;
             else if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X > textWidth)
-                titleScale = 0.95f;
+                adjustedTitleScale = 0.95f;
 
             // Recipe title
-            textPosition.Y = this.LeftButton.bounds.Y + 1 * Scale;
-            textPosition.Y -= (Game1.smallFont.MeasureString(
-                Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 6 * Scale) * this._textScale.Y;
-            textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y * titleScale;
-            if (textHeightCheck * titleScale > textHeightCheckMilestones[0])
-                textPosition.Y += (textHeightCheck - textHeightCheckMilestones[0]) / 2;
-			this.DrawText(
-				b: b,
-				text: text,
-				x: textPosition.X,
-				y: textPosition.Y,
-				w: textWidth,
-				scale: 1.5f * titleScale);
+            textOffset.Y = 1 * Scale;
+            textOffset.Y -= (Game1.smallFont.MeasureString(
+                Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 6 * Scale) * this._textScale.Y * adjustedTitleScale;
+            textHeight = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y * adjustedTitleScale;
+            if (textHeight * adjustedTitleScale > textHeightCheckMilestones[0])
+                textOffset.Y += (textHeight - textHeightCheckMilestones[0]) / 2;
+            titleOffset = textOffset;
+			titleWidth = textWidth;
+            title = text;
 
-            // Recipe description
-            textPosition.X = 0;
-            textPosition.Y = this.LeftButton.bounds.Y + this.LeftButton.bounds.Height + 6 * Scale;
-            if (textHeightCheck > textHeightCheckMilestones[0])
-                textPosition.Y += textHeightCheck - 50 * this._textScale.X;
+			// Recipe description
+			float descriptionY = Math.Max(
+				this.LeftButton.bounds.Height + 6 * Scale,
+				textOffset.Y + textHeight);
+
+			textOffset.X = 0;
+            textOffset.Y = descriptionY;
+            if (textHeight > textHeightCheckMilestones[0])
+                textOffset.Y += textHeight - 50 * this._textScale.X;
             textWidth = (int)(this._textWidth * this._textScale.X);
             text = knowsRecipe
                 ? recipe.description
                 : Strings.Get("menu.cooking_recipe.title_unknown");
-			this.DrawText(
-				b: b,
-				text: text,
-				x: textPosition.X,
-				y: textPosition.Y,
-				w: textWidth);
-            textPosition.Y += TextDividerGap * 2;
+			Vector2 descriptionSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+			float descriptionScrollScale = 2500f;
+			float descriptionScrollY = knowsRecipe && this.CanScrollDescription
+				? MathF.Sin(MathF.PI / 2 + (float)this._scrollTimer / descriptionScrollScale % descriptionScrollScale) - 1f
+				: 0;
+			descriptionScrollY *= descriptionSize.Y / Scale;
 
-            // Recipe ingredients
-            if (textHeightCheck > textHeightCheckMilestones[0] && Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y < 80)
-                textPosition.Y -= 6 * Scale;
-            textHeightCheck = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
-            if (textHeightCheck > textHeightCheckMilestones[2])
-                textPosition.Y += 6 * Scale;
-            if (textHeightCheck > textHeightCheckMilestones[1] && recipe.getNumberOfIngredients() < 6)
-                textPosition.Y += 6 * Scale;
-            textPosition.Y += TextDividerGap + Game1.smallFont.MeasureString(
-                Game1.parseText(this._textScale.Y < 1 ? "Hippo!\nHippo!" : "Hippo!\nHippo!\nHippo!", Game1.smallFont, textWidth)).Y * this._textScale.Y;
-			this.DrawHorizontalDivider(
-				b: b,
-				x: 0,
-				y: textPosition.Y,
-				w: this._lineWidth);
-            textPosition.Y += TextDividerGap;
-            text = Strings.Get("menu.cooking_recipe.ingredients_label");
+			if (this.CanScrollDescription)
+			{
+				// Draw a horizontal cutoff for scrolling description text
+				// i don't know why single-line titles need y+3*scale and i don't care why
+				this.DrawHorizontalDivider(
+					b: b,
+					x: x,
+					y: y + textOffset.Y + (textHeight * adjustedTitleScale <= textHeightCheckMilestones[0] ? 1 : -2) * Scale,
+					w: this._lineWidth);
+			}
+
 			this.DrawText(
 				b: b,
 				text: text,
-				x: textPosition.X,
-				y: textPosition.Y,
-				colour: SubtextColour);
-            if (Game1.options.showAdvancedCraftingInformation)
-            {
-                // Recipe craftable count
+				x: x + textOffset.X,
+				y: y + textOffset.Y + descriptionScrollY,
+				w: textWidth);
+            textOffset.Y += TextDividerGap * 2;
+
+			// Recipe ingredients and description spacing
+			if (textHeight > textHeightCheckMilestones[0] && descriptionSize.Y < 80)
+				textOffset.Y -= 6 * Scale;
+			textHeight = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
+			if (textHeight > textHeightCheckMilestones[2])
+				textOffset.Y += 6 * Scale;
+			if (textHeight > textHeightCheckMilestones[1] && recipe.getNumberOfIngredients() < 6)
+				textOffset.Y += 6 * Scale;
+			textOffset.Y += TextDividerGap + Game1.smallFont.MeasureString(
+				Game1.parseText(this._textScale.Y < 1 ? "Hippo!\nHippo!" : "Hippo!\nHippo!\nHippo!", Game1.smallFont, textWidth)).Y * this._textScale.Y;
+
+			// START TITLE CONTENT
+
+			{
+				drawDivider(x: x, y: y, w: textWidth, textOffset: textOffset, justChecking: true, out float dividerHeight);
+
+				int ingredientsHeight = (int)(dividerHeight + (knowsRecipe ? recipe.getNumberOfIngredients() * ingredientRowHeight + ingredientDividerSpacing : 8 * Scale));
+				int ingredientsSafeY = Math.Min(
+					(int)textOffset.Y,
+					(int)(this.ContentArea.Height - ingredientsHeight - descriptionY));
+				this.CanScrollDescription = descriptionSize.Y > ingredientsSafeY - descriptionY;
+
+				// Recipe scrollable block
+				/*drawMenuSlice(slice: new(
+					x: 0,
+					y: CookbookAnimation.Size.Y / 4,
+					width: CookbookAnimation.Size.X / 2,
+					height: CookbookAnimation.Size.Y / 7),
+					isMenuLocal: false);*/
+				drawMenuSlice(slice: new(
+					x: 0,
+					y: 0,
+					width: CookbookAnimation.Size.X / 2,
+					height: (int)(descriptionY / Scale)),
+					isMenuLocal: true);
+				drawMenuSlice(slice: new(
+					x: 0,
+					y: ingredientsSafeY / Scale,
+					width: CookbookAnimation.Size.X / 2,
+					height: ingredientsHeight / Scale),
+					isMenuLocal: true);
+
+				// Clickables
+				if (this.CanScrollLeft)
+					this.LeftButton.draw(b);
+				if (this.CanScrollRight)
+					this.RightButton.draw(b);
+
+				// Recipe icon
+				Rectangle recipeIcon = this.RecipeIconButton.bounds;
+				recipe.drawMenuView(
+					b: b,
+					x: recipeIcon.Location.X,
+					y: recipeIcon.Location.Y);
+
+				// Favourite icon on recipe icon
+				Color favouriteColour = Instance.States.Value.FavouriteRecipes.Contains(recipe.name)
+					? Color.White
+					: recipeIcon.Contains(cursor)
+						? Color.Wheat * 0.5f
+						: Color.Transparent;
+				Utility.drawWithShadow(
+					b: b,
+					texture: CookingMenu.Texture,
+					position: recipeIcon.Location.ToVector2() + new Vector2(x: 0, y: recipeIcon.Height),
+					sourceRect: FavouriteIconSource,
+					color: favouriteColour,
+					rotation: 0,
+					origin: FavouriteIconSource.Size.ToVector2() / 2,
+					scale: 3f,
+					shadowIntensity: favouriteColour.A / 255 * 0.35f);
+
+				// Recipe title
 				this.DrawText(
 					b: b,
-					text: $"({this.Menu.RecipeInfo.NumCraftable})",
-					x: this.ContentArea.Width + (this.ContentArea.Width - this._lineWidth) * -0.5f,
-					y: textPosition.Y,
-					justify: TextJustify.Right,
-					colour: SubtextColour);
-            }
-            textPosition.Y += Game1.smallFont.MeasureString(
-            Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
-			this.DrawHorizontalDivider(
-				b: b,
-				x: 0,
-				y: textPosition.Y,
-				w: this._lineWidth);
-            textPosition.Y += TextDividerGap - 16 * Scale / 2 + 1 * Scale;
+					text: title,
+					x: titleOffset.X,
+					y: y + titleOffset.Y,
+					w: titleWidth,
+					scale: baseTitleScale * adjustedTitleScale);
 
-            if (knowsRecipe)
+				textOffset.Y = ingredientsSafeY;
+			}
+
+			// END TITLE CONTENT
+
+			{
+				// Recipe ingredients divider heading
+				drawDivider(x: x, y: y, w: textWidth, textOffset: textOffset, justChecking: false, out float dividerHeight);
+				textOffset.Y += ingredientDividerSpacing;
+			}
+
+			// Recipe ingredients list
+			if (knowsRecipe)
             {
 				int i = 0;
                 foreach (var pair in recipe.recipeList)
                 {
-                    textPosition.Y += 16 * Scale / 2 + (recipe.getNumberOfIngredients() < 5 ? 4 : 0);
+                    textOffset.Y += ingredientRowHeight;
 
                     string id = pair.Key;
                     string name = recipe.getNameFromIndex(id);
@@ -373,8 +511,8 @@ namespace LoveOfCooking.Menu
                     b.Draw(
                         texture: texture,
                         position: new(
-                            x: this.ContentArea.X,
-                            y: textPosition.Y - 2f),
+                            x: x + this.ContentArea.X,
+                            y: y + textOffset.Y - 2f),
                         sourceRectangle: sourceRect,
                         color: Color.White,
                         rotation: 0f,
@@ -387,8 +525,8 @@ namespace LoveOfCooking.Menu
                         toDraw: requiredQuantity,
                         b: b,
                         position: new(
-                            x: this.ContentArea.X + 8 * Scale - Game1.tinyFont.MeasureString(string.Concat(requiredQuantity)).X,
-                            y: textPosition.Y + 4.5f * Scale),
+                            x: x + this.ContentArea.X + 8 * Scale - Game1.tinyFont.MeasureString(string.Concat(requiredQuantity)).X,
+                            y: y + textOffset.Y + 4.5f * Scale),
                         scale: 2f,
                         layerDepth: 0.87f,
                         c: Color.AntiqueWhite);
@@ -396,16 +534,16 @@ namespace LoveOfCooking.Menu
 					this.DrawText(
 						b: b,
 						text: name,
-						x: 12 * Scale,
-						y: textPosition.Y,
+						x: x + 12 * Scale,
+						y: y + textOffset.Y,
 						colour: drawColour);
 
                     // Ingredient stock
                     if (Game1.options.showAdvancedCraftingInformation)
                     {
 						Point position = new(
-                            x: (int)(this._lineWidth - 16 * Scale * this._textScale.X),
-                            y: (int)(textPosition.Y + 0.5f * Scale));
+                            x: (int)(x + this._lineWidth - 16 * Scale * this._textScale.X),
+                            y: (int)(y + textOffset.Y + 0.5f * Scale));
                         b.Draw(
                             texture: CookingMenu.Texture,
                             position: new(this.ContentArea.X + position.X, position.Y),
@@ -419,7 +557,7 @@ namespace LoveOfCooking.Menu
 						this.DrawText(
 							b: b,
 							text: this.Menu.RecipeInfo.IngredientQuantitiesHeld[i].ToString(),
-							x: position.X + 32,
+							x: position.X + 8 * Scale,
 							y: position.Y,
 							w: 72,
 							colour: drawColour);
@@ -429,19 +567,19 @@ namespace LoveOfCooking.Menu
             }
             else
             {
-                textPosition.Y += 16 * Scale / 2 + 1 * Scale;
+                textOffset.Y += ingredientRowHeight;
                 text = Strings.Get("menu.cooking_recipe.title_unknown");
 				this.DrawText(
 					b: b,
 					text: text,
-					x: 10 * Scale,
-					y: textPosition.Y,
+					x: x + 10 * Scale,
+					y: y + textOffset.Y,
 					w: textWidth,
 					colour: SubtextColour);
             }
-        }
+		}
 
-        public override bool TryPop()
+		public override bool TryPop()
         {
             return true;
         }
