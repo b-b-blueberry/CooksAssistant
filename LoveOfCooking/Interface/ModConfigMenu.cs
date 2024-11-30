@@ -69,14 +69,7 @@ namespace LoveOfCooking.Interface
 			static string GetFullWidthSpace()
 			{
 				// Replace unintuitive GMCM page links with fullwidth clickables and a centred title banner drawn over the top
-				int width = LocalizedContentManager.CurrentLanguageCode switch
-				{
-					LocalizedContentManager.LanguageCode.zh => 144,
-					LocalizedContentManager.LanguageCode.ko => 55,
-					LocalizedContentManager.LanguageCode.ja => 50,
-					_ => 46
-				};
-				return new(c: ' ', count: width);
+				return new(c: ' ', count: 1000 / SpriteText.getWidthOfString(" "));
 			}
 
 			gmcm.AddPageLink(
