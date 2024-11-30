@@ -748,11 +748,12 @@ namespace LoveOfCooking.Menu
 					buffPosition.X += xOffset * 1.5f;
 
 					// Unique buff title
+					float lineWidth = (int)(this.ContentArea.Width - buffPosition.X - 10 * Scale);
 					float lineHeight = Game1.smallFont.MeasureString(buff.displayName).Y;
 					text = Game1.parseText(
 						text: buff.displayName,
 						whichFont: Game1.smallFont,
-						width: (int)(this.ContentArea.Width - buffPosition.X));
+						width: (int)lineWidth);
 					textSize = Game1.smallFont.MeasureString(text);
 					this.DrawText(
 						b: b,
