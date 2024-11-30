@@ -628,8 +628,9 @@ namespace LoveOfCooking.Menu
 				float buffOffsetX = 0;
 				Vector2 textSize;
 
-				// Energy
 				position.X = (CurrentLanguageCode is LanguageCode.zh ? 2 : -2) * Scale;
+
+				// Energy
 				text = buff is null
 					? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3116", stamina)
 					: stamina > 0 ? $"+{stamina}" : $"{stamina}";
@@ -647,17 +648,18 @@ namespace LoveOfCooking.Menu
 				this.DrawText(
 					b: b,
 					text: text,
-				x: position.X,
+					x: position.X,
 					y: position.Y);
 				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
 				buffOffsetX = textSize.X;
+
+				position.X -= xOffset;
 				position.Y += textSize.Y * this._textScale.Y;
 
 				// Health
 				text = buff is null
 					? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3118", health)
 					: stamina > 0 ? $"+{health}" : $"{health}";
-				position.X -= xOffset;
 				b.Draw(
 					texture: Game1.mouseCursors,
 					position: new(x: this.ContentArea.X + position.X, y: position.Y),
@@ -672,7 +674,7 @@ namespace LoveOfCooking.Menu
 				this.DrawText(
 					b: b,
 					text: text,
-				x: position.X,
+					x: position.X,
 					y: position.Y);
 				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
 				if (buffOffsetX < textSize.X)
