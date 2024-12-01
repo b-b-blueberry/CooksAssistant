@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
@@ -18,6 +19,7 @@ namespace LoveOfCooking.Menu
         public bool CanScrollLeft => this.Menu.RecipeInfo.Index > 0;
         public bool CanScrollRight => this.Menu.RecipeInfo.Index < this.Menu.Recipes.Count - 1;
 
+		public bool CanDrawDescription;
 		public bool CanScrollDescription;
 
 		// Components
@@ -307,108 +309,133 @@ namespace LoveOfCooking.Menu
 			bool knowsRecipe = recipe is not null && Game1.player.knowsRecipe(recipe.name);
             bool isKorean = CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts;
             Point cursor = Game1.getMousePosition(ui_scale: true);
-            float textHeight;
-			int[] textHeightCheckMilestones = [60, 100, 120];
-            Vector2 textOffset = Vector2.Zero;
-            Vector2 titleOffset = Vector2.Zero;
+
             int x = 0;
             int y = this.LeftButton.bounds.Top;
-			int textWidth;
-			int titleWidth;
-            string text;
-            string title;
-			int ingredientRowHeight = Game1.smallestTileSize * Scale / 2 + (recipe.getNumberOfIngredients() < 5 ? 4 : 0);
-			int ingredientDividerSpacing = 4 * Scale;
+			int rowHeight = Game1.smallestTileSize * Scale / 2 + (recipe.getNumberOfIngredients() < 5 ? 4 : 0);
+			int dividerSpacing = 4 * Scale;
+
+			// Recipe title
+
+			int titleSpacing = 8 * Scale;
+			int titleWidth = this.RightButton.bounds.Left - this.LeftButton.bounds.Right // between buttons
+				- Game1.smallestTileSize * Scale // minus icon
+				- 18 * Scale; // minus spacing
+			int titleHeight;
+			string title = knowsRecipe
+				? recipe.DisplayName
+				: Strings.Get("menu.cooking_recipe.title_unknown");
+
+			// try to squeeze large names into title area
+			Vector2 titleSize = Game1.smallFont.MeasureString(Game1.parseText(title, Game1.smallFont, titleWidth));
+			if (titleSize.X > titleWidth)
+				title = title.Replace("-", $"-{Environment.NewLine}").Trim();
 
 			float baseTitleScale = 1.5f;
 			float adjustedTitleScale = 1f;
-            textWidth = (int)(40f * Scale * this._textScale.Y);
-            text = knowsRecipe
-                ? recipe.DisplayName
-                : Strings.Get("menu.cooking_recipe.title_unknown");
-            textOffset.X = this.LeftButton.bounds.Width + 14 * Scale;
-
-            // Attempt to fix for Deutsch lange names
-            if (CurrentLanguageCode is LanguageCode.de && Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X > textWidth)
-                text = text.Replace("-", "-\n").Trim();
-
-            // Try squeeze large names into title area
-            if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X * 0.8 > textWidth)
+			if (titleSize.X * 0.8 > titleWidth)
                 adjustedTitleScale = 0.735f;
-            else if (Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).X > textWidth)
+            else if (titleSize.X > titleWidth)
                 adjustedTitleScale = 0.95f;
 
-            // Recipe title
-            textOffset.Y = 1 * Scale;
-            textOffset.Y -= (Game1.smallFont.MeasureString(
-                Game1.parseText(text, Game1.smallFont, textWidth)).Y / 2 - 6 * Scale) * this._textScale.Y * adjustedTitleScale;
-            textHeight = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y * adjustedTitleScale;
-            if (textHeight * adjustedTitleScale > textHeightCheckMilestones[0])
-                textOffset.Y += (textHeight - textHeightCheckMilestones[0]) / 2;
-            titleOffset = textOffset;
-			titleWidth = textWidth;
-            title = text;
+			// align title with icon
+			string line = "Hippo!";
+			string titleParsed = Game1.parseText(
+				text: title,
+				whichFont: Game1.smallFont,
+				width: titleWidth);
+			int titleLines = 1 + titleParsed.Count(c => c == '\n');
+			string titleTemplate = string.Join(Environment.NewLine, Enumerable.Repeat(line, titleLines));
+			titleSize = Game1.smallFont.MeasureString(titleTemplate) * this._textScale.Y * adjustedTitleScale;
+            titleHeight = (int)titleSize.Y;
+            Vector2 titleOffset = new(
+				x: this.LeftButton.bounds.Width + (Game1.smallestTileSize - 2) * Scale,
+				y: titleSpacing - titleSize.Y / 2 + titleLines * 0.5f * Scale);
 
 			// Recipe description
-			float descriptionY = Math.Max(
-				this.LeftButton.bounds.Height + 6 * Scale,
-				textOffset.Y + textHeight);
-
-			textOffset.X = 0;
-            textOffset.Y = descriptionY;
-            if (textHeight > textHeightCheckMilestones[0])
-                textOffset.Y += textHeight - 50 * this._textScale.X;
-            textWidth = (int)(this._textWidth * this._textScale.X);
-            text = knowsRecipe
+			Vector2 textOffset = new(
+				x: 0,
+				y: 4 * Scale + Math.Max(
+					this.LeftButton.bounds.Height,
+					titleOffset.Y + titleSize.Y + titleLines * 2 * Scale));
+            int textWidth = (int)(this._textWidth * this._textScale.X);
+            string text = knowsRecipe
                 ? recipe.description
                 : Strings.Get("menu.cooking_recipe.title_unknown");
 			Vector2 descriptionSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+			float descriptionY = (int)textOffset.Y;
 			float descriptionScrollScale = 2500f;
 			float descriptionScrollY = knowsRecipe && this.CanScrollDescription
 				? MathF.Sin(MathF.PI / 2 + (float)this._scrollTimer / descriptionScrollScale % descriptionScrollScale) - 1f
 				: 0;
 			descriptionScrollY *= descriptionSize.Y / Scale;
-
 			if (this.CanScrollDescription)
+				descriptionScrollY += 2 * Scale;
+			descriptionSize.Y += 2 * Scale; // added padding between description and ingredients
+
+			if (this.CanDrawDescription)
 			{
-				// Draw a horizontal cutoff for scrolling description text
-				// i don't know why single-line titles need y+3*scale and i don't care why
-				this.DrawHorizontalDivider(
+				if (this.CanScrollDescription)
+				{
+					// draw a horizontal cutoff for scrolling description text
+					this.DrawHorizontalDivider(
+						b: b,
+						x: x,
+						y: y + descriptionY + (titleLines == 1 ? 1 : 0.25f) * Scale,
+						w: this._lineWidth);
+				}
+				this.DrawText(
 					b: b,
-					x: x,
-					y: y + textOffset.Y + (textHeight * adjustedTitleScale <= textHeightCheckMilestones[0] ? 1 : -2) * Scale,
-					w: this._lineWidth);
+					text: text,
+					x: x + textOffset.X,
+					y: y + textOffset.Y + descriptionScrollY,
+					w: textWidth);
 			}
-
-			this.DrawText(
-				b: b,
-				text: text,
-				x: x + textOffset.X,
-				y: y + textOffset.Y + descriptionScrollY,
-				w: textWidth);
-            textOffset.Y += TextDividerGap * 2;
-
-			// Recipe ingredients and description spacing
-			if (textHeight > textHeightCheckMilestones[0] && descriptionSize.Y < 80)
-				textOffset.Y -= 6 * Scale;
-			textHeight = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * this._textScale.Y;
-			if (textHeight > textHeightCheckMilestones[2])
-				textOffset.Y += 6 * Scale;
-			if (textHeight > textHeightCheckMilestones[1] && recipe.getNumberOfIngredients() < 6)
-				textOffset.Y += 6 * Scale;
-			textOffset.Y += TextDividerGap + Game1.smallFont.MeasureString(
-				Game1.parseText(this._textScale.Y < 1 ? "Hippo!\nHippo!" : "Hippo!\nHippo!\nHippo!", Game1.smallFont, textWidth)).Y * this._textScale.Y;
 
 			// START TITLE CONTENT
 
 			{
-				drawDivider(x: x, y: y, w: textWidth, textOffset: textOffset, justChecking: true, out float dividerHeight);
+				// Recipe ingredients and description spacing
 
-				int ingredientsHeight = (int)(dividerHeight + (knowsRecipe ? recipe.getNumberOfIngredients() * ingredientRowHeight + ingredientDividerSpacing : 8 * Scale));
-				int ingredientsSafeY = Math.Min(
-					(int)textOffset.Y,
-					(int)(this.ContentArea.Height - ingredientsHeight - descriptionY));
-				this.CanScrollDescription = descriptionSize.Y > ingredientsSafeY - descriptionY;
+				// ingredients list will sit at a default position unless the size
+				// of the title, description, or ingredients list forces it to move
+
+				// standard measurements
+				int contentHeight = this.ContentArea.Height;
+				int footerHeight = 22 * Scale;
+				// default dimensions are roughly halfway down the page,
+				// which fits recipes with a short title, description, or ingredients list
+				float defaultY = contentHeight / 5;
+				float defaultHeight = this._textScale.Y * Game1.smallFont.MeasureString(
+					Game1.parseText(string.Join(Environment.NewLine, Enumerable.Repeat(line, this._textScale.Y < 1 ? 2 : 3)), Game1.smallFont, textWidth)).Y;
+				// we pick the larger of default and actual dimensions for ingredients,
+				// moving the ingredients list down first
+				float largestY = Math.Max(
+					descriptionY + descriptionSize.Y,
+					defaultY + defaultHeight);
+				// check divider height without drawing so we can include it in the measurements
+				// available height is area between ideal description bottom and page footer
+				// ideal Y is the draw position of an ingredients list that fits in the available height
+				int availableHeight = (int)(contentHeight - footerHeight - largestY);
+				int idealY = contentHeight - footerHeight - availableHeight;
+				drawDivider(x: x, y: y, w: textWidth, textOffset: new(textOffset.X, idealY), justChecking: true, out float dividerHeight);
+				// ingredients height is sum height of subheading divider and rows of items, including footer
+				// unknown recipes simply display a short string instead of an ingredients list
+				int ingredientsHeight = (int)((knowsRecipe
+					? recipe.getNumberOfIngredients() * rowHeight + dividerSpacing + dividerHeight
+					: 8 * Scale));
+				// diff is the distance the ingredients list and divider are extending outside of their available area
+				// if negative, it is (value) pixels outside of the available area
+				float diff = availableHeight - ingredientsHeight;
+				// final Y is the draw position of the divider and ingredients list
+				// we worked so hard for this
+				int finalY = idealY + (int)Math.Min(0, diff);
+				// description will autoscroll if its draw position + height overlap with the ingredients list draw position
+				// rhs value is the amount of overlap allowed before scrolling
+				this.CanScrollDescription = descriptionY + descriptionSize.Y - finalY > 4 * Scale;
+				// description will be hidden entirely if its draw position is almost touching the ingredients list draw position
+				// rhs value is the minimum description height to draw
+				this.CanDrawDescription = finalY - descriptionY > 8 * Scale;
 
 				// Recipe scrollable block
 				/*drawMenuSlice(slice: new(
@@ -425,7 +452,7 @@ namespace LoveOfCooking.Menu
 					isMenuLocal: true);
 				drawMenuSlice(slice: new(
 					x: 0,
-					y: ingredientsSafeY / Scale,
+					y: finalY / Scale,
 					width: CookbookAnimation.Size.X / 2,
 					height: ingredientsHeight / Scale),
 					isMenuLocal: true);
@@ -469,7 +496,7 @@ namespace LoveOfCooking.Menu
 					w: titleWidth,
 					scale: baseTitleScale * adjustedTitleScale);
 
-				textOffset.Y = ingredientsSafeY;
+				textOffset.Y = finalY;
 			}
 
 			// END TITLE CONTENT
@@ -477,7 +504,7 @@ namespace LoveOfCooking.Menu
 			{
 				// Recipe ingredients divider heading
 				drawDivider(x: x, y: y, w: textWidth, textOffset: textOffset, justChecking: false, out float dividerHeight);
-				textOffset.Y += ingredientDividerSpacing;
+				textOffset.Y += dividerSpacing;
 			}
 
 			// Recipe ingredients list
@@ -486,7 +513,7 @@ namespace LoveOfCooking.Menu
 				int i = 0;
                 foreach (var pair in recipe.recipeList)
                 {
-                    textOffset.Y += ingredientRowHeight;
+                    textOffset.Y += rowHeight;
 
                     string id = pair.Key;
                     string name = recipe.getNameFromIndex(id);
@@ -567,7 +594,7 @@ namespace LoveOfCooking.Menu
             }
             else
             {
-                textOffset.Y += ingredientRowHeight;
+                textOffset.Y += rowHeight;
                 text = Strings.Get("menu.cooking_recipe.title_unknown");
 				this.DrawText(
 					b: b,
