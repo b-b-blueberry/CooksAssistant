@@ -198,7 +198,7 @@ namespace LoveOfCooking.Objects
 					this._frame = elapsed / CookbookAnimation.FastFrameTime;
 
 					// Skip animation per config value
-					if (!ModEntry.Config.PlayMenuAnimation || ModEntry.Instance.States.Value.IsModConfigMenuTransition)
+					if (!ModEntry.Config.PlayMenuAnimation)
 					{
 						this._frame = CookbookAnimation.LastFrame;
 						inverse = 1;
