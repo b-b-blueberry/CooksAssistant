@@ -118,9 +118,6 @@ namespace LoveOfCooking
 			// Cooking Animations
 			this.Helper.Events.Display.RenderedWorld += this.Event_DrawCookingAnimation;
 
-			// Cookbook Animations
-			this.States.Value.CookbookAnimation.Register(helper: this.Helper);
-
 			// Food Heals Over Time
 			this.States.Value.Regeneration.RegisterEvents(helper: this.Helper);
 

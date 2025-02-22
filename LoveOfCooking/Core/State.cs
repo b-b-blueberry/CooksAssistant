@@ -2,6 +2,7 @@
 using System.Linq;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Mods;
 
@@ -43,7 +44,11 @@ namespace LoveOfCooking
 		public State()
 		{
 			this.Reset();
-		}
+
+            // Cookbook Animations
+            this.CookbookAnimation.ScreenId = Context.ScreenId;
+            this.CookbookAnimation.Register(helper: ModEntry.Instance.Helper);
+        }
 
 		/// <summary>
 		/// Reset all variables to default values.

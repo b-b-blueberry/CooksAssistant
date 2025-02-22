@@ -1,5 +1,4 @@
 ﻿using System;
-using LoveOfCooking.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -48,7 +47,11 @@ namespace LoveOfCooking.Objects
 		public static readonly Point Size = new(x: 256, y: 256);
 		public static Texture2D Texture { get; private set; }
 
-		public CookbookAnimation()
+        // Splitscreen
+        private int _screenId;
+        public int ScreenId { get => this._screenId; set => this._screenId = value; }
+
+        public CookbookAnimation()
 		{
 			this.Reset();
 		}
@@ -113,6 +116,9 @@ namespace LoveOfCooking.Objects
 
 		private void Update(object sender, UpdateTickedEventArgs e)
 		{
+			if (this.ScreenId != Context.ScreenId)
+				return;
+
 			// Update blackout fade independently of animation
 			if (this._isVisible && this._fade < CookbookAnimation.FadeTo)
 				this._fade += CookbookAnimation.FadeTo / CookbookAnimation.FadeTime;
@@ -263,7 +269,7 @@ namespace LoveOfCooking.Objects
 
 		private void Draw(object sender, RenderedHudEventArgs e)
 		{
-			if (this._fade <= 0 || CookbookAnimation.Texture is null)
+			if (this.ScreenId != Context.ScreenId || this._fade <= 0 || CookbookAnimation.Texture is null)
 				return;
 
 			Rectangle area = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
