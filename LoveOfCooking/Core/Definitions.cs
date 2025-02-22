@@ -6,8 +6,6 @@ namespace LoveOfCooking
 {
 	public class SkillValues
 	{
-		// Level-up pages
-		public IDictionary<int, IList<string>> LevelUpRecipes;
 		// Experience gains
 		public Color ExperienceBarColor;
 		public List<int> ExperienceCurve;

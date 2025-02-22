@@ -1,8 +1,9 @@
-﻿using SpaceCore;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
-using System;
-using System.Collections.Generic;
 
 namespace LoveOfCooking.Objects
 {
@@ -30,8 +31,9 @@ namespace LoveOfCooking.Objects
 		int GetExperienceRequiredForLevel(int level);
 		int GetTotalExperienceRequiredForLevel(int level);
 		int GetExperienceRemainingUntilLevel(int level);
+		IList<string> GetAllLoveOfCookingRecipes();
 		IReadOnlyDictionary<int, IList<string>> GetAllLevelUpRecipes();
-		IReadOnlyList<string> GetCookingRecipesForLevel(int level);
+        IReadOnlyList<string> GetCookingRecipesForLevel(int level);
 		int CalculateExperienceGainedFromCookingItem(Item item, int numIngredients, int numCooked, bool applyExperience);
 		bool RollForExtraPortion();
 	}
@@ -154,26 +156,38 @@ namespace LoveOfCooking.Objects
 			return this.GetTotalExperienceRequiredForLevel(level) - this.GetTotalCurrentExperience();
 		}
 
-		/// <returns>Table of recipes learned through leveling Cooking.</returns>
-		public IReadOnlyDictionary<int, IList<string>> GetAllLevelUpRecipes()
-		{
-			return (IReadOnlyDictionary<int, IList<string>>)ModEntry.Definitions.CookingSkillValues.LevelUpRecipes;
-		}
+        /// <returns>Table of recipes learned through leveling Cooking.</returns>
+        public IList<string> GetAllLoveOfCookingRecipes()
+        {
+            return CraftingRecipe.cookingRecipes.Keys
+				.Where(s => s.StartsWith(ModEntry.AssetPrefix))
+				.ToList();
+        }
 
-		/// <returns>New recipes learned when reaching this level.</returns>
-		public IReadOnlyList<string> GetCookingRecipesForLevel(int level)
+        /// <returns>Table of recipes learned through leveling Cooking.</returns>
+        public IReadOnlyDictionary<int, IList<string>> GetAllLevelUpRecipes()
+        {
+			IDictionary<int, IList<string>> recipes = new Dictionary<int, IList<string>>();
+			for (int level = 0; level <= 10; ++level)
+            {
+                recipes.TryAdd(level, []);
+            }
+			foreach ((string recipe, string data) in CraftingRecipe.cookingRecipes)
+			{
+				string[] requirements = ArgUtility.Get(data.Split('/'), 3).Split(' ');
+                if (requirements.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
+				{
+					recipes.TryAdd(level, []);
+					recipes[level].Add(recipe);
+				}
+			}
+			return (IReadOnlyDictionary<int, IList<string>>)recipes;
+        }
+
+        /// <returns>New recipes learned when reaching this level.</returns>
+        public IReadOnlyList<string> GetCookingRecipesForLevel(int level)
 		{
-			// Level undefined
-			if (!ModEntry.Definitions.CookingSkillValues.LevelUpRecipes.ContainsKey(level))
-			{
-				return [];
-			}
-			// Level used for professions, no new recipes added
-			if (level % 5 == 0)
-			{
-				return [];
-			}
-			return (IReadOnlyList<string>)ModEntry.Definitions.CookingSkillValues.LevelUpRecipes[level];
+			return (IReadOnlyList<string>)(this.GetAllLevelUpRecipes().TryGetValue(level, out var value) ? value ?? [] : []);
 		}
 
 		/// <summary>

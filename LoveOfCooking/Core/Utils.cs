@@ -815,52 +815,6 @@ namespace LoveOfCooking
 			return rate;
 		}
 
-		public static void AddAndDisplayNewRecipesOnLevelUp(SpaceCore.Interface.SkillLevelUpMenu menu)
-		{
-			// Add cooking recipes
-			string skill = ModEntry.Instance.Helper.Reflection
-				.GetField<string>(menu, "currentSkill")
-				.GetValue();
-			if (skill != CookingSkill.InternalName)
-				return;
-			
-			int level = ModEntry.Instance.Helper.Reflection
-				.GetField<int>(menu, "currentLevel")
-				.GetValue();
-			List<CraftingRecipe> cookingRecipes = ModEntry.CookingSkillApi
-				.GetCookingRecipesForLevel(level)
-				.ToList()
-				.ConvertAll(name => new CraftingRecipe(name: ModEntry.ObjectPrefix + name, isCookingRecipe: true))
-				.Where(recipe => !Game1.player.knowsRecipe(recipe.name))
-				.ToList();
-			foreach (CraftingRecipe recipe in cookingRecipes.Where(r => !Game1.player.cookingRecipes.ContainsKey(r.name)))
-			{
-				Game1.player.cookingRecipes[recipe.name] = 0;
-			}
-
-			// Add crafting recipes
-			List<CraftingRecipe> craftingRecipes = [];
-			// No new crafting recipes currently.
-
-			// Apply new recipes
-			List<CraftingRecipe> combinedRecipes = craftingRecipes
-				.Concat(cookingRecipes)
-				.ToList();
-			ModEntry.Instance.Helper.Reflection
-				.GetField<List<CraftingRecipe>>(menu, "newCraftingRecipes")
-				.SetValue(combinedRecipes);
-			Log.D(combinedRecipes.Aggregate($"New recipes for level {level}:", (total, cur) => $"{total}{Environment.NewLine}{cur.name} ({cur.createItem().ItemId})"),
-				ModEntry.Config.DebugMode);
-
-			// Adjust menu to fit if necessary
-			const int defaultMenuHeightInRecipes = 4;
-			int menuHeightInRecipes = combinedRecipes.Count + combinedRecipes.Count(recipe => recipe.bigCraftable);
-			if (menuHeightInRecipes >= defaultMenuHeightInRecipes)
-			{
-				menu.height += (menuHeightInRecipes - defaultMenuHeightInRecipes) * StardewValley.Object.spriteSheetTileSize * Game1.pixelZoom;
-			}
-		}
-
 		public static bool IsFridgeOrMinifridge(StardewValley.Object o)
 		{
 			return o is Chest c && c.fridge.Value;

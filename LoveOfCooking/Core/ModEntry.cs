@@ -140,8 +140,7 @@ namespace LoveOfCooking
 			string cmd = ModEntry.Definitions.ConsoleCommandPrefix;
 
 			IEnumerable<string> forgetLoveOfCookingRecipes() {
-				IEnumerable<string> recipes = ModEntry.Definitions.CookingSkillValues.LevelUpRecipes.Values
-					.SelectMany(s => s);
+				IEnumerable<string> recipes = CookingSkillApi.GetAllLoveOfCookingRecipes();
 				foreach (string recipe in recipes)
 				{
 					Game1.player.cookingRecipes.Remove(recipe);
@@ -448,13 +447,6 @@ namespace LoveOfCooking
 			{
 				// Unlock any existing mutexes from this player
 				ModEntry.Instance.States.Value.MenuMutex?.ReleaseLocks();
-			}
-
-			// Add new recipes on level-up for Cooking skill
-			if (e.NewMenu is SpaceCore.Interface.SkillLevelUpMenu levelUpMenu1)
-			{
-				Utils.AddAndDisplayNewRecipesOnLevelUp(levelUpMenu1);
-				return;
 			}
 		}
 

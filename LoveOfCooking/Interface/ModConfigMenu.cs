@@ -438,7 +438,7 @@ namespace LoveOfCooking.Interface
 				name: () => string.Empty,
 				beforeMenuOpened: () =>
 				{
-					recipeTable = ModEntry.Definitions.CookingSkillValues.LevelUpRecipes;
+					recipeTable = (IDictionary<int, IList<string>>)ModEntry.CookingSkillApi.GetAllLevelUpRecipes();
 					recipeTableSize = new(
 						x: recipeTable.Values.MaxBy(list => list.Count).Count,
 						y: recipeTable.Values.Count);
@@ -462,10 +462,10 @@ namespace LoveOfCooking.Interface
 					v.X -= width / 2;
 
 					// Draw each level-recipe column
-					foreach (var pair in recipeTable)
+					for (int level = 0; level <= recipeTable.Keys.Max(); ++level)
 					{
-						int level = pair.Key;
-						bool isProfessionLevel = (!pair.Value?.Any() ?? false);
+						recipeTable.TryGetValue(level, out IList<string> recipes);
+						bool isProfessionLevel = level % 5 == 0;
 
 						// Set column and row
 						toArea.Location = v.ToPoint() + new Point(x: fromArea.Width * level * Scale + level * columnSpacing + (level / 5) * professionSpacing, y: 0);
@@ -517,12 +517,12 @@ namespace LoveOfCooking.Interface
 									layerDepth: 1);
 							}
 						}
-						else
+						else if (recipes is not null)
 						{
 							// Draw recipe icons for this level
-							foreach (string item in pair.Value)
+							foreach (string item in recipes)
 							{
-								ObjectData entry = Game1.objectData[$"{ModEntry.ObjectPrefix}{item}"];
+								ObjectData entry = Game1.objectData[item];
 								fromArea = Game1.getSourceRectForStandardTileSheet(
 									tileSheet: objectSprites[entry.Name],
 									tilePosition: entry.SpriteIndex,
