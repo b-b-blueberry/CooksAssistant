@@ -11,6 +11,9 @@
 			"Target": "Data/mail",
 			"Priority": "Early", // [EN]-ONLY: REMOVE THIS LINE FROM CUSTOM TRANSLATION PACKS!!
 			"Entries": {
+
+				////////////////////// 2.0.0
+
 				"blueberry.LoveOfCooking.cookbook_unlocked": "Hi @,^  I was clearing out the attic and found just the thing for you - the old family cookbook! ^  It's missing a few pages, but I'm sure you'll make do. I've thrown in our spare frying pan to help you get started. ^^ Take care honey, and remember to eat well! ^  Love, Mom%item id blueberry.LoveOfCooking_cookbook 1 %%[#]Mom's Cookbook",
 				"blueberry.LoveOfCooking.seasoning_1": "Hi honey,^I came across this recipe in a lifestyle magazine!^It's supposed to make anything taste better.^^Remember to make balanced meals!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_1 %%",
 				"blueberry.LoveOfCooking.seasoning_2": "Hi sweetie!^A wonderful cookery show was on TV showing all-new ways to flavour your food!^I just had to write the recipe down for you.^Keep practicing your cooking!^  Love, Mom%item craftingRecipe blueberry.LoveOfCooking_seasoning_2 %%",
@@ -23,6 +26,14 @@
 			"Target": "Mods/blueberry.LoveOfCooking.Assets/Strings",
 			"Priority": "Early", // [EN]-ONLY: REMOVE THIS LINE FROM CUSTOM TRANSLATION PACKS!!
 			"Entries": {
+
+				////////////////////// 2.0.2
+
+				// BetterCrafting
+				"menu.better_crafting.can_craft.cooking_tool_level": "{0} can only craft with up to {1} ingredients.",
+
+				////////////////////// 2.0.0
+
 				// Mod info
 				"mod.name": "Love of Cooking",
 

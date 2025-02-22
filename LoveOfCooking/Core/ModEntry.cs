@@ -69,6 +69,8 @@ namespace LoveOfCooking
 		// Mod features
 		internal static float DebugGlobalExperienceRate = 1f;
 
+		// Better Crafting
+		internal static Dictionary<string, IIngredient> BetterCraftingSeasonings = [];
 
 		public override void Entry(IModHelper helper)
 		{
@@ -124,6 +126,13 @@ namespace LoveOfCooking
 
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
 			SpaceEvents.AfterGiftGiven += this.SpaceEvents_AfterGiftGiven;
+
+			if (Interfaces.BetterCraftingApi is IBetterCrafting betterCrafting)
+			{
+				betterCrafting.ApplySeasoning += this.BetterCrafting_ApplySeasoning;
+				betterCrafting.CheckCanCraft += this.BetterCrafting_CheckCanCraft;
+				betterCrafting.PostCraft += this.BetterCrafting_PostCraft;
+			}
 		}
 
 		private void AddConsoleCommands()
@@ -567,6 +576,55 @@ namespace LoveOfCooking
 			}
 		}
 
+		private void BetterCrafting_CheckCanCraft(ICheckCanCraftEvent e)
+		{
+			if (ModEntry.Config.AddCookingToolProgression && e.IsCooking)
+			{
+				int level = CookingTool.GetEffectiveGlobalLevel();
+				int allowed = CookingTool.NumIngredientsAllowed(level: level);
+				int required = e.Recipe.Ingredients?.Length ?? 0;
+				string toolId = CookingTool.ToolID(level: level);
+				if (allowed < required)
+				{
+					string s = Strings.Get("menu.better_crafting.can_craft.cooking_tool_level", "@C{red}@M{" + toolId + "}", allowed, required);
+					e.Fail(s);
+				}
+			}
+		}
+
+		private void BetterCrafting_ApplySeasoning(IApplySeasoningEvent e)
+		{
+			if (e.Item is StardewValley.Object o && o.Quality is StardewValley.Object.lowQuality)
+			{
+				foreach ((string itemId, IIngredient seasoning) in ModEntry.BetterCraftingSeasonings)
+				{
+					if (e.HasIngredients(seasoning) && ModEntry.Definitions.Seasonings.TryGetValue(itemId, out SeasoningData data))
+					{
+						o.Quality = data.Quality;
+						e.SetUsedLastMessage(Game1.content.LoadString(data.MessageStringKey, seasoning.DisplayName));
+						e.ApplySeasoning(seasoning);
+						return;
+					}
+				}
+			}
+		}
+
+		private void BetterCrafting_PostCraft(IPostCraftEvent e)
+		{
+			if (e.Recipe.CraftingRecipe is CraftingRecipe recipe && recipe.isCookingRecipe)
+			{
+				Item output = e.Item;
+				Utils.TryCookingSkillBehavioursOnCooked(
+					recipe: recipe,
+					item: ref output);
+				Utils.TryBurnFoodForBetterCrafting(
+					menu: e.Menu,
+					recipe: recipe,
+					input: ref output);
+				e.Item = output;
+			}
+		}
+
 		private bool Init()
 		{
 			try
@@ -645,6 +703,13 @@ namespace LoveOfCooking
 			if (ModEntry.CookingSkillApi?.GetSkill() is CookingSkill skill)
 			{
 				skill.ReloadAssets();
+			}
+
+			if (Interfaces.BetterCraftingApi is IBetterCrafting betterCrafting)
+			{
+				ModEntry.BetterCraftingSeasonings = ModEntry.Definitions.Seasonings.ToDictionary(
+					pair => pair.Key,
+					pair => betterCrafting.CreateBaseIngredient(pair.Key, pair.Value.Quality));
 			}
 		}
 
