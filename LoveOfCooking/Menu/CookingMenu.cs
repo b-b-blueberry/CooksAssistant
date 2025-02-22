@@ -414,14 +414,6 @@ namespace LoveOfCooking.Menu
 
             // Menu
             yOffset = 54 * Scale;
-            if (Context.IsSplitScreen)
-            {
-                centre.X /= 2;
-            }
-            if (this.InventoryManager.UseHorizontalInventoryButtonArea)
-            {
-                yOffset = yOffset / 3 * 2;
-            }
 			this.yPositionOnScreen = (int)(centre.Y - CookbookSource.Center.Y * Scale + yOffset);
 			this.xPositionOnScreen = (int)(centre.X - CookbookSource.Center.X * Scale + xOffset);
 
@@ -440,7 +432,7 @@ namespace LoveOfCooking.Menu
 				int bound = Game1.viewport.Width / 2;
 				float scale = Game1.options.uiScale;
 				float diff = (pos - bound) * scale;
-				this.upperRightCloseButton.bounds.X -= (int)Math.Max(0, diff / 2);
+				this.upperRightCloseButton.bounds.X -= (int)Math.Max(0, diff / 4);
 			}
 
 			this._upperRightInfoButton.bounds.X = this.upperRightCloseButton.bounds.X;
