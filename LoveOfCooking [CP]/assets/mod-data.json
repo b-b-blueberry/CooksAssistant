@@ -113,9 +113,9 @@
                     "minervamaga.FR.BiggerFarmhouses"
                 ],
                 "FoodsThatGiveLeftovers": {
-                    "{{ID}}_seafoodsando": "{{ID}}_seafoodsando_half",
-                    "{{ID}}_eggsando": "{{ID}}_eggsando_half",
-                    "{{ID}}_saladsando": "{{ID}}_saladsando_half"
+                    "{{ID}}_seafoodsando": "blueberry.LoveOfCooking_seafoodsando_half",
+                    "{{ID}}_eggsando": "blueberry.LoveOfCooking_eggsando_half",
+                    "{{ID}}_saladsando": "blueberry.LoveOfCooking_saladsando_half"
                 },
                 "DefaultSeasoning": "917",
                 "Seasonings": {
