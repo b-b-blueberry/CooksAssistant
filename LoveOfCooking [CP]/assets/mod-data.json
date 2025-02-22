@@ -97,6 +97,7 @@
                     "Life Elixir",
                     "Energy Tonic"
                 ],
+                "IndoorsTileSheetTextureName": "Maps\\townInterior",
                 "IndoorsTileIndexesOfKitchens": [ 498, 499, 631, 632, 633 ],
                 "IndoorsTileIndexesOfFridges": [ 173, 258, 500, 634 ],
                 "BurnChanceBase": 0.22,

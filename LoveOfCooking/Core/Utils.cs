@@ -1050,7 +1050,9 @@ namespace LoveOfCooking
 			{
 				for (int x = 0; x < layer.LayerWidth; x++)
 				{
-					if (ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(location.getTileIndexAt(x: x, y: y, layer: layerId)))
+					if (layer.Tiles[x, y] is Tile tile
+						&& tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
+                        && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex))
 					{
 						return true;
 					}
@@ -1075,23 +1077,22 @@ namespace LoveOfCooking
 				return false;
 			}
 
-			// Check for indoors kitchen tiles
-			if (tile is not null)
+            // Check for indoors kitchen tiles
+            bool isCookingStationTile = tile is not null
+				&& tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
+                && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
+			if (!location.IsOutdoors && isCookingStationTile)
 			{
-				bool isCookingStationTile = ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
-				if (!location.IsOutdoors && isCookingStationTile)
+				if (!location.IsFarm)
 				{
-					if (!location.IsFarm)
+					// Check friendship before using kitchens in NPC homes outside of the farm
+					string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
+					if (!Utils.CanUseCharacterKitchen(who: who, character: npc))
 					{
-						// Check friendship before using kitchens in NPC homes outside of the farm
-						string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
-						if (!Utils.CanUseCharacterKitchen(who: who, character: npc))
-						{
-							friendshopLockedBy = npc;
-						}
+						friendshopLockedBy = npc;
 					}
-					return true;
 				}
+				return true;
 			}
 
 			return false;
