@@ -52,7 +52,6 @@ namespace LoveOfCooking.Interface
 			{
 				if (!Interfaces.IsLoaded)
 				{
-					Interfaces.IdentifyLoadedOptionalMods();
 					Interfaces.LoadCustomCommunityCentreContent();
 					Interfaces.LoadBetterCraftingAPI();
 					Interfaces.IsLoaded = true
@@ -67,11 +66,12 @@ namespace LoveOfCooking.Interface
 			}
 		}
 
-		private static void IdentifyLoadedOptionalMods()
+		internal static void LoadOptionalMods()
 		{
 			UsingCustomCC = Interfaces.Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingBigBackpack = Interfaces.Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
 			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Interfaces.Helper.ModRegistry.IsLoaded);
+			ModConfigMenu.Generate(gmcm: Interfaces.GenericModConfigMenu);
 		}
 
 		private static bool LoadSpaceCoreAPI()
@@ -161,7 +161,6 @@ namespace LoveOfCooking.Interface
 			}
 
 			Interfaces.GenericModConfigMenu = gmcm;
-			ModConfigMenu.Generate(gmcm: gmcm);
 			return true;
 		}
 

@@ -593,6 +593,9 @@ namespace LoveOfCooking
 		{
 			try
 			{
+				// Interfaces (register)
+				Interfaces.Load();
+
 				// Game state queries
 				Queries.RegisterAll();
 
@@ -608,8 +611,8 @@ namespace LoveOfCooking
 				// Console commands
 				this.AddConsoleCommands();
 
-				// Interfaces
-				Interfaces.Load();
+				// Interfaces (with content)
+				Interfaces.LoadOptionalMods();
 
 				// Cooking skill
 				ModEntry.CookingSkillApi = new CookingSkillAPI(this.Helper.Reflection);
@@ -639,7 +642,10 @@ namespace LoveOfCooking
 				.OrderByDescending(pair => pair.Value.Quality)
 				.ToDictionary(pair => pair.Key, pair => pair.Value);
 
-			ModEntry.CookingSkillApi?.GetSkill()?.ReloadAssets();
+			if (ModEntry.CookingSkillApi?.GetSkill() is CookingSkill skill)
+			{
+				skill.ReloadAssets();
+			}
 		}
 
 		private void PrintConfig()
