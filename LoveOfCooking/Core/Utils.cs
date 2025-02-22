@@ -20,6 +20,7 @@ using StardewValley.Objects;
 using StardewValley.Projectiles;
 using StardewValley.SpecialOrders.Objectives;
 using StardewValley.TerrainFeatures;
+using StardewValley.TokenizableStrings;
 using xTile.Layers;
 using xTile.Tiles;
 using CraftingPage = StardewValley.Menus.CraftingPage;
@@ -367,7 +368,7 @@ namespace LoveOfCooking
 			// Icons are furnished with some recognisable stereotypes of items from each category
 			if (ModEntry.Definitions.CategoryDisplayInformation.TryGetValue(id, out string[] value)) {
 				displayId = value[0];
-				displayName = Game1.content.LoadString(value[1]);
+				displayName = TokenParser.ParseText(value[1]);
 				return true;
 			}
 			else
