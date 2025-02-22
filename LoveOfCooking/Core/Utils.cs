@@ -353,7 +353,6 @@ namespace LoveOfCooking
 					// Take all recipe lists up to the current level
 					.TakeWhile(pair => pair.Key < level)
 					.SelectMany(pair => pair.Value) // Flatten recipe lists into their recipes
-					.Select(r => ModEntry.ObjectPrefix + r) // Add item prefixes
 					.Where(r => !Game1.player.cookingRecipes.ContainsKey(r)); // Take recipes not known by the player
 				foreach (string recipe in missingRecipes)
 				{

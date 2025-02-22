@@ -135,7 +135,7 @@ namespace LoveOfCooking
 					.SelectMany(s => s);
 				foreach (string recipe in recipes)
 				{
-					Game1.player.cookingRecipes.Remove(ModEntry.ObjectPrefix + recipe);
+					Game1.player.cookingRecipes.Remove(recipe);
 				}
 				return recipes;
 			}

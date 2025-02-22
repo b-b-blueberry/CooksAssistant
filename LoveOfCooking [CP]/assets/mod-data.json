@@ -28,15 +28,15 @@
                     // Level-up pages
                     "LevelUpRecipes": {
                         "0": [],
-                        "1": [ "bakedpotato", "burrito", "quiche" ],
-                        "2": [ "crepes", "hotcocoa", "breakfast", "waffles" ],
-                        "3": [ "arancini", "craymornay", "leeks", "lobster" ],
-                        "4": [ "carrotcake", "chocoflan", "profiteroles", "parfait" ],
+                        "1": [ "{{ID}}_bakedpotato", "{{ID}}_burrito", "{{ID}}_quiche" ],
+                        "2": [ "{{ID}}_crepes", "{{ID}}_hotcocoa", "{{ID}}_breakfast", "{{ID}}_waffles" ],
+                        "3": [ "{{ID}}_arancini", "{{ID}}_craymornay", "{{ID}}_leeks", "{{ID}}_lobster" ],
+                        "4": [ "{{ID}}_carrotcake", "{{ID}}_chocoflan", "{{ID}}_profiteroles", "{{ID}}_parfait" ],
                         "5": [],
-                        "6": [ "cocococktail", "nigiri", "unagi", "kebab", "fruity" ],
-                        "7": [ "cherrypie", "eggsando", "summersalad", "lasagna", "burger" ],
-                        "8": [ "applepie", "saladsando", "hunters", "curry", "roast" ],
-                        "9": [ "admiralpie", "seafoodsando", "pilaf", "paella", "oceanplatter" ],
+                        "6": [ "{{ID}}_cocococktail", "{{ID}}_nigiri", "{{ID}}_unagi", "{{ID}}_kebab", "{{ID}}_fruity" ],
+                        "7": [ "{{ID}}_cherrypie", "{{ID}}_eggsando", "{{ID}}_summersalad", "{{ID}}_lasagna", "{{ID}}_burger" ],
+                        "8": [ "{{ID}}_applepie", "{{ID}}_saladsando", "{{ID}}_hunters", "{{ID}}_curry", "{{ID}}_roast" ],
+                        "9": [ "{{ID}}_admiralpie", "{{ID}}_seafoodsando", "{{ID}}_pilaf", "{{ID}}_paella", "{{ID}}_oceanplatter" ],
                         "10": []
                     },
                     // Experience gains
