@@ -384,17 +384,14 @@ namespace LoveOfCooking.Interface
 						layerDepth: 1);
 
 					// Next level number
-					if (!isMaxLevel)
-					{
-						offset = new Vector2(x: width + spacing, y: 0);
-						Utility.drawTinyDigits(
-							toDraw: nextLevel,
-							b: b,
-							position: v + offset,
-							scale: Scale,
-							layerDepth: 1,
-							c: nextLevel % 5 == 0 ? Color.Orange : Color.White);
-					}
+					offset = new Vector2(x: width + spacing, y: 0);
+					Utility.drawTinyDigits(
+						toDraw: isMaxLevel ? level : nextLevel,
+						b: b,
+						position: v + offset,
+						scale: Scale,
+						layerDepth: 1,
+						c: nextLevel % 5 == 0 ? Color.Orange : Color.White);
 
 					// Experience bar
 					// background
@@ -425,7 +422,7 @@ namespace LoveOfCooking.Interface
 					// Draw friendship requirements
 					v.Y += 8 * Scale;
 					string experience = isMaxLevel
-						? Strings.Get("config.info.cookingskill.subheading.2", currentXP)
+						? Strings.Get("config.info.cookingskill.subheading.maxlevel")
 						: Strings.Get("config.info.cookingskill.subheading.3", currentXP, requiredXP);
 					v.Y += ModConfigMenu.DrawSubheading(b: b, v: v + new Vector2(x: width / 2, y: offset.Y), text: experience, font: Game1.smallFont).Y;
 					v.Y += 8 * Scale;

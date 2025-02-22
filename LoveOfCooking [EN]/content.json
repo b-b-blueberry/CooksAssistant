@@ -29,6 +29,9 @@
 
 				////////////////////// 2.0.2
 
+				// Config options
+				"config.info.cookingskill.subheading.maxlevel": "Level MAX",
+
 				// BetterCrafting
 				"menu.better_crafting.can_craft.cooking_tool_level": "{0} can only craft with up to {1} ingredients.",
 
