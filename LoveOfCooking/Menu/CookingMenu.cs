@@ -1451,6 +1451,14 @@ namespace LoveOfCooking.Menu
 			this.DrawExtraStuff(b);
         }
 
+        public override void drawBackground(SpriteBatch b)
+        {
+            base.drawBackground(b);
+
+            // Redraw CookbookAnimation over MenuBackground
+            ModEntry.Instance.States.Value.CookbookAnimation.Draw(b);
+        }
+
         private void DrawExtraStuff(SpriteBatch b)
 		{
 			// DEBUG

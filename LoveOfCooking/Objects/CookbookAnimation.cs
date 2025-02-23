@@ -89,7 +89,7 @@ namespace LoveOfCooking.Objects
 		public void Register(IModHelper helper)
 		{
 			helper.Events.GameLoop.UpdateTicked += this.Update;
-			helper.Events.Display.RenderedHud += this.Draw;
+			helper.Events.Display.RenderedHud += (object sender, RenderedHudEventArgs e) => this.Draw(e.SpriteBatch);
 		}
 
 		public void Play(Animation animation, Action onComplete = null)
@@ -267,21 +267,19 @@ namespace LoveOfCooking.Objects
 			}
 		}
 
-		private void Draw(object sender, RenderedHudEventArgs e)
+		public void Draw(SpriteBatch b)
 		{
 			if (this.ScreenId != Context.ScreenId || this._fade <= 0 || CookbookAnimation.Texture is null)
 				return;
 
-			Rectangle area = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
-
 			// Blackout
-			e.SpriteBatch.Draw(
+			b.Draw(
 				texture: Game1.fadeToBlackRect,
-				destinationRectangle: area,
+				destinationRectangle: Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea,
 				color: Color.Black * this._fade);
 
 			// Animation
-			e.SpriteBatch.Draw(
+			b.Draw(
 				texture: CookbookAnimation.Texture,
 				position: this.GetDrawOrigin(),
 				sourceRectangle: new(
