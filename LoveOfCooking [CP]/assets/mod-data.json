@@ -33,13 +33,12 @@
                         "A": 255
                     },
                     "ExperienceCurve": [ 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 ],
-                    "GlobalExperienceRate": 1.0,
                     "MaxFoodStackPerDayForExperienceGains": 50,
-                    "ExperienceGlobalScaling": 1.0,
+                    "ExperienceGlobalScaling": 1.25,
                     "ExperienceNewRecipeBonus": 34,
                     "ExperienceDailyBonus": 12,
                     "ExperienceIngredientsBaseValue": 1.0,
-                    "ExperienceIngredientsBonusScaling": 0.2,
+                    "ExperienceIngredientsBonusScaling": 0.5,
                     "ExperienceIngredientsFinalBaseValue": 5.0,
                     "ExperienceIngredientsBonusFinalMultiplier": 4.0,
                     // Profession bonuses
