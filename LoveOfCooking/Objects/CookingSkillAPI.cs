@@ -172,15 +172,18 @@ namespace LoveOfCooking.Objects
             {
                 recipes.TryAdd(level, []);
             }
-			foreach ((string recipe, string data) in CraftingRecipe.cookingRecipes)
-			{
-				string[] requirements = ArgUtility.Get(data.Split('/'), 3).Split(' ');
-                if (requirements.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
-				{
-					recipes.TryAdd(level, []);
-					recipes[level].Add(recipe);
-				}
-			}
+			if ((CraftingRecipe.cookingRecipes ?? DataLoader.CookingRecipes(Game1.content)) is Dictionary<string, string> data)
+            {
+                foreach ((string key, string value) in data)
+                {
+                    string[] requirements = ArgUtility.Get(value.Split('/'), 3).Split(' ');
+                    if (requirements.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
+                    {
+                        recipes.TryAdd(level, []);
+                        recipes[level].Add(key);
+                    }
+                }
+            }
 			return (IReadOnlyDictionary<int, IList<string>>)recipes;
         }
 
