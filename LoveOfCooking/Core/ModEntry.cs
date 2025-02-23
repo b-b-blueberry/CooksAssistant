@@ -169,7 +169,7 @@ namespace LoveOfCooking
 					}
 
 					// Update experience
-					this.Helper.Reflection.GetField
+					this.Helper.Reflection.GetProperty
 						<Dictionary<long, Dictionary<string, int>>>
 						(typeof(SpaceCore.Skills), "Exp")
 						.GetValue()
