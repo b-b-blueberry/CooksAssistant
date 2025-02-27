@@ -176,8 +176,11 @@ namespace LoveOfCooking.Objects
             {
                 foreach ((string key, string value) in data)
                 {
-                    string[] requirements = ArgUtility.Get(value.Split('/'), 3).Split(' ');
-                    if (requirements.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
+                    if (value is null || !ArgUtility.TryGet(value.Split('/'), 3, out string field, out string error, allowBlank: false) || field is null || error is not null)
+                        continue;
+
+					string[] requirements = field?.Split(' ');
+                    if (requirements?.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
                     {
                         recipes.TryAdd(level, []);
                         recipes[level].Add(key);
