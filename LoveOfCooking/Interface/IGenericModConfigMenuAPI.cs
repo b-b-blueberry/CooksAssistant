@@ -5,7 +5,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Utilities;
 using StardewValley;
 
-namespace LoveOfCooking
+namespace LoveOfCooking.Interface
 {
 	/// <summary>The API which lets other mods add a config UI through Generic Mod Config Menu.</summary>
 	public interface IGenericModConfigMenuAPI
@@ -163,6 +163,10 @@ namespace LoveOfCooking
 		/// <summary>Open the config UI for a specific mod.</summary>
 		/// <param name="mod">The mod's manifest.</param>
 		void OpenModMenu(IManifest mod);
+
+		/// <summary>Open the config UI for a specific mod, as a child menu if there is an existing menu.</summary>
+		/// <param name="mod">The mod's manifest.</param>
+		void OpenModMenuAsChildMenu(IManifest mod);
 
 		/// <summary>Get the currently-displayed mod config menu, if any.</summary>
 		/// <param name="mod">The manifest of the mod whose config menu is being shown, or <c>null</c> if not applicable.</param>

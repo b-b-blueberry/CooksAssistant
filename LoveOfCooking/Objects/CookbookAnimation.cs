@@ -1,5 +1,4 @@
 ﻿using System;
-using LoveOfCooking.Menu;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI;
@@ -48,7 +47,11 @@ namespace LoveOfCooking.Objects
 		public static readonly Point Size = new(x: 256, y: 256);
 		public static Texture2D Texture { get; private set; }
 
-		public CookbookAnimation()
+        // Splitscreen
+        private int _screenId;
+        public int ScreenId { get => this._screenId; set => this._screenId = value; }
+
+        public CookbookAnimation()
 		{
 			this.Reset();
 		}
@@ -86,7 +89,7 @@ namespace LoveOfCooking.Objects
 		public void Register(IModHelper helper)
 		{
 			helper.Events.GameLoop.UpdateTicked += this.Update;
-			helper.Events.Display.RenderedHud += this.Draw;
+			helper.Events.Display.RenderedHud += (object sender, RenderedHudEventArgs e) => this.Draw(e.SpriteBatch);
 		}
 
 		public void Play(Animation animation, Action onComplete = null)
@@ -113,6 +116,9 @@ namespace LoveOfCooking.Objects
 
 		private void Update(object sender, UpdateTickedEventArgs e)
 		{
+			if (this.ScreenId != Context.ScreenId)
+				return;
+
 			// Update blackout fade independently of animation
 			if (this._isVisible && this._fade < CookbookAnimation.FadeTo)
 				this._fade += CookbookAnimation.FadeTo / CookbookAnimation.FadeTime;
@@ -198,7 +204,7 @@ namespace LoveOfCooking.Objects
 					this._frame = elapsed / CookbookAnimation.FastFrameTime;
 
 					// Skip animation per config value
-					if (!ModEntry.Config.PlayMenuAnimation || ModEntry.Instance.States.Value.IsModConfigMenuTransition)
+					if (!ModEntry.Config.PlayMenuAnimation)
 					{
 						this._frame = CookbookAnimation.LastFrame;
 						inverse = 1;
@@ -261,21 +267,19 @@ namespace LoveOfCooking.Objects
 			}
 		}
 
-		private void Draw(object sender, RenderedHudEventArgs e)
+		public void Draw(SpriteBatch b)
 		{
-			if (this._fade <= 0 || CookbookAnimation.Texture is null)
+			if (this.ScreenId != Context.ScreenId || this._fade <= 0 || CookbookAnimation.Texture is null)
 				return;
 
-			Rectangle area = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
-
 			// Blackout
-			e.SpriteBatch.Draw(
+			b.Draw(
 				texture: Game1.fadeToBlackRect,
-				destinationRectangle: area,
+				destinationRectangle: Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea,
 				color: Color.Black * this._fade);
 
 			// Animation
-			e.SpriteBatch.Draw(
+			b.Draw(
 				texture: CookbookAnimation.Texture,
 				position: this.GetDrawOrigin(),
 				sourceRectangle: new(

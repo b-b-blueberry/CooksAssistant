@@ -979,7 +979,7 @@ namespace LoveOfCooking.Menu
             {
                 if (this.IsGridView)
                 {
-                    for (int i = 0; i < this._visibleResults.Count; ++i)
+                    for (int i = 0; i < Math.Min(this.ResultsGridClickables.Count, this._visibleResults.Count); ++i)
                     {
                         recipe = this._visibleResults[i];
                         if (recipe is null || !this.ResultsGridClickables[i].visible)
@@ -991,7 +991,7 @@ namespace LoveOfCooking.Menu
                 else
                 {
                     int localWidth = this._resultsArea.Width - TextSpacingFromIcons;
-                    for (int i = 0; i < this._visibleResults.Count; ++i)
+                    for (int i = 0; i < Math.Min(this.ResultsListClickables.Count, this._visibleResults.Count); ++i)
                     {
                         recipe = this._visibleResults[i];
                         if (recipe is null || !this.ResultsListClickables[i].visible)

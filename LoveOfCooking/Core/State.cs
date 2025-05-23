@@ -2,6 +2,7 @@
 using System.Linq;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
+using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Mods;
 
@@ -20,7 +21,6 @@ namespace LoveOfCooking
 		public CookingMenu.Filter LastRecipeFilterThisSession;
 		public CookingMenu.Sorter LastRecipeSorterThisSession;
 		public bool IsLastRecipeSearchReversed;
-		public bool IsModConfigMenuTransition;
 		public CookbookAnimation CookbookAnimation = new();
 		public MultipleMutexRequest MenuMutex;
 
@@ -44,7 +44,11 @@ namespace LoveOfCooking
 		public State()
 		{
 			this.Reset();
-		}
+
+            // Cookbook Animations
+            this.CookbookAnimation.ScreenId = Context.ScreenId;
+            this.CookbookAnimation.Register(helper: ModEntry.Instance.Helper);
+        }
 
 		/// <summary>
 		/// Reset all variables to default values.
@@ -62,7 +66,6 @@ namespace LoveOfCooking
 			this.LastRecipeFilterThisSession = CookingMenu.Filter.None;
 			this.LastRecipeSorterThisSession = CookingMenu.Sorter.Name;
 			this.IsLastRecipeSearchReversed = false;
-			this.IsModConfigMenuTransition = false;
 			this.CookbookAnimation.Reset();
 			this.MenuMutex?.ReleaseLocks();
 

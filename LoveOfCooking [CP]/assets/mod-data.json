@@ -25,20 +25,6 @@
                     1 // Year
                 ],
                 "CookingSkillValues": {
-                    // Level-up pages
-                    "LevelUpRecipes": {
-                        "0": [],
-                        "1": [ "bakedpotato", "burrito", "quiche" ],
-                        "2": [ "crepes", "hotcocoa", "breakfast", "waffles" ],
-                        "3": [ "arancini", "craymornay", "leeks", "lobster" ],
-                        "4": [ "carrotcake", "chocoflan", "profiteroles", "parfait" ],
-                        "5": [],
-                        "6": [ "cocococktail", "nigiri", "unagi", "kebab", "fruity" ],
-                        "7": [ "cherrypie", "eggsando", "summersalad", "lasagna", "burger" ],
-                        "8": [ "applepie", "saladsando", "hunters", "curry", "roast" ],
-                        "9": [ "admiralpie", "seafoodsando", "pilaf", "paella", "oceanplatter" ],
-                        "10": []
-                    },
                     // Experience gains
                     "ExperienceBarColor": {
                         "R": 57,
@@ -47,13 +33,12 @@
                         "A": 255
                     },
                     "ExperienceCurve": [ 100, 380, 770, 1300, 2150, 3300, 4800, 6900, 10000, 15000 ],
-                    "GlobalExperienceRate": 1.0,
                     "MaxFoodStackPerDayForExperienceGains": 50,
-                    "ExperienceGlobalScaling": 1.0,
-                    "ExperienceNewRecipeBonus": 34,
-                    "ExperienceDailyBonus": 12,
+                    "ExperienceGlobalScaling": 1.25,
+                    "ExperienceNewRecipeBonus": 48,
+                    "ExperienceDailyBonus": 16,
                     "ExperienceIngredientsBaseValue": 1.0,
-                    "ExperienceIngredientsBonusScaling": 0.2,
+                    "ExperienceIngredientsBonusScaling": 0.5,
                     "ExperienceIngredientsFinalBaseValue": 5.0,
                     "ExperienceIngredientsBonusFinalMultiplier": 4.0,
                     // Profession bonuses
@@ -111,6 +96,7 @@
                     "Life Elixir",
                     "Energy Tonic"
                 ],
+                "IndoorsTileSheetTextureName": "Maps\\townInterior",
                 "IndoorsTileIndexesOfKitchens": [ 498, 499, 631, 632, 633 ],
                 "IndoorsTileIndexesOfFridges": [ 173, 258, 500, 634 ],
                 "BurnChanceBase": 0.22,
@@ -127,9 +113,9 @@
                     "minervamaga.FR.BiggerFarmhouses"
                 ],
                 "FoodsThatGiveLeftovers": {
-                    "{{ID}}_seafoodsando": "{{ID}}_seafoodsando_half",
-                    "{{ID}}_eggsando": "{{ID}}_eggsando_half",
-                    "{{ID}}_saladsando": "{{ID}}_saladsando_half"
+                    "{{ID}}_seafoodsando": "blueberry.LoveOfCooking_seafoodsando_half",
+                    "{{ID}}_eggsando": "blueberry.LoveOfCooking_eggsando_half",
+                    "{{ID}}_saladsando": "blueberry.LoveOfCooking_saladsando_half"
                 },
                 "DefaultSeasoning": "917",
                 "Seasonings": {

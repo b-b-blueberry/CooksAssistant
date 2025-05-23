@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using Interface;
 using StardewModdingAPI;
-using StardewValley;
 
 namespace LoveOfCooking.Interface
 {
@@ -52,7 +51,6 @@ namespace LoveOfCooking.Interface
 			{
 				if (!Interfaces.IsLoaded)
 				{
-					Interfaces.IdentifyLoadedOptionalMods();
 					Interfaces.LoadCustomCommunityCentreContent();
 					Interfaces.LoadBetterCraftingAPI();
 					Interfaces.IsLoaded = true
@@ -67,11 +65,12 @@ namespace LoveOfCooking.Interface
 			}
 		}
 
-		private static void IdentifyLoadedOptionalMods()
+		internal static void LoadOptionalMods()
 		{
 			UsingCustomCC = Interfaces.Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingBigBackpack = Interfaces.Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
 			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Interfaces.Helper.ModRegistry.IsLoaded);
+			ModConfigMenu.Generate(gmcm: Interfaces.GenericModConfigMenu);
 		}
 
 		private static bool LoadSpaceCoreAPI()
@@ -108,28 +107,8 @@ namespace LoveOfCooking.Interface
 			IBetterCrafting betterCrafting = Interfaces.Helper.ModRegistry
 				.GetApi<IBetterCrafting>
 				("leclair.bettercrafting");
-			if (betterCrafting is not null)
-			{
-				betterCrafting.PostCraft += Interfaces.BetterCrafting_PostCraft;
-			}
 
 			Interfaces.BetterCraftingApi = betterCrafting;
-		}
-
-		private static void BetterCrafting_PostCraft(IPostCraftEvent @event)
-		{
-			if (!@event.Recipe.CraftingRecipe.isCookingRecipe)
-				return;
-
-			Item output = @event.Item;
-			Utils.TryCookingSkillBehavioursOnCooked(
-				recipe: @event.Recipe.CraftingRecipe,
-				item: ref output);
-			Utils.TryBurnFoodForBetterCrafting(
-				menu: @event.Menu,
-				recipe: @event.Recipe.CraftingRecipe,
-				input: ref output);
-			@event.Item = output;
 		}
 
 		private static void LoadCustomCommunityCentreContent()
@@ -161,7 +140,6 @@ namespace LoveOfCooking.Interface
 			}
 
 			Interfaces.GenericModConfigMenu = gmcm;
-			ModConfigMenu.Generate(gmcm: gmcm);
 			return true;
 		}
 

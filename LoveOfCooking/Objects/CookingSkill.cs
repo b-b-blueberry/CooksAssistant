@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using LoveOfCooking.Menu;
 using Microsoft.Xna.Framework;
-using StardewModdingAPI;
 
 namespace LoveOfCooking.Objects
 {

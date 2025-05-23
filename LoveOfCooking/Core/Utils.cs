@@ -20,6 +20,7 @@ using StardewValley.Objects;
 using StardewValley.Projectiles;
 using StardewValley.SpecialOrders.Objectives;
 using StardewValley.TerrainFeatures;
+using StardewValley.TokenizableStrings;
 using xTile.Layers;
 using xTile.Tiles;
 using CraftingPage = StardewValley.Menus.CraftingPage;
@@ -353,7 +354,6 @@ namespace LoveOfCooking
 					// Take all recipe lists up to the current level
 					.TakeWhile(pair => pair.Key < level)
 					.SelectMany(pair => pair.Value) // Flatten recipe lists into their recipes
-					.Select(r => ModEntry.ObjectPrefix + r) // Add item prefixes
 					.Where(r => !Game1.player.cookingRecipes.ContainsKey(r)); // Take recipes not known by the player
 				foreach (string recipe in missingRecipes)
 				{
@@ -368,7 +368,7 @@ namespace LoveOfCooking
 			// Icons are furnished with some recognisable stereotypes of items from each category
 			if (ModEntry.Definitions.CategoryDisplayInformation.TryGetValue(id, out string[] value)) {
 				displayId = value[0];
-				displayName = Game1.content.LoadString(value[1]);
+				displayName = TokenParser.ParseText(value[1]);
 				return true;
 			}
 			else
@@ -816,52 +816,6 @@ namespace LoveOfCooking
 			return rate;
 		}
 
-		public static void AddAndDisplayNewRecipesOnLevelUp(SpaceCore.Interface.SkillLevelUpMenu menu)
-		{
-			// Add cooking recipes
-			string skill = ModEntry.Instance.Helper.Reflection
-				.GetField<string>(menu, "currentSkill")
-				.GetValue();
-			if (skill != CookingSkill.InternalName)
-				return;
-			
-			int level = ModEntry.Instance.Helper.Reflection
-				.GetField<int>(menu, "currentLevel")
-				.GetValue();
-			List<CraftingRecipe> cookingRecipes = ModEntry.CookingSkillApi
-				.GetCookingRecipesForLevel(level)
-				.ToList()
-				.ConvertAll(name => new CraftingRecipe(name: ModEntry.ObjectPrefix + name, isCookingRecipe: true))
-				.Where(recipe => !Game1.player.knowsRecipe(recipe.name))
-				.ToList();
-			foreach (CraftingRecipe recipe in cookingRecipes.Where(r => !Game1.player.cookingRecipes.ContainsKey(r.name)))
-			{
-				Game1.player.cookingRecipes[recipe.name] = 0;
-			}
-
-			// Add crafting recipes
-			List<CraftingRecipe> craftingRecipes = [];
-			// No new crafting recipes currently.
-
-			// Apply new recipes
-			List<CraftingRecipe> combinedRecipes = craftingRecipes
-				.Concat(cookingRecipes)
-				.ToList();
-			ModEntry.Instance.Helper.Reflection
-				.GetField<List<CraftingRecipe>>(menu, "newCraftingRecipes")
-				.SetValue(combinedRecipes);
-			Log.D(combinedRecipes.Aggregate($"New recipes for level {level}:", (total, cur) => $"{total}{Environment.NewLine}{cur.name} ({cur.createItem().ItemId})"),
-				ModEntry.Config.DebugMode);
-
-			// Adjust menu to fit if necessary
-			const int defaultMenuHeightInRecipes = 4;
-			int menuHeightInRecipes = combinedRecipes.Count + combinedRecipes.Count(recipe => recipe.bigCraftable);
-			if (menuHeightInRecipes >= defaultMenuHeightInRecipes)
-			{
-				menu.height += (menuHeightInRecipes - defaultMenuHeightInRecipes) * StardewValley.Object.spriteSheetTileSize * Game1.pixelZoom;
-			}
-		}
-
 		public static bool IsFridgeOrMinifridge(StardewValley.Object o)
 		{
 			return o is Chest c && c.fridge.Value;
@@ -1096,7 +1050,9 @@ namespace LoveOfCooking
 			{
 				for (int x = 0; x < layer.LayerWidth; x++)
 				{
-					if (ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(location.getTileIndexAt(x: x, y: y, layer: layerId)))
+					if (layer.Tiles[x, y] is Tile tile
+						&& tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
+                        && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex))
 					{
 						return true;
 					}
@@ -1121,23 +1077,22 @@ namespace LoveOfCooking
 				return false;
 			}
 
-			// Check for indoors kitchen tiles
-			if (tile is not null)
+            // Check for indoors kitchen tiles
+            bool isCookingStationTile = tile is not null
+				&& tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
+                && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
+			if (!location.IsOutdoors && isCookingStationTile)
 			{
-				bool isCookingStationTile = ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
-				if (!location.IsOutdoors && isCookingStationTile)
+				if (!location.IsFarm)
 				{
-					if (!location.IsFarm)
+					// Check friendship before using kitchens in NPC homes outside of the farm
+					string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
+					if (!Utils.CanUseCharacterKitchen(who: who, character: npc))
 					{
-						// Check friendship before using kitchens in NPC homes outside of the farm
-						string npc = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
-						if (!Utils.CanUseCharacterKitchen(who: who, character: npc))
-						{
-							friendshopLockedBy = npc;
-						}
+						friendshopLockedBy = npc;
 					}
-					return true;
 				}
+				return true;
 			}
 
 			return false;

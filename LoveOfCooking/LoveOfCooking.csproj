@@ -3,7 +3,7 @@
 	<PropertyGroup>
 		<AssemblyName>LoveOfCooking</AssemblyName>
 		<RootNamespace>LoveOfCooking</RootNamespace>
-		<Version>2.0.1</Version>
+		<Version>2.0.3</Version>
 		<TargetFramework>net6.0</TargetFramework>
 		<Platforms>AnyCPU</Platforms>
 		<PlatformTarget>AnyCPU</PlatformTarget>
@@ -39,5 +39,10 @@
 		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)"/>
 		<ContentPacks Include="../LoveOfCooking [EN]" Version="$(Version)"/>
 	</ItemGroup>
-
+	
+	<ItemGroup>
+		<Content Include="../LoveOfCooking [CP]/**" Link="_LoveOfCooking [CP]\%(RecursiveDir)\%(FileName)%(Extension)" CopyToOutputDirectory="Never" />
+		<Content Include="../LoveOfCooking [EN]/**" Link="_LoveOfCooking [EN]\%(RecursiveDir)\%(FileName)%(Extension)" CopyToOutputDirectory="Never" />
+	</ItemGroup>
+	
 </Project>

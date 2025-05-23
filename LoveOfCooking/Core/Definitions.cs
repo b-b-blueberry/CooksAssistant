@@ -6,8 +6,6 @@ namespace LoveOfCooking
 {
 	public class SkillValues
 	{
-		// Level-up pages
-		public IDictionary<int, IList<string>> LevelUpRecipes;
 		// Experience gains
 		public Color ExperienceBarColor;
 		public List<int> ExperienceCurve;
@@ -59,7 +57,8 @@ namespace LoveOfCooking
 		public float RegenFinalRate;
 		public Dictionary<string, float> RegenSkillModifiers;
 		public string[] EdibleItemsWithNoFoodBehaviour;
-		public int[] IndoorsTileIndexesOfKitchens;
+		public string IndoorsTileSheetTextureName;
+        public int[] IndoorsTileIndexesOfKitchens;
 		public int[] IndoorsTileIndexesOfFridges;
 		public float BurnChanceBase;
 		public float BurnChancePerIngredient;

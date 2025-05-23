@@ -220,7 +220,6 @@ namespace LoveOfCooking.Menu
 			this.height = 720;
 			this._iconShakeTimerField = Helper.Reflection.GetField<Dictionary<int, double>>(this.inventory, "_iconShakeTimer");
             Game1.displayHUD = true; // Prevents hidden HUD on crash when initialising menu, set to false at the end of this method
-			ModEntry.Instance.States.Value.IsModConfigMenuTransition = false;
 
 			// Populate recipe lists
 			recipes = recipes is not null
@@ -415,14 +414,6 @@ namespace LoveOfCooking.Menu
 
             // Menu
             yOffset = 54 * Scale;
-            if (Context.IsSplitScreen)
-            {
-                centre.X /= 2;
-            }
-            if (this.InventoryManager.UseHorizontalInventoryButtonArea)
-            {
-                yOffset = yOffset / 3 * 2;
-            }
 			this.yPositionOnScreen = (int)(centre.Y - CookbookSource.Center.Y * Scale + yOffset);
 			this.xPositionOnScreen = (int)(centre.X - CookbookSource.Center.X * Scale + xOffset);
 
@@ -441,7 +432,7 @@ namespace LoveOfCooking.Menu
 				int bound = Game1.viewport.Width / 2;
 				float scale = Game1.options.uiScale;
 				float diff = (pos - bound) * scale;
-				this.upperRightCloseButton.bounds.X -= (int)Math.Max(0, diff / 2);
+				this.upperRightCloseButton.bounds.X -= (int)Math.Max(0, diff / 4);
 			}
 
 			this._upperRightInfoButton.bounds.X = this.upperRightCloseButton.bounds.X;
@@ -990,15 +981,7 @@ namespace LoveOfCooking.Menu
             {
                 if (Interfaces.GenericModConfigMenu is not null)
                 {
-                    ModEntry.Instance.States.Value.IsModConfigMenuTransition = true;
-                    this.exitFunction += () =>
-                    {
-                        Log.D("Opening mod config menu.", Config.DebugMode);
-                        DelayedAction.functionAfterDelay(
-                            func: () => Interfaces.GenericModConfigMenu.OpenModMenu(mod: ModEntry.Instance.ModManifest),
-                            delay: 33);
-                    };
-					this.exitThisMenu();
+                    Interfaces.GenericModConfigMenu.OpenModMenuAsChildMenu(mod: ModEntry.Instance.ModManifest);
 				}
                 else
                 {
@@ -1466,6 +1449,14 @@ namespace LoveOfCooking.Menu
 
             // Draw overlays
 			this.DrawExtraStuff(b);
+        }
+
+        public override void drawBackground(SpriteBatch b)
+        {
+            base.drawBackground(b);
+
+            // Redraw CookbookAnimation over MenuBackground
+            ModEntry.Instance.States.Value.CookbookAnimation.Draw(b);
         }
 
         private void DrawExtraStuff(SpriteBatch b)
