@@ -427,7 +427,7 @@ namespace LoveOfCooking
 			}
 			if (fridge is not null)
 			{
-				mutexes.Add(fridge.mutex);
+				mutexes.Add(fridge.GetMutex());
 			}
 
 			// Create mutex request for all containers
@@ -440,7 +440,7 @@ namespace LoveOfCooking
 					if (fridge != null)
 						containers[fridge.Items] = fridge;
 					foreach (Chest chest in minifridges)
-						containers[chest.Items] = chest;
+						containers[chest.GetItemsForPlayer()] = chest;
 
 					// Reduce to known recipes
 					List<CraftingRecipe> recipes = CraftingRecipe.cookingRecipes.Keys
