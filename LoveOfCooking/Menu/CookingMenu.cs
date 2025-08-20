@@ -981,6 +981,7 @@ namespace LoveOfCooking.Menu
             {
                 if (Interfaces.GenericModConfigMenu is not null)
                 {
+                    this.hoverText = null;
                     Interfaces.GenericModConfigMenu.OpenModMenuAsChildMenu(mod: ModEntry.Instance.ModManifest);
 				}
                 else
