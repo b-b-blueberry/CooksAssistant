@@ -126,10 +126,7 @@ namespace LoveOfCooking.Menu
         /// </summary>
         public static bool CanBeCooked(Item item)
         {
-            return !(item is null or Tool or Furniture or Ring or Clothing or Boots or Hat or Wallpaper
-                || item.Category < -90 || item.isLostItem || !item.canBeTrashed()
-                || item is StardewValley.Object o && (o.bigCraftable.Value || o.specialItem)
-                || IsSeasoning(item));
+            return item is not null && item.Category > -90 && item.HasTypeObject() && item.canBeTrashed() && item.canBeShipped() && !IsSeasoning(item);
         }
 
         /// <summary>
