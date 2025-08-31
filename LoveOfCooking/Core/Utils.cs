@@ -23,6 +23,7 @@ using StardewValley.TerrainFeatures;
 using StardewValley.TokenizableStrings;
 using xTile.Layers;
 using xTile.Tiles;
+using static SpaceCore.Skills;
 using CraftingPage = StardewValley.Menus.CraftingPage;
 using Rectangle = Microsoft.Xna.Framework.Rectangle;
 
@@ -837,10 +838,14 @@ namespace LoveOfCooking
 		{
 			bool isEdible = item is not StardewValley.Object o || o.Edibility != -300;
 			var buffs = item.GetFoodOrDrinkBuffs();
-			return isEdible
-				? buffs.FirstOrDefault((Buff buff) => buff.visible && buff.id != "food" && buff.id != "drink")
-					?? buffs.FirstOrDefault((Buff buff) => buff.visible && buff.HasAnyEffects())
-				: null;
+			if (isEdible)
+			{
+				var buffet = buffs.FirstOrDefault((Buff buff) => buff.visible && buff.id != "food" && buff.id != "drink");
+				var bouffant = buffs.FirstOrDefault((Buff buff) => buff.visible && buff.HasAnyEffects());
+				var bussin = buffs.FirstOrDefault((Buff buff) => buff is SkillBuff sbuff && (sbuff.SkillLevelIncreases.Any(pair => pair.Value != 0) || sbuff.HealthRegen != 0 || sbuff.StaminaRegen != 0));
+                return buffet ?? bouffant ?? bussin;
+            }
+			return null;
 		}
 
 		public static int GetOneSeasoningFromInventory(IList<Item> expandedInventory, List<KeyValuePair<string, int>> seasoning)

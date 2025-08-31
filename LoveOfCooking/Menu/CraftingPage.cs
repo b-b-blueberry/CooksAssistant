@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using LoveOfCooking.Objects;
+﻿using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
-using Netcode;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static LoveOfCooking.Menu.CookingMenu;
+using static SpaceCore.Skills;
 using static StardewValley.LocalizedContentManager;
 
 namespace LoveOfCooking.Menu
@@ -23,8 +24,8 @@ namespace LoveOfCooking.Menu
 		private const int IngredientSlotsWide = 3;
 		private const int IngredientSlotsHigh = 2;
 
-		// Components
-		private Rectangle _cookIconArea;
+        // Components
+        private Rectangle _cookIconArea;
 		private Rectangle _quantityScrollableArea;
 		public ClickableTextureComponent CookButton { get; private set; }
 		public ClickableTextureComponent SeasoningButton { get; private set; }
@@ -599,7 +600,8 @@ namespace LoveOfCooking.Menu
 
 			// Draw cooking recipe healing and buff info
 
-			int textWidth = (int)(this._textWidth * this._textScale.X);
+			SpriteFont font = Game1.smallFont;
+            int textWidth = (int)(this._textWidth * this._textScale.X);
 			Vector2 position = Vector2.Zero;
 			string text;
 
@@ -628,7 +630,7 @@ namespace LoveOfCooking.Menu
 				float buffOffsetX = 0;
 				Vector2 textSize;
 
-				position.X = (CurrentLanguageCode is LanguageCode.zh ? 2 : -2) * Scale;
+                position.X = (CurrentLanguageCode is LanguageCode.zh ? 2 : -2) * Scale;
 
 				// Energy
 				text = buff is null
@@ -636,8 +638,8 @@ namespace LoveOfCooking.Menu
 					: stamina > 0 ? $"+{stamina}" : $"{stamina}";
 				b.Draw(
 					texture: Game1.mouseCursors,
-					position: new(x: this.ContentArea.X + position.X, y: position.Y),
-					sourceRectangle: EnergyIconSource,
+                    position: position + new Vector2(this.ContentArea.X, 0),
+                    sourceRectangle: EnergyIconSource,
 					color: Color.White,
 					rotation: 0f,
 					origin: Vector2.Zero,
@@ -650,7 +652,7 @@ namespace LoveOfCooking.Menu
 					text: text,
 					x: position.X,
 					y: position.Y);
-				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+				textSize = font.MeasureString(Game1.parseText(text, font, textWidth));
 				buffOffsetX = textSize.X;
 
 				position.X -= xOffset;
@@ -659,11 +661,11 @@ namespace LoveOfCooking.Menu
 				// Health
 				text = buff is null
 					? Game1.content.LoadString("Strings\\StringsFromCSFiles:Game1.cs.3118", health)
-					: stamina > 0 ? $"+{health}" : $"{health}";
+					: health > 0 ? $"+{health}" : $"{health}";
 				b.Draw(
 					texture: Game1.mouseCursors,
-					position: new(x: this.ContentArea.X + position.X, y: position.Y),
-					sourceRectangle: HealthIconSource,
+                    position: position + new Vector2(this.ContentArea.X, 0),
+                    sourceRectangle: HealthIconSource,
 					color: Color.White,
 					rotation: 0f,
 					origin: Vector2.Zero,
@@ -676,7 +678,7 @@ namespace LoveOfCooking.Menu
 					text: text,
 					x: position.X,
 					y: position.Y);
-				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+				textSize = font.MeasureString(Game1.parseText(text, font, textWidth));
 				if (buffOffsetX < textSize.X)
 					buffOffsetX = textSize.X;
 
@@ -690,11 +692,11 @@ namespace LoveOfCooking.Menu
 					: Utility.getMinutesSecondsStringFromMilliseconds(buff.millisecondsDuration);
 
 				// Duration icon
-				position.Y += Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth)).Y * 1.1f * this._textScale.Y;
+				position.Y += font.MeasureString(Game1.parseText(text, font, textWidth)).Y * 1.1f * this._textScale.Y;
 				position.X -= xOffset;
 				b.Draw(
 					texture: Game1.mouseCursors,
-					position: new(x: this.ContentArea.X + position.X, y: position.Y),
+					position: position + new Vector2(this.ContentArea.X, 0),
 					sourceRectangle: DurationIconSource,
 					color: Color.White,
 					rotation: 0f,
@@ -710,22 +712,20 @@ namespace LoveOfCooking.Menu
 					text: text,
 				x: position.X,
 					y: position.Y);
-				textSize = Game1.smallFont.MeasureString(Game1.parseText(text, Game1.smallFont, textWidth));
+				textSize = font.MeasureString(Game1.parseText(text, font, textWidth));
 				position.Y -= textSize.Y * 1.1f * this._textScale.Y;
 				position.Y -= textSize.Y * this._textScale.Y;
 				if (buffOffsetX < textSize.X)
 					buffOffsetX = textSize.X;
 
-				textSize = Game1.smallFont.MeasureString(Game1.parseText("+66:66", Game1.smallFont, textWidth));
+				textSize = font.MeasureString(Game1.parseText("+66:66", font, textWidth));
 				buffOffsetX = Math.Max(buffOffsetX, textSize.X);
 				buffOffsetX += xOffset / 2;
 
 				// Buffs
 				if (!string.IsNullOrEmpty(buff.displayName))
 				{
-					Vector2 buffPosition = new(
-						x: position.X + buffOffsetX,
-						y: position.Y + textSize.Y);
+					Vector2 buffPosition = position + new Vector2(buffOffsetX, textSize.Y);
 
 					// Unique buff icon
 					Rectangle source = Game1.getSourceRectForStandardTileSheet(
@@ -735,9 +735,7 @@ namespace LoveOfCooking.Menu
 						height: 16);
 					b.Draw(
 						texture: buff.iconTexture,
-						position: new(
-							x: this.ContentArea.X + buffPosition.X,
-							y: buffPosition.Y),
+						position: buffPosition + new Vector2(this.ContentArea.X, 0),
 						sourceRectangle: source,
 						color: Color.White,
 						rotation: 0f,
@@ -749,80 +747,144 @@ namespace LoveOfCooking.Menu
 
 					// Unique buff title
 					float lineWidth = (int)(this.ContentArea.Width - buffPosition.X - 10 * Scale);
-					float lineHeight = Game1.smallFont.MeasureString(buff.displayName).Y;
+					float lineHeight = font.MeasureString(buff.displayName).Y;
 					text = Game1.parseText(
 						text: buff.displayName,
-						whichFont: Game1.smallFont,
+						whichFont: font,
 						width: (int)lineWidth);
-					textSize = Game1.smallFont.MeasureString(text);
+					textSize = font.MeasureString(text);
 					this.DrawText(
 						b: b,
 						text: text,
 						x: buffPosition.X,
 						y: buffPosition.Y + lineHeight / 2 - textSize.Y / 2);
 				}
-				else if (buff.HasAnyEffects() && buff.effects is not null)
+				else
 				{
-					const int width = 3;
-					const int height = 3;
-					int count = 0;
-					List<NetFloat> attributes =
-					[
-						buff.effects.FarmingLevel,
-						buff.effects.FishingLevel,
-						buff.effects.MiningLevel,
-						null, // Crafting
-						buff.effects.LuckLevel,
-						buff.effects.ForagingLevel,
-						null, // Digging
-						buff.effects.MaxStamina,
-						buff.effects.MagneticRadius,
-						buff.effects.Speed,
-						buff.effects.Defense,
-						buff.effects.Attack
-					];
-					int numToDisplay = attributes.Count(a => a is not null && a.Value != 0);
-					for (int i = 0; i < attributes.Count && count < width * height; ++i)
+					Dictionary<int, float> effects = [];
+					if (buff.effects is not null && buff.HasAnyEffects())
 					{
-						if (attributes[i] is null || attributes[i].Value == 0)
-							continue;
-
-						int row = count / width;
-						int col = count % height;
-						++count;
-
-						float value = attributes[i].Value;
-						Vector2 buffPosition = new(
-							x: position.X + textSize.X * row + buffOffsetX,
-							y: position.Y + textSize.Y * col);
-
-						// Buff icon
-						b.Draw(
-							texture: Game1.mouseCursors,
-							position: new(
-								x: this.ContentArea.X + buffPosition.X,
-								y: buffPosition.Y),
-							sourceRectangle: new(x: 10 + 10 * i, y: 428, width: 10, height: 10),
-							color: Color.White,
-							rotation: 0f,
-							origin: Vector2.Zero,
-							scale: SmallScale,
-							effects: SpriteEffects.None,
-							layerDepth: 1f);
-
-						// Buff amount and attribute
-						buffPosition.X += xOffset;
-						text = (value > 0 ? $"+{value} " : $"{value} ").PadRight(3);
-
-						// Show attribute name if we're only showing a single column
-						if (numToDisplay <= height)
-							text += Strings.Get($"menu.cooking_recipe.buff.{i}");
-						this.DrawText(
-							b: b,
-							text: text,
-							x: buffPosition.X,
-							y: buffPosition.Y);
+						effects.TryAddMany(new() {
+							{0, buff.effects.FarmingLevel.Value},
+							{1, buff.effects.FishingLevel.Value},
+							{2, buff.effects.MiningLevel.Value},
+							// {3, 0}, // Crafting
+							{4, buff.effects.LuckLevel.Value},
+							{5, buff.effects.ForagingLevel.Value},
+							// {6, 0}, // Digging
+							{7, buff.effects.MaxStamina.Value},
+							{8, buff.effects.MagneticRadius.Value},
+							{9, buff.effects.Speed.Value},
+							{10, buff.effects.Defense.Value},
+							{11, buff.effects.Attack.Value}
+						});
 					}
+					{
+                        const int width = 3;
+                        const int height = 3;
+
+                        int count = 0;
+                        int numToDisplay = effects.Count(pair => pair.Value != 0);
+						bool drawNames = numToDisplay <= height;
+
+                        if (buff is SkillBuff sbuff)
+						{
+							numToDisplay += sbuff.SkillLevelIncreases.Count(pair => pair.Value > 0);
+							if (sbuff.HealthRegen != 0)
+								++numToDisplay;
+                            if (sbuff.StaminaRegen != 0)
+                                ++numToDisplay;
+                        }
+
+                        foreach ((int i, float value) in effects)
+                        {
+                            if (count >= width * height)
+                                break;
+
+                            if (value == 0)
+                                continue;
+
+                            int row = count / width;
+                            int col = count % height;
+                            ++count;
+
+                            Vector2 buffPosition = position
+                                + new Vector2(textSize.X * row, textSize.Y * col)
+                                + new Vector2(buffOffsetX, 0);
+
+                            // Buff icon
+                            b.Draw(
+                                texture: Game1.mouseCursors,
+                                position: buffPosition + new Vector2(this.ContentArea.X, 0),
+                                sourceRectangle: new(x: 10 + 10 * i, y: 428, width: 10, height: 10),
+                                color: Color.White,
+                                rotation: 0f,
+                                origin: Vector2.Zero,
+                                scale: SmallScale,
+                                effects: SpriteEffects.None,
+                                layerDepth: 1f);
+
+                            // Buff amount and attribute
+                            buffPosition.X += xOffset;
+                            text = (value > 0 ? $"+{value} " : $"{value} ").PadRight(3);
+
+                            // Show attribute name if we're only showing a single column
+                            if (drawNames)
+                                text += Strings.Get($"menu.cooking_recipe.buff.{i}");
+                            this.DrawText(
+                                b: b,
+                                text: text,
+                                x: buffPosition.X,
+                                y: buffPosition.Y);
+                        }
+
+                        if (buff is SkillBuff sbuff1)
+                        {
+                            foreach ((string name, int value) in sbuff1.SkillLevelIncreases)
+                            {
+                                if (count >= width * height)
+                                    break;
+
+                                if (value == 0)
+                                    continue;
+
+                                int row = count / width;
+                                int col = count % height;
+                                ++count;
+
+                                Vector2 buffPosition = position
+									+ new Vector2(textSize.X * row, textSize.Y * col)
+                                    + new Vector2(buffOffsetX, 0);
+
+                                Skill skill = SpaceCore.Skills.GetSkill(name);
+                                SkillBuff.DrawBuffEffect(b, buffPosition + new Vector2(this.ContentArea.X, 0), value: value, label: drawNames ? skill.GetName() : null, font: font, icon: skill.SkillsPageIcon, spacing: (int)xOffset, shadowAlpha: 0);
+                            }
+                            if (sbuff1.StaminaRegen != 0)
+                            {
+                                int row = count / width;
+                                int col = count % height;
+                                ++count;
+
+                                Vector2 buffPosition = position
+                                    + new Vector2(textSize.X * row, textSize.Y * col)
+                                    + new Vector2(buffOffsetX, 0);
+
+                                SkillBuff.DrawStaminaRegenBuffEffect(b, buffPosition + new Vector2(this.ContentArea.X, 0), value: sbuff1.StaminaRegen, drawText: drawNames, font: font, shadowAlpha: 0);
+                            }
+                            if (sbuff1.HealthRegen != 0)
+                            {
+                                int row = count / width;
+                                int col = count % height;
+                                ++count;
+
+                                Vector2 buffPosition = position
+                                    + new Vector2(textSize.X * row, textSize.Y * col)
+                                    + new Vector2(buffOffsetX, 0);
+
+                                SkillBuff.DrawHealthRegenBuffEffect(b, buffPosition + new Vector2(this.ContentArea.X, 0), value: sbuff1.HealthRegen, drawText: drawNames, font: font, shadowAlpha: 0);
+							}
+                        }
+                    }
 				}
 			}
 		}
