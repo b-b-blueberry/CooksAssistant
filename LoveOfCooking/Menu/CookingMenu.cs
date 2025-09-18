@@ -6,6 +6,7 @@ using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
 using StardewValley.Inventories;
@@ -200,7 +201,9 @@ namespace LoveOfCooking.Menu
             {
 				this.Name = name;
                 this.Index = index;
-				this.Recipe = new CraftingRecipe(name: name, isCookingRecipe: true);
+				this.Recipe = CustomCraftingRecipe.CookingRecipes.TryGetValue(name, out CustomCraftingRecipe customData)
+                    ? new SpaceCore.Framework.CustomCraftingRecipe(name, true, customData)
+                    : new CraftingRecipe(name, true);
 				this.Item = this.Recipe.createItem();
 				this.Buff = Utils.GetFirstVisibleBuffOnItem(item: this.Item);
 			}
@@ -484,7 +487,7 @@ namespace LoveOfCooking.Menu
         internal bool ChangeRecipe(string name)
         {
             int index = this.Recipes.FindIndex(recipe => recipe.name == name);
-            return this.ChangeRecipe(name: name, index: index);
+            return this.ChangeRecipe(name, index);
         }
 
 		internal bool ChangeRecipe(string name, int index)
@@ -497,10 +500,10 @@ namespace LoveOfCooking.Menu
 				return false;
 
 			// Set new recipe
-			this.RecipeInfo = new(name: name, index: index);
+			this.RecipeInfo = new(name, index);
 
 			// Behaviours on recipe changed
-			this._searchPage.GoToRecipe(index: index);
+			this._searchPage.GoToRecipe(index);
             if (this._recipePage.IsVisible)
             {
 				this.TryAutoFillIngredients(isClearedIfDisabled: false);
@@ -514,22 +517,9 @@ namespace LoveOfCooking.Menu
         private void UpdateCraftableCounts(CraftingRecipe recipe)
         {
 			this.RecipeInfo.IngredientQuantitiesHeld.Clear();
-            for (int i = 0; i < this.RecipeInfo.Recipe.getNumberOfIngredients(); ++i)
-            {
-				string id = this.RecipeInfo.Recipe.recipeList.Keys.ElementAt(i);
-				int requiredQuantity = this.RecipeInfo.Recipe.recipeList.Values.ElementAt(i);
-				int heldQuantity = 0;
-                List<CookingManager.Ingredient> ingredients = CookingManager.GetMatchingIngredients(id: id, sourceItems: this.Items, required: requiredQuantity);
-                if (ingredients is not null && ingredients.Any())
-                {
-                    heldQuantity = ingredients.Sum((ing) => this.CookingManager.GetItemForIngredient(ingredient: ing, sourceItems: this.Items).Stack);
-                    requiredQuantity -= heldQuantity;
-                }
-
-				this.RecipeInfo.IngredientQuantitiesHeld.Add(heldQuantity);
-            }
-			this.RecipeInfo.NumCraftable = this.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Items, limitToCurrentIngredients: false);
-			this.RecipeInfo.NumReadyToCraft = this.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Items, limitToCurrentIngredients: true);
+            this.RecipeInfo.IngredientQuantitiesHeld.AddRange(this.CookingManager.GetMatchingIngredientQuantities(recipe, this.Items));
+			this.RecipeInfo.NumCraftable = this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: false);
+			this.RecipeInfo.NumReadyToCraft = this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: true);
         }
 
         public void TryAutoFillIngredients(bool isClearedIfDisabled, bool? forceTo = null)
@@ -613,15 +603,15 @@ namespace LoveOfCooking.Menu
 			int inventoryIndex = this.InventoryManager.Index;
 
             bool itemWasMoved = false;
-            if (this.CookingManager.IsInventoryItemInCurrentIngredients(inventoryIndex: inventoryIndex, itemIndex: itemIndex))
+            if (this.CookingManager.IsInventoryItemInCurrentIngredients(item))
             {
                 // Try to remove inventory item from its ingredient slot
                 itemWasMoved = this.CookingManager.RemoveFromIngredients(inventoryId: inventoryIndex, itemIndex: itemIndex);
             }
-            if (!itemWasMoved && CookingManager.CanBeCooked(item: item) && !this.CookingManager.AreAllIngredientSlotsFilled)
+            if (!itemWasMoved && CookingManager.CanBeCooked(item) && !this.CookingManager.AreAllIngredientSlotsFilled)
             {
                 // Try add inventory item to an empty ingredient slot
-                itemWasMoved = this.CookingManager.AddToIngredients(whichInventory: inventoryIndex, whichItem: itemIndex, itemId: item.ItemId);
+                itemWasMoved = this.CookingManager.AddToIngredients(whichInventory: inventoryIndex, whichItem: itemIndex, item: item);
             }
             return itemWasMoved;
         }
@@ -729,16 +719,13 @@ namespace LoveOfCooking.Menu
 		/// <returns>Whether or not any food was crafted.</returns>
 		public bool TryCookRecipe(CraftingRecipe recipe, int quantity)
         {
-			int craftableCount = Math.Min(quantity, this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: true));
-            if (craftableCount < 1)
-                return false;
-
-			this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: craftableCount, out int burntQuantity);
+			this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: quantity, out int burntQuantity);
             if (Config.PlayCookingAnimation)
             {
                 Game1.displayHUD = true;
+                // Doesn't check against SpaceCore ingredients since noone's paying me anyway
                 Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntQuantity: burntQuantity,
-                    containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == -4));
+                    containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == StardewValley.Object.FishCategory));
 				Game1.playSound(CookCue);
 				this.PopMenuStack(playSound: false, tryToQuit: true);
 			}
@@ -952,7 +939,7 @@ namespace LoveOfCooking.Menu
             // Ingredients items
             if (this._craftingPage.TryClickIngredientSlot(x: x, y: y, out int index))
             {
-				this.hoveredItem = this.CookingManager.GetItemForIngredient(index: index, sourceItems: this.Items);
+				this.hoveredItem = this.CookingManager.GetItemForIngredient(index);
 			}
 
             // Page contents

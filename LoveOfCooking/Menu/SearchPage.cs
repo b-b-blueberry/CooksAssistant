@@ -238,10 +238,10 @@ namespace LoveOfCooking.Menu
 						&& Utils.GetFirstVisibleBuffOnItem(item: recipe.createItem()) is not null;
                     break;
                 case Filter.New:
-                    filterFunc = recipe => !Game1.player.recipesCooked.ContainsKey(recipe.createItem().ItemId);
+                    filterFunc = recipe => !Game1.player.recipesCooked.ContainsKey(recipe.name);
                     break;
                 case Filter.Ready:
-                    filterFunc = recipe => recipe.recipeList.Count <= this.Menu.CookingManager.MaxIngredients
+                    filterFunc = recipe => recipe.getNumberOfIngredients() <= this.Menu.CookingManager.MaxIngredients
                         && 0 < this.Menu.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Menu.Items, limitToCurrentIngredients: false);
                     break;
                 case Filter.Favourite:
