@@ -5,6 +5,7 @@ using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using SpaceCore;
 using StardewValley;
 using StardewValley.ItemTypeDefinitions;
 using StardewValley.Menus;
@@ -511,30 +512,36 @@ namespace LoveOfCooking.Menu
 			if (knowsRecipe)
             {
 				int i = 0;
-                foreach (var pair in recipe.recipeList)
+
+				// parse relevant fields from spacecore and stardewvalley cooking recipes
+				List<(string id, string displayName, int quantity, Texture2D texture, Rectangle? sourceRect)> ingredients;
+				if (recipe is SpaceCore.Framework.CustomCraftingRecipe custom && CustomCraftingRecipe.CookingRecipes.TryGetValue(recipe.name, out CustomCraftingRecipe customData))
+				{
+					ingredients = customData.Ingredients.Select(entry => ((string)null, entry.DisplayName, entry.Quantity, entry.IconTexture, entry.IconSubrect)).ToList();
+				}
+				else
+				{
+					ingredients = recipe.recipeList.Select(entry =>
+                    {
+						Utils.TryGetCategoryDisplayInformation(id: entry.Key, out string categoryId, out string categoryName);
+						string id = categoryId ?? entry.Key;
+                        ParsedItemData dataOrErrorItem = ItemRegistry.GetDataOrErrorItem(recipe.getSpriteIndexFromRawIndex(id));
+                        return (id, categoryName ?? recipe.getNameFromIndex(id), entry.Value, dataOrErrorItem.GetTexture(), (Rectangle?)dataOrErrorItem.GetSourceRect());
+					}).ToList();
+				}
+
+                foreach ((string id, string displayName, int quantity, Texture2D texture, Rectangle? sourceRect) in ingredients)
                 {
                     textOffset.Y += rowHeight;
+					bool valid = this.Menu.RecipeInfo.IngredientQuantitiesHeld.Count > i;
 
-                    string id = pair.Key;
-                    string name = recipe.getNameFromIndex(id);
-
-                    if (id.StartsWith('-') && Utils.TryGetCategoryDisplayInformation(id: id, out string categoryId, out string categoryName))
-                    {
-                        id = categoryId;
-                        name = categoryName;
-                    }
-
-					int requiredQuantity = pair.Value;
-                    Color drawColour = this.Menu.RecipeInfo.IngredientQuantitiesHeld[i] < requiredQuantity
+                    Color drawColour = (!valid || this.Menu.RecipeInfo.IngredientQuantitiesHeld[i] < quantity)
                         ? BlockedColour
                         : i >= this.Menu.CookingManager.MaxIngredients
                             ? Color.Firebrick * 0.8f
                             : TextColour;
 
                     // Ingredient icon
-                    ParsedItemData dataOrErrorItem = ItemRegistry.GetDataOrErrorItem(recipe.getSpriteIndexFromRawIndex(id));
-                    Texture2D texture = dataOrErrorItem.GetTexture();
-                    Rectangle sourceRect = dataOrErrorItem.GetSourceRect();
                     b.Draw(
                         texture: texture,
                         position: new(
@@ -547,20 +554,22 @@ namespace LoveOfCooking.Menu
                         scale: 2f,
                         effects: SpriteEffects.None,
                         layerDepth: 0.86f);
+
                     // Ingredient quantity
                     Utility.drawTinyDigits(
-                        toDraw: requiredQuantity,
+                        toDraw: quantity,
                         b: b,
                         position: new(
-                            x: x + this.ContentArea.X + 8 * Scale - Game1.tinyFont.MeasureString(string.Concat(requiredQuantity)).X,
+                            x: x + this.ContentArea.X + 8 * Scale - Game1.tinyFont.MeasureString(string.Concat(quantity)).X,
                             y: y + textOffset.Y + 4.5f * Scale),
                         scale: 2f,
                         layerDepth: 0.87f,
                         c: Color.AntiqueWhite);
+
 					// Ingredient name
 					this.DrawText(
 						b: b,
-						text: name,
+						text: displayName,
 						x: x + 12 * Scale,
 						y: y + textOffset.Y,
 						colour: drawColour);
@@ -583,7 +592,7 @@ namespace LoveOfCooking.Menu
                             layerDepth: 1);
 						this.DrawText(
 							b: b,
-							text: this.Menu.RecipeInfo.IngredientQuantitiesHeld[i].ToString(),
+							text: valid ? this.Menu.RecipeInfo.IngredientQuantitiesHeld[i].ToString() : "null",
 							x: position.X + 8 * Scale,
 							y: position.Y,
 							w: 72,
