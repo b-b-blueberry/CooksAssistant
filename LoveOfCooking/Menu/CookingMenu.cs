@@ -155,6 +155,9 @@ namespace LoveOfCooking.Menu
         }
         private readonly Stack<State> _stack = new();
 
+        // interactions
+        private bool _canInteract => !this._craftingPage.IsCooking;
+
         // pages
         private readonly List<GenericPage> _pages = new();
         private readonly SearchPage _searchPage;
@@ -516,7 +519,7 @@ namespace LoveOfCooking.Menu
 
         private void UpdateCraftableCounts(CraftingRecipe recipe)
         {
-			this.RecipeInfo.IngredientQuantitiesHeld.Clear();
+            this.RecipeInfo.IngredientQuantitiesHeld.Clear();
             this.RecipeInfo.IngredientQuantitiesHeld.AddRange(this.CookingManager.GetMatchingIngredientQuantities(recipe, this.Items));
 			this.RecipeInfo.NumCraftable = this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: false);
 			this.RecipeInfo.NumReadyToCraft = this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: true);
@@ -909,7 +912,10 @@ namespace LoveOfCooking.Menu
             if (!this.IsGoodState())
                 return;
 
-			this.hoverText = null;
+            if (!this._canInteract)
+                x = y = -1;
+
+            this.hoverText = null;
 			this.hoveredItem = null;
 
 			// Menu buttons
@@ -937,7 +943,7 @@ namespace LoveOfCooking.Menu
 			this.InventoryManager.OnHovered(x: x, y: y, hoverText: ref this.hoverText);
 
             // Ingredients items
-            if (this._craftingPage.TryClickIngredientSlot(x: x, y: y, out int index))
+            if (this._craftingPage.TryClickIngredientSlot(x: x, y: y, out int index) && this.RecipeInfo is not null)
             {
 				this.hoveredItem = this.CookingManager.GetItemForIngredient(index);
 			}
@@ -957,6 +963,9 @@ namespace LoveOfCooking.Menu
             if (!this.IsGoodState())
                 return;
             State state = this._stack.Peek();
+
+            if (!this._canInteract)
+                return;
 
             if (this._isCloseButtonVisible && this.upperRightCloseButton.containsPoint(x, y))
             {
@@ -1009,6 +1018,9 @@ namespace LoveOfCooking.Menu
             if (!this.IsGoodState())
                 return;
 
+            if (!this._canInteract)
+                return;
+
             // Ignore Buttons.X input
             if (Game1.options.gamepadControls)
                 return;
@@ -1043,6 +1055,9 @@ namespace LoveOfCooking.Menu
             if (!this.IsGoodState())
                 return;
 
+            if (!this._canInteract)
+                return;
+
             // Start mouse-held behaviours after a delay
             if (this._mouseHeldTicks < 0 || ++this._mouseHeldTicks < 30)
                 return;
@@ -1066,6 +1081,9 @@ namespace LoveOfCooking.Menu
         {
             base.releaseLeftClick(x, y);
 
+            if (!this._canInteract)
+                return;
+
             if (!this.IsGoodState())
                 return;
 
@@ -1078,7 +1096,10 @@ namespace LoveOfCooking.Menu
                 return;
 			State state = this._stack.Peek();
 
-			int id = this.currentlySnappedComponent is not null ? this.currentlySnappedComponent.myID : -1;
+            if (!this._canInteract)
+                return;
+
+            int id = this.currentlySnappedComponent is not null ? this.currentlySnappedComponent.myID : -1;
 
             if (Config.DebugMode)
                 Log.D(this.currentlySnappedComponent is not null
