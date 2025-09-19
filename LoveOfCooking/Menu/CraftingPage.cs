@@ -20,7 +20,7 @@ namespace LoveOfCooking.Menu
         public ClickableComponent LastIngredientSlot => this.IngredientSlotButtons.Last();
 
         /// <summary>Number of valid ingredient items currently in slots.</summary>
-        public int IngredientsCount => this.Menu.CookingManager.CurrentIngredients.Count(ingredient => ingredient?.Item is not null);
+        public int IngredientsCount => this.Menu.CookingManager.CurrentIngredients.Count(ingredient => ingredient.HasValue && this.Menu.CookingManager.GetItemForIngredient(ingredient.Value, this.Menu.Items) is not null);
 
         /// <summary>Whether cooking drop-in animation sequence is currently playing.</summary>
         public bool IsCooking => this._ingredientsDropInTimer > 0;
@@ -408,7 +408,7 @@ namespace LoveOfCooking.Menu
 				for (int i = 0; i < this.Menu.CookingManager.CurrentIngredients.Count; ++i)
 				{
 					var ingredient = this.Menu.CookingManager.CurrentIngredients[i];
-                    if (ingredient?.Item is not Item item)
+                    if (!this.Menu.CookingManager.CurrentIngredients[i].HasValue || this.Menu.CookingManager.GetItemForIngredient(this.Menu.CookingManager.CurrentIngredients[i].Value, this.Menu.Items) is not Item item)
 						continue;
 
 					var slot = this.IngredientSlotButtons[i];
@@ -449,7 +449,7 @@ namespace LoveOfCooking.Menu
 
 			for (int i = 0; i < this.Menu.CookingManager.CurrentIngredients.Count; ++i)
 			{
-				if (this.Menu.CookingManager.GetItemForIngredient(i) is not Item item)
+				if (!this.Menu.CookingManager.CurrentIngredients[i].HasValue || this.Menu.CookingManager.GetItemForIngredient(this.Menu.CookingManager.CurrentIngredients[i].Value, this.Menu.Items) is not Item item)
 					continue;
 
 				position = new(
