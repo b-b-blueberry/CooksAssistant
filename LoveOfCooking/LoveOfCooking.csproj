@@ -7,13 +7,10 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<Platforms>AnyCPU</Platforms>
 		<PlatformTarget>AnyCPU</PlatformTarget>
-		<EnableHarmony>true</EnableHarmony>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<LangVersion>latest</LangVersion>
-		<EnableNETAnalyzers>true</EnableNETAnalyzers>
-		<AnalysisLevel>6.0</AnalysisLevel>
+    <LangVersion>latest</LangVersion>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>6.0</AnalysisLevel>
+    <EnableHarmony>true</EnableHarmony>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -36,8 +33,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)"/>
-		<ContentPacks Include="../LoveOfCooking [EN]" Version="$(Version)"/>
+		<ContentPacks Include="../LoveOfCooking [CP]" Version="$(Version)" />
+		<ContentPacks Include="../LoveOfCooking [EN]" Version="$(Version)" />
 	</ItemGroup>
 	
 	<ItemGroup>
