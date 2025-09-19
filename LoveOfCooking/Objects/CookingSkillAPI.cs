@@ -26,7 +26,6 @@ namespace LoveOfCooking.Objects
 		IReadOnlyDictionary<ICookingSkillAPI.Profession, bool> GetCurrentProfessions(long playerID = -1L);
 		bool HasProfession(ICookingSkillAPI.Profession profession, long playerID = -1L);
 		bool AddExperienceDirectly(int experience);
-		void AddCookingBuffToItem(string name, int value);
 		int GetTotalCurrentExperience();
 		int GetExperienceRequiredForLevel(int level);
 		int GetTotalExperienceRequiredForLevel(int level);
@@ -89,19 +88,6 @@ namespace LoveOfCooking.Objects
 		{
 			Farmer player = Game1.GetPlayer(playerID, onlyOnline: false) ?? Game1.MasterPlayer;
 			return (player ?? Game1.player).HasCustomProfession(this.GetSkill().Professions[(int)profession]);
-		}
-
-		/// <summary>
-		/// Not yet implemented
-		/// </summary>
-		/// <param name="name">Name of the item to receive the buff.</param>
-		/// <param name="value">Added skill level amount, will act as a debuff if negative.</param>
-		public void AddCookingBuffToItem(string name, int value)
-		{
-			if (value == 0)
-				return;
-
-			throw new NotImplementedException();
 		}
 
 		/// <summary>
