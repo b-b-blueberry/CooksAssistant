@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using SpaceCore;
+﻿using SpaceCore;
 using StardewModdingAPI;
 using StardewValley;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace LoveOfCooking.Objects
 {
@@ -26,7 +26,6 @@ namespace LoveOfCooking.Objects
 		IReadOnlyDictionary<ICookingSkillAPI.Profession, bool> GetCurrentProfessions(long playerID = -1L);
 		bool HasProfession(ICookingSkillAPI.Profession profession, long playerID = -1L);
 		bool AddExperienceDirectly(int experience);
-		void AddCookingBuffToItem(string name, int value);
 		int GetTotalCurrentExperience();
 		int GetExperienceRequiredForLevel(int level);
 		int GetTotalExperienceRequiredForLevel(int level);
@@ -36,6 +35,16 @@ namespace LoveOfCooking.Objects
         IReadOnlyList<string> GetCookingRecipesForLevel(int level);
 		int CalculateExperienceGainedFromCookingItem(Item item, int numIngredients, int numCooked, bool applyExperience);
 		bool RollForExtraPortion();
+
+        event Action<IPostCookEvent> PostCook;
+    }
+
+    public interface IPostCookEvent
+    {
+        CraftingRecipe Recipe { get; }
+        Farmer Player { get; }
+        IList<StardewValley.Object> CookedItems { get; set; }
+        IList<IList<Item>> ConsumedItems { get; }
 	}
 
 	public class CookingSkillAPI : ICookingSkillAPI
@@ -89,19 +98,6 @@ namespace LoveOfCooking.Objects
 		{
 			Farmer player = Game1.GetPlayer(playerID, onlyOnline: false) ?? Game1.MasterPlayer;
 			return (player ?? Game1.player).HasCustomProfession(this.GetSkill().Professions[(int)profession]);
-		}
-
-		/// <summary>
-		/// Not yet implemented
-		/// </summary>
-		/// <param name="name">Name of the item to receive the buff.</param>
-		/// <param name="value">Added skill level amount, will act as a debuff if negative.</param>
-		public void AddCookingBuffToItem(string name, int value)
-		{
-			if (value == 0)
-				return;
-
-			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -176,8 +172,11 @@ namespace LoveOfCooking.Objects
             {
                 foreach ((string key, string value) in data)
                 {
-                    string[] requirements = ArgUtility.Get(value.Split('/'), 3).Split(' ');
-                    if (requirements.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
+                    if (value is null || !ArgUtility.TryGet(value.Split('/'), 3, out string field, out string error, allowBlank: false) || field is null || error is not null)
+                        continue;
+
+					string[] requirements = field?.Split(' ');
+                    if (requirements?.Length > 1 && requirements[0] == CookingSkill.InternalName && int.TryParse(requirements[^1], out int level))
                     {
                         recipes.TryAdd(level, []);
                         recipes[level].Add(key);
@@ -283,5 +282,57 @@ namespace LoveOfCooking.Objects
 		{
 			return Game1.random.NextDouble() < ModEntry.Definitions.CookingSkillValues.ExtraPortionChance;
 		}
+
+        /// <summary>
+        /// A list of events that should be run after the crafting process. One event is fired for every batch cook.
+        /// These events are currently not fired for burnt items.
+        /// </summary>
+        public event Action<IPostCookEvent> PostCook;
+
+        internal void FirePostCookEvents(PostCookEvent ev)
+        {
+            if (this.PostCook is null)
+                return;
+
+            foreach (Action<IPostCookEvent> action in this.PostCook.GetInvocationList())
+            {
+                try
+                {
+                    action.Invoke(ev);
+                }
+                catch (Exception e)
+                {
+                    Log.E("Error processing post cook events: " + e.ToString());
+                }
+            }
+        }
+    }
+
+    public class PostCookEvent : IPostCookEvent
+    {
+        /// <summary>
+        /// The recipe being cooked.
+        /// </summary>
+        public CraftingRecipe Recipe { get; }
+        /// <summary>
+        /// The farmer cooking this recipe.
+        /// </summary>
+        public Farmer Player { get; }
+        /// <summary>
+        /// The items that were cooked. This list can be mutated to change the output.
+        /// </summary>
+        public IList<StardewValley.Object> CookedItems { get; set; }
+        /// <summary>
+        /// The list of items that were consumed as ingredients. Each list corresponds to one individual craft.
+        /// </summary>
+        public IList<IList<Item>> ConsumedItems { get; }
+
+        public PostCookEvent(CraftingRecipe recipe, Farmer player, IList<StardewValley.Object> cookedItems, IList<IList<Item>> consumedItems)
+        {
+            this.Recipe = recipe;
+            this.Player = player;
+            this.CookedItems = cookedItems;
+            this.ConsumedItems = consumedItems;
+        }
 	}
 }

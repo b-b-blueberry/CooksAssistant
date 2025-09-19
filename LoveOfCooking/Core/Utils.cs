@@ -637,8 +637,10 @@ namespace LoveOfCooking
 			// Oven-baked foods
 			if (isBaked && !ModEntry.Definitions.PancakeyFoods.Any(name.Contains))
 			{
-				frames[^1] = new(58, ms * 2);
-				frames.Add(new(44, ms * 8)
+				frames[^1] = new(63, ms / 4);
+                frames.Add(new(62, ms * 2));
+                frames.Add(new(63, ms / 4));
+                frames.Add(new(44, ms * 8)
 				{
 					frameEndBehavior = delegate
 					{
@@ -646,8 +648,10 @@ namespace LoveOfCooking
 						Game1.player.FacingDirection = 0;
 					}
 				});
-				frames.Add(new(58, ms * 2));
-				frames.Add(new(0, ms));
+				frames.Add(new(63, ms / 4));
+				frames.Add(new(62, ms * 2));
+                frames.Add(new(63, ms / 4));
+                frames.Add(new(0, ms));
 			}
 
 			// Dough-tossing foods

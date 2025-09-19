@@ -90,12 +90,13 @@ namespace LoveOfCooking
 				return;
 			}
 
+            ModEntry.CookingSkillApi = new CookingSkillAPI(this.Helper.Reflection);
 			this.Helper.Events.GameLoop.GameLaunched += this.GameLoop_GameLaunched;
 		}
 
 		public override object GetApi()
 		{
-			return new CookingSkillAPI(reflection: this.Helper.Reflection);
+            return ModEntry.CookingSkillApi;
 		}
 
 		private void RegisterEvents()
@@ -663,7 +664,6 @@ namespace LoveOfCooking
 				Interfaces.LoadOptionalMods();
 
 				// Cooking skill
-				ModEntry.CookingSkillApi = new CookingSkillAPI(this.Helper.Reflection);
 				SpaceCore.Skills.RegisterSkill(new CookingSkill());
 			}
 			catch (Exception e)

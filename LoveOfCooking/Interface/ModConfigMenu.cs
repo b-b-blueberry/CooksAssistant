@@ -29,6 +29,9 @@ namespace LoveOfCooking.Interface
 
 		internal static bool Generate(IGenericModConfigMenuAPI gmcm)
 		{
+			if (gmcm is null)
+				return false;
+
 			// Register menu
 			IManifest mod = ModEntry.Instance.ModManifest;
 			gmcm.Register(

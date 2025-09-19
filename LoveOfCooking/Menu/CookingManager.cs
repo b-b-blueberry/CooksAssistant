@@ -207,7 +207,7 @@ namespace LoveOfCooking.Menu
             return this.IngredientMatcherFor(recipe).ChooseIngredientsForCrafting(recipe, this.CurrentIngredients);
         }
 
-        internal List<Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
+        internal IList<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
         {
             // Identify items to be consumed from inventory to fulfil ingredients requirements
             var ingredientsToConsume = this.GetIngredientsConsumedForCrafting(recipe);
@@ -221,13 +221,22 @@ namespace LoveOfCooking.Menu
             };
             int numPerCraft = recipe.numberProducedPerCraft;
 
+            // A collection of (cloned) ingredient lists for use with the API. Each list corresponds to the ingredients used for one craft.
+            IList<IList<Item>> usedIngredientsLists = [];
             for (int i = 0; i < quantity && ingredientsToConsume is not null; ++i)
             {
+                List<Item> usedIngredients = [];
+
                 // Consume ingredients from source lists
                 foreach ((int index, int stack) in ingredientsToConsume.ToList())
                 {
                     Ingredient ingredient = this.CurrentIngredients[index].Value;
-                    if ((sourceItems[ingredient.WhichInventory][ingredient.WhichItem].Stack -= stack) < 1)
+                    
+                    var clonedItem = ingredient.Item.getOne();
+                    clonedItem.Stack = stack;
+                    usedIngredients.Add(clonedItem);
+
+                    if ((ingredient.Item.Stack -= stack) < 1)
                     {
                         if (ingredient.WhichInventory == InventoryManager.BackpackInventoryId)
                         {
@@ -238,6 +247,7 @@ namespace LoveOfCooking.Menu
                         {
                             // Clear item and ensure no gaps are left in inventory for fridges and chests
                             sourceItems[ingredient.WhichInventory].RemoveAt(ingredient.WhichItem);
+
                             // Adjust other ingredients accordingly
                             for (int j = 0; j < this.CurrentIngredients.Count; ++j)
                             {
@@ -255,6 +265,9 @@ namespace LoveOfCooking.Menu
                     }
                 }
 
+                // Record the used ingredients for this one craft
+                usedIngredientsLists.Add(usedIngredients);
+
                 // Add to stack
                 qualityStacks[0] += numPerCraft;
 
@@ -262,6 +275,14 @@ namespace LoveOfCooking.Menu
                 if (Utils.TryApplyCookingQuantityBonus())
                 {
                     qualityStacks[0] += numPerCraft;
+
+                    // Add another list of ingredients since we're crafting twice
+                    usedIngredientsLists.Add(usedIngredients.Select(item =>
+                    {
+                        var newItem = item.getOne();
+                        newItem.Stack = item.Stack;
+                        return newItem;
+                    }).ToList());
                 }
 
                 // Choose new ingredients until none are found
@@ -318,7 +339,7 @@ namespace LoveOfCooking.Menu
             }
 
 			// Create item list from quality stacks
-			List<Object> itemsCooked = [];
+            IList<StardewValley.Object> itemsCooked = [];
             foreach (KeyValuePair<int, int> pair in qualityStacks.Where(pair => pair.Value > 0))
             {
 				Object item = recipe.createItem() as Object;
@@ -326,13 +347,17 @@ namespace LoveOfCooking.Menu
                 item.Stack = pair.Value;
                 itemsCooked.Add(item);
             }
-            return itemsCooked;
+
+            // Run the cook event handlers, replacing the items with the modified one if necessary
+            PostCookEvent ev = new(recipe, Game1.player, itemsCooked, usedIngredientsLists);
+            (ModEntry.CookingSkillApi as CookingSkillAPI).FirePostCookEvents(ev);
+            return ev.CookedItems ?? itemsCooked;
         }
 
         internal int CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
         {
             // Craft items to be cooked from recipe
-            List<Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity, out burntQuantity);
+            IList<StardewValley.Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity, out burntQuantity);
             int quantityCooked = Math.Max(0, itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft - burntQuantity);
             Item item = recipe.createItem();
 
