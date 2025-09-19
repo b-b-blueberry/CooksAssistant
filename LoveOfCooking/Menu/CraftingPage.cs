@@ -19,8 +19,23 @@ namespace LoveOfCooking.Menu
         public ClickableComponent FirstIngredientSlot => this.IngredientSlotButtons.First();
         public ClickableComponent LastIngredientSlot => this.IngredientSlotButtons.Last();
 
-		// Layout
-		private const int IngredientSlotsWide = 3;
+        /// <summary>Number of valid ingredient items currently in slots.</summary>
+        public int IngredientsCount => this.Menu.CookingManager.CurrentIngredients.Count(ingredient => ingredient.HasValue && this.Menu.CookingManager.GetItemForIngredient(ingredient.Value, this.Menu.Items) is not null);
+
+        /// <summary>Whether cooking drop-in animation sequence is currently playing.</summary>
+        public bool IsCooking => this._ingredientsDropInTimer > 0;
+
+        /// <summary>Milliseconds until each item can start flyby after the last.</summary>
+        private int CookingDelayPerItem => 200;
+
+        /// <summary>Milliseconds until each item can finish flyby.</summary>
+        private int CookingFlybyPerItem => 660;
+
+        /// <summary>Milliseconds until the last item can start and finish flyby.</summary>
+        private int CookingTotalDuration => this.CookingFlybyPerItem + this.CookingDelayPerItem * this.IngredientsCount;
+
+        // Layout
+        private const int IngredientSlotsWide = 3;
 		private const int IngredientSlotsHigh = 2;
 
 		// Components
@@ -37,8 +52,10 @@ namespace LoveOfCooking.Menu
 		private double _animBounceValue;
 		private double _animAlpha;
 
+		/// <summary>Milliseconds from 0 to <see cref="CookingTotalDuration"/> used to progress cooking ingredients items in motion.</summary>
+		private double _ingredientsDropInTimer;
+
 		// Text entry
-		private SpriteFont _quantityFont => Game1.dialogueFont;
         private int _quantity;
 
         public override ClickableComponent DefaultClickableComponent => this.CookButton;
@@ -105,6 +122,24 @@ namespace LoveOfCooking.Menu
 					scale: Scale));
 			}
 		}
+
+		private void StartCookingAnimation()
+        {
+			// Start sequence if animations are enabled, otherwise skip to end
+            this._ingredientsDropInTimer = ModEntry.Config.PlayMenuAnimation ? 0.0001f : this.CookingTotalDuration;
+
+			// Play sounds
+			int i = this.IngredientsCount;
+			ICue cue = null;
+			void boing()
+			{
+				cue?.Stop(Microsoft.Xna.Framework.Audio.AudioStopOptions.Immediate);
+				Game1.playSound("dwop", Game1.random.Next(500, 1500), out cue);
+				if (--i > 0)
+					DelayedAction.functionAfterDelay(boing, this.CookingDelayPerItem);
+			}
+			boing();
+        }
 
 		public override List<ClickableComponent> CreateClickableComponents()
 		{
@@ -277,14 +312,7 @@ namespace LoveOfCooking.Menu
 				// Cook! button
 				if (this.CookButton.bounds.Contains(x, y))
 				{
-					if (this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity))
-					{
-						this.TryPop();
-					}
-					else
-					{
-						Game1.playSound(CancelCue);
-					}
+					this.StartCookingAnimation();
 				}
 				else if (this.SeasoningButton.containsPoint(x,y ))
 				{
@@ -300,19 +328,6 @@ namespace LoveOfCooking.Menu
 			{
 				// Quantity up/down buttons
 				this.TryClickQuantityButton(x: x, y: y);
-
-				// Cook! button
-				if (this.CookButton.bounds.Contains(x, y))
-				{
-					if (this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity))
-					{
-						this.TryPop();
-					}
-					else
-					{
-						Game1.playSound(CancelCue);
-					}
-				}
 			}
 		}
 
@@ -347,7 +362,7 @@ namespace LoveOfCooking.Menu
         public override void Update(GameTime time)
 		{
 			// Cook! button animation loop plays to completion on hover
-			if (this._animBounceValue > 0.01d || this.CookButton.bounds.Contains(Game1.getMousePosition()))
+			if (this.IsCooking || this._animBounceValue > 0.01d || this.CookButton.bounds.Contains(Game1.getMousePosition()))
 			{
 				this._animAlpha = Math.Min(1, this._animAlpha + 0.01f * time.ElapsedGameTime.Milliseconds);
 				this._animBounceTimer += time.ElapsedGameTime.Milliseconds;
@@ -357,6 +372,18 @@ namespace LoveOfCooking.Menu
 			{
 				this._animAlpha = Math.Max(0, this._animAlpha - 0.01f * time.ElapsedGameTime.Milliseconds);
 			}
+
+			// Ingredients move from slots to frying pan on cook! button pressed
+			if (this.IsCooking)
+			{
+                this._ingredientsDropInTimer = Math.Clamp(this._ingredientsDropInTimer + time.ElapsedGameTime.TotalMilliseconds, 0, this.CookingTotalDuration);
+
+				// Finish animation, craft food items, and close menu
+				if (this._ingredientsDropInTimer >= this.CookingTotalDuration)
+				{
+					this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity);
+                }
+            }
 		}
 
 		public override void Draw(SpriteBatch b)
@@ -373,12 +400,42 @@ namespace LoveOfCooking.Menu
 			else
 			{
 				this.DrawEdibilityView(b: b);
-			}
+            }
+
+            // Ingredients move in sequence from slots to frying pan on cook! button pressed
+            if (this._ingredientsDropInTimer > 0)
+            {
+				for (int i = 0; i < this.Menu.CookingManager.CurrentIngredients.Count; ++i)
+				{
+					var ingredient = this.Menu.CookingManager.CurrentIngredients[i];
+                    if (!this.Menu.CookingManager.CurrentIngredients[i].HasValue || this.Menu.CookingManager.GetItemForIngredient(this.Menu.CookingManager.CurrentIngredients[i].Value, this.Menu.Items) is not Item item)
+						continue;
+
+					var slot = this.IngredientSlotButtons[i];
+					var start = slot.bounds.Center.ToVector2();
+                    var end = this.CookButton.bounds.Center.ToVector2() + (this.CookButton.bounds.Size - slot.bounds.Size).ToVector2() / 2;
+
+                    var delay = this.CookingDelayPerItem * i;
+                    var ratio = Math.Clamp(((float)this._ingredientsDropInTimer - delay) / (this.CookingFlybyPerItem), 0, 1);
+					var easeRatio = 1 - MathF.Cos(ratio * MathF.PI / 2);
+					var swellRatio = 1 - MathF.Cos(ratio * MathF.PI * 2);
+					var alpha = 1f - MathF.Pow(easeRatio, 4);
+
+                    item.drawInMenu(
+                        spriteBatch: b,
+                        location: Vector2.Lerp(start, end, easeRatio) - new Vector2(StardewValley.Object.spriteSheetTileSize * Game1.pixelZoom / 2),
+                        scaleSize: 1 + swellRatio / 2,
+                        transparency: 1,
+                        layerDepth: 1f,
+                        drawStackNumber: StackDrawType.Hide,
+                        color: Color.White * alpha,
+                        drawShadow: false);
+				}
+            }
         }
 
 		private void DrawCookingSlots(SpriteBatch b)
 		{
-			Item item;
 			Vector2 position;
 			Dictionary<int, double> iconShakeTimer = this.Menu._iconShakeTimerField.GetValue();
 
@@ -386,10 +443,13 @@ namespace LoveOfCooking.Menu
 			foreach (ClickableTextureComponent clickable in this.IngredientSlotButtons)
 				clickable.draw(b);
 
+			// Hide items for ingredient drop-in animations on cook! button pressed
+			if (this.IsCooking)
+				return;
+
 			for (int i = 0; i < this.Menu.CookingManager.CurrentIngredients.Count; ++i)
 			{
-				item = this.Menu.CookingManager.GetItemForIngredient(index: i, sourceItems: this.Menu.Items);
-				if (item is null)
+				if (!this.Menu.CookingManager.CurrentIngredients[i].HasValue || this.Menu.CookingManager.GetItemForIngredient(this.Menu.CookingManager.CurrentIngredients[i].Value, this.Menu.Items) is not Item item)
 					continue;
 
 				position = new(

@@ -427,7 +427,7 @@ namespace LoveOfCooking
 			}
 			if (fridge is not null)
 			{
-				mutexes.Add(fridge.mutex);
+				mutexes.Add(fridge.GetMutex());
 			}
 
 			// Create mutex request for all containers
@@ -440,7 +440,7 @@ namespace LoveOfCooking
 					if (fridge != null)
 						containers[fridge.Items] = fridge;
 					foreach (Chest chest in minifridges)
-						containers[chest.Items] = chest;
+						containers[chest.GetItemsForPlayer()] = chest;
 
 					// Reduce to known recipes
 					List<CraftingRecipe> recipes = CraftingRecipe.cookingRecipes.Keys
@@ -636,8 +636,10 @@ namespace LoveOfCooking
 			// Oven-baked foods
 			if (isBaked && !ModEntry.Definitions.PancakeyFoods.Any(name.Contains))
 			{
-				frames[^1] = new(58, ms * 2);
-				frames.Add(new(44, ms * 8)
+				frames[^1] = new(63, ms / 4);
+                frames.Add(new(62, ms * 2));
+                frames.Add(new(63, ms / 4));
+                frames.Add(new(44, ms * 8)
 				{
 					frameEndBehavior = delegate
 					{
@@ -645,8 +647,10 @@ namespace LoveOfCooking
 						Game1.player.FacingDirection = 0;
 					}
 				});
-				frames.Add(new(58, ms * 2));
-				frames.Add(new(0, ms));
+				frames.Add(new(63, ms / 4));
+				frames.Add(new(62, ms * 2));
+                frames.Add(new(63, ms / 4));
+                frames.Add(new(0, ms));
 			}
 
 			// Dough-tossing foods
