@@ -381,7 +381,9 @@ namespace LoveOfCooking.Menu
 				// Finish animation, craft food items, and close menu
 				if (this._ingredientsDropInTimer >= this.CookingTotalDuration)
 				{
-					this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity);
+					this._ingredientsDropInTimer = 0;
+
+                    this.Menu.TryCookRecipe(recipe: this.Menu.RecipeInfo.Recipe, quantity: this._quantity);
                 }
             }
 		}
