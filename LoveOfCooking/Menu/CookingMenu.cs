@@ -741,7 +741,7 @@ namespace LoveOfCooking.Menu
             {
                 Game1.displayHUD = true;
                 Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntQuantity: burntQuantity,
-                    containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == -4));
+                    containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == StardewValley.Object.FishCategory));
 				Game1.playSound(CookCue);
 				this.PopMenuStack(playSound: false, tryToQuit: true);
 			}

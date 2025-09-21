@@ -839,7 +839,7 @@ namespace LoveOfCooking
 
 		public static Buff GetFirstVisibleBuffOnItem(Item item)
 		{
-			bool isEdible = item is not StardewValley.Object o || o.Edibility != -300;
+			bool isEdible = item is not StardewValley.Object o || o.Edibility != StardewValley.Object.inedible;
 			var buffs = item.GetFoodOrDrinkBuffs();
 			return isEdible
 				? buffs.FirstOrDefault((Buff buff) => buff.visible && buff.id != "food" && buff.id != "drink")
