@@ -58,7 +58,7 @@ namespace LoveOfCooking.Menu
             position.Y -= this.Menu.yPositionOnScreen;
 
             // Adjust text position
-            w = w > 0 ? w : font.MeasureString(text).X + (CurrentLanguageCode is LanguageCode.ja or LanguageCode.zh ? 20 : 0);
+            w = w > 0 ? w : 999999999;
             position.X -= (int)(font.MeasureString(text).X * ((int)justify * 0.5f));
             if (CurrentLanguageCode is LanguageCode.ko && ModEntry.Config.ResizeKoreanFonts)
                 scale *= ModEntry.Definitions.KoreanFontScale.Y;
