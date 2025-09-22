@@ -1,4 +1,5 @@
-﻿using SpaceCore;
+﻿using LoveOfCooking.Objects;
+using SpaceCore;
 using StardewValley;
 using System;
 using System.Collections.Generic;
@@ -101,6 +102,8 @@ namespace LoveOfCooking.Menu
             if (recipe is null)
                 return 0;
 
+            List<float> quantities = [];
+
             foreach ((object query, int quantity) in this.RequiredQuantities(recipe))
             {
                 float count = 0;
@@ -130,14 +133,12 @@ namespace LoveOfCooking.Menu
                         count = matching.Sum(i => i?.Item?.Stack ?? 0) / required;
                     }
                 }
-                // Amount craftable is 0 if any single ingredient is missing
-                if (count < 1)
-                {
-                    return 0;
-                }
-                // Amount craftable is the minimum craftable per ingredient
-                total = total == -1 ? count : Math.Min(total, count);
+                quantities.Add(count);
             }
+
+            // Amount craftable is the minimum craftable per ingredient
+            total = quantities.OrderByDescending(qty => qty).Take(CookingManager.DefaultIngredientsSlots).Min();
+
             return (int)total;
         }
 
@@ -178,11 +179,6 @@ namespace LoveOfCooking.Menu
                         required -= consumed;
                         ingredientsToConsume.Add(i, consumed);
                     }
-                }
-                if (required > 0)
-                {
-                    // Abort search if any required ingredients aren't fulfilled
-                    return [];
                 }
             }
             return ingredientsToConsume;

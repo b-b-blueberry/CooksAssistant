@@ -82,6 +82,14 @@ namespace LoveOfCooking.Objects
 				: CookingTool.MaxIngredients;
 		}
 
+        /// <summary>
+        /// Whether the player's cooking tool has been fully upgraded.
+        /// </summary>
+        public static bool IsMaxLevel()
+        {
+            return CookingTool.GetEffectiveGlobalLevel() == CookingTool.MaxUpgradeLevel;
+        }
+
 		public static string WalletID(int level)
 		{
 			return CookingTool.InternalName;

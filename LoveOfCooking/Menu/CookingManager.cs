@@ -433,8 +433,9 @@ namespace LoveOfCooking.Menu
         internal void AutoFillIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems)
         {
             // Don't fill slots if the player isn't able to cook the recipe
-            if (recipe is null || this.MaxIngredients < recipe.getNumberOfIngredients()
-                || 1 > this.GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients: false))
+            if (recipe is null
+                || (!CookingTool.IsMaxLevel() && this.MaxIngredients < recipe.getNumberOfIngredients())
+                || this.GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients: false) <= 0)
                 return;
 
             // Get all matching ingredients for recipe items

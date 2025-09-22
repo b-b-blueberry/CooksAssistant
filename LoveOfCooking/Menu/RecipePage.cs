@@ -533,11 +533,12 @@ namespace LoveOfCooking.Menu
                 foreach ((string id, string displayName, int quantity, Texture2D texture, Rectangle? sourceRect) in ingredients)
                 {
                     textOffset.Y += rowHeight;
-					bool valid = this.Menu.RecipeInfo.IngredientQuantitiesHeld.Count > i;
+					bool okQuantity = this.Menu.RecipeInfo.IngredientQuantitiesHeld.Count > i;
+					bool okSlot = i < this.Menu.CookingManager.MaxIngredients || CookingTool.IsMaxLevel();
 
-                    Color drawColour = (!valid || this.Menu.RecipeInfo.IngredientQuantitiesHeld[i] < quantity)
+                    Color drawColour = (!okQuantity || this.Menu.RecipeInfo.IngredientQuantitiesHeld[i] < quantity)
                         ? BlockedColour
-                        : i >= this.Menu.CookingManager.MaxIngredients
+                        : !okSlot
                             ? Color.Firebrick * 0.8f
                             : TextColour;
 
@@ -592,7 +593,7 @@ namespace LoveOfCooking.Menu
                             layerDepth: 1);
 						this.DrawText(
 							b: b,
-							text: valid ? this.Menu.RecipeInfo.IngredientQuantitiesHeld[i].ToString() : "null",
+							text: okQuantity ? this.Menu.RecipeInfo.IngredientQuantitiesHeld[i].ToString() : "null",
 							x: position.X + 8 * Scale,
 							y: position.Y,
 							w: 72,
