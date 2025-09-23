@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib; // el diavolo nuevo
+﻿using HarmonyLib; // el diavolo nuevo
+using LoveOfCooking.Interface;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
@@ -21,6 +19,9 @@ using StardewValley.Projectiles;
 using StardewValley.SpecialOrders.Objectives;
 using StardewValley.TerrainFeatures;
 using StardewValley.TokenizableStrings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using xTile.Layers;
 using xTile.Tiles;
 using CraftingPage = StardewValley.Menus.CraftingPage;
@@ -448,8 +449,11 @@ namespace LoveOfCooking
 						.Select(key => new CraftingRecipe(name: key, isCookingRecipe: true))
 						.ToList();
 
-					// Create new cooking menu
-					CookingMenu menu = new(recipes: recipes, materialContainers: containers)
+					// Remote Fridge Storage
+					containers.TryAddMany(Interfaces.RemoteFridgeApi?.GetFridgeChests().ToDictionary(chest => chest.Items as IInventory, chest => chest));
+
+                    // Create new cooking menu
+                    CookingMenu menu = new(recipes: recipes, materialContainers: containers)
 					{
 						exitFunction = delegate
 						{
