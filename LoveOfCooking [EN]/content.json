@@ -80,7 +80,7 @@
 				"config.info.controllermap.title": "Gamepad controls",
 				"config.info.controllermap.button.a": "   Select",
 				"config.info.controllermap.button.b": "   Cancel",
-				"config.info.controllermap.button.x": "   Auto-add ingredients",
+				"config.info.controllermap.button.x": "   Auto-fill ingredients",
 				"config.info.controllermap.button.y": "   Cancel",
 				"config.info.controllermap.button.select": "   Search",
 				"config.info.controllermap.button.start": "   Cancel",
@@ -153,7 +153,7 @@
 				"menu.cooking_recipe.favourite_label": "Favourite",
 				"menu.cooking_recipe.quantity_label": "Makes",
 				"menu.cooking_recipe.which_label": "Which would you like to make?",
-				"menu.cooking_recipe.autofill_label": "Auto-add ingredients",
+				"menu.cooking_recipe.autofill_label": "Auto-fill ingredients",
 
 				"menu.cooking_recipe.buff.0": "Farming",
 				"menu.cooking_recipe.buff.1": "Fishing",
