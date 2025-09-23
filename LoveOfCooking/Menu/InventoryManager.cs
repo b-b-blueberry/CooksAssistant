@@ -738,7 +738,6 @@ namespace LoveOfCooking.Menu
 		public override void Draw(SpriteBatch b)
 		{
 			this.DrawInventoryMenu(b);
-			this.DrawActualInventory(b);
 		}
 	}
 }

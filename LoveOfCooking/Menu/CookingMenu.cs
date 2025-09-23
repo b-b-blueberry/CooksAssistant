@@ -225,6 +225,7 @@ namespace LoveOfCooking.Menu
 			this.width = CookbookSource.Width * Scale;
 			this.height = 720;
 			this._iconShakeTimerField = Helper.Reflection.GetField<Dictionary<int, double>>(this.inventory, "_iconShakeTimer");
+            this.inventory.highlightMethod = this.ItemHighlightMethod;
             Game1.displayHUD = true; // Prevents hidden HUD on crash when initialising menu, set to false at the end of this method
 
 			// Populate recipe lists
@@ -544,6 +545,11 @@ namespace LoveOfCooking.Menu
 
             if (this.RecipeInfo?.Recipe is not null)
 				this.UpdateCraftableCounts(recipe: this.RecipeInfo.Recipe);
+        }
+
+        public bool ItemHighlightMethod(Item item)
+        {
+            return CookingManager.CanBeCooked(item) && !this.CookingManager.IsInventoryItemInCurrentIngredients(item);
         }
 
         /// <summary>
@@ -1456,6 +1462,7 @@ namespace LoveOfCooking.Menu
 
 			// Draw inventory
 			this.InventoryManager.Draw(b);
+            this.inventory.draw(b);
 
             // Draw overlays
 			this.DrawExtraStuff(b);
