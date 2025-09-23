@@ -603,7 +603,9 @@ namespace LoveOfCooking
 				endSound = "furnace";
 			}
 
-			Game1.player.Halt();
+            var direction = Game1.player.FacingDirection;
+
+            Game1.player.Halt();
 			Game1.player.FarmerSprite.StopAnimation();
 			Game1.player.completelyStopAnimatingOrDoingAction();
 			Game1.player.faceDirection(0);
@@ -755,11 +757,11 @@ namespace LoveOfCooking
 					// Add effects for ruined food from Food Can Burn
 					Utils.PlayFoodBurnEffects(burntQuantity: burntQuantity, position: Utils.GuessKitchenGrabTilePosition());
 
-					// Face forwards after animation
+					// Face original direction after animation
 					Game1.player.jitterStrength = 0f;
 					Game1.player.stopJittering();
 					Game1.freezeControls = false;
-					Game1.player.FacingDirection = 2;
+					Game1.player.FacingDirection = direction;
 					Game1.addHUDMessage(HUDMessage.ForItemGained(item: recipe.createItem(), count: quantity));
 				}
 			};
