@@ -419,7 +419,7 @@ namespace LoveOfCooking
 		{
 			// Rebuild mutexes because the IL is unreadable
 			Chest fridge = location.GetFridge();
-			List<Chest> minifridges = [];
+			List<Item> minifridges = [];
 			List<NetMutex> mutexes = [];
 			foreach (Chest chest in location.Objects.Values.Where(IsFridgeOrMinifridge).Cast<Chest>())
 			{
@@ -437,7 +437,7 @@ namespace LoveOfCooking
 				success_callback: delegate (MultipleMutexRequest request)
 				{
 					// Map containers with inventories to preserve object references
-					Dictionary<IInventory, Chest> containers = new();
+					Dictionary<IInventory, Item> containers = new();
 					if (fridge != null)
 						containers[fridge.Items] = fridge;
 					foreach (Chest chest in minifridges)
@@ -450,7 +450,27 @@ namespace LoveOfCooking
 						.ToList();
 
 					// Remote Fridge Storage
-					containers.TryAddMany(Interfaces.RemoteFridgeApi?.GetFridgeChests().ToDictionary(chest => chest.Items as IInventory, chest => chest));
+					if (Interfaces.RemoteFridgeApi is IRemoteFridgeAPI remoteFridgeStorage)
+					{
+						containers.TryAddMany(remoteFridgeStorage.GetFridgeChests().ToDictionary(chest => chest.Items as IInventory, chest => chest as Item));
+					}
+
+					// Item Bags
+					if (Interfaces.ItemBagsApi is IItemBagsAPI itemBags)
+					{
+                        var inventories = containers.Keys.ToList();
+						inventories = inventories.AddItem(Game1.player.Items).ToList();
+
+						foreach (var inventory in inventories)
+						{
+							foreach (var bag in itemBags.GetItemBags(inventory))
+                            {
+                                var items = new Inventory();
+                                items.AddRange(itemBags.GetObjectsInsideBag(bag, true).Cast<Item>().ToList());
+                                containers.Add(items, bag);
+                            }
+						}
+					}
 
                     // Create new cooking menu
                     CookingMenu menu = new(recipes: recipes, materialContainers: containers)
@@ -826,14 +846,14 @@ namespace LoveOfCooking
 			return rate;
 		}
 
-		public static bool IsFridgeOrMinifridge(StardewValley.Object o)
+		public static bool IsFridgeOrMinifridge(Item item)
 		{
-			return o is Chest c && c.fridge.Value;
+			return item is Chest c && c.fridge.Value;
 		}
 
-		public static bool IsMinifridge(StardewValley.Object o)
+		public static bool IsMinifridge(Item item)
 		{
-			return Utils.IsFridgeOrMinifridge(o) && o.ItemId != "130";
+			return Utils.IsFridgeOrMinifridge(item) && item.ItemId != "130";
 		}
 
 		public static bool IsItemFoodAndNotYetEaten(Item item)

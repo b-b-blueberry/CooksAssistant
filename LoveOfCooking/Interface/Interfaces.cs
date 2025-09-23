@@ -17,6 +17,7 @@ namespace LoveOfCooking.Interface
 		internal static IGenericModConfigMenuAPI GenericModConfigMenu;
 		internal static IBetterCrafting BetterCraftingApi;
 		internal static IRemoteFridgeAPI RemoteFridgeApi;
+		internal static IItemBagsAPI ItemBagsApi;
 
         // Loaded mods
         internal static bool UsingCustomCC;
@@ -52,6 +53,7 @@ namespace LoveOfCooking.Interface
 			{
 				if (!Interfaces.IsLoaded)
 				{
+					Interfaces.LoadItemBagsAPI();
 					Interfaces.LoadRemoteFridgeStorageAPI();
 					Interfaces.LoadCustomCommunityCentreAPI();
 					Interfaces.LoadBetterCraftingAPI();
@@ -130,16 +132,25 @@ namespace LoveOfCooking.Interface
 			}
 		}
 
-		private static void LoadRemoteFridgeStorageAPI()
-		{
+        private static void LoadRemoteFridgeStorageAPI()
+        {
             IRemoteFridgeAPI api = Interfaces.Helper.ModRegistry
                 .GetApi<IRemoteFridgeAPI>
-				("EternalSoap.RemoteFridgeStorage");
+                ("EternalSoap.RemoteFridgeStorage");
 
-			Interfaces.RemoteFridgeApi = api;
+            Interfaces.RemoteFridgeApi = api;
         }
 
-		private static bool LoadModConfigMenu()
+        private static void LoadItemBagsAPI()
+        {
+            IItemBagsAPI api = Interfaces.Helper.ModRegistry
+                .GetApi<IItemBagsAPI>
+                ("SlayerDharok.Item_Bags");
+
+            Interfaces.ItemBagsApi = api;
+        }
+
+        private static bool LoadModConfigMenu()
 		{
 			IGenericModConfigMenuAPI gmcm = Interfaces.Helper.ModRegistry
 				.GetApi<IGenericModConfigMenuAPI>

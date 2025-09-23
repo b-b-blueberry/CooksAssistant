@@ -1,14 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using StardewModdingAPI;
 using StardewValley;
+using StardewValley.Extensions;
 using StardewValley.Inventories;
 using StardewValley.Menus;
 using StardewValley.Objects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using static LoveOfCooking.Menu.CookingMenu;
 using static LoveOfCooking.ModEntry;
 
@@ -16,10 +17,11 @@ namespace LoveOfCooking.Menu
 {
 	internal class InventoryManager : CookingMenuSubMenu
 	{
+		// Properties
 		public InventoryMenu InventoryMenu => this.Menu.inventory;
 		public int Index => this._inventoryId;
 		public List<IList<Item>> Items => this._inventoryList;
-		public List<(IInventory Inventory, Chest Chest)> Inventories => this._inventoryAndChestList;
+		public List<IInventory> Inventories => this._inventories.Select(i => i.Inventory).ToList();
 		public bool ShowInventoriesPopup { get; set; }
 		public string InventoryDisplayName { get; private set; }
 
@@ -42,23 +44,58 @@ namespace LoveOfCooking.Menu
 
 		// Inventory management
 		private int _inventoryId;
-		private List<(IInventory Inventory, Chest Chest)> _inventoryAndChestList;
-		private readonly List<IList<Item>> _inventoryList = [];
-		private readonly List<KeyValuePair<Color, bool>> _chestColours = [];
+		private readonly List<InventoryEntry> _inventories;
+		private readonly List<IList<Item>> _inventoryList;
+
 		internal const int BackpackInventoryId = 0;
 		internal const int MaximumExtraInventories = 24;
-		private int _inventoryIdsBeforeMinifridges = 0;
-		private int _inventoryIdsBeforeChests = 0;
-		private int _numberOfMinifridges = 0;
-		private int _numberOfChests = 0;
 
-		public InventoryManager(CookingMenu menu, Dictionary<IInventory, Chest> inventoryAndChestMap) : base(menu)
+		private record struct InventoryEntry
 		{
-			// Set initial material containers for additional inventories
-			this._inventoryAndChestList = inventoryAndChestMap?.Select(pair => (pair.Key, pair.Value)).ToList() ?? [];
-		}
+			public IInventory Inventory;
+			public Item Container;
+			public bool IsColoured;
+            public Color Colour;
+        }
 
-		public void ChangeInventory(bool selectNext, bool loop)
+		public InventoryManager(CookingMenu menu, Dictionary<IInventory, Item> inventoryContainers)
+			: base(menu)
+        {
+            this._inventoryId = BackpackInventoryId;
+
+            // Set material containers for base and additional inventories
+            Dictionary<IInventory, Item> dict = [];
+            dict.Add(Game1.player.Items, null);
+			dict.TryAddMany(inventoryContainers);
+            this._inventories = dict
+				// remove excess inventories
+				.Take(InventoryManager.MaximumExtraInventories)
+                // assign inventories to map
+                .Select(pair => new InventoryEntry()
+				{
+					Inventory = pair.Key,
+					Container = pair.Value,
+					IsColoured = pair.Value is not Chest chest ? false : chest.playerChest.Value
+								&& (chest.ItemId == "130" || chest.ItemId == "232") // Colourable chests
+								&& !chest.playerChoiceColor.Value.Equals(Color.Black), // Coloured chests
+					Colour = pair.Value is not Chest chest1 ? Color.White : chest1.playerChoiceColor.Value
+
+				})
+                // place backpack first:
+                .OrderByDescending(pair => pair.Container is null)
+                // place fridge next:
+                .ThenByDescending(pair => Utils.IsFridgeOrMinifridge(pair.Container))
+				// then minifridges, then chests:
+				.ThenByDescending(pair => !Utils.IsMinifridge(pair.Container))
+				// then sort these by item:
+				.ThenBy(pair => pair.Container?.ItemId)
+				.ToList();
+
+			// Set duplicate inventory list for easy access to materials
+			this._inventoryList = this._inventories.Select(pair => pair.Inventory.ToList() as IList<Item>).ToList();
+        }
+
+        public void ChangeInventory(bool selectNext, bool loop)
 		{
 			int delta = selectNext ? 1 : -1;
 			int index = this._inventoryId;
@@ -132,16 +169,13 @@ namespace LoveOfCooking.Menu
 		public string GetInventoryTitle()
 		{
 			string text = null;
-			if (this._inventoryId >= this._inventoryIdsBeforeChests)
+			if (this._inventories[this._inventoryId].Container is Item item)
 			{
-				if (this._inventoryAndChestList[this._inventoryId - this._inventoryIdsBeforeChests].Chest is Chest chest)
-				{
-					text = Utils.IsMinifridge(chest)
-						? Strings.Get("menu.inventory.minifridge")
-						: Utils.IsFridgeOrMinifridge(chest)
-							? Strings.Get("menu.inventory.fridge")
-							: chest.DisplayName;
-				}
+				text = Utils.IsMinifridge(item)
+					? Strings.Get("menu.inventory.minifridge")
+					: Utils.IsFridgeOrMinifridge(item)
+						? Strings.Get("menu.inventory.fridge")
+						: item.DisplayName;
 			}
 			else
 			{
@@ -161,38 +195,38 @@ namespace LoveOfCooking.Menu
 			};
 		}
 
-		private void DrawInventorySlot(SpriteBatch b, int which, Vector2 position, float scale)
+		private void DrawInventorySelectButton(SpriteBatch b, int which, Vector2 position, float scale)
 		{
-			Rectangle destRect = new(
-				x: (int)(position.X + this.InventorySelectButtons[which].bounds.Width / 2),
-				y: (int)(position.Y + this.InventorySelectButtons[which].bounds.Height / 2),
-				width: (int)(this.InventorySelectButtons[which].sourceRect.Width * scale),
-				height: (int)(this.InventorySelectButtons[which].sourceRect.Height * scale));
+			var button = this.InventorySelectButtons[which];
+			var inventory = this._inventories[which];
+			var source = button.sourceRect;
+
+			Rectangle dest = new(
+				x: (int)(position.X + button.bounds.Width / 2),
+				y: (int)(position.Y + button.bounds.Height / 2),
+				width: (int)(source.Width * scale),
+				height: (int)(source.Height * scale));
 			b.Draw(
 				texture: CookingMenu.Texture,
-				destinationRectangle: destRect,
-				sourceRectangle: this.InventorySelectButtons[which].sourceRect,
+				destinationRectangle: dest,
+				sourceRectangle: source,
 				color: Color.White,
-				rotation: 0f,
-				origin: this.InventorySelectButtons[which].sourceRect.Size.ToVector2() / 2,
+				rotation: 0,
+				origin: source.Size.ToVector2() / 2,
 				effects: SpriteEffects.None,
-				layerDepth: 1f);
-			if (which >= this._inventoryIdsBeforeChests)
+				layerDepth: 1);
+			if (inventory.IsColoured)
 			{
-				// chest button tint
-				KeyValuePair<Color, bool> tintAndEnabled = this._chestColours[which - this._inventoryIdsBeforeChests];
-				if (tintAndEnabled.Value)
-				{
-					b.Draw(
-						texture: CookingMenu.Texture,
-						destinationRectangle: destRect,
-						sourceRectangle: this.InventorySelectButtons[which].sourceRect,
-						color: tintAndEnabled.Key,
-						rotation: 0f,
-						origin: this.InventorySelectButtons[which].sourceRect.Size.ToVector2() / 2,
-						effects: SpriteEffects.None,
-						layerDepth: 1f);
-				}
+                // chest button tint
+				b.Draw(
+					texture: CookingMenu.Texture,
+					destinationRectangle: dest,
+					sourceRectangle: source,
+					color: inventory.Colour,
+					rotation: 0,
+					origin: source.Size.ToVector2() / 2,
+					effects: SpriteEffects.None,
+					layerDepth: 1);
 			}
 		}
 
@@ -209,7 +243,7 @@ namespace LoveOfCooking.Menu
 
 				// Inventory select tab
 				this.TabButton.draw(b);
-				this.DrawInventorySlot(b,
+				this.DrawInventorySelectButton(b,
 					which: this._inventoryId,
 					position: new(
 						x: this.TabButton.bounds.X + 2 * this.TabButton.baseScale,
@@ -239,7 +273,7 @@ namespace LoveOfCooking.Menu
 				for (int i = 0; i < this.InventorySelectButtons.Count; ++i)
 				{
 					// nav button icon
-					this.DrawInventorySlot(b,
+					this.DrawInventorySelectButton(b,
 						which: i,
 						position: Utility.PointToVector2(this.InventorySelectButtons[i].bounds.Location),
 						scale: this.InventorySelectButtons[i].scale);
@@ -375,76 +409,56 @@ namespace LoveOfCooking.Menu
 
 		public override List<ClickableComponent> CreateClickableComponents()
 		{
-			// Add base player inventories:
-			this._inventoryId = BackpackInventoryId;
-			this._inventoryList.Add(Game1.player.Items);
-
-			// Determine extra inventories:
-			this._inventoryIdsBeforeMinifridges = this._inventoryList.Count;
-
-			if (this._inventoryAndChestList.Any())
-			{
-				// Populate inventory lists
-				this._inventoryAndChestList = this._inventoryAndChestList
-					// place fridge first if one exists:
-					.OrderByDescending(pair => Utils.IsFridgeOrMinifridge(pair.Chest))
-					// then minifridges, then chests, if any exist
-					.ThenByDescending(pair => !Utils.IsMinifridge(pair.Chest))
-					.ToList();
-
-				while (this._inventoryAndChestList.Count >= MaximumExtraInventories)
-					this._inventoryAndChestList.Remove(this._inventoryAndChestList.Last());
-
-				this._inventoryList.AddRange(this._inventoryAndChestList.Select(pair => pair.Inventory));
-				this._chestColours.AddRange(this._inventoryAndChestList.Select(pair => pair.Chest).Select(
-					(c) => new KeyValuePair<Color, bool>(
-						key: c.playerChoiceColor.Value,
-						value: c.playerChest.Value
-							&& (c.ItemId == "130" || c.ItemId == "232") // Colourable chests
-							&& !c.playerChoiceColor.Value.Equals(Color.Black)))); // Coloured chests
-				this._numberOfMinifridges = this._inventoryAndChestList.Count(pair => Utils.IsMinifridge(pair.Chest));
-			}
-
-			this._inventoryIdsBeforeChests = this._inventoryIdsBeforeMinifridges + this._numberOfMinifridges;
-			this._numberOfChests = this._inventoryList.Count - this._inventoryIdsBeforeChests;
-
 			// Populate clickable inventories list
 			{
-				// Use backpack icon based on player inventory capacity
-				Rectangle sourceRect = this.GetBackpackIconForPlayer(Game1.player);
+                Texture2D texture;
+                Rectangle sourceRect;
 				Rectangle destRect = new(
 					x: -1,
 					y: -1,
 					width: 16 * Scale,
 					height: 16 * Scale);
-				this.InventorySelectButtons.Add(new(
-					name: "inventorySelectBackpack",
-					bounds: destRect,
-					label: null,
-					hoverText: null,
-					texture: ModEntry.SpriteSheet,
-					sourceRect: sourceRect,
-					scale: Scale,
-					drawShadow: false));
-				for (int i = 0; i < this._inventoryAndChestList.Count; ++i)
+
+				for (int i = 0; i < this._inventories.Count; ++i)
 				{
-					sourceRect = Utils.IsFridgeOrMinifridge(this._inventoryAndChestList[i].Chest)
-						? Utils.IsMinifridge(this._inventoryAndChestList[i].Chest)
-							? InventoryMinifridgeIconSource
-							: InventoryFridgeIconSource
-						: this._chestColours[i].Value
-							? InventoryChestColourableIconSource
-							: InventoryChestIconSource;
+					var inventory = this._inventories[i];
+					if (inventory.Container is Chest chest)
+                    {
+						// Chests, fridges, and minifridges
+                        sourceRect = Utils.IsFridgeOrMinifridge(chest)
+                            ? Utils.IsMinifridge(chest)
+                                ? InventoryMinifridgeIconSource
+                                : InventoryFridgeIconSource
+                            : inventory.IsColoured
+                                ? InventoryChestColourableIconSource
+                                : InventoryChestIconSource;
+						texture = ModEntry.SpriteSheet;
+                    }
+					else if (inventory.Container is Item item)
+					{
+						// Generic non-chest containers
+						var data = ItemRegistry.GetDataOrErrorItem(item.ItemId);
+                        sourceRect = data.GetSourceRect();
+						texture = data.GetTexture();
+                    }
+					else
+					{
+                        // Non-item containers, i.e. the player's backpack
+                        // Use backpack icon based on player inventory capacity
+                        texture = ModEntry.SpriteSheet;
+						sourceRect = this.GetBackpackIconForPlayer(Game1.player);
+                    }
+
 					this.InventorySelectButtons.Add(new(
 						name: $"inventorySelectContainer{i}",
 						bounds: destRect,
 						label: null,
 						hoverText: null,
-						texture: ModEntry.SpriteSheet,
+						texture: texture,
 						sourceRect: sourceRect,
 						scale: Scale,
 						drawShadow: false));
-				}
+                }
 			}
 
 			this.TabButton = new(
@@ -560,64 +574,66 @@ namespace LoveOfCooking.Menu
 				const int longSideSpacing = 4 * Scale;
 				const int addedSpacing = 2 * Scale;
 
-				int longSideLength = 2 * ((this.InventorySelectButtons.Count + 1) / 2) / 2;
+                var backpack = this.InventorySelectButtons[0];
+				var fridge = this.InventorySelectButtons[1];
+
+                int longSideLength = 2 * ((this.InventorySelectButtons.Count + 1) / 2) / 2;
 				int wideSideLength = 2;
 				int xLength = isHorizontal ? longSideLength : wideSideLength;
 				int yLength = isHorizontal ? wideSideLength : longSideLength;
-				int cardHeight = (int)(this.InventorySelectButtons[0].bounds.Height * (yLength + 0.5f)) + areaPadding;
+				int cardHeight = (int)(backpack.bounds.Height * (yLength + 0.5f)) + areaPadding;
 
 				// Backpack and fridge
 				{
-					this.InventorySelectButtons[0].bounds.X =
-					isHorizontal
-							? this.Area.Center.X + 32 * Scale
-								- (this.InventorySelectButtons.Count + 1) / 2 * ((this.InventorySelectButtons[0].bounds.Width + 1 * Scale) / 2)
-							: this.TabButton.bounds.X - 2 * Scale
-								- 2 * this.InventorySelectButtons[0].bounds.Width - addedSpacing - 1 * Scale - 4 * Scale;
-					this.InventorySelectButtons[1].bounds.X = this.InventorySelectButtons[0].bounds.X
-						+ (isHorizontal
-							? 0
-							: this.InventorySelectButtons[0].bounds.Width);
+					backpack.bounds.X = isHorizontal
+						? this.Area.Center.X + 32 * Scale
+							- (this.InventorySelectButtons.Count + 1) / 2 * ((backpack.bounds.Width + 1 * Scale) / 2)
+						: this.TabButton.bounds.X - 2 * Scale
+							- 2 * backpack.bounds.Width - addedSpacing - 1 * Scale - 4 * Scale;
+                    fridge.bounds.X = backpack.bounds.X + (isHorizontal
+						? 0
+						: backpack.bounds.Width);
 
 					int maximumHeight = this.Menu.height;
-					int itemHeight = this.InventorySelectButtons[0].bounds.Height;
+					int itemHeight = backpack.bounds.Height;
 					float itemsPerScreen = maximumHeight / itemHeight;
 					float itemRatio = (yLength - 1) / itemsPerScreen;
 					int verticalPositionY = this.TabButton.bounds.Y + (this.TabButton.bounds.Height - itemHeight) / 2;
 					int heightDifference = maximumHeight - verticalPositionY + areaPadding * 2;
 					float offsetToFillSpaceBelow = (heightDifference + itemHeight / 2) * itemRatio / 2;
 					verticalPositionY += (int)offsetToFillSpaceBelow;
-					this.InventorySelectButtons[0].bounds.Y = isHorizontal
-							? this.InventoryMenu.yPositionOnScreen + this.InventoryMenu.height + longSideSpacing + addedSpacing
-							: verticalPositionY - (yLength - 1) * itemHeight;
-					this.InventorySelectButtons[1].bounds.Y = this.InventorySelectButtons[0].bounds.Y
-						+ (isHorizontal
-							? this.InventorySelectButtons[0].bounds.Height + longSideSpacing
-							: 0);
+					backpack.bounds.Y = isHorizontal
+						? this.InventoryMenu.yPositionOnScreen + this.InventoryMenu.height + longSideSpacing + addedSpacing
+						: verticalPositionY - (yLength - 1) * itemHeight;
+                    fridge.bounds.Y = backpack.bounds.Y + (isHorizontal
+						? backpack.bounds.Height + longSideSpacing
+						: 0);
 				}
 
-				// Mini-fridges
-				for (int i = this._inventoryIdsBeforeMinifridges + 1; i < this.InventorySelectButtons.Count; ++i)
+				// Mini-fridges, chests, and others
+				for (int i = 2; i < this.InventorySelectButtons.Count; ++i)
 				{
+					var button = this.InventorySelectButtons[i];
+
 					int shortSideIndex = i % 2;
 					int shortSidePlacement = 0;
 					int longSideIndex = 0;
 					int longSidePlacement = i / 2;
-					this.InventorySelectButtons[i].bounds.X =
+                    button.bounds.X =
 						this.InventorySelectButtons[isHorizontal ? longSideIndex : shortSideIndex].bounds.X
-						+ this.InventorySelectButtons[0].bounds.Width * (isHorizontal ? longSidePlacement : shortSidePlacement)
+						+ backpack.bounds.Width * (isHorizontal ? longSidePlacement : shortSidePlacement)
 						+ (isHorizontal ? addedSpacing : 0);
-					this.InventorySelectButtons[i].bounds.Y =
+                    button.bounds.Y =
 						this.InventorySelectButtons[isHorizontal ? shortSideIndex : longSideIndex].bounds.Y
-						+ this.InventorySelectButtons[0].bounds.Height * (isHorizontal ? shortSidePlacement : longSidePlacement)
+						+ backpack.bounds.Height * (isHorizontal ? shortSidePlacement : longSidePlacement)
 						+ (isHorizontal ? 0 : addedSpacing);
 				}
 
 				// Area to draw inventory buttons popup
 				this._inventoriesPopupArea = new(
-					x: this.InventorySelectButtons[0].bounds.X - addedSpacing,
-					y: this.InventorySelectButtons[0].bounds.Y - areaPadding - addedSpacing,
-					width: (this.InventorySelectButtons[0].bounds.Width + addedSpacing) * xLength + areaPadding,
+					x: backpack.bounds.X - addedSpacing,
+					y: backpack.bounds.Y - areaPadding - addedSpacing,
+					width: (backpack.bounds.Width + addedSpacing) * xLength + areaPadding,
 					height: cardHeight);
 
 				// Area to track user scrollwheel actions
@@ -671,17 +687,11 @@ namespace LoveOfCooking.Menu
 				else if (this.ShowInventoriesPopup)
 				{
 					// Inventories popup
-					foreach (ClickableTextureComponent clickable in this.InventorySelectButtons)
+					for (int i = 0; i < this.InventorySelectButtons.Count; ++i)
 					{
-						if (clickable.bounds.Contains(x, y))
+						if (this.InventorySelectButtons[i].bounds.Contains(x, y))
 						{
-							int index = clickable.name == "inventorySelectBackpack"
-								// Player backpack
-								? BackpackInventoryId
-								// Fridges, minifridges and chests
-								: int.Parse(clickable.name.Substring(clickable.name.IndexOf(clickable.name.First(char.IsDigit))))
-									+ this._inventoryIdsBeforeMinifridges;
-							this.ChangeInventory(index);
+							this.ChangeInventory(i);
 							Game1.playSound(ClickCue);
 							break;
 						}

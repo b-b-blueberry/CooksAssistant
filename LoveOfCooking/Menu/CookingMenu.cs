@@ -215,7 +215,7 @@ namespace LoveOfCooking.Menu
         public List<CraftingRecipe> Recipes => this._searchPage.Results;
         public bool ReadyToCook => this.RecipeInfo?.NumReadyToCraft > 0;
 
-        public CookingMenu(List<CraftingRecipe> recipes = null, Dictionary<IInventory, Chest> materialContainers = null, string initialRecipe = null)
+        public CookingMenu(List<CraftingRecipe> recipes = null, Dictionary<IInventory, Item> materialContainers = null, string initialRecipe = null)
             : base(inventory: null, context: null)
         {
 			// Set up menu properties
@@ -238,19 +238,19 @@ namespace LoveOfCooking.Menu
 			this._searchPage = new(menu: this, values: recipes);
 			this._recipePage = new(menu: this);
 			this._craftingPage = new(menu: this);
-			this._pages.AddRange(new GenericPage[]
-			{
-				this._searchPage,
+            this._pages.AddRange(
+            [
+                this._searchPage,
 				this._recipePage,
 				this._craftingPage
-			});
+			]);
 
 			// Create menu managers after pages
 			this.CookingManager = new(menu: this)
             {
                 MaxIngredients = CookingTool.NumIngredientsAllowed(level: CookingTool.GetEffectiveGlobalLevel())
             };
-			this.InventoryManager = new(menu: this, inventoryAndChestMap: materialContainers);
+			this.InventoryManager = new(menu: this, inventoryContainers: materialContainers ?? []);
 
 			// Setup close button
 			this.initializeUpperRightCloseButton();

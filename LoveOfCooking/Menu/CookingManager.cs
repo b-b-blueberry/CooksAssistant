@@ -380,7 +380,7 @@ namespace LoveOfCooking.Menu
 			    // Consume seasoning items to improve the recipe output item qualities, rebalancing the stack numbers per quality item
 				// Stop iterating when we've run out of standard quality ingredients or no more seasonings can be found
 				List<Item> items = sourceItems.SelectMany(list => list).ToList();
-				List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories.Select(pair => pair.Inventory).ToList();
+				List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories;
 				List<KeyValuePair<string, int>> seasoning = [];
 				int quality = 0;
 				do
