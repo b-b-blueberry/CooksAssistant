@@ -65,7 +65,6 @@ namespace LoveOfCooking
 		public string BurntItemCreated;
 		public List<string> BurntItemAlternatives;
 		public float BurntItemAlternativeChance;
-		public string[] FarmhouseKitchenStartModIDs;
 		public Dictionary<string, string> FoodsThatGiveLeftovers;
 		public string DefaultSeasoning;
 		public Dictionary<string, SeasoningData> Seasonings;

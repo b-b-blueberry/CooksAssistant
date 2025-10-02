@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Interface;
 using StardewModdingAPI;
 
@@ -21,7 +20,6 @@ namespace LoveOfCooking.Interface
         // Loaded mods
         internal static bool UsingCustomCC;
 		internal static bool UsingBigBackpack;
-		internal static bool UsingFarmhouseKitchenStart;
 
 
 		/// <summary>
@@ -70,7 +68,6 @@ namespace LoveOfCooking.Interface
 		{
 			UsingCustomCC = Interfaces.Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingBigBackpack = Interfaces.Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Interfaces.Helper.ModRegistry.IsLoaded);
 			ModConfigMenu.Generate(gmcm: Interfaces.GenericModConfigMenu);
 		}
 
