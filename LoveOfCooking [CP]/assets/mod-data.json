@@ -93,8 +93,8 @@
                     "{{ID}}.CookingSkill": 0.01
                 },
                 "EdibleItemsWithNoFoodBehaviour": [
-                    "Life Elixir",
-                    "Energy Tonic"
+                    "(O)773", // Life Elixir
+                    "(O)349" // Energy Tonic
                 ],
                 "IndoorsTileSheetTextureName": "Maps\\townInterior",
                 "IndoorsTileIndexesOfKitchens": [ 498, 499, 631, 632, 633 ],

@@ -472,7 +472,7 @@ namespace LoveOfCooking
 
 			// Don't consider excluded items for food behaviours, e.g. Food Heals Over Time
 			if (who.itemToEat is not StardewValley.Object food
-                || ModEntry.Definitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.Name))
+                || ModEntry.Definitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.QualifiedItemId))
 				return;
 
 			if (food.ItemId == ModEntry.CookbookItemId)
