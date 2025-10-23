@@ -598,19 +598,26 @@ namespace LoveOfCooking
 
 		private void BetterCrafting_PostCraft(IPostCraftEvent e)
 		{
-			if (e.Recipe.CraftingRecipe is CraftingRecipe recipe && recipe.isCookingRecipe)
+			try
+            {
+                if (e.Recipe.CraftingRecipe is CraftingRecipe recipe && recipe.isCookingRecipe)
+                {
+                    Item output = e.Item;
+                    Utils.TryCookingSkillBehavioursOnCooked(
+                        recipe: recipe,
+                        item: ref output);
+                    Utils.TryBurnFoodForBetterCrafting(
+                        menu: e.Menu,
+                        recipe: recipe,
+                        input: ref output);
+                    e.Item = output;
+                }
+            }
+			catch (EntryPointNotFoundException)
 			{
-				Item output = e.Item;
-				Utils.TryCookingSkillBehavioursOnCooked(
-					recipe: recipe,
-					item: ref output);
-				Utils.TryBurnFoodForBetterCrafting(
-					menu: e.Menu,
-					recipe: recipe,
-					input: ref output);
-				e.Item = output;
-			}
-		}
+                // (2.0.7) Suppress errors for BetterCrafting (2.18.0) IRecipe implementations without a defined CraftingRecipe property
+            }
+        }
 
 		private bool Init()
 		{
