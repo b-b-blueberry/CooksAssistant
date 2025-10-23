@@ -47,7 +47,7 @@ namespace LoveOfCooking
 
             // Cookbook Animations
             this.CookbookAnimation.ScreenId = Context.ScreenId;
-            this.CookbookAnimation.Register(helper: ModEntry.Instance.Helper);
+            this.CookbookAnimation.Register(ModEntry.Instance.Helper);
         }
 
 		/// <summary>

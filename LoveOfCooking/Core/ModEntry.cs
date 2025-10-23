@@ -119,9 +119,6 @@ namespace LoveOfCooking
 			// Cooking Animations
 			this.Helper.Events.Display.RenderedWorld += this.Event_DrawCookingAnimation;
 
-			// Food Heals Over Time
-			this.States.Value.Regeneration.RegisterEvents(helper: this.Helper);
-
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
 			SpaceEvents.AfterGiftGiven += this.SpaceEvents_AfterGiftGiven;
 
