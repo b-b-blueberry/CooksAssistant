@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using Interface;
 using StardewModdingAPI;
 
@@ -16,11 +15,11 @@ namespace LoveOfCooking.Interface
 		internal static IContentPatcherAPI ContentPatcher;
 		internal static IGenericModConfigMenuAPI GenericModConfigMenu;
 		internal static IBetterCrafting BetterCraftingApi;
+		internal static IRemoteFridgeAPI RemoteFridgeApi;
 
-		// Loaded mods
-		internal static bool UsingCustomCC;
+        // Loaded mods
+        internal static bool UsingCustomCC;
 		internal static bool UsingBigBackpack;
-		internal static bool UsingFarmhouseKitchenStart;
 
 
 		/// <summary>
@@ -36,7 +35,7 @@ namespace LoveOfCooking.Interface
 			}
 			catch (Exception e)
 			{
-				Log.E($"Failed to initialise mod-provided APIs:{Environment.NewLine}{e}");
+				Log.E($"Failed to load required mod-provided APIs:{Environment.NewLine}{e}");
 				return false;
 			}
 		}
@@ -51,16 +50,16 @@ namespace LoveOfCooking.Interface
 			{
 				if (!Interfaces.IsLoaded)
 				{
-					Interfaces.LoadCustomCommunityCentreContent();
+					Interfaces.LoadRemoteFridgeStorageAPI();
+					Interfaces.LoadCustomCommunityCentreAPI();
 					Interfaces.LoadBetterCraftingAPI();
-					Interfaces.IsLoaded = true
-						&& Interfaces.LoadModConfigMenu();
+					Interfaces.IsLoaded = Interfaces.LoadModConfigMenu();
 				}
 				return Interfaces.IsLoaded;
 			}
 			catch (Exception e)
 			{
-				Log.E($"Failed to load content from mod-provided APIs:{Environment.NewLine}{e}");
+				Log.E($"Failed to load optional content from mod-provided APIs:{Environment.NewLine}{e}");
 				return false;
 			}
 		}
@@ -69,16 +68,15 @@ namespace LoveOfCooking.Interface
 		{
 			UsingCustomCC = Interfaces.Helper.ModRegistry.IsLoaded("blueberry.CustomCommunityCentre");
 			UsingBigBackpack = Interfaces.Helper.ModRegistry.IsLoaded("spacechase0.BiggerBackpack");
-			UsingFarmhouseKitchenStart = ModEntry.Definitions.FarmhouseKitchenStartModIDs.Any(Interfaces.Helper.ModRegistry.IsLoaded);
 			ModConfigMenu.Generate(gmcm: Interfaces.GenericModConfigMenu);
 		}
 
 		private static bool LoadSpaceCoreAPI()
 		{
-			ISpaceCoreAPI spaceCore = Interfaces.Helper.ModRegistry
+			ISpaceCoreAPI api = Interfaces.Helper.ModRegistry
 				.GetApi<ISpaceCoreAPI>
 				("spacechase0.SpaceCore");
-			if (spaceCore is null)
+			if (api is null)
 			{
 				Log.E("Can't access the SpaceCore API. Is the mod installed correctly?");
 				return false;
@@ -89,38 +87,38 @@ namespace LoveOfCooking.Interface
 
 		private static bool LoadContentPatcherAPI()
 		{
-			IContentPatcherAPI cp = Interfaces.Helper.ModRegistry
+			IContentPatcherAPI api = Interfaces.Helper.ModRegistry
 				.GetApi<IContentPatcherAPI>
 				("Pathoschild.ContentPatcher");
-			if (cp is null)
+			if (api is null)
 			{
 				Log.E("Can't access the ContentPatcher API. Is the mod installed correctly?");
 				return false;
 			}
 
-			Interfaces.ContentPatcher = cp;
+			Interfaces.ContentPatcher = api;
 			return true;
 		}
 
 		private static void LoadBetterCraftingAPI()
 		{
-			IBetterCrafting betterCrafting = Interfaces.Helper.ModRegistry
+			IBetterCrafting api = Interfaces.Helper.ModRegistry
 				.GetApi<IBetterCrafting>
 				("leclair.bettercrafting");
 
-			Interfaces.BetterCraftingApi = betterCrafting;
+			Interfaces.BetterCraftingApi = api;
 		}
 
-		private static void LoadCustomCommunityCentreContent()
+		private static void LoadCustomCommunityCentreAPI()
 		{
-			ICustomCommunityCentreAPI ccc = Interfaces.Helper.ModRegistry
+			ICustomCommunityCentreAPI api = Interfaces.Helper.ModRegistry
 				.GetApi<ICustomCommunityCentreAPI>
 				("blueberry.CustomCommunityCentre");
-			if (Interfaces.UsingCustomCC && ccc is not null && false)
+			if (Interfaces.UsingCustomCC && api is not null && false)
 			{
 				Log.D("Registering CustomCommunityCentre content.",
 					ModEntry.Config.DebugMode);
-				ccc.LoadContentPack(absoluteDirectoryPath: Path.Combine(Interfaces.Helper.DirectoryPath, AssetManager.CommunityCentreContentPackPath));
+				api.LoadContentPack(absoluteDirectoryPath: Path.Combine(Interfaces.Helper.DirectoryPath, AssetManager.CommunityCentreContentPackPath));
 			}
 			else
 			{
@@ -128,6 +126,15 @@ namespace LoveOfCooking.Interface
 					ModEntry.Config.DebugMode);
 			}
 		}
+
+		private static void LoadRemoteFridgeStorageAPI()
+		{
+            IRemoteFridgeAPI api = Interfaces.Helper.ModRegistry
+                .GetApi<IRemoteFridgeAPI>
+				("EternalSoap.RemoteFridgeStorage");
+
+			Interfaces.RemoteFridgeApi = api;
+        }
 
 		private static bool LoadModConfigMenu()
 		{
@@ -175,27 +182,5 @@ namespace LoveOfCooking.Interface
 
 			return chest;
         }
-
-		internal static Type GetMod_RemoteFridgeStorage()
-		{
-			Type mod = Type.GetType("RemoteFridgeStorage.ModEntry, RemoteFridgeStorage");
-			if (mod is null && Helper.ModRegistry.IsLoaded("EternalSoap.RemoteFridgeStorage"))
-			{
-				Log.E("Unable to load Remote Fridge Storage: one or both of these mods is now incompatible."
-					  + "\nChests will not be usable from the cooking page.");
-			}
-			return mod;
-		}
-
-		internal static Type GetMod_ConvenientChests()
-		{
-			Type mod = Type.GetType("ConvenientChests.ModEntry, ConvenientChests");
-			if (mod is null && Helper.ModRegistry.IsLoaded("aEnigma.ConvenientChests"))
-			{
-				Log.E("Unable to load Convenient Chests: one or both of these mods is now incompatible."
-					  + "\nChests will not be usable from the cooking page.");
-			}
-			return mod;
-		}
 	}
 }

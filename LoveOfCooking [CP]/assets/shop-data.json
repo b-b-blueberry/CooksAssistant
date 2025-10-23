@@ -8,7 +8,15 @@
                 "{{ID}}_chocolate": {
                     "Id": "{{ID}}_chocolate",
                     "ItemId": "{{ID}}_chocolate",
-                    "Condition": "PLAYER_FARMHOUSE_UPGRADE Current 1, PLAYER_HAS_MAIL Current ccIsComplete"
+                    "PriceModifierMode": "Stack",
+                    "PriceModifiers": [
+                        {
+                            "Id": "{{ID}}_chocolate_pierre_cc",
+                            "Modification": "Divide",
+                            "Amount": 2,
+                            "Condition": "PLAYER_HAS_MAIL Current ccIsComplete"
+                        }
+                    ]
                 }
             },
             "MoveEntries": [
@@ -25,8 +33,7 @@
             "Entries": {
                 "{{ID}}_chocolate": {
                     "Id": "{{ID}}_chocolate",
-                    "ItemId": "{{ID}}_chocolate",
-                    "Condition": null
+                    "ItemId": "{{ID}}_chocolate"
                 }
             },
             "MoveEntries": [

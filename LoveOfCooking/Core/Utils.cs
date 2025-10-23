@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using HarmonyLib; // el diavolo nuevo
+﻿using HarmonyLib; // el diavolo nuevo
+using LoveOfCooking.Interface;
 using LoveOfCooking.Menu;
 using LoveOfCooking.Objects;
 using Microsoft.Xna.Framework;
@@ -21,6 +19,9 @@ using StardewValley.Projectiles;
 using StardewValley.SpecialOrders.Objectives;
 using StardewValley.TerrainFeatures;
 using StardewValley.TokenizableStrings;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using xTile.Layers;
 using xTile.Tiles;
 using static SpaceCore.Skills;
@@ -277,9 +278,9 @@ namespace LoveOfCooking
 		public static bool TryAddCookbook(Farmer who, bool force = false)
 		{
 			bool hasCookingMenu = ModEntry.Config.AddCookingMenu;
-			bool hasOrWillReceiveMail = Utils.HasOrWillReceiveCookbook(who: Game1.player);
-			bool hasMail = Utils.HasCookbook(who: Game1.player);
-			bool hasKitchen = Game1.player.HouseUpgradeLevel > 0;
+			bool hasOrWillReceiveMail = Utils.HasOrWillReceiveCookbook(who);
+			bool hasMail = Utils.HasCookbook(who);
+			bool hasKitchen = who.HouseUpgradeLevel > 0 || Utils.DoesLocationHaveKitchen(who.homeLocation.Value);
 			bool isMailDateMet = Utils.IsCookbookMailDateMet();
 
 			Log.D($"{nameof(TryAddCookbook)} at {SDate.Now().ToLocaleString()}:"
@@ -449,8 +450,11 @@ namespace LoveOfCooking
 						.Select(key => new CraftingRecipe(name: key, isCookingRecipe: true))
 						.ToList();
 
-					// Create new cooking menu
-					CookingMenu menu = new(recipes: recipes, materialContainers: containers)
+					// Remote Fridge Storage
+					containers.TryAddMany(Interfaces.RemoteFridgeApi?.GetFridgeChests().ToDictionary(chest => chest.Items as IInventory, chest => chest));
+
+                    // Create new cooking menu
+                    CookingMenu menu = new(recipes: recipes, materialContainers: containers)
 					{
 						exitFunction = delegate
 						{
@@ -604,7 +608,9 @@ namespace LoveOfCooking
 				endSound = "furnace";
 			}
 
-			Game1.player.Halt();
+            var direction = Game1.player.FacingDirection;
+
+            Game1.player.Halt();
 			Game1.player.FarmerSprite.StopAnimation();
 			Game1.player.completelyStopAnimatingOrDoingAction();
 			Game1.player.faceDirection(0);
@@ -756,11 +762,11 @@ namespace LoveOfCooking
 					// Add effects for ruined food from Food Can Burn
 					Utils.PlayFoodBurnEffects(burntQuantity: burntQuantity, position: Utils.GuessKitchenGrabTilePosition());
 
-					// Face forwards after animation
+					// Face original direction after animation
 					Game1.player.jitterStrength = 0f;
 					Game1.player.stopJittering();
 					Game1.freezeControls = false;
-					Game1.player.FacingDirection = 2;
+					Game1.player.FacingDirection = direction;
 					Game1.addHUDMessage(HUDMessage.ForItemGained(item: recipe.createItem(), count: quantity));
 				}
 			};
@@ -1043,25 +1049,26 @@ namespace LoveOfCooking
 		{
 			return string.IsNullOrEmpty(character) || who.getFriendshipHeartLevelForNPC(name: character) >= ModEntry.Definitions.NpcKitchenFriendshipRequired;
 		}
-		
-		public static bool DoesLocationHaveKitchen(string name)
-		{
-			GameLocation location = Game1.getLocationFromName(name);
 
+        public static bool DoesLocationHaveKitchen(string name)
+        {
+            GameLocation location = Game1.getLocationFromName(name);
+			return Utils.DoesLocationHaveKitchen(location);
+        }
+
+        public static bool DoesLocationHaveKitchen(GameLocation location)
+		{
 			// Location must be indoors
 			if (location is null || location.IsOutdoors)
 				return false;
 
-			// Location must have kitchen tiles
-			const string layerId = "Buildings";
+            const string layerId = "Buildings";
 			Layer layer = location.map.RequireLayer(layerId);
 			for (int y = 0; y < layer.LayerHeight; y++)
 			{
 				for (int x = 0; x < layer.LayerWidth; x++)
 				{
-					if (layer.Tiles[x, y] is Tile tile
-						&& tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
-                        && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex))
+					if (Utils.IsKitchenTile(location, layer, x, y))
 					{
 						return true;
 					}
@@ -1071,26 +1078,44 @@ namespace LoveOfCooking
 			return false;
 		}
 
-		public static bool IsKitchenTileUnderCursor(GameLocation location, Point point, Farmer who, out string friendshopLockedBy)
+        /// <summary>
+        /// Whether location has kitchen tile action or kitchen tile at particular indoors tilesheet indexes.
+        /// </summary>
+        public static bool IsKitchenTile(GameLocation location, Layer layer, int x, int y)
+        {
+			if (location is null || layer is null)
+				return false;
+
+            if (location.doesTileHaveProperty(x, y, "Action", layer.Id) == "Kitchen")
+                return true;
+
+            return layer.Tiles[x, y] is Tile tile
+                && tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
+                && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
+        }
+
+        public static bool IsKitchenTile(GameLocation location, int x, int y, Farmer who, out string friendshopLockedBy)
 		{
 			friendshopLockedBy = null;
-			Tile tile = location.Map.GetLayer("Buildings").Tiles[point.X, point.Y];
-			string action = location.doesTileHaveProperty(point.X, point.Y, "Action", "Buildings");
+
+            if (location is null)
+                return false;
+
+            const string layerId = "Buildings";
+            Layer layer = location.map.RequireLayer(layerId);
+            Tile tile = layer.Tiles[x, y];
 
 			// Avoid blocking the player from submitting items to special order dropboxes
 			if (who.team.specialOrders.Any(order => order is not null && order.objectives.Any(
 				obj => obj is DonateObjective donate
 					&& donate.dropBoxGameLocation.Value == location.Name
-					&& donate.dropBoxTileLocation.Value == point.ToVector2())))
+					&& donate.dropBoxTileLocation.Value == new Vector2(x, y))))
 			{
 				return false;
 			}
 
             // Check for indoors kitchen tiles
-            bool isCookingStationTile = tile is not null
-				&& tile.TileSheet?.ImageSource == ModEntry.Definitions.IndoorsTileSheetTextureName
-                && ModEntry.Definitions.IndoorsTileIndexesOfKitchens.Contains(tile.TileIndex);
-			if (!location.IsOutdoors && isCookingStationTile)
+			if (!location.IsOutdoors && Utils.IsKitchenTile(location, layer, x, y))
 			{
 				if (!location.IsFarm)
 				{

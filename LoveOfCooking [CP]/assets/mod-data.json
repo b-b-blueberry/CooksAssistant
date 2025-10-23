@@ -93,8 +93,8 @@
                     "{{ID}}.CookingSkill": 0.01
                 },
                 "EdibleItemsWithNoFoodBehaviour": [
-                    "Life Elixir",
-                    "Energy Tonic"
+                    "(O)773", // Life Elixir
+                    "(O)349" // Energy Tonic
                 ],
                 "IndoorsTileSheetTextureName": "Maps\\townInterior",
                 "IndoorsTileIndexesOfKitchens": [ 498, 499, 631, 632, 633 ],
@@ -106,12 +106,6 @@
                     "{{ID}}_burntfood"
                 ],
                 "BurntItemAlternativeChance": 0.333,
-                "FarmhouseKitchenStartModIDs": [
-                    "Allayna.Kitchen",
-                    "burakmese.products",
-                    "Froststar11.CustomFarmhouse",
-                    "minervamaga.FR.BiggerFarmhouses"
-                ],
                 "FoodsThatGiveLeftovers": {
                     "{{ID}}_seafoodsando": "blueberry.LoveOfCooking_seafoodsando_half",
                     "{{ID}}_eggsando": "blueberry.LoveOfCooking_eggsando_half",

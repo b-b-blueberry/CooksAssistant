@@ -109,12 +109,16 @@ namespace LoveOfCooking
 		protected readonly Queue<Regen> TickerHistory = new();
 
 		/// <summary>
-		/// Reset all variables to default values.
+		/// Reset all variables to default values and refresh events.
 		/// </summary>
 		public void Reset()
-		{
-			// Active variables
-			this.IsHealthBarVisible = false;
+        {
+            // Events
+            this.RemoveEvents(helper: ModEntry.Instance.Helper);
+            this.RegisterEvents(helper: ModEntry.Instance.Helper);
+
+            // Active variables
+            this.IsHealthBarVisible = false;
 			this.LastFoodEaten = new();
 			this.PlayerValue = new();
 			this.RemainingValue = new();
@@ -131,30 +135,35 @@ namespace LoveOfCooking
 
 			// Debug variables
 			this.TickerHistory.Clear();
-		}
-		
-		/// <summary>
-		/// Register listeners/handlers for game and SMAPI event hooks.
-		/// </summary>
-		public void RegisterEvents(IModHelper helper)
-		{
-			helper.Events.GameLoop.UpdateTicked += this.Update;
-			if (ModEntry.Config.ShowFoodRegenBar)
-			{
-				helper.Events.Display.RenderingHud += this.Draw;
-				helper.Events.Display.Rendered += this.AfterDraw;
-			}
-			else
-			{
-				helper.Events.Display.RenderingHud -= this.Draw;
-				helper.Events.Display.Rendered -= this.AfterDraw;
-			}
-		}
+        }
 
-		/// <summary>
-		/// Update cached config values from definitions data file.
-		/// </summary>
-		public void UpdateDefinitions()
+        /// <summary>
+        /// Register listeners/handlers for game and SMAPI event hooks.
+        /// </summary>
+        protected void RegisterEvents(IModHelper helper)
+        {
+            helper.Events.GameLoop.UpdateTicked += this.Update;
+            if (ModEntry.Config.ShowFoodRegenBar)
+            {
+                helper.Events.Display.RenderingHud += this.Draw;
+                helper.Events.Display.Rendered += this.AfterDraw;
+            }
+        }
+
+        /// <summary>
+        /// Remove listeners/handlers for game and SMAPI event hooks.
+        /// </summary>
+        protected void RemoveEvents(IModHelper helper)
+        {
+            helper.Events.GameLoop.UpdateTicked -= this.Update;
+            helper.Events.Display.RenderingHud -= this.Draw;
+            helper.Events.Display.Rendered -= this.AfterDraw;
+        }
+
+        /// <summary>
+        /// Update cached config values from definitions data file.
+        /// </summary>
+        public void UpdateDefinitions()
 		{
 			// Calculate food regeneration rate from skill levels
 			const int maxLevel = 10;

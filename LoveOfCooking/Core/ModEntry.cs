@@ -119,9 +119,6 @@ namespace LoveOfCooking
 			// Cooking Animations
 			this.Helper.Events.Display.RenderedWorld += this.Event_DrawCookingAnimation;
 
-			// Food Heals Over Time
-			this.States.Value.Regeneration.RegisterEvents(helper: this.Helper);
-
 			SpaceEvents.OnItemEaten += this.SpaceEvents_ItemEaten;
 			SpaceEvents.AfterGiftGiven += this.SpaceEvents_AfterGiftGiven;
 
@@ -417,7 +414,7 @@ namespace LoveOfCooking
 			{
 				// Open cooking menus from available kitchen tiles
 				if (ModEntry.Config.CanUseTownKitchens && Utils.CanUseKitchens(who: Game1.player)
-					&& Utils.IsKitchenTileUnderCursor(location: Game1.currentLocation, point: e.Cursor.GrabTile.ToPoint(), who: Game1.player, out string friendshipLockedBy))
+					&& Utils.IsKitchenTile(Game1.currentLocation, (int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, Game1.player, out string friendshipLockedBy))
 				{
 					if (friendshipLockedBy is null)
 					{
@@ -472,7 +469,7 @@ namespace LoveOfCooking
 
 			// Don't consider excluded items for food behaviours, e.g. Food Heals Over Time
 			if (who.itemToEat is not StardewValley.Object food
-                || ModEntry.Definitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.Name))
+                || ModEntry.Definitions.EdibleItemsWithNoFoodBehaviour.Contains(who.itemToEat.QualifiedItemId))
 				return;
 
 			if (food.ItemId == ModEntry.CookbookItemId)
@@ -601,19 +598,26 @@ namespace LoveOfCooking
 
 		private void BetterCrafting_PostCraft(IPostCraftEvent e)
 		{
-			if (e.Recipe.CraftingRecipe is CraftingRecipe recipe && recipe.isCookingRecipe)
+			try
+            {
+                if (e.Recipe.CraftingRecipe is CraftingRecipe recipe && recipe.isCookingRecipe)
+                {
+                    Item output = e.Item;
+                    Utils.TryCookingSkillBehavioursOnCooked(
+                        recipe: recipe,
+                        item: ref output);
+                    Utils.TryBurnFoodForBetterCrafting(
+                        menu: e.Menu,
+                        recipe: recipe,
+                        input: ref output);
+                    e.Item = output;
+                }
+            }
+			catch (EntryPointNotFoundException)
 			{
-				Item output = e.Item;
-				Utils.TryCookingSkillBehavioursOnCooked(
-					recipe: recipe,
-					item: ref output);
-				Utils.TryBurnFoodForBetterCrafting(
-					menu: e.Menu,
-					recipe: recipe,
-					input: ref output);
-				e.Item = output;
-			}
-		}
+                // (2.0.7) Suppress errors for BetterCrafting (2.18.0) IRecipe implementations without a defined CraftingRecipe property
+            }
+        }
 
 		private bool Init()
 		{
