@@ -202,19 +202,22 @@ namespace LoveOfCooking
 			this.LastFoodEaten = food.getOne() as StardewValley.Object;
 
 			// Regenerate health/energy over time:
-			int foodHealth = food.healthRecoveredOnConsumption();
-			int foodStamina = food.staminaRecoveredOnConsumption();
+			int health = food.healthRecoveredOnConsumption();
+			int stamina = food.staminaRecoveredOnConsumption();
 
 			// Add new regen values to current amount
-			this.RemainingValue.HP += foodHealth;
-			this.RemainingValue.EP += foodStamina;
+			// If health or energy is negative, don't affect regeneration
+			this.RemainingValue.HP += Math.Max(0, health);
+			this.RemainingValue.EP += Math.Max(0, stamina);
 
 			// Reset total regeneration values to start from current remaining amount
 			this.InitialValue = this.RemainingValue;
 
-			// Revert player values to before having eaten food
-			this.RevertPlayer();
-		}
+            // Revert player values to before having eaten food
+			// If health or energy is negative, subtract that from the player rather than the regeneration
+            Game1.player.health = (int)Math.Ceiling(this.PlayerValue.HP) + Math.Min(0, health);
+            Game1.player.Stamina = this.PlayerValue.EP + Math.Min(0, stamina);
+        }
 
 		/// <summary>
 		/// Add HP and EP values to the remaining regeneration amount.
@@ -225,15 +228,6 @@ namespace LoveOfCooking
 		public void Add(int hp, int ep)
 		{
 			this.RemainingValue += new Regen { HP = hp, EP = ep };
-		}
-
-		/// <summary>
-		/// Revert player status bar values to their state on the previous tick.
-		/// </summary>
-		public void RevertPlayer()
-		{
-			Game1.player.health = (int)Math.Ceiling(this.PlayerValue.HP);
-			Game1.player.Stamina = this.PlayerValue.EP;
 		}
 
 		/// <summary>
