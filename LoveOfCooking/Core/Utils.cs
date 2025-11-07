@@ -1024,7 +1024,7 @@ namespace LoveOfCooking
 			// Add cooking skill experience
 			ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
 				item: item,
-				numIngredients: recipe.getNumberOfIngredients(),
+				numIngredients: Utils.BoundedNumberOfIngredients(recipe),
 				numCooked: item.Stack,
 				applyExperience: true);
 
@@ -1043,6 +1043,11 @@ namespace LoveOfCooking
 		public static bool CanUseKitchens(Farmer who)
 		{
 			return !ModEntry.Config.AddCookingMenu || Utils.HasCookbook(who: who);
+		}
+
+		public static int BoundedNumberOfIngredients(CraftingRecipe recipe)
+		{
+			return Math.Min(recipe.getNumberOfIngredients(), CookingManager.DefaultIngredientsSlots);
 		}
 
 		public static bool CanUseCharacterKitchen(Farmer who, string character)

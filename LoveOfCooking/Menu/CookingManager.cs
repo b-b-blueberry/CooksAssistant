@@ -113,7 +113,7 @@ namespace LoveOfCooking.Menu
             int cookingLevel = ModEntry.CookingSkillApi.GetLevel();
 			float baseRate = ModEntry.Definitions.BurnChanceBase;
 			float addedRate = ModEntry.Definitions.BurnChancePerIngredient;
-            float chance = Math.Max(minimumChance, baseRate + addedRate * recipe.getNumberOfIngredients()
+            float chance = Math.Max(minimumChance, baseRate + addedRate * Utils.BoundedNumberOfIngredients(recipe)
                 - cookingLevel * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction
                 - CookingTool.GetEffectiveGlobalLevel() / 2f * ModEntry.Definitions.CookingSkillValues.BurnChanceModifier * ModEntry.Definitions.CookingSkillValues.BurnChanceReduction);
 
@@ -370,7 +370,7 @@ namespace LoveOfCooking.Menu
 
                 ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
                     item: item,
-                    numIngredients: recipe.getNumberOfIngredients(),
+                    numIngredients: Utils.BoundedNumberOfIngredients(recipe),
                     numCooked: quantityCooked,
                     applyExperience: true);
                 for (int i = 0; i < quantityCooked; ++i)
@@ -434,7 +434,7 @@ namespace LoveOfCooking.Menu
         {
             // Don't fill slots if the player isn't able to cook the recipe
             if (recipe is null
-                || (!CookingTool.IsMaxLevel() && this.MaxIngredients < recipe.getNumberOfIngredients())
+                || (!CookingTool.IsMaxLevel() && this.MaxIngredients < Utils.BoundedNumberOfIngredients(recipe))
                 || this.GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients: false) <= 0)
                 return;
 
