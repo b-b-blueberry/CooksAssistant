@@ -10,6 +10,7 @@ using StardewModdingAPI;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
 using StardewValley;
+using StardewValley.Locations;
 using StardewValley.Menus;
 
 namespace LoveOfCooking
@@ -407,22 +408,26 @@ namespace LoveOfCooking
 		
 		private void Input_ButtonPressed(object sender, ButtonPressedEventArgs e)
 		{
-			if (Utils.PlayerAgencyLostCheck() || Game1.activeClickableMenu is not null || !Game1.player.CanMove)
+			if (Utils.PlayerAgencyLostCheck() || Game1.activeClickableMenu is not null)
 				return;
 
-			if (e.Button.IsActionButton())
+            var player = Game1.player;
+            var location = player.currentLocation;
+
+            if (e.Button.IsActionButton())
 			{
 				// Open cooking menus from available kitchen tiles
-				if (ModEntry.Config.CanUseTownKitchens && Utils.CanUseKitchens(who: Game1.player)
-					&& Utils.IsKitchenTile(Game1.currentLocation, (int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, Game1.player, out string friendshipLockedBy))
+				if ((location is FarmHouse or IslandFarmHouse || ModEntry.Config.CanUseTownKitchens)
+					&& Utils.CanUseKitchens(who: player)
+					&& Utils.IsKitchenTile(location, (int)e.Cursor.GrabTile.X, (int)e.Cursor.GrabTile.Y, player, out string friendshipLockedBy))
 				{
 					if (friendshipLockedBy is null)
 					{
-						Utils.TryOpenNewCookingMenu();
+						Utils.CreateNewCookingMenu(location);
 					}
 					else
 					{
-						string name = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == Game1.currentLocation.Name).Key;
+						string name = ModEntry.NpcHomeLocations.FirstOrDefault(pair => pair.Value == location.Name).Key;
 						NPC npc = Game1.getCharacterFromName(name);
 						Game1.drawDialogueNoTyping(Strings.Get("menu.cooking_station.no_friendship", npc.displayName));
 					}

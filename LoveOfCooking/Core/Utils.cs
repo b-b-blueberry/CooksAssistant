@@ -397,7 +397,7 @@ namespace LoveOfCooking
 			// Cache request to ensure it's unlocked later
 			ModEntry.Instance.States.Value.MenuMutex = mutex;
 
-			if (ModEntry.Config.AddCookingMenu && Utils.CanUseKitchens(who: Game1.player) || forceOpen)
+			if (Utils.CanUseKitchens(who: Game1.player) || forceOpen)
 			{
 				// Play animation and open menu
 				Game1.playSound("bigSelect");
