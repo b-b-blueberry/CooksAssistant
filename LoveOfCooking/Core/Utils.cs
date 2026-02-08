@@ -410,8 +410,13 @@ namespace LoveOfCooking
 			}
 			else
 			{
-				mutex.ReleaseLocks();
+				// Release the new menu mutex if one was created
+				mutex?.ReleaseLocks();
+
+				// Dialogue notice if player can't use kitchens
 				Game1.drawDialogueNoTyping(Strings.Get("menu.cooking_station.no_cookbook"));
+
+				// Show HUD (hidden on replaced/new menu created)
 				Game1.displayHUD = true;
 			}
 		}
