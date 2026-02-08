@@ -423,7 +423,7 @@ namespace LoveOfCooking
 				{
 					if (friendshipLockedBy is null)
 					{
-						Utils.CreateNewCookingMenu(location);
+						Utils.CreateNewCookingMenu(null, location);
 					}
 					else
 					{

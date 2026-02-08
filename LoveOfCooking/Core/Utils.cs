@@ -421,7 +421,7 @@ namespace LoveOfCooking
 			}
 		}
 
-		internal static void CreateNewCookingMenu(GameLocation location)
+		internal static void CreateNewCookingMenu(CraftingPage fromMenu, GameLocation location)
 		{
 			// Rebuild mutexes because the IL is unreadable
 			Chest fridge = location.GetFridge();
@@ -450,10 +450,17 @@ namespace LoveOfCooking
 						containers[chest.GetItemsForPlayer()] = chest;
 
 					// Reduce to known recipes
-					List<CraftingRecipe> recipes = CraftingRecipe.cookingRecipes.Keys
-						.Where(Game1.player.cookingRecipes.ContainsKey)
-						.Select(key => new CraftingRecipe(name: key, isCookingRecipe: true))
-						.ToList();
+                    List<CraftingRecipe> recipes = [];
+                    if (fromMenu is not null)
+                    {
+                        // Use recipes from original menu if provided
+                        recipes.AddRange(fromMenu.pagesOfCraftingRecipes.SelectMany(page => page.Select(pair => pair.Value)).Where(recipe => Game1.player.cookingRecipes.ContainsKey(recipe.name)));
+                    }
+                    else
+                    {
+						// Use all recipes
+                        recipes.AddRange(CraftingRecipe.cookingRecipes.Keys.Where(Game1.player.cookingRecipes.ContainsKey).Select(key => new CraftingRecipe(name: key, isCookingRecipe: true)));
+                    }
 
 					// Remote Fridge Storage
 					containers.TryAddMany(Interfaces.RemoteFridgeApi?.GetFridgeChests().ToDictionary(chest => chest.Items as IInventory, chest => chest));
