@@ -349,7 +349,7 @@ namespace LoveOfCooking
 			int sourceWidth = AssetManager.RegenBarArea.Width;
 			int sourceHeight = AssetManager.RegenBarArea.Height;
 			Vector2 regenBarOrigin = new Vector2(
-				x: viewport.Right - (sourceWidth (1 + otherBarCount) * Game1.pixelZoom) - (otherBarWidth * (1 + otherBarCount)),
+				x: viewport.Right - (sourceWidth * (1 + otherBarCount) * Game1.pixelZoom) - (otherBarWidth * (1 + otherBarCount)),
 				y: viewport.Bottom - heightFromBottom - (sourceHeight * Game1.pixelZoom));
 
 			// Regen bar sprites
