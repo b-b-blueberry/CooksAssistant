@@ -337,7 +337,7 @@ namespace LoveOfCooking
 			Rectangle viewport = Game1.graphics.GraphicsDevice.Viewport.TitleSafeArea;
 
 			const int heightFromBottom = 4 * Game1.pixelZoom;
-			const int otherBarWidth = 12 * Game1.pixelZoom;
+			const int otherBarWidth = 2 * Game1.pixelZoom;
 			const int otherBarSpacing = 1 * Game1.pixelZoom;
 
 			Point barIconOffset = new Point(x: -1, y: 1);
@@ -349,7 +349,7 @@ namespace LoveOfCooking
 			int sourceWidth = AssetManager.RegenBarArea.Width;
 			int sourceHeight = AssetManager.RegenBarArea.Height;
 			Vector2 regenBarOrigin = new Vector2(
-				x: viewport.Right - (sourceWidth * Game1.pixelZoom / 2) - (otherBarWidth * (1 + otherBarCount)),
+				x: viewport.Right - ((sourceWidth * (1 + otherBarCount)) * Game1.pixelZoom) - (otherBarWidth * (1 + otherBarCount)),
 				y: viewport.Bottom - heightFromBottom - (sourceHeight * Game1.pixelZoom));
 
 			// Regen bar sprites
