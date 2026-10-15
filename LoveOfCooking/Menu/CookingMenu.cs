@@ -728,12 +728,18 @@ namespace LoveOfCooking.Menu
 		/// <returns>Whether or not any food was crafted.</returns>
 		public bool TryCookRecipe(CraftingRecipe recipe, int quantity)
         {
-			this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: quantity, out int burntQuantity);
+			this.CookingManager.CookRecipe(recipe: recipe, sourceItems: this.Items, quantity: quantity, out int burntQuantity, out int craftQuantity);
+            if (craftQuantity is 0)
+            {
+                this.UpdateCraftableCounts(recipe: recipe);
+                this._craftingPage.OnReadyToCookChanged();
+                return false;
+            }
             if (Config.PlayCookingAnimation)
             {
                 Game1.displayHUD = true;
                 // Doesn't check against SpaceCore ingredients since noone's paying me anyway
-                Utils.AnimateForRecipe(recipe: recipe, quantity: quantity, burntQuantity: burntQuantity,
+                Utils.AnimateForRecipe(recipe: recipe, quantity: craftQuantity, burntQuantity: burntQuantity,
                     containsFish: recipe.recipeList.Any(pair => ItemRegistry.Create<StardewValley.Object>(pair.Key, 0).Category == StardewValley.Object.FishCategory));
 				Game1.playSound(CookCue);
 

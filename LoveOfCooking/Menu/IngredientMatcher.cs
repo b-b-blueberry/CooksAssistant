@@ -11,11 +11,11 @@ namespace LoveOfCooking.Menu
     internal interface IIngredientMatcher
     {
         bool IsMatchingIngredient(CraftingRecipe recipe, object query, Item item);
-        List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, object query, int required, int limit = CookingManager.DefaultIngredientsSlots);
+        List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, object query);
         List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems);
         List<int> GetMatchingIngredientQuantities(CraftingRecipe recipe, List<IList<Item>> sourceItems);
-        int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients);
-        List<List<int>> GetItemIndexes(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients);
+        int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients, int limit = int.MaxValue);
+        List<List<int>> GetItemIndexes(CraftingRecipe recipe, List<Ingredient?> ingredients);
         Dictionary<int, int> ChooseIngredientsForCrafting(CraftingRecipe recipe, List<Ingredient?> ingredients);
     }
 
@@ -39,31 +39,21 @@ namespace LoveOfCooking.Menu
                 : item.QualifiedItemId == ItemRegistry.QualifyItemId(itemId);
         }
 
-        public virtual List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, object query, int required, int limit = CookingManager.DefaultIngredientsSlots)
+        public virtual List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, object query)
         {
             List<Ingredient?> foundIngredients = [];
-            int ingredientsFulfilled = 0;
-            int ingredientsRequired = required;
             for (int i = 0; i < sourceItems.Count; ++i)
             {
-                for (int j = 0; j < sourceItems[i].Count && ingredientsFulfilled < limit; ++j)
+                for (int j = 0; j < sourceItems[i].Count; ++j)
                 {
                     if (sourceItems[i][j] is Item item
+                        && item.Stack > 0
                         && CookingManager.CanBeCooked(item)
                         && this.IsMatchingIngredient(recipe, query, item))
                     {
                         // Mark ingredient as matched
                         Ingredient ingredient = new(whichInventory: i, whichItem: j, item: item);
                         foundIngredients.Add(ingredient);
-
-                        // Count up number of fulfilled ingredients
-                        // Ingredients may require multiple items each if stacks are small enough, or requirement is large enough
-                        ingredientsRequired -= item.Stack;
-                        if (ingredientsRequired < 0)
-                        {
-                            ++ingredientsFulfilled;
-                            ingredientsRequired = required;
-                        }
                     }
                 }
             }
@@ -73,32 +63,25 @@ namespace LoveOfCooking.Menu
         public virtual List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems)
         {
             return this.RequiredQuantities(recipe)
-                .SelectMany(ingredient => this.GetMatchingIngredients(recipe, sourceItems, ingredient.Query, ingredient.Quantity))
+                .SelectMany(ingredient => this.GetMatchingIngredients(recipe, sourceItems, ingredient.Query))
+                .DistinctBy(ingredient => (ingredient.Value.WhichInventory, ingredient.Value.WhichItem))
                 .ToList();
         }
 
         public virtual List<int> GetMatchingIngredientQuantities(CraftingRecipe recipe, List<IList<Item>> sourceItems)
         {
             List<int> quantities = [];
-            foreach ((object query, int quantity) in this.RequiredQuantities(recipe))
+            foreach ((object query, int _) in this.RequiredQuantities(recipe))
             {
-                int requiredQuantity = quantity;
-                int heldQuantity = 0;
-                var ingredients = this.GetMatchingIngredients(recipe, sourceItems, query, requiredQuantity);
-                if (ingredients is not null && ingredients.Any())
-                {
-                    heldQuantity = ingredients.Sum((ingredient) => ingredient?.Item?.Stack ?? 0);
-                    requiredQuantity -= heldQuantity;
-                }
-
-                quantities.Add(heldQuantity);
+                var ingredients = this.GetMatchingIngredients(recipe, sourceItems, query);
+                quantities.Add((int)Math.Min(int.MaxValue, ingredients.Sum(ingredient => (long)ingredient.Value.Item.Stack)));
             }
             return quantities;
         }
 
-        public virtual int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients)
+        public virtual int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients, int limit = int.MaxValue)
         {
-            if (recipe is null)
+            if (recipe is null || limit <= 0)
                 return 0;
 
             var consumeItems = ingredients ?? sourceItems
@@ -106,37 +89,31 @@ namespace LoveOfCooking.Menu
                     .Select((item, itemIndex) => (Ingredient?)new Ingredient(inventoryIndex, itemIndex, item)))
                 .ToList();
 
-            // Select items to be consumed, transforming into a separate list of clones
+            // Count required quantities of each item
             consumeItems = consumeItems
                 .Where(entry => entry?.Item is Item item && item.Stack > 0 && CookingManager.CanBeCooked(item))
-                .GroupBy(entry => (entry.Value.WhichInventory, entry.Value.WhichItem))
-                .Select(group =>
-                {
-                    Ingredient ingredient = group.First().Value;
-                    Item clone = ingredient.Item.getOne();
-                    clone.Stack = ingredient.Item.Stack;
-                    return (Ingredient?)new Ingredient(ingredient.WhichInventory, ingredient.WhichItem, clone);
-                })
+                .DistinctBy(entry => (entry.Value.WhichInventory, entry.Value.WhichItem))
                 .ToList();
+            int[] available = consumeItems.Select(ingredient => ingredient.Value.Item.Stack).ToArray();
+            var requiredQuantities = this.RequiredQuantities(recipe).ToList();
 
             // Select ingredients for each item, incrementing craftable count if fulfilled
             int amountCraftable = 0;
             Dictionary<int, int> consumeIngredients;
-            while ((consumeIngredients = this.ChooseIngredientsForCrafting(recipe, consumeItems)) is not null)
+            while (amountCraftable < limit && (consumeIngredients = this.ChooseIngredientsForCrafting(recipe, consumeItems, available, requiredQuantities)) is not null)
             {
                 foreach ((int index, int quantity) in consumeIngredients)
-                    consumeItems[index].Value.Item.Stack -= quantity;
+                    available[index] -= quantity;
                 ++amountCraftable;
             }
             return amountCraftable;
         }
 
-        public virtual List<List<int>> GetItemIndexes(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients)
+        public virtual List<List<int>> GetItemIndexes(CraftingRecipe recipe, List<Ingredient?> ingredients)
         {
             return this.RequiredQuantities(recipe)
-                .Select(iq => ingredients
-                    .Where(ingredient => ingredient is Ingredient ing && this.IsMatchingIngredient(recipe, iq.Query, ing.Item))
-                    .Select(ingredient => ingredients.IndexOf(ingredient))
+                .Select(iq => Enumerable.Range(0, ingredients.Count)
+                    .Where(index => ingredients[index] is Ingredient ingredient && this.IsMatchingIngredient(recipe, iq.Query, ingredient.Item))
                     .OrderByDescending(i => ingredients[i]?.Item?.Stack)
                     .ToList())
                 .ToList();
@@ -144,10 +121,19 @@ namespace LoveOfCooking.Menu
 
         public Dictionary<int, int> ChooseIngredientsForCrafting(CraftingRecipe recipe, List<Ingredient?> ingredients)
         {
+            int[] available = ingredients.Select(ingredient => Math.Max(0, ingredient?.Item?.Stack ?? 0)).ToArray();
+            return this.ChooseIngredientsForCrafting(recipe, ingredients, available, this.RequiredQuantities(recipe).ToList());
+        }
+
+        private Dictionary<int, int> ChooseIngredientsForCrafting(CraftingRecipe recipe, List<Ingredient?> ingredients,
+            int[] available, List<(object Query, int Quantity)> requiredQuantities)
+        {
             Dictionary<int, int> ingredientsToConsume = [];
-            var requiredQuantities = this.RequiredQuantities(recipe).ToList();
             foreach ((object query, int quantity) in requiredQuantities)
             {
+                if (quantity <= 0)
+                    return null;
+
                 // Subtract quantity consumed from quantity required until required is 0
                 // Recipe is considered craftable when all required counts are 0
                 int required = quantity;
@@ -159,7 +145,7 @@ namespace LoveOfCooking.Menu
                     {
                         // Earlier requirements may have already reserved part of this stack
                         ingredientsToConsume.TryGetValue(i, out int reserved);
-                        int consumed = Math.Min(required, Math.Max(0, item.Stack - reserved));
+                        int consumed = Math.Min(required, Math.Max(0, available[i] - reserved));
                         if (consumed > 0)
                         {
                             ingredientsToConsume[i] = reserved + consumed;
@@ -167,10 +153,15 @@ namespace LoveOfCooking.Menu
                         }
                     }
                 }
+
                 if (required > 0)
                     return null;
             }
-            return ingredientsToConsume.Count > 0 ? ingredientsToConsume : null;
+
+            if (ingredientsToConsume.Count is 0)
+                return null;
+
+            return ingredientsToConsume;
         }
     }
 
@@ -182,7 +173,7 @@ namespace LoveOfCooking.Menu
             {
                 return customRecipeData.Ingredients.Select(ingredient => ((object)ingredient, ingredient.Quantity));
             }
-            return null;
+            return [];
         }
 
         public override bool IsMatchingIngredient(CraftingRecipe recipe, object query, Item item)

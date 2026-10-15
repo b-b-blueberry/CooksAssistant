@@ -89,6 +89,8 @@ namespace LoveOfCooking.Menu
             {
                 return this == obj;
             }
+
+            public override int GetHashCode() => HashCode.Combine(this.WhichInventory, this.WhichItem, this.Item);
         }
 
 
@@ -139,31 +141,6 @@ namespace LoveOfCooking.Menu
 
         private IIngredientMatcher IngredientMatcherFor(CraftingRecipe recipe) => recipe is SpaceCore.Framework.CustomCraftingRecipe ? this._spaceCoreIngredientMatcher : this._ingredientMatcher;
 
-        /// <summary>
-        /// Checks whether an item is equivalent to another for the purposes of being used as an ingredient in a cooking recipe.
-        /// </summary>
-        /// <param name="id">Identifier for matching, is considered an item category if negative.</param>
-        /// <param name="item">Item to compare identifier against.</param>
-        public bool IsMatchingIngredient(CraftingRecipe recipe, string id, Item item)
-        {
-            if (recipe is SpaceCore.Framework.CustomCraftingRecipe)
-                return this._spaceCoreIngredientMatcher.IsMatchingIngredient(recipe, id, item);
-            else
-                return this._ingredientMatcher.IsMatchingIngredient(recipe, id, item);
-        }
-
-        /// <summary>
-        /// Find all items in some lists that work as an ingredient or substitute in a cooking recipe for some given requirement.
-        /// </summary>
-        /// <param name="id">The required item's identifier for the recipe, given as an index or category.</param>
-        /// <param name="sourceItems">Container of items in which to seek a match.</param>
-        /// <param name="required">Stack quantity required to fulfil this ingredient in its recipe.</param>
-        /// <param name="limit">Maximum number of matching ingredients to return.</param>
-        internal List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, string id, int required, int limit = DefaultIngredientsSlots)
-        {
-            return this.IngredientMatcherFor(recipe).GetMatchingIngredients(recipe, sourceItems, id, required, limit);
-        }
-
         internal List<Ingredient?> GetMatchingIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems)
         {
             return this.IngredientMatcherFor(recipe).GetMatchingIngredients(recipe, sourceItems);
@@ -174,14 +151,14 @@ namespace LoveOfCooking.Menu
             return this.IngredientMatcherFor(recipe).GetMatchingIngredientQuantities(recipe, sourceItems);
         }
 
-        internal int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, bool limitToCurrentIngredients)
+        internal int GetAmountCraftable(CraftingRecipe recipe, List<IList<Item>> sourceItems, bool limitToCurrentIngredients, int limit = int.MaxValue)
         {
-            return this.IngredientMatcherFor(recipe).GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients ? this.CurrentIngredients : null);
+            return this.IngredientMatcherFor(recipe).GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients ? this.CurrentIngredients : null, limit);
         }
 
-        internal List<List<int>> GetItemInventoryIndexes(CraftingRecipe recipe, List<IList<Item>> sourceItems, List<Ingredient?> ingredients)
+        internal List<List<int>> GetItemInventoryIndexes(CraftingRecipe recipe, List<Ingredient?> ingredients)
         {
-            return this.IngredientMatcherFor(recipe).GetItemIndexes(recipe, sourceItems, ingredients);
+            return this.IngredientMatcherFor(recipe).GetItemIndexes(recipe, ingredients);
         }
 
         internal Item GetItemForIngredient(int i)
@@ -207,8 +184,18 @@ namespace LoveOfCooking.Menu
             return this.IngredientMatcherFor(recipe).ChooseIngredientsForCrafting(recipe, this.CurrentIngredients);
         }
 
-        internal IList<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
+        internal IList<StardewValley.Object> CraftItemAndConsumeIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity, out int craftQuantity)
         {
+            burntQuantity = 0;
+            craftQuantity = 0;
+
+            this.RefreshCurrentIngredients(sourceItems);
+
+            if (recipe is null || quantity <= 0)
+                return [];
+
+            HashSet<int> changedInventories = [];
+
             // Identify items to be consumed from inventory to fulfil ingredients requirements
             var ingredientsToConsume = this.GetIngredientsConsumedForCrafting(recipe);
 
@@ -225,10 +212,23 @@ namespace LoveOfCooking.Menu
             IList<IList<Item>> usedIngredientsLists = [];
             for (int i = 0; i < quantity && ingredientsToConsume is not null; ++i)
             {
+                // Validate every source before consuming any part of this craft.
+                if (!ingredientsToConsume.All(pair =>
+                {
+                    Ingredient ingredient = this.CurrentIngredients[pair.Key].Value;
+                    IList<Item> inventory = sourceItems[ingredient.WhichInventory];
+                    return inventory is IInventory && ingredient.WhichItem >= 0 && ingredient.WhichItem < inventory.Count
+                        && ReferenceEquals(inventory[ingredient.WhichItem], ingredient.Item)
+                        && ingredient.Item.Stack >= pair.Value;
+                }))
+                {
+                    break;
+                }
+
                 List<Item> usedIngredients = [];
 
                 // Consume ingredients from source lists
-                foreach ((int index, int stack) in ingredientsToConsume.ToList())
+                foreach ((int index, int stack) in ingredientsToConsume)
                 {
                     Ingredient ingredient = this.CurrentIngredients[index].Value;
                     
@@ -236,35 +236,13 @@ namespace LoveOfCooking.Menu
                     clonedItem.Stack = stack;
                     usedIngredients.Add(clonedItem);
 
-                    if ((ingredient.Item.Stack -= stack) < 1)
-                    {
-                        if (ingredient.WhichInventory == InventoryManager.BackpackInventoryId)
-                        {
-                            // Clear item slot in player's inventory
-                            sourceItems[ingredient.WhichInventory][ingredient.WhichItem] = null;
-                        }
-                        else
-                        {
-                            // Clear item and ensure no gaps are left in inventory for fridges and chests
-                            sourceItems[ingredient.WhichInventory].RemoveAt(ingredient.WhichItem);
-
-                            // Adjust other ingredients accordingly
-                            for (int j = 0; j < this.CurrentIngredients.Count; ++j)
-                            {
-                                if (this.CurrentIngredients[j].HasValue
-                                    && this.CurrentIngredients[j].Value.WhichInventory == ingredient.WhichInventory
-                                    && this.CurrentIngredients[j].Value.WhichItem > ingredient.WhichItem)
-                                {
-									this.CurrentIngredients[j] = new Ingredient(
-                                        whichInventory: this.CurrentIngredients[j].Value.WhichInventory,
-                                        whichItem: this.CurrentIngredients[j].Value.WhichItem - 1,
-                                        item: this.CurrentIngredients[j].Value.Item);
-                                }
-                            }
-                        }
+                    IInventory inventory = (IInventory)sourceItems[ingredient.WhichInventory];
+                    inventory.Reduce(ingredient.Item, stack, reduceRemainderFromInventory: false);
+                    changedInventories.Add(ingredient.WhichInventory);
+                    if (ingredient.Item.Stack <= 0 || !ReferenceEquals(inventory[ingredient.WhichItem], ingredient.Item))
                         this.CurrentIngredients[index] = null;
-                    }
                 }
+                ++craftQuantity;
 
                 // Record the used ingredients for this one craft
                 usedIngredientsLists.Add(usedIngredients);
@@ -290,6 +268,19 @@ namespace LoveOfCooking.Menu
                 ingredientsToConsume = this.GetIngredientsConsumedForCrafting(recipe);
             }
 
+            // Remove nulls from non-player inventories
+            foreach (int inventoryId in changedInventories)
+            {
+                var inventory = (IInventory)sourceItems[inventoryId];
+                if (!inventory.IsLocalPlayerInventory)
+                    inventory.RemoveEmptySlots();
+            }
+
+            this.RefreshCurrentIngredients(sourceItems);
+
+            if (craftQuantity is 0)
+                return [];
+
 			// Apply seasoning quality bonuses to the stack choices
 			if (this.IsUsingSeasonings) {
 			    // Consume seasoning items to improve the recipe output item qualities, rebalancing the stack numbers per quality item
@@ -297,11 +288,12 @@ namespace LoveOfCooking.Menu
 				List<Item> items = sourceItems.SelectMany(list => list).ToList();
 				List<IInventory> inventories = this._cookingMenu.InventoryManager.Inventories.Select(pair => pair.Inventory).ToList();
 				List<KeyValuePair<string, int>> seasoning = [];
-				int quality = 0;
-				do
+				while (qualityStacks[Object.lowQuality] > 0)
 				{
                     seasoning.Clear();
-					quality = Utils.GetOneSeasoningFromInventory(items, seasoning);
+					int quality = Utils.GetOneSeasoningFromInventory(items, seasoning);
+                    if (quality <= Object.lowQuality)
+                        break;
 					if (quality > 0)
 					{
 						// Reduce the base quality stack
@@ -321,11 +313,11 @@ namespace LoveOfCooking.Menu
 						}
 					}
 				}
-				while (qualityStacks[0] > 0 && quality > 0);
 			}
 
+            this.RefreshCurrentIngredients(sourceItems);
+
 			// Apply burn chance to destroy cooked food at random
-			burntQuantity = 0;
             List<int> qualities = qualityStacks.Keys.ToList();
             foreach (int quality in qualities)
             {
@@ -355,11 +347,18 @@ namespace LoveOfCooking.Menu
             return ev.CookedItems ?? itemsCooked;
         }
 
-        internal int CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity)
+        internal int CookRecipe(CraftingRecipe recipe, List<IList<Item>> sourceItems, int quantity, out int burntQuantity, out int craftQuantity)
         {
+            burntQuantity = 0;
+            craftQuantity = 0;
+
             // Craft items to be cooked from recipe
-            IList<StardewValley.Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity, out burntQuantity);
-            int quantityCooked = Math.Max(0, itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft - burntQuantity);
+            IList<StardewValley.Object> itemsCooked = this.CraftItemAndConsumeIngredients(recipe, sourceItems, quantity, out burntQuantity, out craftQuantity);
+
+            if (craftQuantity is 0)
+                return 0;
+
+            int quantityCooked = Math.Max(0, itemsCooked.Sum(item => item.Stack) / recipe.numberProducedPerCraft);
             Item item = recipe.createItem();
 
             // Track experience for items cooked
@@ -367,7 +366,7 @@ namespace LoveOfCooking.Menu
             {
                 if (!ModEntry.Instance.States.Value.FoodCookedToday.ContainsKey(recipe.name))
                     ModEntry.Instance.States.Value.FoodCookedToday[recipe.name] = 0;
-                ModEntry.Instance.States.Value.FoodCookedToday[recipe.name] += quantity;
+                ModEntry.Instance.States.Value.FoodCookedToday[recipe.name] += craftQuantity;
 
                 ModEntry.CookingSkillApi.CalculateExperienceGainedFromCookingItem(
                     item: item,
@@ -438,7 +437,7 @@ namespace LoveOfCooking.Menu
             // Don't fill slots if the player isn't able to cook the recipe
             if (recipe is null
                 || (!CookingTool.IsMaxLevel() && this.MaxIngredients < Utils.BoundedNumberOfIngredients(recipe))
-                || this.GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients: false) <= 0)
+                || this.GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients: false, limit: 1) <= 0)
                 return;
 
             // Get all matching ingredients for recipe items
@@ -450,7 +449,7 @@ namespace LoveOfCooking.Menu
 
             // Reduce ingredients to try and complete the recipe in as many slots as we have,
             // sorting by stack counts to maximise the amount craftable
-            var matchingItemIndexes = this.GetItemInventoryIndexes(recipe, sourceItems, ingredients);
+            var matchingItemIndexes = this.GetItemInventoryIndexes(recipe, ingredients);
 
 			// Add items from each list of matching ingredients in turn
 			// This should create a mixed list where each required item has an ingredient represented
@@ -474,6 +473,20 @@ namespace LoveOfCooking.Menu
                 .Take(this.MaxIngredients))
             {
 				this.AddToIngredients(ingredient);
+            }
+        }
+
+        private void RefreshCurrentIngredients(List<IList<Item>> sourceItems)
+        {
+            for (int i = 0; i < this.CurrentIngredients.Count; ++i)
+            {
+                if (this.CurrentIngredients[i] is not Ingredient ingredient)
+                    continue;
+                int index = ingredient.WhichInventory >= 0 && ingredient.WhichInventory < sourceItems.Count
+                    && ingredient.Item is Item item && item.Stack > 0
+                    ? sourceItems[ingredient.WhichInventory].IndexOf(ingredient.Item) : -1;
+                this.CurrentIngredients[i] = index < 0 ? null
+                    : new Ingredient(ingredient.WhichInventory, index, ingredient.Item);
             }
         }
 
