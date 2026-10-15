@@ -496,10 +496,10 @@ namespace LoveOfCooking
 					"RATE",
 					"REGEN"
 				];
-				linePosition = blockPosition = new Vector2(
+                linePosition = blockPosition = new Vector2(
 					x: viewport.Right - margin.X,
 					y: viewport.Bottom - margin.Y);
-				foreach (string debugLine in debugLines.Reverse())
+				foreach (string debugLine in debugLines)
 				{
 					Vector2 textSize = Game1.smallFont.MeasureString(debugLine);
 					linePosition.X = blockPosition.X - textSize.X;
@@ -524,7 +524,7 @@ namespace LoveOfCooking
 					.ToArray();
 				blockPosition.X -= 220;
 				linePosition = blockPosition;
-				foreach (string debugLine in debugLines.Reverse())
+				foreach (string debugLine in debugLines)
 				{
 					Vector2 textSize = Game1.smallFont.MeasureString(debugLine);
 					linePosition.Y -= textSize.Y;

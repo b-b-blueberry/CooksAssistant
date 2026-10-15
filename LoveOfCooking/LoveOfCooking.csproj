@@ -26,10 +26,7 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<Reference Include="SpaceCore">
-			<HintPath>$(GamePath)\Mods\SpaceCore\SpaceCore.dll</HintPath>
-			<Private>false</Private>
-		</Reference>
+    <Reference Include="SpaceCore" HintPath="$(GamePath)\Mods\SpaceCore\SpaceCore.dll" Private="false" />
 	</ItemGroup>
 
 	<ItemGroup>
