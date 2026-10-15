@@ -262,6 +262,7 @@ namespace LoveOfCooking.Menu
                                 }
                             }
                         }
+                        this.CurrentIngredients[index] = null;
                     }
                 }
 
@@ -407,6 +408,8 @@ namespace LoveOfCooking.Menu
 
         internal bool AddToIngredients(Ingredient ingredient)
         {
+            if (this.IsInventoryItemInCurrentIngredients(ingredient.WhichInventory, ingredient.WhichItem))
+                return false;
             if (this.FirstEmptySlot < 0 || this.FirstEmptySlot >= this.MaxIngredients)
                 return false;
 			this.CurrentIngredients[this.FirstEmptySlot] = ingredient;
@@ -466,7 +469,9 @@ namespace LoveOfCooking.Menu
             }
 
             // Fill slots with select ingredients
-            foreach (Ingredient ingredient in ingredientsToUse.Take(this.MaxIngredients))
+            foreach (Ingredient ingredient in ingredientsToUse
+                .DistinctBy(i => (i.WhichInventory, i.WhichItem))
+                .Take(this.MaxIngredients))
             {
 				this.AddToIngredients(ingredient);
             }
