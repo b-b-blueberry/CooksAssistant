@@ -1126,7 +1126,7 @@ namespace LoveOfCooking
 			if (who.team.specialOrders.Any(order => order is not null && order.objectives.Any(
 				obj => obj is DonateObjective donate
 					&& donate.dropBoxGameLocation.Value == location.Name
-					&& donate.dropBoxTileLocation.Value == new Vector2(x, y))))
+					&& donate.dropBoxTileLocation.Value == new Vector2(x, y - 1))))
 			{
 				return false;
 			}
