@@ -503,6 +503,10 @@ namespace LoveOfCooking.Menu
 			if (this.RecipeInfo is not null && index == this.RecipeInfo.Index)
 				return false;
 
+            // Prevent users from changing recipe during interaction blocks (i.e. cook animations)
+            if (!this._canInteract)
+                return false;
+
 			// Set new recipe
 			this.RecipeInfo = new(name, index);
 
