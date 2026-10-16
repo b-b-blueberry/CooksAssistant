@@ -434,18 +434,37 @@ namespace LoveOfCooking.Menu
 
         internal void AutoFillIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems)
         {
-            // Don't fill slots if the player isn't able to cook the recipe
-            if (recipe is null
-                || (!CookingTool.IsMaxLevel() && this.MaxIngredients < Utils.BoundedNumberOfIngredients(recipe))
-                || this.GetAmountCraftable(recipe, sourceItems, limitToCurrentIngredients: false, limit: 1) <= 0)
+            if (recipe is null)
                 return;
+
+            List<Ingredient?> ingredients = this.GetAutofillIngredients(recipe, sourceItems);
+
+            if (this.IngredientMatcherFor(recipe).ChooseIngredientsForCrafting(recipe, ingredients) is null)
+                return;
+
+            this.ClearCurrentIngredients();
+
+            foreach (Ingredient? ingredient in ingredients)
+                this.AddToIngredients(ingredient.Value);
+        }
+
+        internal bool CanCraftAny(CraftingRecipe recipe, List<IList<Item>> sourceItems)
+        {
+            return recipe is not null
+                && this.IngredientMatcherFor(recipe).ChooseIngredientsForCrafting(recipe, this.GetAutofillIngredients(recipe, sourceItems)) is not null;
+        }
+
+        private List<Ingredient?> GetAutofillIngredients(CraftingRecipe recipe, List<IList<Item>> sourceItems)
+        {
+            if (recipe is null || this.MaxIngredients <= 0)
+                return [];
 
             // Get all matching ingredients for recipe items
             List<Ingredient?> ingredients = this.GetMatchingIngredients(recipe, sourceItems);
 
             // Skip if no matching ingredients are found
             if (ingredients is null || !ingredients.Any())
-                return;
+                return [];
 
             // Reduce ingredients to try and complete the recipe in as many slots as we have,
             // sorting by stack counts to maximise the amount craftable
@@ -467,13 +486,11 @@ namespace LoveOfCooking.Menu
                 }
             }
 
-            // Fill slots with select ingredients
-            foreach (Ingredient ingredient in ingredientsToUse
+            return ingredientsToUse
                 .DistinctBy(i => (i.WhichInventory, i.WhichItem))
-                .Take(this.MaxIngredients))
-            {
-				this.AddToIngredients(ingredient);
-            }
+                .Take(this.MaxIngredients)
+                .Select(ingredient => (Ingredient?)ingredient)
+                .ToList();
         }
 
         private void RefreshCurrentIngredients(List<IList<Item>> sourceItems)

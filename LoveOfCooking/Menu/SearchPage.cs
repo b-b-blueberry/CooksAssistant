@@ -241,8 +241,7 @@ namespace LoveOfCooking.Menu
                     filterFunc = recipe => recipe.itemToProduce.All(item => !Game1.player.recipesCooked.ContainsKey(item));
                     break;
                 case Filter.Ready:
-                    filterFunc = recipe => Utils.BoundedNumberOfIngredients(recipe) <= this.Menu.CookingManager.MaxIngredients
-                        && 0 < this.Menu.CookingManager.GetAmountCraftable(recipe: recipe, sourceItems: this.Menu.Items, limitToCurrentIngredients: false, limit: 1);
+                    filterFunc = recipe => this.Menu.CookingManager.CanCraftAny(recipe, this.Menu.Items);
                     break;
                 case Filter.Favourite:
                     filterFunc = recipe => Instance.States.Value.FavouriteRecipes.Contains(recipe.name);

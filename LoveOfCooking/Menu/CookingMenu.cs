@@ -198,6 +198,7 @@ namespace LoveOfCooking.Menu
             public readonly Buff Buff;
             public int NumCraftable;
             public int NumReadyToCraft;
+            public bool CanCraftAny;
             public readonly List<int> IngredientQuantitiesHeld = new();
 
             public RecipeInfoClass(string name, int index)
@@ -237,6 +238,12 @@ namespace LoveOfCooking.Menu
 				: Utility.GetAllPlayerUnlockedCookingRecipes()
 					.Select(str => new CraftingRecipe(str, true))
 					.Where(recipe => recipe.name != InvalidRecipeName).ToList();
+
+            // Prepare SpaceCore custom recipes
+            recipes = recipes.Select(recipe => recipe is not SpaceCore.Framework.CustomCraftingRecipe
+                && CustomCraftingRecipe.CookingRecipes.TryGetValue(recipe.name, out CustomCraftingRecipe customData)
+                    ? new SpaceCore.Framework.CustomCraftingRecipe(recipe.name, true, customData)
+                    : recipe).ToList();
 
 			// Create pages and their components with filtered recipes
 			this._searchPage = new(menu: this, values: recipes);
@@ -528,6 +535,8 @@ namespace LoveOfCooking.Menu
             this.RecipeInfo.IngredientQuantitiesHeld.AddRange(this.CookingManager.GetMatchingIngredientQuantities(recipe, this.Items));
 			this.RecipeInfo.NumCraftable = this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: false);
 			this.RecipeInfo.NumReadyToCraft = this.CookingManager.GetAmountCraftable(recipe, this.Items, limitToCurrentIngredients: true);
+            this.RecipeInfo.CanCraftAny = this.RecipeInfo.NumReadyToCraft > 0
+                || this.CookingManager.CanCraftAny(recipe, this.Items);
         }
 
         public void TryAutoFillIngredients(bool isClearedIfDisabled, bool? forceTo = null)

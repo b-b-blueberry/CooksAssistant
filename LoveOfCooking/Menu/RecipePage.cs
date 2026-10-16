@@ -283,7 +283,8 @@ namespace LoveOfCooking.Menu
 					text: text,
 					x: x + textOffset.X,
 					y: y + textOffset.Y,
-					colour: SubtextColour);
+					colour: this.Menu.RecipeInfo.NumCraftable > 0 && !this.Menu.RecipeInfo.CanCraftAny
+                        ? Color.Firebrick * 0.8f : SubtextColour);
 					if (Game1.options.showAdvancedCraftingInformation)
 					{
 						// Recipe craftable count
@@ -534,13 +535,10 @@ namespace LoveOfCooking.Menu
                 {
                     textOffset.Y += rowHeight;
 					bool okQuantity = this.Menu.RecipeInfo.IngredientQuantitiesHeld.Count > i;
-					bool okSlot = i < this.Menu.CookingManager.MaxIngredients || CookingTool.IsMaxLevel();
 
                     Color drawColour = (!okQuantity || this.Menu.RecipeInfo.IngredientQuantitiesHeld[i] < quantity)
                         ? BlockedColour
-                        : !okSlot
-                            ? Color.Firebrick * 0.8f
-                            : TextColour;
+                        : TextColour;
 
                     // Ingredient icon
                     b.Draw(
