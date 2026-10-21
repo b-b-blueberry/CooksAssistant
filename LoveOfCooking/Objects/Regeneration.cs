@@ -323,7 +323,7 @@ namespace LoveOfCooking
 		[EventPriority(EventPriority.Low)]
 		protected void Draw(object sender, RenderingHudEventArgs e)
 		{
-			if (!Game1.IsHudDrawn || this.RemainingValue.Total <= 0)
+			if (!Game1.IsHudDrawn || this.RemainingValue.Total <= 0 || Game1.eventUp)
 			{
 				return;
 			}
